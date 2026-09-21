@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en" data-site="memory">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n-title="train.title" data-i18n-title-suffix="Memory Training">MemoryDuel</title>
+  <meta name="description" data-i18n="train.meta_desc" content="MemoryDuel solo training — card matching, digit flash memory. Multiple difficulty levels. Personal bests saved locally. Free to play, privacy-first.">
+  <meta data-i18n="meta.auto.hc_记忆训练记忆力翻牌配对数字记忆_1529" name="keywords" content="Memory Training,memory,Card Matching,Number Memory,memory game,memory duel,brain training">
+  <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+
+  <!-- SEO: Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="MemoryDuel" />
+  <meta property="og:title" data-i18n="train.og_title" content="🧠 MemoryDuel · Memory Training Games" />
+  <meta property="og:description" data-i18n="train.og_desc" content="Card matching, digit flash, word flashcards. Multiple difficulty levels. Personal bests saved locally. Free to play, privacy-first." />
+  <meta property="og:url" content="https://memoryduel.com/train.html" />
+  <meta property="og:image" content="https://memoryduel.com/og-default.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="632" />
+  <meta property="og:image:alt" data-i18n="train.og_image_alt" content="MemoryDuel Training - Memory Games" />
+
+  <!-- SEO: Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" data-i18n="train.twitter_title" content="🧠 MemoryDuel · Memory Training" />
+  <meta name="twitter:description" data-i18n="train.twitter_desc" content="Card matching, digit flash, word flashcards · Offline memory training" />
+  <meta name="twitter:image" content="https://memoryduel.com/og-default.jpg" />
+
+  <!-- SEO: Canonical -->
+  <link rel="canonical" href="https://memoryduel.com/train.html" />
+
+  
+  
+  <link rel="alternate" hreflang="zh-CN" href="https://memoryduel.com/train.html" />
+  <link rel="alternate" hreflang="en" href="https://memoryduel.com/train.html?lang=en" />
+  <link rel="alternate" hreflang="ja" href="https://memoryduel.com/train.html?lang=ja" />
+  <link rel="alternate" hreflang="es" href="https://memoryduel.com/train.html?lang=es" />
+  <link rel="alternate" hreflang="fr" href="https://memoryduel.com/train.html?lang=fr" />
+  <link rel="alternate" hreflang="de" href="https://memoryduel.com/train.html?lang=de" />
+  <link rel="alternate" hreflang="x-default" href="https://memoryduel.com/train.html" />
+<!-- SEO: hreflang -->
+
+  <style>
+    /* ===== 复刻 mathduel 设计系统 ===== */
+    :root {
+      --p: #4f46e5; --p-d: #4338ca; --p-l: #eef2ff;
+      --g: #22b573; --g-l: #e7f9f0;
+      --o: #ff9f43; --o-l: #fff3e4;
+      --bg: #faf9ff; --card: #ffffff;
+      --t: #1e1b4b; --m: #6b7280;
+      --line: rgba(23, 24, 40, 0.08);
+      --r: 16px;
+      --shadow: 0 4px 16px rgba(60, 60, 120, 0.06);
+      --shadow-hover: 0 8px 24px rgba(60, 60, 120, 0.1);
+      --red: #dc2626; --red-l: #fee2e2;
+      --flip-dur: 0.4s;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--t); line-height: 1.6; }
+    a { color: inherit; text-decoration: none; }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+    nav { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+    .nav-in { display: flex; align-items: center; gap: 18px; height: 60px; }
+    .logo { font-weight: 800; font-size: 19px; }
+    .logo span { color: var(--p); }
+    .nav-links { display: flex; gap: 4px; margin-left: auto; }
+    .nav-links a { color: var(--m); font-size: 14px; padding: 8px 12px; border-radius: 999px; transition: all 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--p); background: var(--p-l); }
+    .hero { padding: 44px 0 26px; text-align: center; }
+    .hero h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.2; margin-bottom: 12px; }
+    .hero h1 em { font-style: normal; color: var(--p); }
+    .hero p { color: var(--m); font-size: 16px; max-width: 620px; margin: 0 auto 8px; }
+    .badge { display: inline-block; background: var(--p-l); color: var(--p-d); font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 999px; margin-bottom: 16px; }
+    section { padding: 36px 0 8px; }
+    .sec-head { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+    .sec-head .no { font-size: 13px; font-weight: 700; color: var(--p); background: var(--p-l); width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; }
+    .sec-head h2 { font-size: 24px; margin: 0; }
+    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+    .feature { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--card); border-radius: 12px; border: 1px solid var(--line); }
+    .feature .icon { font-size: 20px; }
+    .feature span { font-size: 14px; color: var(--m); }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 20px; box-shadow: var(--shadow); transition: all 0.2s; cursor: pointer; display: block; }
+    .card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); border-color: var(--p); }
+    .card h3 { margin: 12px 0 6px; font-size: 17px; display: flex; align-items: center; gap: 8px; }
+    .card p { margin: 0; color: var(--m); font-size: 14px; }
+    .card .icon { font-size: 28px; }
+    .card .tag { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--p-l); color: var(--p-d); font-weight: 600; }
+    .card .tag.hot { background: var(--o-l); color: #b45309; }
+    .card.active { border-color: var(--p); box-shadow: 0 8px 24px rgba(99,102,241,0.18); }
+    .card.active .icon { filter: none; }
+    .btn { display: inline-block; background: var(--p); color:#fff; border:none; border-radius:10px; padding:10px 18px; font-size:14px; font-weight:600; cursor:pointer; margin-top:12px; }
+    .btn.ghost { background: var(--p-l); color: var(--p-d); }
+    .account-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 20px; }
+    .account-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+    .account-row:last-child { border-bottom: none; }
+    .account-row .icon { font-size: 20px; }
+    .account-row .label { color: var(--m); font-size: 14px; flex: 1; }
+    .account-row .value { font-weight: 600; font-size: 14px; }
+    .account-row .value.highlight { color: var(--p); }
+    .stats-card { background: linear-gradient(135deg, var(--p-l), var(--g-l)); border-radius: 20px; padding: 24px; text-align: center; }
+    .stats-card h3 { font-size: 18px; margin-bottom: 16px; }
+    .stats-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .stat-item { text-align: center; min-width: 80px; }
+    .stat-item .val { font-size: 26px; font-weight: 800; color: var(--p); }
+    .stat-item .lab { font-size: 13px; color: var(--m); }
+    .stat-item .score { font-size: 12px; color: var(--m); }
+    footer { margin-top: 60px; border-top: 1px solid var(--line); background: var(--card); padding: 28px 0 40px; text-align: center; color: var(--m); font-size: 13px; }
+    footer a { color: var(--p); font-weight: 600; margin: 0 8px; }
+    footer a:hover { text-decoration: underline; }
+    @media (max-width: 640px) { .nav-links { display: none; } .hero { padding: 30px 0 20px; } .cards { grid-template-columns: 1fr; } }
+
+    /* ===== 游戏专属样式（沿用同一设计语言） ===== */
+    .diff-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 8px 0 4px; }
+    .diff-btn { border: 1px solid var(--line); background: var(--card); color: var(--m); padding: 6px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+    .diff-btn:hover { border-color: var(--p); color: var(--p); }
+    .diff-btn.active { background: var(--p-l); color: var(--p-d); border-color: var(--p); }
+    .stats { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 14px 0 18px; }
+    .stat { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 10px 18px; text-align: center; min-width: 84px; box-shadow: var(--shadow); }
+    .stat .lab { font-size: 12px; color: var(--m); }
+    .stat .val { font-size: 22px; font-weight: 800; color: var(--p); }
+    .stat .val.warn { color: var(--red); }
+
+    .board { display: grid; gap: 10px; justify-content: center; margin-bottom: 8px; }
+    .card2 { position: relative; width: 76px; height: 84px; cursor: pointer; perspective: 600px; -webkit-tap-highlight-color: transparent; }
+    .card2 .inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform var(--flip-dur); border-radius: 12px; }
+    .card2.flipped .inner, .card2.matched .inner { transform: rotateY(180deg); }
+    .card2 .face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; display: grid; place-items: center; border-radius: 12px; border: 1px solid var(--line); box-shadow: var(--shadow); }
+    .card2 .face.back { background: linear-gradient(135deg, var(--p-d), var(--p)); color: rgba(255,255,255,0.5); font-size: 20px; }
+    .card2 .face.front { background: var(--card); transform: rotateY(180deg); color: var(--p-d); }
+    .card2.matched .face.front { background: var(--g-l); color: var(--g); }
+    .card2 .face.front .glyph { font-size: 30px; font-weight: 700; }
+
+    .result { display: none; text-align: center; background: linear-gradient(135deg, var(--p-l), var(--g-l)); border-radius: 20px; padding: 26px 20px; margin-bottom: 24px; }
+    .result.show { display: block; }
+    .result h2 { font-size: 26px; margin-bottom: 6px; }
+    .result .stats-row { margin: 14px 0; }
+    .result .stat-item .val { font-size: 26px; }
+    .result .best { color: var(--g); font-weight: 700; }
+
+    .game-box { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 24px 18px; box-shadow: var(--shadow); display: flex; flex-direction: column; }
+    .nkey { font-size: 18px; min-width: 46px; padding: 8px 0; }
+
+    @media (max-width: 460px) { .card2 { width: 64px; height: 72px; } .card2 .face.front .glyph { font-size: 26px; } .board { gap: 8px; } }
+
+    /* ===== 对战模式样式 (MemoryDuel AI Battle) ===== */
+    .battle-stage {
+      position: fixed; inset: 0;
+      background: linear-gradient(135deg, var(--p-l) 0%, var(--bg) 100%);
+      z-index: 100; padding: 20px;
+      overflow-y: auto;
+      display: none;
+    }
+    .battle-stage.active { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
+    .battle-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(60, 60, 120, 0.12);
+      max-width: 720px; width: 100%; padding: 24px; margin: 0 auto;
+    }
+    .battle-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 20px; padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+    .battle-header h2 { margin: 0; font-size: 18px; color: var(--p-d); }
+    .battle-progress { font-size: 13px; color: var(--m); }
+    .battle-progress b { color: var(--p); font-size: 18px; }
+    .battle-scores {
+      display: grid; grid-template-columns: 1fr auto 1fr;
+      gap: 12px; align-items: center; margin-bottom: 20px;
+    }
+    .score-card {
+      background: var(--bg); border: 1px solid var(--line);
+      border-radius: 14px; padding: 12px 14px; text-align: center;
+    }
+    .score-card.you { background: linear-gradient(135deg, var(--p-l), #fff); }
+    .score-card.bot { background: linear-gradient(135deg, #fef3e4, #fff); }
+    .score-name { font-size: 13px; color: var(--m); margin-bottom: 4px; }
+    .score-val { font-size: 28px; font-weight: 800; color: var(--p); }
+    .score-card.bot .score-val { color: var(--o); }
+    .vs-badge {
+      background: var(--p); color: #fff; padding: 6px 12px;
+      border-radius: 999px; font-size: 12px; font-weight: 700;
+    }
+    .battle-timer {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+    }
+    .timer-bar {
+      flex: 1; height: 8px; background: var(--line);
+      border-radius: 999px; overflow: hidden;
+    }
+    .timer-fill {
+      height: 100%; background: linear-gradient(90deg, var(--g), var(--o), #dc2626);
+      transition: width 0.2s linear;
+    }
+    .timer-val { font-size: 14px; font-weight: 700; color: var(--p-d); min-width: 32px; text-align: right; }
+    .battle-question {
+      font-size: 19px; line-height: 1.55; color: var(--t);
+      margin: 16px 0 20px; min-height: 60px;
+    }
+    .battle-options { display: grid; gap: 10px; }
+    .battle-opt {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px; border: 2px solid var(--line);
+      border-radius: 12px; background: var(--card);
+      font-size: 15px; cursor: pointer; transition: all 0.15s;
+      text-align: left; width: 100%; color: var(--t);
+    }
+    .battle-opt:hover:not(:disabled) { border-color: var(--p); background: var(--p-l); }
+    .battle-opt:disabled { cursor: not-allowed; opacity: 0.7; }
+    .battle-opt.correct { border-color: var(--g); background: var(--g-l); }
+    .battle-opt.wrong { border-color: #dc2626; background: #fee2e2; }
+    .battle-opt .opt-letter {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--p-l); color: var(--p-d);
+      display: grid; place-items: center; font-weight: 700; font-size: 14px;
+      flex-shrink: 0;
+    }
+    .battle-opt.correct .opt-letter { background: var(--g); color: #fff; }
+    .battle-opt.wrong .opt-letter { background: #dc2626; color: #fff; }
+    .battle-explain {
+      margin-top: 14px; padding: 12px 14px;
+      background: var(--p-l); border-radius: 10px;
+      font-size: 13px; color: var(--m); line-height: 1.5;
+      display: none;
+    }
+    .battle-explain.show { display: block; }
+    .battle-explain b { color: var(--p-d); }
+    .battle-result {
+      text-align: center; padding: 32px 20px;
+    }
+    .battle-result h2 { font-size: 32px; margin-bottom: 8px; }
+    .battle-result.win h2 { color: var(--g); }
+    .battle-result.lose h2 { color: #dc2626; }
+    .battle-result.draw h2 { color: var(--m); }
+    .battle-result .score-big {
+      font-size: 48px; font-weight: 900; color: var(--p);
+      margin: 16px 0;
+    }
+    .battle-actions { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+    .battle-bot-thinking {
+      text-align: center; padding: 14px;
+      color: var(--m); font-size: 13px; font-style: italic;
+    }
+  </style>
+  <link rel="stylesheet" href="/css/shared/tokens.css?v=p4fix2">
+  <link rel="stylesheet" href="/css/shared/brand-ds2.css?v=ds2-22">
+  <link rel="manifest" href="/manifest.zh.webmanifest">
+</head>
+<body>
+
+<div id="site-header" style="min-height:65px"
+     data-brand-a="Memory" data-brand-b="Duel" data-mark="duel-brain"
+     data-nav='[{"label":"Home","href":"/","i18n":"nav.home"}]'
+     data-cta-label="Home" data-cta-href="/" data-cta-i18n="nav.home"></div>
+
+<!-- Battle Stage (AI / Online duel) -->
+  <div class="battle-stage" id="battleStage">
+    <div class="battle-card" id="battleCard">
+      <div class="battle-header">
+        <h2 id="battleTitle">⚔️ AI Battle</h2>
+        <div class="battle-progress">
+          Question <b id="battleCur">1</b> / <span id="battleTotal">10</span>
+        </div>
+      </div>
+      <div class="battle-scores">
+        <div class="score-card you">
+          <div class="score-name" id="battleYouName" data-i18n="mm_train_4">You</div>
+          <div class="score-val" id="battleYouScore">0</div>
+        </div>
+        <div class="vs-badge">VS</div>
+        <div class="score-card bot">
+          <div class="score-name" id="battleBotName">AI</div>
+          <div class="score-val" id="battleBotScore">0</div>
+        </div>
+      </div>
+      <div class="battle-timer">
+        <div class="timer-bar"><div class="timer-fill" id="battleTimerFill"></div></div>
+        <div class="timer-val" id="battleTimerVal">15</div>
+      </div>
+      <div class="battle-question" id="battleQuestion">Loading...</div>
+      <div class="battle-options" id="battleOptions"></div>
+      <div class="battle-explain" id="battleExplain"></div>
+      <div class="battle-bot-thinking" id="battleBotThinking" style="display:none">🤖 Bot is thinking...</div>
+      <div class="battle-actions" id="battleActions"></div>
+    </div>
+  </div>
+
+  <script>
+
+<!-- Shared JS (load order: i18n -> quiz-data -> battle engine) -->
+<script defer src="/js/toast.js?v=p3"></script>
+<script defer src="/js/sidebar.js?v=sb34"></script>
+<script src="/assets/quiz-data.js?v=qd2" defer></script>
+<script src="/i18n/i18n.js?v=33" defer></script>
+
+<!-- Battle Engine: real AI / Online duel game logic -->
+  <script>
+  (function() {
+    'use strict';
+    // === i18n helpers (T = translate with fallback, zhOnly = return zh fallback if lang=zh) ===
+    var T = function (key, fallback) {
+      try {
+        if (window.__t) return window.__t(key, fallback);
+        if (window.t) return window.t(key, fallback);
+        if (window.i18n && window.i18n.t) return window.i18n.t(key, fallback);
+      } catch (e) {}
+      return (fallback != null) ? fallback : key;
+    };
+    var __t = T;
+    var zhOnly = function (zh, en) { return (getLang() === 'zh') ? zh : (en || zh); };
+
+    var params = new URLSearchParams(location.search);
+    var mode = params.get('mode');     // 'ai' or 'online'
+    var room = params.get('room');     // room code (online)
+    var cat  = params.get('cat') || 'general';
+    if (!mode && !room) return;        // 直接打开 train.html 时不启动 duel
+
+    /* ===== Battle 配置 ===== */
+    var TOTAL_ROUNDS = 10;
+    var PER_QUESTION_MS = 15000;      // 15 秒 / 题
+    var BOT_MIN_THINK = 2000;          // 2 秒
+    var BOT_MAX_THINK = 9000;          // 9 秒
+    var BOT_ACCURACY = 0.62;           // AI 整体正确率（随难度可调）
+
+    var BOT_NAMES_BY_LANG = (function () {
+      var m = {};
+      ['zh','en','ja','es','fr','de'].forEach(function (l) {
+        var v = T('train.bot_names', '');
+        m[l] = v ? v.split(',') : [];
+      });
+      return m;
+    })();
+
+    function getLang() { return (window.i18n && window.i18n.getLang) ? window.i18n.getLang() : 'en'; }
+    function pickBotName() {
+      var list = BOT_NAMES_BY_LANG[getLang()] || BOT_NAMES_BY_LANG.en;
+      return list[Math.floor(Math.random() * list.length)];
+    }
+    function shuffleArr(a) {
+      for (var i = a.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var t = a[i]; a[i] = a[j]; a[j] = t;
+      }
+      return a;
+    }
+
+    function ensureQuiz(cb) {
+      if (window.MemoryDuelQuiz && window.MemoryDuelQuiz.ready) return cb();
+      if (window.MemoryDuelQuiz && window.MemoryDuelQuiz.ensureLoaded) {
+        window.MemoryDuelQuiz.ensureLoaded().then(cb).catch(function() {
+          showError('Failed to load quiz data. Please refresh and try again.');
+        });
+        return;
+      }
+      // quiz-data.js 还没加载：等 memoryduel-quiz-ready
+      window.addEventListener('memoryduel-quiz-ready', function once() {
+        if (window.MemoryDuelQuiz && window.MemoryDuelQuiz.ensureLoaded) {
+          window.MemoryDuelQuiz.ensureLoaded().then(cb).catch(function() {
+            showError('Failed to load quiz data. Please refresh and try again.');
+          });
+        } else {
+          showError('Quiz module not loaded. Please refresh and try again.');
+        }
+      }, { once: true });
+    }
+
+    function showError(msg) {
+      var stage = document.getElementById('battleStage');
+      if (!stage) { alert(msg); return; }
+      stage.classList.add('active');
+      var card = document.getElementById('battleCard');
+      card.innerHTML =
+        '<div style="text-align:center;padding:40px 20px">' +
+          '<h2 style="color:#dc2626;margin-bottom:12px">⚠️ Error</h2>' +
+          '<p style="color:#6b7280;margin-bottom:20px">' + msg + '</p>' +
+          '<button class="btn" onclick="location.href=\'/\'">Back to Lobby</button>' +
+        '</div>';
+    }
+
+    /* ===== Battle State ===== */
+    var B = {
+      questions: [],
+      idx: 0,
+      youScore: 0,
+      botScore: 0,
+      timer: null,
+      timerStart: 0,
+      answered: false,
+      botAnswered: false,
+      botCorrect: false,
+      botThinkTimer: null,
+    };
+
+    function startBattle(questions) {
+      if (!questions || questions.length === 0) {
+        showError('No questions available for this category.');
+        return;
+      }
+      B.questions = shuffleArr(questions.slice(0, Math.max(TOTAL_ROUNDS, questions.length))).slice(0, TOTAL_ROUNDS);
+      B.idx = 0;
+      B.youScore = 0;
+      B.botScore = 0;
+      document.getElementById('battleStage').classList.add('active');
+      document.getElementById('battleTotal').textContent = B.questions.length;
+      document.getElementById('battleBotName').textContent = pickBotName();
+      document.getElementById('battleYouName').textContent = T('train.you_label','You');
+      updateScores();
+      nextQuestion();
+    }
+
+    function updateScores() {
+      document.getElementById('battleYouScore').textContent = B.youScore;
+      document.getElementById('battleBotScore').textContent = B.botScore;
+      document.getElementById('battleCur').textContent = (B.idx + 1);
+    }
+
+    function nextQuestion() {
+      if (B.idx >= B.questions.length) { finishBattle(); return; }
+      B.answered = false;
+      B.botAnswered = false;
+      B.botCorrect = false;
+
+      var q = B.questions[B.idx];
+      var lang = getLang();
+      // 题面/选项优先用 qn[lang]/op[lang]，fallback 到 en，再 fallback 到 q/op（后端字段）
+      var text = (q.qn && (q.qn[lang] || q.qn.en)) || q.q || '';
+      var options = (q.op && (q.op[lang] || q.op.en)) || q.options || [];
+      var correct = q.ans;
+
+      document.getElementById('battleQuestion').textContent = text;
+      document.getElementById('battleExplain').classList.remove('show');
+      document.getElementById('battleExplain').innerHTML = '';
+      document.getElementById('battleBotThinking').style.display = 'none';
+      document.getElementById('battleActions').innerHTML = '';
+
+      var letters = ['A','B','C','D','E','F'];
+      var optsHtml = '';
+      for (var i = 0; i < options.length; i++) {
+        optsHtml +=
+          '<button class="battle-opt" data-idx="' + i + '">' +
+            '<span class="opt-letter">' + (letters[i] || '?') + '</span>' +
+            '<span>' + options[i] + '</span>' +
+          '</button>';
+      }
+      var optsEl = document.getElementById('battleOptions');
+      optsEl.innerHTML = optsHtml;
+      Array.prototype.forEach.call(optsEl.querySelectorAll('.battle-opt'), function(btn) {
+        btn.addEventListener('click', function() { onUserAnswer(parseInt(btn.dataset.idx, 10), correct); });
+      });
+
+      startTimer();
+      // Bot 同时开始“思考”
+      scheduleBotAnswer(correct);
+    }
+
+    function startTimer() {
+      B.timerStart = Date.now();
+      if (B.timer) clearInterval(B.timer);
+      var fill = document.getElementById('battleTimerFill');
+      var val = document.getElementById('battleTimerVal');
+      B.timer = setInterval(function() {
+        var elapsed = Date.now() - B.timerStart;
+        var left = Math.max(0, PER_QUESTION_MS - elapsed);
+        var pct = (left / PER_QUESTION_MS) * 100;
+        fill.style.width = pct + '%';
+        val.textContent = Math.ceil(left / 1000);
+        if (left <= 0) {
+          clearInterval(B.timer);
+          if (!B.answered) onUserTimeout();
+        }
+      }, 100);
+    }
+
+    function scheduleBotAnswer(correct) {
+      if (B.botThinkTimer) clearTimeout(B.botThinkTimer);
+      var thinkMs = BOT_MIN_THINK + Math.random() * (BOT_MAX_THINK - BOT_MIN_THINK);
+      document.getElementById('battleBotThinking').style.display = 'block';
+      B.botThinkTimer = setTimeout(function() {
+        document.getElementById('battleBotThinking').style.display = 'none';
+        // Bot 答题：正确率 BOT_ACCURACY，否则随机错答
+        B.botCorrect = Math.random() < BOT_ACCURACY;
+        var q = B.questions[B.idx];
+        var options = (q.op && (q.op[getLang()] || q.op.en)) || q.options || [];
+        var wrong = [];
+        for (var i = 0; i < options.length; i++) if (i !== correct) wrong.push(i);
+        var botAnswer = B.botCorrect
+          ? correct
+          : (wrong.length ? wrong[Math.floor(Math.random() * wrong.length)] : correct);
+        var btns = document.querySelectorAll('.battle-opt');
+        if (btns[botAnswer] && !B.answered) {
+          // 用户还没答：Bot 抢先给分
+          if (B.botCorrect) { B.botScore++; updateScores(); }
+        }
+        // 保存 Bot 的选择，等到 onUserAnswer 高亮
+        B._botChoice = botAnswer;
+      }, thinkMs);
+    }
+
+    function onUserAnswer(idx, correct) {
+      if (B.answered) return;
+      B.answered = true;
+      clearInterval(B.timer);
+      if (B.botThinkTimer) { clearTimeout(B.botThinkTimer); B.botThinkTimer = null; }
+      document.getElementById('battleBotThinking').style.display = 'none';
+
+      var btns = document.querySelectorAll('.battle-opt');
+      if (btns[correct]) btns[correct].classList.add('correct');
+      if (idx === correct) B.youScore++;
+      else if (btns[idx]) btns[idx].classList.add('wrong');
+
+      Array.prototype.forEach.call(btns, function(b) { b.disabled = true; });
+
+      // 显示解释
+      var q = B.questions[B.idx];
+      var lang = getLang();
+      var explain = (q.ex && (q.ex[lang] || q.ex.en)) || q.explain || '';
+      if (explain) {
+        document.getElementById('battleExplain').innerHTML =
+          T('battle.answer_prefix','Answer: ') + '<b>' + (correct + 1) + '</b> · ' + explain;
+        document.getElementById('battleExplain').classList.add('show');
+      }
+
+      // 高亮 Bot 的选择
+      var botChoice = B._botChoice;
+      if (typeof botChoice === 'number' && btns[botChoice] && !btns[botChoice].classList.contains('correct') && !btns[botChoice].classList.contains('wrong')) {
+        if (B.botCorrect) btns[botChoice].classList.add('correct');
+        else btns[botChoice].classList.add('wrong');
+      }
+
+      updateScores();
+      setTimeout(showNextButton, 800);
+    }
+
+    function onUserTimeout() {
+      B.answered = true;
+      if (B.botThinkTimer) { clearTimeout(B.botThinkTimer); B.botThinkTimer = null; }
+      document.getElementById('battleBotThinking').style.display = 'none';
+      var btns = document.querySelectorAll('.battle-opt');
+      var correct = B.questions[B.idx].ans;
+      if (btns[correct]) btns[correct].classList.add('correct');
+      Array.prototype.forEach.call(btns, function(b) { b.disabled = true; });
+      var q = B.questions[B.idx];
+      var lang = getLang();
+      var explain = (q.ex && (q.ex[lang] || q.ex.en)) || q.explain || '';
+      if (explain) {
+        document.getElementById('battleExplain').innerHTML =
+          T('battle.timeout_prefix','⏰ Time\'s up! ') + T('battle.answer_prefix','Answer: ') + '<b>' + (correct + 1) + '</b> · ' + explain;
+        document.getElementById('battleExplain').classList.add('show');
+      }
+      // Bot 可能已经抢答加分了
+      setTimeout(showNextButton, 400);
+    }
+
+    function showNextButton() {
+      var isLast = B.idx >= B.questions.length - 1;
+      var html = '<button class="btn" id="battleNext">' + (isLast ? T('battle.see_result','See Result') : T('battle.next','Next →')) + '</button>';
+      document.getElementById('battleActions').innerHTML = html;
+      document.getElementById('battleNext').addEventListener('click', function() {
+        B.idx++;
+        updateScores();
+        nextQuestion();
+      });
+    }
+
+    function finishBattle() {
+      clearInterval(B.timer);
+      if (B.botThinkTimer) { clearTimeout(B.botThinkTimer); B.botThinkTimer = null; }
+      document.getElementById('battleBotThinking').style.display = 'none';
+      var outcome, title;
+      if (B.youScore > B.botScore) { outcome = 'win'; title = T('battle.you_win','🎉 You win!'); }
+      else if (B.youScore < B.botScore) { outcome = 'lose'; title = T('battle.you_lose','😔 You lose. Try again!'); }
+      else { outcome = 'draw'; title = T('battle.draw','🤝 Draw!'); }
+      var youVal = B.youScore;
+      var botVal = B.botScore;
+      var total = B.questions.length;
+      var card = document.getElementById('battleCard');
+      card.innerHTML =
+        '<div class="battle-result ' + outcome + '">' +
+          '<h2>' + title + '</h2>' +
+          '<div class="battle-scores">' +
+            '<div class="score-card you"><div class="score-name">' + T('train.you_label','You') + '</div><div class="score-val">' + youVal + '</div></div>' +
+            '<div class="vs-badge">VS</div>' +
+            '<div class="score-card bot"><div class="score-name">' + document.getElementById('battleBotName').textContent + '</div><div class="score-val">' + botVal + '</div></div>' +
+          '</div>' +
+          '<div class="score-big">' + youVal + ' : ' + botVal + '</div>' +
+          '<p style="color:#6b7280;margin-top:8px">' + T('train.total_questions','Total {n} questions · You got {y} right').replace('{n}', total).replace('{y}', youVal) + '</p>' +
+          '<div class="battle-actions">' +
+            '<button class="btn" onclick="location.reload()">🔁 ' + T('train.battle_retry','Play again') + '</button>' +
+            '<button class="btn ghost" onclick="location.href=\'/\'">← ' + T('battle.back_lobby','Back to Lobby') + '</button>' +
+          '</div>' +
+        '</div>';
+    }
+
+    function startAiBattle(category) {
+      // Fast single-category load (avoid waiting for 12×2000 serial ensureLoaded)
+      var Q = window.MemoryDuelQuiz;
+      if (!Q || !Q.fetchBundle) {
+        // quiz-data.js still loading: wait for memoryduel-quiz-ready
+        window.addEventListener('memoryduel-quiz-ready', function once() {
+          startAiBattle(category);
+        }, { once: true });
+        return;
+      }
+      // 1) Already loaded? Use cache.
+      var pool = (Q.byCategory && Q.byCategory(category)) || [];
+      if (pool.length > 0) { startBattle(pool); return; }
+      // 2) Fast-path: fetch only this category (count=60, ~0.4s)
+      Q.fetchBundle(category, 1).then(function(arr) {
+        // Push to QUESTIONS so byCategory works on retry
+        if (arr && arr.length > 0) {
+          for (var i = 0; i < arr.length; i++) Q.QUESTIONS.push(arr[i]);
+        }
+        var pool2 = (Q.byCategory && Q.byCategory(category)) || [];
+        if (pool2.length > 0) startBattle(pool2);
+        else showError('"' + category + '" ' + T('battle.quiz_empty_inline','Quiz bank is empty. Please choose another category.'));
+      }).catch(function() {
+        showError(T('battle.load_failed','Failed to load quiz data. Please refresh and try again.'));
+      });
+    }
+
+    /* ===== 在线对战（真实服务端:匹配建房 → 开局发题 → 服务端判分）===== */
+    var PID = ''; // 会话签发后由 ensureSession 填充(F-010,不再用客户端自造 id)
+    var OL = {
+      code: '', category: 'general', totalRounds: 10,
+      questions: [], idx: 0, myScore: 0, oppScore: 0, oppName: '',
+      timer: null, timerStart: 0, answered: false,
+      pollTimer: null, statusTimer: null, isHost: false,
+    };
+
+    function escHtml(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+
+    function mdApi(method, path, body, retry) {
+      return ensureSession().then(function (s) {
+        var opts = { method: method, headers: { 'X-Player-ID': s.pid, 'X-Player-Token': s.token } };
+        if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
+        var apiPath = (typeof window !== 'undefined' && window.API_BASE ? window.API_BASE + path : path);
+        return fetch(apiPath, opts).then(function (r) { return r.json(); }).then(function (j) {
+          // 会话失效(KV 过期/清库)→ 清缓存重新签发并重试一次
+          if (!j || !j.ok) {
+            if (j && j.error && j.error.code === 'UNAUTHORIZED' && !retry) {
+              try { localStorage.removeItem('md_session'); } catch (e) {}
+              sessionPromise = null;
+              return mdApi(method, path, body, true);
+            }
+            throw new Error((j && j.error && (j.error.msg || j.error.code)) || 'api_error');
+          }
+          return j.data;
+        });
+      });
+    }
+
+    // 会话(F-010): pid/token 由服务端签发并配对, 不再自造 Math.random 身份
+    var sessionPromise = null;
+    function ensureSession() {
+      if (sessionPromise) return sessionPromise;
+      sessionPromise = (function () {
+        var s = null;
+        try { s = JSON.parse(localStorage.getItem('md_session') || 'null'); } catch (e) {}
+        if (s && s.pid && s.token) return Promise.resolve(s);
+        return fetch((window.API_BASE || '') + '/api/md/session', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+          .then(function (r) { return r.json(); })
+          .then(function (j) {
+            if (!j || !j.ok || !j.data || !j.data.pid) throw new Error('session failed');
+            s = { pid: j.data.pid, token: j.data.token };
+            try { localStorage.setItem('md_session', JSON.stringify(s)); } catch (e) {}
+            return s;
+          });
+      })();
+      return sessionPromise;
+    }
+
+    // 在线路径报错:先清理等待卡/轮询,再走通用 showError
+    function olShowError(msg) {
+      olCleanup();
+      showError(msg);
+    }
+
+    function olCleanup() {
+      if (OL.statusTimer) { clearInterval(OL.statusTimer); OL.statusTimer = null; }
+      if (OL.pollTimer) { clearInterval(OL.pollTimer); OL.pollTimer = null; }
+      if (OL.timer) clearInterval(OL.timer);
+      var wc = document.getElementById('olWaitingCard');
+      if (wc && wc.parentNode) wc.parentNode.removeChild(wc);
+      var bc = document.getElementById('battleCard');
+      if (bc) bc.style.display = '';
+    }
+
+    function startOnlineRoom(roomCode) {
+      var code = String(roomCode || '').trim().toUpperCase();
+      // 只接受服务端房间码格式(6 位大写字母/数字),伪造房间码直接报错
+      if (!/^[A-Z2-9]{6}$/.test(code)) {
+        olShowError(T('lobby.invalid_room_code','Invalid room code (must be 6 uppercase letters or digits).'));
+        return;
+      }
+      OL.code = code;
+      ensureSession().then(function (s) { PID = s.pid; joinRoomFlow(); })
+        .catch(function () { olShowError(T('lobby.session_init_failed','Session init failed. Please refresh and retry.')); });
+    }
+
+    function joinRoomFlow() {
+      mdApi('POST', '/api/md/room/join', { code: OL.code, name: 'Player' })
+        .then(function (room) { showWaiting(room); })
+        .catch(function (err) {
+          // join 失败 → 查状态:已开局则断线重连拉题;已在房间(预加入)则进等待室;否则报错
+          mdApi('GET', '/api/md/room/status?code=' + encodeURIComponent(OL.code))
+            .then(function (st) {
+              if (st.status === 'playing') return fetchQuestions();
+              var mine = (st.players || []).some(function (p) { return p.pid === PID; });
+              if (mine) return showWaiting(st);
+              throw err;
+            })
+            .catch(function () { olShowError(T('lobby.room_not_found','Room not found, full, or expired.') + ' (' + err.message + ')'); });
+        });
+    }
+
+    function showWaiting(room) {
+      OL.isHost = !!(room.players[0] && room.players[0].pid === PID);
+      OL.category = room.category || 'general';
+      OL.totalRounds = room.rounds || room.totalRounds || 10;
+      var opp = null;
+      room.players.forEach(function (p) { if (p.pid !== PID && !opp) opp = p; });
+      if (opp) OL.oppName = opp.name;
+      var zh = getLang() === 'zh';
+      var stage = document.getElementById('battleStage');
+      stage.classList.add('active');
+      // 隐藏对战面板(其子元素是渲染必需的,不能销毁),等待室用独立卡片
+      document.getElementById('battleCard').style.display = 'none';
+      var waitEl = document.getElementById('olWaitingCard');
+      if (!waitEl) {
+        waitEl = document.createElement('div');
+        waitEl.className = 'battle-card';
+        waitEl.id = 'olWaitingCard';
+        stage.appendChild(waitEl);
+      }
+      var namesHtml = room.players.map(function (p) {
+        return '<div class="score-card ' + (p.pid === PID ? 'you' : 'bot') + '"><div class="score-name">' +
+          escHtml(p.name) + (p.host ? ' 👑' : '') + '</div><div class="score-val">' +
+          (p.pid === PID ? T('train.you_label','You') : 'P2') + '</div></div>';
+      }).join('<div class="vs-badge">VS</div>');
+      var startBox = OL.isHost
+        ? '<button class="btn" id="olStart">▶ ' + T('room.start_battle','Start Battle') + '</button>'
+        : '<p style="color:#6b7280">' + T('room.waiting_host','Waiting for host to start…') + '</p>';
+      waitEl.innerHTML =
+        '<div style="text-align:center;padding:30px 16px">' +
+          '<h2 style="margin-bottom:8px">🌐 Room ' + escHtml(OL.code) + '</h2>' +
+          '<h3 style="margin-bottom:16px">' + T('room.room_ready','Room Ready') + '</h3>' +
+          '<div class="battle-scores">' + namesHtml + '</div>' +
+          '<div id="olWaitBox" style="margin-top:18px">' + startBox + '</div>' +
+          '<div class="battle-actions" style="margin-top:16px"><button class="btn ghost" onclick="location.href=\'/\'">← ' + T('battle.back_lobby','Back to Lobby') + '</button></div>' +
+        '</div>';
+      var sb = document.getElementById('olStart');
+      if (sb) sb.addEventListener('click', hostStart);
+      // 轮询:开局后自动进入对局
+      if (OL.statusTimer) clearInterval(OL.statusTimer);
+      OL.statusTimer = setInterval(function () {
+        mdApi('GET', '/api/md/room/status?code=' + encodeURIComponent(OL.code)).then(function (st) {
+          if (st.status === 'playing') {
+            clearInterval(OL.statusTimer); OL.statusTimer = null;
+            fetchQuestions();
+          }
+        }).catch(function () {});
+      }, 2000);
+    }
+
+    function hostStart() {
+      mdApi('POST', '/api/md/room/start', { code: OL.code, category: OL.category, lang: getLang(), rounds: OL.totalRounds })
+        .then(function (d) { beginOnlineBattle(d.questions); })
+        .catch(function (err) { olShowError(T('room.start_failed','Start failed: ') + err.message); });
+    }
+
+    function fetchQuestions() {
+      mdApi('GET', '/api/md/room/questions?code=' + encodeURIComponent(OL.code))
+        .then(function (d) { beginOnlineBattle(d.questions); })
+        .catch(function (err) { olShowError(T('room.fetch_questions_failed','Failed to load questions: ') + err.message); });
+    }
+
+    function beginOnlineBattle(questions) {
+      if (OL.statusTimer) { clearInterval(OL.statusTimer); OL.statusTimer = null; }
+      if (!questions || !questions.length) { olShowError(T('room.bank_empty','Quiz bank is empty. Cannot start.')); return; }
+      // 收起等待室,恢复对战面板
+      var wc = document.getElementById('olWaitingCard');
+      if (wc && wc.parentNode) wc.parentNode.removeChild(wc);
+      document.getElementById('battleCard').style.display = '';
+      OL.questions = questions;
+      OL.idx = 0; OL.myScore = 0; OL.oppScore = 0; OL.answered = false;
+      document.getElementById('battleTitle').innerHTML = '🌐 Room ' + escHtml(OL.code);
+      document.getElementById('battleTotal').textContent = questions.length;
+      document.getElementById('battleYouName').textContent = T('train.you_label','You');
+      document.getElementById('battleBotName').textContent = OL.oppName || 'Opponent';
+      document.getElementById('battleBotThinking').style.display = 'none';
+      updateOnlineScores();
+      renderOnlineQuestion();
+      startOppPolling();
+    }
+
+    function updateOnlineScores() {
+      document.getElementById('battleYouScore').textContent = OL.myScore;
+      document.getElementById('battleBotScore').textContent = OL.oppScore;
+      document.getElementById('battleCur').textContent = (OL.idx + 1);
+    }
+
+    function renderOnlineQuestion() {
+      if (OL.idx >= OL.questions.length) { finishOnline(); return; }
+      OL.answered = false;
+      var q = OL.questions[OL.idx];
+      var options = q.options || [];
+      document.getElementById('battleQuestion').textContent = q.q || '';
+      document.getElementById('battleExplain').classList.remove('show');
+      document.getElementById('battleExplain').innerHTML = '';
+      document.getElementById('battleBotThinking').style.display = 'none';
+      document.getElementById('battleActions').innerHTML = '';
+      var letters = ['A','B','C','D','E','F'];
+      var optsHtml = '';
+      for (var i = 0; i < options.length; i++) {
+        optsHtml += '<button class="battle-opt" data-idx="' + i + '">' +
+          '<span class="opt-letter">' + (letters[i] || '?') + '</span>' +
+          '<span>' + escHtml(options[i]) + '</span></button>';
+      }
+      var optsEl = document.getElementById('battleOptions');
+      optsEl.innerHTML = optsHtml;
+      Array.prototype.forEach.call(optsEl.querySelectorAll('.battle-opt'), function (btn) {
+        btn.addEventListener('click', function () { onOnlineAnswer(parseInt(btn.dataset.idx, 10)); });
+      });
+      startOnlineTimer();
+    }
+
+    function startOnlineTimer() {
+      OL.timerStart = Date.now();
+      if (OL.timer) clearInterval(OL.timer);
+      var fill = document.getElementById('battleTimerFill');
+      var val = document.getElementById('battleTimerVal');
+      OL.timer = setInterval(function () {
+        var left = Math.max(0, PER_QUESTION_MS - (Date.now() - OL.timerStart));
+        fill.style.width = (left / PER_QUESTION_MS * 100) + '%';
+        val.textContent = Math.ceil(left / 1000);
+        if (left <= 0) { clearInterval(OL.timer); if (!OL.answered) onOnlineTimeout(); }
+      }, 100);
+    }
+
+    function onOnlineAnswer(idx) {
+      if (OL.answered) return;
+      OL.answered = true;
+      clearInterval(OL.timer);
+      var ms = Date.now() - OL.timerStart;
+      var btns = document.querySelectorAll('#battleOptions .battle-opt');
+      Array.prototype.forEach.call(btns, function (b) { b.disabled = true; });
+      mdApi('POST', '/api/md/answer', { code: OL.code, round: OL.idx, option: idx, ms: ms })
+        .then(function (r) {
+          if (r.score !== undefined) OL.myScore = r.score;
+          var key = (r.answerKey !== undefined && r.answerKey !== null) ? r.answerKey : -1;
+          if (btns[key]) btns[key].classList.add('correct');
+          if (!r.correct && btns[idx]) btns[idx].classList.add('wrong');
+          updateOnlineScores();
+          showOnlineNext('');
+        })
+        .catch(function (err) {
+          // 提交失败(网络/房间异常):本题不判分,允许继续
+          showOnlineNext(T('battle.submit_failed','Submit failed: ') + err.message);
+        });
+    }
+
+    function onOnlineTimeout() {
+      OL.answered = true;
+      var btns = document.querySelectorAll('#battleOptions .battle-opt');
+      Array.prototype.forEach.call(btns, function (b) { b.disabled = true; });
+      var zh = getLang() === 'zh';
+      document.getElementById('battleExplain').innerHTML =
+        '<b>⏰ ' + T('battle.timeout_prefix','⏰ Time\'s up! ').replace(/ .*$/,'') + '</b>' + T('battle.timeout_no_score','No score for this question.');
+      document.getElementById('battleExplain').classList.add('show');
+      showOnlineNext('');
+    }
+
+    function showOnlineNext(errMsg) {
+      var isLast = OL.idx >= OL.questions.length - 1;
+      var zh = getLang() === 'zh';
+      var html = '';
+      if (errMsg) html += '<p style="color:#dc2626;font-size:13px;margin:0 0 8px">' + escHtml(errMsg) + '</p>';
+      html += '<button class="btn" id="olNext">' + (isLast ? T('battle.see_result','See Result') : T('battle.next','Next →')) + '</button>';
+      document.getElementById('battleActions').innerHTML = html;
+      document.getElementById('olNext').addEventListener('click', function () {
+        OL.idx++;
+        updateOnlineScores();
+        renderOnlineQuestion();
+      });
+    }
+
+    function startOppPolling() {
+      if (OL.pollTimer) clearInterval(OL.pollTimer);
+      OL.pollTimer = setInterval(function () {
+        mdApi('GET', '/api/md/room/status?code=' + encodeURIComponent(OL.code)).then(function (st) {
+          var opp = null;
+          st.players.forEach(function (p) { if (p.pid !== PID && !opp) opp = p; });
+          if (opp) {
+            OL.oppScore = opp.score || 0;
+            if (opp.name) document.getElementById('battleBotName').textContent = opp.name;
+          }
+          updateOnlineScores();
+        }).catch(function () {});
+      }, 2500);
+    }
+
+    function finishOnline() {
+      clearInterval(OL.timer);
+      if (OL.pollTimer) { clearInterval(OL.pollTimer); OL.pollTimer = null; }
+      var zh = getLang() === 'zh';
+      // 结算(幂等:重复 finish 由服务端拒绝,忽略即可)
+      mdApi('POST', '/api/md/room/finish', { code: OL.code }).catch(function () {});
+      var youVal = OL.myScore, botVal = OL.oppScore, total = OL.questions.length;
+      var outcome, title;
+      if (youVal > botVal) { outcome = 'win'; title = T('battle.you_win','🎉 You win!'); }
+      else if (youVal < botVal) { outcome = 'lose'; title = T('battle.you_lose','😔 You lose. Try again!'); }
+      else { outcome = 'draw'; title = T('battle.draw','🤝 Draw!'); }
+      var card = document.getElementById('battleCard');
+      card.innerHTML =
+        '<div class="battle-result ' + outcome + '">' +
+          '<h2>' + title + '</h2>' +
+          '<div class="battle-scores">' +
+            '<div class="score-card you"><div class="score-name">' + T('train.you_label','You') + '</div><div class="score-val">' + youVal + '</div></div>' +
+            '<div class="vs-badge">VS</div>' +
+            '<div class="score-card bot"><div class="score-name">' + escHtml(document.getElementById('battleBotName').textContent) + '</div><div class="score-val">' + botVal + '</div></div>' +
+          '</div>' +
+          '<div class="score-big">' + youVal + ' : ' + botVal + '</div>' +
+          '<p style="color:#6b7280;margin-top:8px">' + T('train.summary_p1','Total ') + total + T('train.summary_p2',' questions · You scored <b style="color:#4f46e5">') + youVal + '</b></p>' +
+          '<div class="battle-actions">' +
+            '<button class="btn" onclick="location.href=\'/\'">🏠 ' + T('battle.back_lobby','Back to Lobby') + '</button>' +
+          '</div>' +
+        '</div>';
+    }
+
+    if (mode === 'ai') startAiBattle(cat);
+    else if (room) startOnlineRoom(room);
+  })();
+  </script>
+  <script src="/shared/site-header.js?v=ds2-10"></script>
+  <script src="/js/coins-bar.js?v=20260924" defer></script>
+  <script src="/shared/sso-bridge.js?v=1" defer></script>
+</body>
+</html>

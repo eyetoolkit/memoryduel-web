@@ -1,0 +1,95 @@
+# MemoryDuel — 完整版
+
+> 记忆力训练游戏 · 免费、无需登录、成绩只存本地
+> 更新时间: 2026-09-18
+
+## 1. 什么是 MemoryDuel
+
+MemoryDuel（memoryduel.com）是一个面向全球用户的在线记忆力训练平台。它提供翻牌配对、数字闪记等经过认知心理学验证的记忆训练形式，把「记忆力训练」包装成轻量、即时可玩的小游戏。用户无需注册、无需下载安装，打开网页即可开始一轮训练。
+
+核心设计原则：
+
+1. **零门槛** — 无需账号，打开即玩
+2. **隐私优先** — 成绩默认只存浏览器本地，不上传、不追踪、无广告
+3. **短会话** — 单轮训练通常在 1–3 分钟内完成，适合碎片时间
+4. **可离线** — 通过 PWA 与 Service Worker 支持离线游玩
+
+## 2. 游戏与模式
+
+### 翻牌配对（Memory Match）
+
+网格中排列成对出现的卡片。每次翻开两张，若图案相同则配对成功并保持翻开，否则翻回。目标是用最少的步数与最短时间完成全部配对。这是记忆训练中最经典的形式，直接锻炼视觉短时记忆与注意力。
+
+- 入口：`/train`
+- 玩法说明页：`/how-to-play/memory-match/`
+
+### 数字闪记
+
+短暂显示一串数字（如 5 位），随后隐藏并要求用户复现。答对后数字串逐级加长，直至出错为止。用于测量并扩展工作记忆容量。
+
+### 训练模式
+
+无对局压力的自由练习模式，适合日常习惯性训练。
+
+### 对战模式
+
+两名玩家进行记忆力对决，比较同一轮训练中的表现（正确率 / 用时 / 步数）。
+
+## 3. 记忆力训练的依据
+
+记忆游戏是目前被科学验证较多的脑力训练形式之一。其核心机制是：通过要求大脑主动地编码（encode）、存储（store）与提取（retrieve）信息，来强化工作记忆与短时记忆的通路。定期、短时的训练比偶尔的长时训练更容易形成习惯，也更容易看到进步。
+
+站点在玩法说明页中对此作了更详细的说明：`/how-to-play/memory-match/`。
+
+## 4. 多语言
+
+站点支持 6 种语言，通过路径前缀区分：
+
+| 语言 | 路径 |
+|---|---|
+| 简体中文 | `/zh/` |
+| English | `/en/` |
+| 日本語 | `/ja/` |
+| Deutsch | `/de/` |
+| Español | `/es/` |
+| Français | `/fr/` |
+
+各语言版本通过 `hreflang` 标注互相关联，根路径 `/` 为默认语言入口。
+
+## 5. 页面清单
+
+| 路径 | 说明 |
+|---|---|
+| `/` | 首页 |
+| `/train` | 训练模式 |
+| `/membership/` | 会员说明 |
+| `/how-to-play/memory-match/` | 玩法说明：记忆游戏如何运作 |
+| `/blog/memory-training-games/` | 文章：记忆力训练游戏 |
+| `/about/` | 关于 |
+| `/contact/` | 联系我们 |
+| `/privacy/` | 隐私政策 |
+| `/terms/` | 使用条款 |
+
+## 6. 技术栈
+
+- **前端**：HTML / CSS / 原生 JavaScript（无框架），无构建步骤
+- **托管**：Cloudflare Pages（全球边缘分发）
+- **后端**：Cloudflare Workers，承载账号 / 会员 / 对战相关 API（路径前缀 `/api/md/*`）
+- **离线**：Service Worker 缓存 + PWA manifest（`manifest.webmanifest`）
+- **多语言**：`i18n/` 目录下的按语言 JSON 词条 + 客户端 `i18n.js`
+
+## 7. AI 与爬虫说明
+
+- 本站欢迎 AI 爬虫与搜索引擎索引，`robots.txt` 已显式声明允许 GPTBot / ClaudeBot / PerplexityBot / Google-Extended 等。
+- 仅 `/api/`、`/ws`、`/data/` 路径禁止抓取。
+- 本站提供 `/llms.txt`（精简版）与本文件 `/llms-full.txt`（完整版）供 AI 系统理解站点结构与内容。
+- 站点内容以事实性说明为主（游戏规则、训练原理、功能清单），便于被直接引用。
+
+## 8. 链接
+
+- 主页：https://memoryduel.com/
+- 训练模式：https://memoryduel.com/train
+- 玩法说明：https://memoryduel.com/how-to-play/memory-match/
+- 关于：https://memoryduel.com/about/
+- Sitemap：https://memoryduel.com/sitemap.xml
+- LLMs 精简版：https://memoryduel.com/llms.txt

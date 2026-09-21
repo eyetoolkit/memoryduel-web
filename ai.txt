@@ -1,0 +1,21 @@
+MemoryDuel
+记忆对决 · https://memoryduel.com
+
+在线记忆力训练平台：翻牌配对与数字闪记，通过短时训练锻炼视觉短时记忆与工作记忆。
+无需注册即可开始，成绩默认只存浏览器本地，不上传、无广告、无第三方追踪。
+提供训练模式与 1v1 对战模式。
+
+主要页面：
+- / 首页
+- /train 训练模式
+- /how-to-play/memory-match/ 玩法说明：记忆游戏如何运作
+- /blog/memory-training-games/ 文章：记忆力训练游戏
+- /membership/ 会员
+- /about/ 关于
+
+多语言：/zh/ /en/ /ja/ /de/ /es/ /fr/
+技术栈：HTML/CSS/原生 JS（无框架）+ PWA；Cloudflare Pages 托管静态资源，
+Cloudflare Workers 提供 API（账号 / 会员 / 对战）。
+
+AI 索引说明：欢迎搜索引擎与 AI 爬虫（GPTBot / ClaudeBot / PerplexityBot / Google-Extended）。
+详见 /llms.txt（精简）与 /llms-full.txt（完整）。

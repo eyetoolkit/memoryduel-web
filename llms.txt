@@ -1,0 +1,51 @@
+# MemoryDuel
+
+> 记忆力训练游戏 · 免费、无需登录、成绩只存本地
+
+## 项目概述
+
+MemoryDuel（memoryduel.com）是一个在线记忆力训练平台，通过翻牌配对与数字闪记等游戏测试并锻炼短时记忆与工作记忆。所有成绩默认只保存在用户浏览器本地，不上传服务器，无需注册即可开始训练。
+
+## 游戏与模式
+
+- **翻牌配对** (`/train/`) — 记忆并配对成对的图案/数字卡片，用最少步数完成
+- **数字闪记** — 短暂显示一串数字后复现，逐级加长
+- **训练模式** — 自由练习，无对局压力
+- **对战模式** — 与对手进行记忆力对决（1v1）
+
+## 核心功能
+
+- **无需登录** — 打开即可训练，成绩存于本地
+- **隐私优先** — 成绩只存本地，不上传、不追踪
+- **多语言支持** — 简体中文、English、日本語、Deutsch、Español、Français
+- **PWA 支持** — 可安装到桌面/主屏幕，支持离线访问
+
+## 多语言
+
+站点支持 6 种语言，路径前缀为 `/zh/`、`/en/`、`/ja/`、`/de/`、`/es/`、`/fr/`。
+
+## 主要页面
+
+- `/` — 首页
+- `/train` — 训练模式
+- `/how-to-play/memory-match/` — 玩法说明：记忆游戏如何运作
+- `/blog/memory-training-games/` — 文章：记忆力训练游戏
+- `/membership/` — 会员
+- `/about/` — 关于
+- `/contact/` — 联系我们
+- `/privacy/` — 隐私政策
+- `/terms/` — 使用条款
+
+## 技术栈
+
+- 前端：HTML / CSS / 原生 JavaScript（无框架）
+- 托管：Cloudflare Pages
+- 后端：Cloudflare Workers（账号 / 会员 / 对战相关 API）
+- 离线：Service Worker + PWA manifest
+
+## 链接
+
+- 主页：https://memoryduel.com/
+- 训练模式：https://memoryduel.com/train
+- 玩法说明：https://memoryduel.com/how-to-play/memory-match/
+- Sitemap：https://memoryduel.com/sitemap.xml

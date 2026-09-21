@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en" data-site="memory">
+<head>
+  <script>
+    // 全局API配置 - 根据站点自动选择API服务器
+    (function() {
+      var site = document.documentElement.getAttribute('data-site') || 'memory';
+      var apiHosts = {
+        'memory': 'api.memoryduel.com',
+        'math': 'api.mathduel.games',
+        'board': 'api.boardduel.com'
+      };
+      window.API_BASE = 'https://' + (apiHosts[site] || 'api.memoryduel.com');
+      window.WS_BASE = 'wss://' + (apiHosts[site] || 'ws.memoryduel.com');
+    })();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="home.title">MemoryDuel · Knowledge Duel</title>
+  <meta name="description" data-i18n="home.meta_desc" content="Knowledge battle platform with 46,000+ questions across 12+ categories. 1v1 real-time duel, AI sparring, ranked matches. Tap to play, no install.">
+  <meta name="keywords" content="knowledge battle,trivia,quiz duel,1v1,ai sparring,online quiz,multiplayer trivia,memory training">
+  <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MemoryDuel">
+  <meta property="og:title" data-i18n="home.og_title" content="MemoryDuel · Knowledge Duel">
+  <meta property="og:description" data-i18n="home.og_desc" content="46,000+ questions · 12+ categories · 6 languages · 1v1 real-time. Tap to play, no login, no install, free to play.">
+  <meta property="og:url" content="https://memoryduel.com/">
+  <meta property="og:locale" content="en_US">
+  <meta name="og:image" content="https://memoryduel.com/og-default.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" data-i18n="home.og_title" content="MemoryDuel · Knowledge Duel">
+  <meta name="twitter:description" data-i18n="home.og_desc" content="46,000+ questions · 12+ categories · 6 languages · Free · Free to play.">
+  <meta name="twitter:image" content="https://memoryduel.com/og-default.jpg">
+  <link rel="canonical" href="https://memoryduel.com/">
+
+  
+  
+  <link rel="alternate" hreflang="zh-CN" href="https://memoryduel.com/" />
+  <link rel="alternate" hreflang="en" href="https://memoryduel.com/?lang=en" />
+  <link rel="alternate" hreflang="ja" href="https://memoryduel.com/?lang=ja" />
+  <link rel="alternate" hreflang="es" href="https://memoryduel.com/?lang=es" />
+  <link rel="alternate" hreflang="fr" href="https://memoryduel.com/?lang=fr" />
+  <link rel="alternate" hreflang="de" href="https://memoryduel.com/?lang=de" />
+  <link rel="alternate" hreflang="x-default" href="https://memoryduel.com/" />
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoGame",
+    "name": "MemoryDuel - Knowledge Battle",
+    "url": "https://memoryduel.com/",
+    "description": "Real-time 1v1 knowledge battle covering 12+ categories, 46,000+ questions in 6 languages.",
+    "genre": ["Trivia", "Quiz", "Multiplayer"],
+    "operatingSystem": "Any (Web Browser)",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+  <link rel="manifest" href="/manifest.zh.webmanifest">
+  <link rel="stylesheet" href="/css/shared/tokens.css?v=md-p3">
+  <link rel="stylesheet" href="/css/shared/sidebar.css?v=p28">
+  <link rel="stylesheet" href="/css/shared/components.css?v=md-c8">
+  <link rel="stylesheet" href="/css/shared/brand-ds2.css?v=ds2-22">
+  <link rel="stylesheet" href="/css/home.css?v=md-home2">
+  <link rel="stylesheet" href="/css/shared/toast.css?v=md-t3">
+  <script defer src="/js/ui-i18n.js?v=md-ui58"></script>
+  <script src="/i18n/i18n.js?v=33" defer></script>
+  <script src="/i18n/lang-switcher.js" defer></script>
+  <!-- B4.3: 防闪烁 + 自动跟随系统主题 -->
+  <script>
+    (function(){try{var t=localStorage.getItem('bd-theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}else if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();
+  </script>
+  <!-- ===== 共享设计系统 ds 视觉（与 MathDuel / BoardDuel 首页同构） =====
+       来源 docs/polish/ds-design-system.md：hero 渐变三站同靛蓝底，MemoryDuel 末停微红收尾；
+       主 CTA 用三站统一的琥珀渐变(--ds-grad-btn-cta)，次 CTA 与 chip 走玻璃态。
+       ⚠️ memoryduel 是知识问答站、没有游戏图标网格，故**不套用 games-first 重排**；
+       只统一视觉语言，且不触碰 /train.html 训练流入口（导航 L76/L86 的 Train 链接）。 -->
+  <style>
+    .gradient-hero {
+      background: linear-gradient(135deg, #3730A3 0%, #4F46E5 50%, #312E81 94%, #DC2626 100%) !important;
+    }
+    .hero-ctas .btn-glow,
+    .hero-ctas .btn-glass {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-weight: 700; font-size: 1.05rem; line-height: 1;
+      padding: 0.95rem 1.4rem; border-radius: 12px;
+      transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease;
+      cursor: pointer; border: 0;
+    }
+    .hero-ctas .btn-glow {
+      color: #1E1B39;
+      background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
+      box-shadow: 0 8px 24px rgba(245, 158, 11, 0.35);
+    }
+    .hero-ctas .btn-glow:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(245, 158, 11, 0.45);
+    }
+    .hero-ctas .btn-glass {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.10);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+    }
+    .hero-ctas .btn-glass:hover { background: rgba(255, 255, 255, 0.18); }
+    .gradient-hero .chip {
+      background: rgba(255, 255, 255, 0.10);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #fff;
+      border-radius: 999px;
+      padding: 0.4rem 0.85rem;
+      font-size: 0.85rem;
+      display: inline-flex; align-items: center; gap: 0.4rem;
+    }
+    .gradient-hero .chip .dot {
+      width: 6px; height: 6px; border-radius: 999px;
+      background: #DC2626; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.18);
+    }
+  </style>
+</head>
+<body>
+<!-- DUEL-DS v2 全局吸顶头部 (JS 注入) -->
+<div id="site-header" style="min-height:65px"
+     data-brand-a="Memory" data-brand-b="Duel" data-mark="duel-brain"
+     data-nav='[{"label":"Play","href":"#lobby","i18n":"nav.play"},{"label":"Train","href":"/train.html","i18n":"nav.train"},{"label":"How to Play","href":"#how","i18n":"nav.how"}]'
+     data-cta-label="Start Duel" data-cta-href="#lobby" data-cta-i18n="home.btn_start_duel"></div>
+
+<div class="layout">
+  <div class="drawer-backdrop"></div>
+  <aside class="sidebar" style="display:none" role="navigation">
+    <a href="/" class="sidebar-brand">🧠 Memory<span>Duel</span></a>
+    <div class="sidebar-group-label" data-i18n="nav.lobby_group">Lobby</div>
+    <a href="#lobby" class="sidebar-link"><span class="ico">⚔️</span><span data-i18n="nav.1v1_duel">1v1 Duel</span></a>
+    <a href="#online" class="sidebar-link"><span class="ico">🌐</span><span data-i18n="nav.online_match">Online Match</span></a>
+    <a href="/train.html" class="sidebar-link"><span class="ico">🤖</span><span data-i18n="nav.train">Training</span></a>
+    <div class="sidebar-group-label" data-i18n="nav.features_group">Features</div>
+    <a href="#features" class="sidebar-link"><span class="ico">✨</span><span data-i18n="nav.features">How to Play</span></a>
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-footer">
+      <a href="/about/" data-i18n="nav.about">About</a>
+      <a href="/privacy/" data-i18n="nav.privacy">Privacy</a>
+      <a href="/terms/" data-i18n="nav.terms">Terms</a>
+    </div>
+  </aside>
+  <div class="layout-main">
+
+    <!-- ============ Hero (Gradient Tech) ============ -->
+    <section class="gradient-hero">
+      <span class="hero-orb o1"></span><span class="hero-orb o2"></span><span class="hero-orb o3"></span>
+      <div class="duel-wrap home-hero-inner">
+        <span class="sec-eyebrow"><svg class="duel-icon" aria-hidden="true"><use href="/shared/icons.svg#duel-brain"></use></svg> <span data-i18n="home.badge">Knowledge Battle</span></span>
+        <h1 class="hero-h1"><span data-i18n="home.h1a">Outsmart opponents, </span><em class="grad-text" data-i18n="home.h1em">5 minutes</em></h1>
+        <p class="hero-sub" data-i18n="home.desc">Science, history, geography, sports, movies and more. Speed wins. Knowledge conquers.</p>
+        <div class="hero-tags">
+          <span class="chip"><span class="dot"></span><span data-i18n="home.hero_questions">46,000+ Questions</span></span>
+          <span class="chip"><span class="dot"></span><span data-i18n="home.hero_languages">6 Languages</span></span>
+          <span class="chip"><span class="dot"></span><span data-i18n="home.hero_timed">Timed Quizzes</span></span>
+          <span class="chip"><span class="dot"></span><span data-i18n="home.hero_ranks">Ranked Matches</span></span>
+        </div>
+        <div class="hero-ctas">
+          <a href="#lobby" class="btn-glow lg"><svg class="duel-icon" aria-hidden="true"><use href="/shared/icons.svg#duel-play"></use></svg> <span id="startBtnText" data-i18n="home.btn_start_duel">Start Duel</span></a>
+          <button data-open-auth="register" class="btn-glass"><svg class="duel-icon" aria-hidden="true"><use href="/shared/icons.svg#duel-lock"></use></svg> <span data-i18n="home.btn_login_register">Login / Register</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Stats Bar ============ -->
+    <section class="duel-section" style="padding-top:var(--s-12);padding-bottom:var(--s-12)">
+      <div class="duel-wrap">
+        <div class="stats-grid">
+          <div class="stat-pill"><span class="v">46K+</span><span class="l" data-i18n="home.stat_questions">Questions</span></div>
+          <div class="stat-pill"><span class="v">12+</span><span class="l" data-i18n="home.stat_categories">Categories</span></div>
+          <div class="stat-pill"><span class="v">6</span><span class="l" data-i18n="home.stat_languages">Languages</span></div>
+          <div class="stat-pill"><span class="v">Free</span><span class="l" data-i18n="home.stat_free">No Ads · No Tracking</span></div>
+          <div class="stat-pill online-live"><span class="v" id="onlineRooms">鈥?/span><span class="l" data-i18n="home.stat_online">rooms live</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Choose Mode + Categories ============ -->
+    <section class="duel-section tint" id="lobby">
+    <!-- ============ Global Top Players ============ -->
+    <section class="duel-section" id="globalTop">
+      <div class="duel-wrap">
+        <div class="sec-head">
+          <span class="sec-eyebrow"><svg class="duel-icon" aria-hidden="true"><use href="/shared/icons.svg#duel-trophy"></use></svg></span>
+          <h2 class="sec-title-xl"><span class="grad-text" data-i18n="home.rank_title">Global Top Players</span></h2>
+          <p class="sec-sub-xl" data-i18n="home.rank_sub">The best minds dueling right now</p>
+        </div>
+        <div class="top-rank-scroll" id="topRankList">
+          <div class="top-rank-loading" data-i18n="home.rank_loading">Loading top players...</div>
+        </div>
+        <script src="/js/home-toprank.js"></script>
+      </div>
+    </section>
+
+      <div class="duel-wrap">
+        <div class="sec-head">
+          <span class="sec-eyebrow"><svg class="duel-icon" aria-hidden="true"><use href="/shared/icons.svg#duel-sword"></use></svg> <span data-i18n="home.section_duel_modes">Choose Mode</span></span>
+          <h2 class="sec-title-xl" data-i18n="home.section_duel_modes">Choose Mode</h2>
+          <p class="sec-sub-xl" data-i18n="home.how_to_play_desc">AI sparring is always ready. Online match starts in 3s.</p>
+        </div>
+        <div class="glass" style="border-radius:var(--r-xl);padding:var(--s-8)">
+          <div class="mode-row" id="modeToggle" style="display:flex;gap:8px;margin-bottom:24px">
+            <button class="mode-btn on" data-m="ai" data-i18n="home.mode_ai">🤖 vs AI</button>
+            <button class="mode-btn" data-m="online" data-i18n="home.mode_online">🌐 Online</button>
+          </div>
+          <div id="aiPanel">
+            <h3 data-i18n="home.select_category">Select Category</h3>
+            <div class="cat-grid" id="catGrid"></div>
+            <div class="home-actions">
+              <button class="btn btn-primary" id="startAiBtn" data-i18n="home.start_duel">⚔️ Start Duel</button>
+              <button class="btn btn-ghost" data-open-auth="register" data-i18n="home.login_to_unlock">🔑 Login to Unlock All Categories</button>
+            </div>
+          </div>
+          <div id="onlinePanel" style="display:none">
+            <div class="online-mode">
+              <h3 data-i18n="home.quick_match">Quick Match</h3>
+              <p data-i18n="home.quick_match_desc">Match with a random real player in seconds.</p>
+              <button class="btn btn-primary" id="startMatchBtn" data-i18n="home.start_match">⚡ Start Matching</button>
+              <button class="btn btn-ghost" id="cancelMatchBtn" style="display:none" data-i18n="common.cancel">Cancel</button>
+              <div id="matchStatus" style="margin-top:12px;text-align:center;color:var(--text-muted)"></div>
+              <div class="divider"><span data-i18n="home.or">or</span></div>
+              <div class="room-actions">
+                <div class="room-row">
+                  <input type="text" id="roomInput" class="room-input" placeholder="Room code" data-i18n-placeholder="home.enter_room_code" maxlength="6">
+                  <button class="btn btn-ghost" id="joinBtn" data-i18n="home.join_room">Join Room</button>
+                </div>
+                <button class="btn btn-ghost" id="createRoomBtn" data-i18n="home.create_room">➕ Create Private Room</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Features ============ -->
+    <section class="duel-section" id="features">
+      <div class="duel-wrap">
+        <div class="sec-head">
+          <span class="sec-eyebrow"><svg class="duel-icon" aria-hidden="true"><use href="/shared/icons.svg#duel-sparkles"></use></svg> <span data-i18n="home.section_features">Features</span></span>
+          <h2 class="sec-title-xl" data-i18n="home.section_features">Features</h2>
+          <p class="sec-sub-xl" data-i18n="home.features_desc">Everything you need for knowledge battles.</p>
+        </div>
+        <div class="features-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--s-5)">
+          <div class="duel-card"><div class="ic"><svg class="duel-icon lg" aria-hidden="true"><use href="/shared/icons.svg#duel-zap"></use></svg></div><h3 data-i18n="home.feat_timed">Timed Duel</h3><p data-i18n="home.feat_timed_desc">Answer first to score. Speed wins.</p></div>
+          <div class="duel-card"><div class="ic"><svg class="duel-icon lg" aria-hidden="true"><use href="/shared/icons.svg#duel-globe"></use></svg></div><h3 data-i18n="home.feat_multi">Multi-language</h3><p data-i18n="home.feat_multi_desc">6 languages. Play with global players.</p></div>
+          <div class="duel-card"><div class="ic"><svg class="duel-icon lg" aria-hidden="true"><use href="/shared/icons.svg#duel-bot"></use></svg></div><h3 data-i18n="home.feat_ai">AI Sparring</h3><p data-i18n="home.feat_ai_desc">Practice anytime. AI difficulty adapts to you.</p></div>
+          <div class="duel-card"><div class="ic"><svg class="duel-icon lg" aria-hidden="true"><use href="/shared/icons.svg#duel-trophy"></use></svg></div><h3 data-i18n="home.feat_ranks">Ranked System</h3><p data-i18n="home.feat_ranks_desc">Climb the leaderboard. Earn badges.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ How to Play ============ -->
+    <section class="duel-section tint" id="how">
+      <div class="duel-wrap">
+        <div class="sec-head">
+          <h2 class="sec-title-xl" data-i18n="home.section_how">How to Play</h2>
+        </div>
+        <div class="how-steps" style="display:flex;gap:var(--s-5);flex-wrap:wrap;justify-content:center">
+          <div class="duel-card" style="flex:1;min-width:200px;text-align:center"><span class="how-no" style="display:inline-grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--brand-subtle);color:var(--brand-700);font-weight:800;margin-bottom:12px">1</span><div data-i18n="home.step1">Pick a category</div></div>
+          <div class="duel-card" style="flex:1;min-width:200px;text-align:center"><span class="how-no" style="display:inline-grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--brand-subtle);color:var(--brand-700);font-weight:800;margin-bottom:12px">2</span><div data-i18n="home.step2">Start a duel or invite a friend</div></div>
+          <div class="duel-card" style="flex:1;min-width:200px;text-align:center"><span class="how-no" style="display:inline-grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--brand-subtle);color:var(--brand-700);font-weight:800;margin-bottom:12px">3</span><div data-i18n="home.step3">Answer first to win</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Why MemoryDuel ============ -->
+    <section class="duel-section" id="pricing">
+      <div class="duel-wrap">
+        <div class="sec-head">
+          <h2 class="sec-title-xl" data-i18n="home.section_value">Why MemoryDuel?</h2>
+        </div>
+        <div class="features-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--s-5)">
+          <div class="duel-card"><div class="ic"><svg class="duel-icon lg" aria-hidden="true"><use href="/shared/icons.svg#duel-check"></use></svg></div><h3 data-i18n="home.value_no_ads">No Ads</h3><p data-i18n="home.value_no_ads_desc">Clean experience. No interruptions.</p></div>
+          <div class="duel-card"><div class="ic"><svg class="duel-icon lg" aria-hidden="true"><use href="/shared/icons.svg#duel-users"></use></svg></div><h3 data-i18n="home.value_no_login">No Login</h3><p data-i18n="home.value_no_login_desc">Tap to play. No account needed.</p></div>
+          <div class="duel-card"><div class="ic"><svg class="duel-icon lg" aria-hidden="true"><use href="/shared/icons.svg#duel-bot"></use></svg></div><h3 data-i18n="home.value_ai">AI Duel</h3><p data-i18n="home.value_ai_desc">Practice 24/7 with adaptive AI.</p></div>
+          <div class="duel-card"><div class="ic"><svg class="duel-icon lg" aria-hidden="true"><use href="/shared/icons.svg#duel-flame"></use></svg></div><h3 data-i18n="home.value_progress">Progress</h3><p data-i18n="home.value_progress_desc">Track stats. Climb ranks.</p></div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<footer class="sites-footer">
+  <div class="wrap">
+    <div class="sf-title" data-i18n="home.site_network">🎯 Our Brand Portfolio</div>
+    <div class="sf-matrix">
+      <a href="https://mathduel.games/" class="sf-item">
+        <svg class="duel-icon sf-emoji" aria-hidden="true"><use href="/shared/icons.svg#duel-calculator"></use></svg>
+        <span data-i18n="mm_index_1">MathDuel</span>
+      </a>
+      <a href="https://boardduel.com/" class="sf-item">
+        <svg class="duel-icon sf-emoji" aria-hidden="true"><use href="/shared/icons.svg#duel-chess"></use></svg>
+        <span data-i18n="mm_index_2">BoardDuel</span>
+      </a>
+      <a href="https://memoryduel.com/" class="sf-item current">
+        <svg class="duel-icon sf-emoji" aria-hidden="true"><use href="/shared/icons.svg#duel-brain"></use></svg>
+        <span data-i18n="mm_index_3">MemoryDuel</span>
+      </a>
+    </div>
+    <div class="sf-links">
+      <a href="/about/" data-i18n="nav.about">About</a>
+      <a href="/privacy/" data-i18n="nav.privacy">Privacy</a>
+      <a href="/terms/" data-i18n="nav.terms">Terms</a>
+      <a href="/contact/" data-i18n="nav.contact">Contact</a>
+    </div>
+    <div class="sf-copy" data-i18n="home.footer">© 2026 MemoryDuel · No Ads · No Tracking · Pure Static</div>
+  </div>
+</footer>
+
+<div id="auth-modal-placeholder"></div>
+<script src="/shared/auth-extras.js?v=1"></script>
+  <script src="/shared/auth-modal.js?v=20260924"></script>
+<script src="/js/toast.js?v=t6"></script>
+<script src="/js/sidebar.js?v=sb34"></script>
+<script src="/assets/quiz-data.js?v=qd1"></script>
+<script src="/shared/site-header.js?v=ds2-10"></script>
+  <script src="/js/coins-bar.js?v=20260924" defer></script>
+  <script src="/shared/sso-bridge.js?v=1" defer></script>
+<script type="module">
+import { initHome } from '/assets/js/home.mjs';
+initHome();
+</script>
+
+<script>
+(function() {
+  var el = document.getElementById('onlineRooms');
+  if (!el) return;
+  function loadOnline() {
+    var onlineApi = (typeof window !== 'undefined' && window.API_BASE ? window.API_BASE : '') + '/md/online';
+    fetch(onlineApi).then(function(r) { return r.json(); }).then(function(d) {
+      el.textContent = (d && typeof d.rooms === 'number') ? d.rooms : '\u2014';
+    }).catch(function() { el.textContent = '\u2014'; });
+  }
+  loadOnline();
+  setInterval(loadOnline, 30000);
+})();
+</script>
+<script src="/shared/onboard.js?v=20260917"></script><script src="/shared/achievements.js"></script></body>
+</html>

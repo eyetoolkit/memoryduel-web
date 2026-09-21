@@ -1,0 +1,286 @@
+/* ════════════════════════════════════════════════════════════════
+   MemoryDuel Home — 站点私有样式 (B2 拆分)
+   原为 components.css 尾部私有补丁, 已拆出为独立文件, 由 index.html 引用。
+   注意: 本文件为站点私有, 不属于 packages/shared-fe 共享真源。
+   ════════════════════════════════════════════════════════════════ */
+
+/* 模式切换 (AI vs Online) */
+.mode-row {
+  display: inline-flex;
+  background: var(--card, #fff);
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: 999px;
+  padding: 4px;
+  gap: 4px;
+}
+.mode-btn {
+  padding: 8px 18px;
+  border: none;
+  background: transparent;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--m, #6b7280);
+  cursor: pointer;
+  transition: all .15s;
+}
+.mode-btn:hover { color: var(--brand, #4f46e5); }
+.mode-btn.on {
+  background: var(--brand, #4f46e5);
+  color: #fff;
+}
+
+/* AI Panel: 分类网格 */
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  margin: 16px 0 24px;
+}
+.cat-card {
+  background: var(--card, #fff);
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: var(--r, 14px);
+  padding: 16px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .2s;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font: inherit;
+  color: inherit;
+}
+.cat-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--brand, #4f46e5);
+  box-shadow: 0 6px 14px rgba(79, 70, 229, .12);
+}
+.cat-card.selected {
+  border-color: var(--brand, #4f46e5);
+  background: rgba(79, 70, 229, .06);
+}
+.cat-card.locked {
+  opacity: .55;
+  cursor: not-allowed;
+}
+.cat-card .cat-icon { font-size: 28px; }
+.cat-card .cat-name { font-weight: 700; font-size: 13px; }
+.cat-card .cat-count { font-size: 11px; color: var(--m, #6b7280); }
+
+/* AI 动作区 */
+.home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 12px;
+}
+.home-actions .btn {
+  min-width: 180px;
+}
+
+/* Online Panel */
+.online-mode {
+  text-align: center;
+  max-width: 480px;
+  margin: 0 auto;
+}
+.online-mode h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+.online-mode p {
+  color: var(--m, #6b7280);
+  margin: 0 0 16px;
+  font-size: 14px;
+}
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 18px 0;
+  color: var(--m, #6b7280);
+  font-size: 13px;
+}
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line, #e2e8f0);
+}
+.divider span {
+  padding: 0 12px;
+}
+.room-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+.room-row {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  max-width: 360px;
+}
+.room-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: var(--r, 10px);
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+  font-family: inherit;
+}
+
+/* Features grid */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+.feat-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px;
+  background: var(--card, #fff);
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: var(--r, 14px);
+  transition: all .2s;
+}
+.feat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, .06);
+}
+.feat-card .feat-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: rgba(79, 70, 229, .08);
+  border-radius: 10px;
+}
+.feat-card .feat-txt h3 {
+  font-size: 15px;
+  margin: 0 0 4px;
+  font-weight: 700;
+}
+.feat-card .feat-txt p {
+  font-size: 13px;
+  color: var(--m, #6b7280);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* How steps */
+.how-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+.how-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  background: var(--card, #fff);
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: var(--r, 12px);
+}
+.how-step .how-no {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: var(--brand, #4f46e5);
+  color: #fff;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* Pricing / Value grid */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+.pricing-card {
+  padding: 18px;
+  background: var(--card, #fff);
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: var(--r, 14px);
+  text-align: center;
+}
+.pricing-card h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+}
+.pricing-card p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--m, #6b7280);
+  line-height: 1.5;
+}
+
+/* Footer */
+.home-footer {
+  margin-top: 60px;
+  padding: 32px 0 28px;
+  border-top: 1px solid var(--line, #e2e8f0);
+  background: var(--card, #fff);
+  text-align: center;
+}
+.home-footer .footer-brands {
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+.home-footer .footer-brand a {
+  color: var(--m, #6b7280);
+  margin: 0 8px;
+  text-decoration: none;
+  transition: color .15s;
+}
+.home-footer .footer-brand a:hover { color: var(--brand, #4f46e5); }
+.home-footer .footer-copy {
+  font-size: 12px;
+  color: var(--m, #6b7280);
+  margin: 0;
+}
+
+/* 按钮通用样式（home 区域） */
+.home-section .btn {
+  display: inline-block;
+  background: var(--brand, #4f46e5);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
+  transition: all .15s;
+}
+.home-section .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(79, 70, 229, .25); }
+.home-section .btn-ghost { background: transparent; color: var(--brand, #4f46e5); border: 1px solid currentColor; }
+.home-section .btn-ghost:hover { background: rgba(79, 70, 229, .08); }
+
+/* 响应式 */
+@media (max-width: 640px) {
+  /* cat-grid: auto-fill 原生在 390px 已给 2 列，不要强制 3 列挤压 */
+  .cat-card { padding: 12px 6px; }
+  .cat-card .cat-icon { font-size: 22px; }
+  .features-grid, .pricing-grid { grid-template-columns: 1fr 1fr; }
+  .home-actions .btn { width: 100%; }

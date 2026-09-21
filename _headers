@@ -1,0 +1,39 @@
+# Cloudflare Pages _headers file
+# 安全头和缓存策略 - 记忆对决 MemoryDuel 纯静态站点
+
+/*
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://cloudflareinsights.com; worker-src 'self'; manifest-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=()
+
+# HTML 短缓存 10 分钟（单页游戏，SW 对页面走缓存优先但仍预留更新）
+/
+  Cache-Control: public, max-age=600, must-revalidate
+
+# PWA manifest 短期缓存
+/manifest*.webmanifest
+  Content-Type: application/manifest+json
+  Cache-Control: public, max-age=86400
+
+# sitemap / llms / ai / robots 短缓存
+/sitemap*.xml
+  Cache-Control: public, max-age=3600
+/llms*.txt
+  Cache-Control: public, max-age=3600, must-revalidate
+/ai.txt
+  Cache-Control: public, max-age=3600, must-revalidate
+/robots.txt
+  Cache-Control: public, max-age=3600, must-revalidate
+
+# service-worker 永缓存控制
+/service-worker.js
+  Cache-Control: no-cache, must-revalidate
+  Service-Worker-Allowed: /
+
+# 阻止 .git 暴露（防御性，CF Pages 不暴露 .git）
+/.git/*
+  X-Robots-Tag: noindex

@@ -1,0 +1,18 @@
+{
+  "name": "Memory Duel 记忆对决",
+  "short_name": "记忆对决",
+  "description": "测试并锻炼你的记忆力的益智游戏：翻牌配对与数字闪记。无登录、无广告、成绩只存本地。",
+  "lang": "zh-CN",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff7ed",
+  "theme_color": "#ea580c",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23ea580c'/%3E%3Ctext x='50' y='50' font-size='58' text-anchor='middle' dominant-baseline='central'%3E%F0%9F%A7%A0%3C/text%3E%3C/svg%3E",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

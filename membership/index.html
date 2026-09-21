@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en" data-site="memory">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n-title="membership.title">Membership Center · MemoryDuel</title>
+<meta name="description" data-i18n="membership.meta_desc" content="View coin balance, daily quests, invite progress, and ad-free privileges. Earn coins playing games for ad-free access. Invite friends for bonus rewards.">
+<link rel="canonical" href="https://memoryduel.com/membership/">
+
+  
+  <link rel="alternate" hreflang="zh-CN" href="https://memoryduel.com/membership/" />
+  <link rel="alternate" hreflang="en" href="https://memoryduel.com/membership/?lang=en" />
+  <link rel="alternate" hreflang="ja" href="https://memoryduel.com/membership/?lang=ja" />
+  <link rel="alternate" hreflang="es" href="https://memoryduel.com/membership/?lang=es" />
+  <link rel="alternate" hreflang="fr" href="https://memoryduel.com/membership/?lang=fr" />
+  <link rel="alternate" hreflang="de" href="https://memoryduel.com/membership/?lang=de" />
+  <link rel="alternate" hreflang="x-default" href="https://memoryduel.com/membership/" />
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<meta property="og:title" data-i18n="membership.title" content="Membership Center · MemoryDuel">
+<meta property="og:description" data-i18n="membership.subtitle" content="One-stop management for coins, quests, and invites. Earn coins playing games for ad-free access.">
+<meta property="og:type" content="website">
+<script src="/i18n/i18n.js" defer></script>
+<style>
+  :root { --p:#4f46e5; --p-d:#4338ca; --p-l:#eef2ff; --g:#22b573; --bg:#faf9ff; --card:#fff; --t:#1e1b4b; --m:#6b7280; --line:rgba(23,24,40,0.08); --warn:#f59e0b; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif; background:var(--bg); color:var(--t); line-height:1.6; }
+  a { color:var(--p); text-decoration:none; }
+  a:hover { text-decoration:underline; }
+  .wrap { max-width:880px; margin:0 auto; padding:0 20px; }
+  nav { position:sticky; top:0; z-index:50; background:rgba(255,255,255,0.95); backdrop-filter:blur(8px); border-bottom:1px solid var(--line); }
+  .nav-inner { display:flex; align-items:center; gap:18px; height:60px; max-width:1180px; margin:0 auto; padding:0 20px; }
+  .nav-brand { font-weight:800; font-size:18px; color:var(--t); }
+  .nav-brand:hover { text-decoration:none; }
+  .nav-links { margin-left:auto; display:flex; gap:4px; }
+  .nav-links a { color:var(--m); font-size:14px; padding:8px 14px; border-radius:999px; transition:.15s; }
+  .nav-links a:hover { color:var(--p); background:var(--p-l); text-decoration:none; }
+  .container { padding:30px 0 60px; }
+
+  h1 { font-size:1.8rem; color:var(--p-d); margin-bottom:.4rem; }
+  .subtitle { color:var(--m); margin-bottom:24px; font-size:.95rem; }
+
+  .grid { display:grid; gap:16px; }
+  .grid-2 { grid-template-columns:repeat(2,1fr); }
+  @media(max-width:680px){ .grid-2 { grid-template-columns:1fr; } }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:20px; }
+  .card-title { font-size:.85rem; text-transform:uppercase; letter-spacing:.5px; color:var(--m); margin-bottom:6px; font-weight:700; }
+  .card-value { font-size:2rem; font-weight:800; color:var(--t); }
+  .card-meta { font-size:.85rem; color:var(--m); margin-top:4px; }
+  .card-accent { background:linear-gradient(135deg,var(--p),var(--p-d)); color:#fff; border:none; }
+  .card-accent .card-title { color:rgba(255,255,255,0.85); }
+  .card-accent .card-value { color:#fff; }
+  .card-accent .card-meta { color:rgba(255,255,255,0.85); }
+
+  .quest-list { display:grid; gap:10px; }
+  .quest { display:flex; align-items:center; gap:14px; padding:14px 16px; background:#f9fafb; border:1.5px solid #e5e7eb; border-radius:10px; transition:.15s; }
+  .quest.done { background:#f0fdf4; border-color:#86efac; }
+  .quest.claimed { background:#f9fafb; border-color:#d1d5db; opacity:.7; }
+  .quest-icon { width:36px; height:36px; border-radius:8px; background:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; border:1px solid var(--line); flex-shrink:0; }
+  .quest.done .quest-icon { background:#dcfce7; border-color:#86efac; }
+  .quest-info { flex:1; min-width:0; }
+  .quest-title { font-weight:600; font-size:.95rem; }
+  .quest-reward { font-size:.78rem; color:var(--m); }
+  .quest-status { padding:4px 10px; border-radius:999px; font-size:.78rem; font-weight:600; }
+  .quest-status.can-claim { background:var(--p); color:#fff; cursor:pointer; }
+  .quest-status.can-claim:hover { background:var(--p-d); }
+  .quest-status.claimed { background:#d1d5db; color:#6b7280; }
+
+  .tabs { display:flex; gap:0; border-bottom:1px solid var(--line); margin:20px 0 16px; }
+  .tab { padding:10px 18px; cursor:pointer; font-size:.95rem; color:var(--m); font-weight:600; border:0; border-bottom:2px solid transparent; background:none; transition:.15s; }
+  .tab:hover { color:var(--p); }
+  .tab.active { color:var(--p); border-bottom-color:var(--p); }
+
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 22px; border-radius:10px; border:none; background:var(--p); color:#fff; font-weight:600; cursor:pointer; transition:.15s; font-size:.92rem; }
+  .btn:hover { background:var(--p-d); }
+  .btn-secondary { background:transparent; color:var(--p); border:1.5px solid var(--p); }
+  .btn-secondary:hover { background:var(--p-l); }
+  .btn-sm { padding:6px 14px; font-size:.85rem; }
+  .btn:disabled { background:#a5b4fc; cursor:not-allowed; }
+
+  .banner { padding:12px 16px; border-radius:10px; margin-bottom:16px; font-size:.9rem; display:flex; align-items:center; gap:10px; }
+  .banner-info { background:var(--p-l); color:var(--p-d); }
+  .banner-success { background:#dcfce7; color:#166534; }
+  .banner-warn { background:#fef3c7; color:#854d0e; }
+
+  .empty { padding:40px 20px; text-align:center; color:var(--m); background:#f9fafb; border-radius:12px; }
+  .loading { padding:40px 20px; text-align:center; color:var(--m); }
+
+  .login-prompt { background:linear-gradient(135deg,var(--p-l),#fef9c3); padding:30px 24px; border-radius:14px; text-align:center; margin-bottom:24px; }
+  .login-prompt h2 { color:var(--p-d); margin-bottom:8px; font-size:1.2rem; }
+  .login-prompt p { color:#57534e; margin-bottom:16px; }
+
+  .lb-table { width:100%; border-collapse:collapse; }
+  .lb-table th { text-align:left; font-size:.78rem; color:var(--m); text-transform:uppercase; padding:8px 12px; border-bottom:1px solid var(--line); font-weight:600; }
+  .lb-table td { padding:12px; border-bottom:1px solid #f3f4f6; font-size:.92rem; }
+  .lb-table tr:hover td { background:#f9fafb; }
+  .rank-1 { color:#eab308; font-weight:700; }
+  .rank-2 { color:#9ca3af; font-weight:700; }
+  .rank-3 { color:#b45309; font-weight:700; }
+
+  .invite-box { background:linear-gradient(135deg,#ec4899,#8b5cf6); color:#fff; padding:20px; border-radius:14px; margin-bottom:16px; }
+  .invite-title { font-size:1rem; font-weight:700; margin-bottom:8px; }
+  .invite-link-row { display:flex; gap:8px; background:rgba(255,255,255,0.15); padding:10px 12px; border-radius:10px; margin-bottom:8px; }
+  .invite-link-row input { flex:1; background:transparent; border:none; color:#fff; font-family:monospace; font-size:.78rem; outline:none; min-width:0; }
+  .invite-link-row button { background:#fff; color:#8b5cf6; border:none; padding:6px 12px; border-radius:8px; cursor:pointer; font-weight:600; font-size:.85rem; flex-shrink:0; }
+  .invite-link-row button:hover { background:#f3e8ff; }
+
+  .hidden { display:none; }
+</style>
+  <link rel="stylesheet" href="/css/shared/tokens.css?v=p4fix2">
+  <link rel="stylesheet" href="/css/shared/brand-ds2.css?v=ds2-22">
+  <link rel="manifest" href="/manifest.zh.webmanifest">
+</head>
+<body>
+
+<div id="site-header" style="min-height:65px"
+     data-brand-a="Memory" data-brand-b="Duel" data-mark="duel-brain"
+     data-nav='[{"label":"Home","href":"/","i18n":"nav.home"}]'
+     data-cta-label="Home" data-cta-href="/" data-cta-i18n="nav.home"></div>
+
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="nav-brand" data-i18n="nav.home">🧠 MemoryDuel</a>
+      <div class="nav-links">
+        <a href="/" data-i18n="nav.home">Home</a>
+        <a href="https://mathduel.games/blog/why-math-puzzles/" data-i18n="nav.blog">Blog</a>
+        <a href="/about/" data-i18n="nav.about">About</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="wrap container">
+    <h1 data-i18n="membership.h1">Membership Center</h1>
+    <p class="subtitle" data-i18n="membership.subtitle">One-stop management for coins, quests, and invites. Earn coins playing games for ad-free access.</p>
+
+    <div id="login-prompt" class="login-prompt hidden">
+      <h2 data-i18n="membership.login_prompt_title">Login to view Membership Center</h2>
+      <p data-i18n="membership.login_prompt_desc">Register and get 100 coins. Earn coins playing games for ad-free access.</p>
+      <button class="btn" data-open-auth="register" data-i18n="membership.login_prompt_btn">Register / Login</button>
+    </div>
+
+    <div id="membership-content" class="hidden">
+
+      <div class="grid grid-2" style="margin-bottom:24px">
+        <div class="card card-accent">
+          <div class="card-title" data-i18n="membership.coins_title">Coin Balance</div>
+          <div class="card-value" id="m-coins">--</div>
+          <div class="card-meta"><span data-i18n-html="membership.coins_total">累计获得 <span id="m-coins-total">--</span> 积分</span></div>
+        </div>
+        <div class="card" id="m-adfree-card">
+          <div class="card-title" data-i18n="membership.adfree_title">Ad-free Status</div>
+          <div class="card-value" id="m-adfree-status">--</div>
+          <div class="card-meta" id="m-adfree-meta">--</div>
+        </div>
+      </div>
+
+      <div class="invite-box">
+        <div class="invite-title" data-i18n="membership.invite_title">Invite Friends, Win Ad-free</div>
+        <p style="font-size:.88rem;opacity:.9;margin-bottom:12px" data-i18n-html="membership.invite_desc">Get <b>500 coins</b> for each valid new user invited. 3/5/10 people also get ad-free bonus.</p>
+        <div class="invite-link-row">
+          <input id="m-invite-link" type="text" readonly />
+          <button id="m-copy-link" data-i18n="membership.copy_btn">Copy</button>
+        </div>
+        <div style="font-size:.85rem;margin-top:6px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+          <span><span data-i18n-html="membership.invited_count">Invited: {n} people</span></span>
+          <span id="m-invite-next" style="opacity:.9"></span>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="quests" data-i18n="membership.tab_quests">Daily Quests</button>
+        <button class="tab" data-tab="history" data-i18n="membership.tab_history">Coin History</button>
+        <button class="tab" data-tab="leaderboard" data-i18n="membership.tab_leaderboard">Leaderboard</button>
+      </div>
+
+      <div id="tab-quests" class="tab-panel">
+        <div id="quests-list" class="quest-list"><div class="loading" data-i18n="membership.loading">Loading...</div></div>
+        <div id="claim-all-row" style="margin-top:16px;text-align:center;display:none">
+          <button class="btn" id="claim-all-btn" data-i18n-html="membership.claim_all">Claim All ( +{n} )</button>
+        </div>
+      </div>
+
+      <div id="tab-history" class="tab-panel hidden">
+        <div id="history-list" class="loading" data-i18n="membership.loading">Loading...</div>
+      </div>
+
+      <div id="tab-leaderboard" class="tab-panel hidden">
+        <div style="display:flex;gap:8px;margin-bottom:14px">
+          <button class="btn btn-secondary btn-sm" data-lb="coins" data-i18n="membership.lb_coins">Coins</button>
+          <button class="btn btn-secondary btn-sm" data-lb="invites" data-i18n="membership.lb_invites">Invites</button>
+        </div>
+        <div id="lb-content" class="loading" data-i18n="membership.loading">Loading...</div>
+      </div>
+
+    </div>
+  </div>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "会员中心",
+    "description": "积分余额、每日任务、邀请进度、免广告特权一站式管理"
+  }
+  </script>
+
+  <script src="/shared/auth-extras.js?v=1"></script>
+  <script src="/shared/auth-modal.js?v=20260924" defer></script>
+  <script src="/js/coins-bar.js?v=20260924" defer></script>
+  <script src="/js/coin-exchange.js?v=20260924" defer></script>
+  <script src="/js/invite-card.js" defer></script>
+
+  <script>
+  (function(){
+    'use strict';
+
+    var tabs = document.querySelectorAll('.tab');
+    var panels = document.querySelectorAll('.tab-panel');
+    var currentTab = 'quests';
+    var lbType = 'coins';
+
+    tabs.forEach(function(t){
+      t.addEventListener('click', function(){
+        var tab = t.dataset.tab;
+        currentTab = tab;
+        tabs.forEach(function(x){ x.classList.toggle('active', x===t); });
+        panels.forEach(function(p){
+          p.classList.toggle('hidden', p.id !== 'tab-'+tab);
+        });
+        if (tab === 'history') loadHistory();
+        if (tab === 'leaderboard') loadLeaderboard();
+      });
+    });
+
+    document.addEventListener('click', function(e){
+      var t = e.target;
+      if (!t || !t.dataset || !t.dataset.lb) return;
+      lbType = t.dataset.lb;
+      document.querySelectorAll('[data-lb]').forEach(function(b){
+        b.classList.toggle('btn-secondary', b.dataset.lb === lbType);
+        b.classList.toggle('btn', true);
+      });
+      loadLeaderboard();
+    });
+
+    function checkLogin(){
+      fetch((window.API_BASE || '') + '/auth/me', {credentials:'same-origin'})
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+          if (d && d.uuid) {
+            document.getElementById('login-prompt').classList.add('hidden');
+            document.getElementById('membership-content').classList.remove('hidden');
+            loadAll();
+          } else {
+            document.getElementById('login-prompt').classList.remove('hidden');
+          }
+        })
+        .catch(function(){
+          document.getElementById('login-prompt').classList.remove('hidden');
+        });
+    }
+
+    function loadAll(){
+      loadMe();
+      loadQuests();
+      loadInvite();
+    }
+
+    function loadMe(){
+      fetch((window.API_BASE || '') + '/membership/me', {credentials:'same-origin'})
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+          if (!d || d.error) return;
+          document.getElementById('m-coins').textContent = d.coins.toLocaleString();
+          var af = d.ad_free;
+          if (af && af.active && af.days_remaining > 0) {
+            document.getElementById('m-adfree-status').textContent = tr('membership.adfree_days', {n: af.days_remaining});
+            document.getElementById('m-adfree-meta').textContent = tr('membership.adfree_expires', {date: new Date(af.expires_at).toLocaleDateString()});
+          } else {
+            document.getElementById('m-adfree-status').textContent = tr('membership.adfree_inactive');
+            document.getElementById('m-adfree-meta').innerHTML = '<a href="#" data-exchange>' + tr('membership.adfree_exchange') + ' →</a>';
+          }
+        });
+
+      fetch((window.API_BASE || '') + '/coins/me', {credentials:'same-origin'})
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+          if (d && d.coins_earned_total !== undefined) {
+            var totalEl = document.getElementById('m-coins-total');
+            if (totalEl) totalEl.textContent = d.coins_earned_total.toLocaleString();
+          }
+        });
+    }
+
+    function loadQuests(){
+      fetch((window.API_BASE || '') + '/membership/quests', {credentials:'same-origin'})
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+          if (!d || !d.quests) return;
+          var html = '';
+          var canClaimIds = [];
+          d.quests.forEach(function(q){
+            var cls = q.completed ? (q.claimed ? 'claimed' : 'done') : '';
+            var statusHtml = '';
+            if (q.claimed) {
+              statusHtml = '<span class="quest-status claimed">' + tr('membership.status_claimed') + '</span>';
+            } else if (q.can_claim) {
+              statusHtml = '<button class="quest-status can-claim" data-claim="'+q.id+'">' + tr('membership.status_claim', {n: q.reward}) + '</button>';
+              canClaimIds.push(q.id);
+            } else {
+              statusHtml = '<span class="quest-status" style="background:#f3f4f6;color:#9ca3af">' + tr('membership.status_incomplete') + '</span>';
+            }
+            html += '<div class="quest '+cls+'">' +
+              '<div class="quest-icon">'+(q.completed?'✓':'·')+'</div>' +
+              '<div class="quest-info"><div class="quest-title">'+q.title+'</div>' +
+              '<div class="quest-reward">'+tr('membership.reward', {n: q.reward})+'</div></div>' +
+              statusHtml + '</div>';
+          });
+          document.getElementById('quests-list').innerHTML = html;
+          var row = document.getElementById('claim-all-row');
+          if (canClaimIds.length > 0) {
+            row.style.display = 'block';
+            document.getElementById('claim-all-amount').textContent = d.available_to_claim;
+            document.getElementById('claim-all-btn').dataset.ids = JSON.stringify(canClaimIds);
+          } else {
+            row.style.display = 'none';
+          }
+        })
+        .catch(function(){ document.getElementById('quests-list').innerHTML = '<div class="empty">'+tr('membership.load_failed')+'</div>'; });
+    }
+
+    function loadInvite(){
+      fetch((window.API_BASE || '') + '/invite/my-code', {credentials:'same-origin'})
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+          if (!d || d.error) return;
+          document.getElementById('m-invite-link').value = d.urls[0] || ('https://memoryduel.com/?ref='+d.code);
+          document.getElementById('m-invite-count').textContent = d.valid_invites;
+          if (d.next_milestone) {
+            document.getElementById('m-invite-next').textContent =
+              tr('membership.milestone_pending', {label: d.next_milestone.label, n: d.next_milestone.valid-d.valid_invites});
+          } else {
+            document.getElementById('m-invite-next').textContent = tr('membership.milestone_done');
+          }
+        });
+    }
+
+    function loadHistory(){
+      fetch((window.API_BASE || '') + '/coins/history?limit=30', {credentials:'same-origin'})
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+          if (!d || !d.history) {
+            document.getElementById('history-list').innerHTML = '<div class="empty">'+tr('membership.empty_history')+'</div>';
+            return;
+          }
+          if (d.history.length === 0) {
+            document.getElementById('history-list').innerHTML = '<div class="empty">'+tr('membership.empty_history')+'</div>';
+            return;
+          }
+          var html = '<div class="card"><table class="lb-table"><thead><tr>'+
+            '<th>'+tr('membership.type_label')+'</th><th>'+tr('membership.source_label')+'</th><th style="text-align:right">'+tr('membership.amount_label')+'</th><th style="text-align:right">'+tr('membership.time_label')+'</th></tr></thead><tbody>';
+          d.history.forEach(function(h){
+            var type = h.type === 'earn' ? '🟢 +' : '🔴 −';
+            var color = h.type === 'earn' ? '#16a34a' : '#dc2626';
+            var src = h.source || '';
+            var srcLabel = {checkin: tr('membership.source_checkin'), game_complete: tr('membership.source_game'), quest: tr('membership.source_quest'), invite: tr('membership.source_invite'), purchase: tr('membership.source_purchase')}[h.source.split(':')[0]] || h.source;
+            var date = new Date(h.ts).toLocaleString('zh-CN', {hour12:false});
+            html += '<tr><td style="color:'+color+';font-weight:600">'+type+'</td>' +
+              '<td><code style="font-size:.78rem">'+srcLabel+'</code></td>' +
+              '<td style="text-align:right;font-weight:600;color:'+color+'">'+h.amount+'</td>' +
+              '<td style="text-align:right;color:var(--m);font-size:.82rem">'+date+'</td></tr>';
+          });
+          html += '</tbody></table></div>';
+          document.getElementById('history-list').innerHTML = html;
+        })
+        .catch(function(){ document.getElementById('history-list').innerHTML = '<div class="empty">'+tr('membership.load_failed')+'</div>'; });
+    }
+
+    function loadLeaderboard(){
+      document.getElementById('lb-content').innerHTML = '<div class="loading">'+tr('membership.loading')+'</div>';
+      fetch((window.API_BASE || '') + '/membership/leaderboard?type='+lbType+'&limit=50', {credentials:'same-origin'})
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+          if (!d || !d.leaderboard || d.leaderboard.length === 0) {
+            document.getElementById('lb-content').innerHTML = '<div class="empty">'+tr('membership.no_players')+'</div>';
+            return;
+          }
+          var html = '<div class="card"><table class="lb-table"><thead><tr>'+
+            '<th>'+tr('membership.lb_rank')+'</th><th>'+tr('membership.lb_uuid')+'</th><th style="text-align:right">'+(lbType==='coins'?tr('membership.lb_coins'):tr('membership.lb_invites'))+'</th></tr></thead><tbody>';
+          d.leaderboard.forEach(function(p){
+            var rankCls = p.rank <= 3 ? 'rank-'+p.rank : '';
+            var shortUUID = (p.uuid || '').slice(0,8);
+            html += '<tr><td class="'+rankCls+'">#'+p.rank+'</td>' +
+              '<td><code style="font-size:.78rem;color:var(--m)">'+shortUUID+'...</code>' +
+              (p.ad_free?' <span style="background:#dcfce7;color:#166534;font-size:.7rem;padding:2px 6px;border-radius:4px">'+tr('membership.adfree_badge')+'</span>':'')+'</td>' +
+              '<td style="text-align:right;font-weight:600">'+(lbType==='coins'?p.total:p.invites)+'</td></tr>';
+          });
+          html += '</tbody></table></div>';
+          html += '<div style="text-align:center;color:var(--m);font-size:.85rem;margin-top:8px">'+tr('membership.lb_players', {n: d.total_players})+'</div>';
+          document.getElementById('lb-content').innerHTML = html;
+        })
+        .catch(function(){ document.getElementById('lb-content').innerHTML = '<div class="empty">'+tr('membership.load_failed')+'</div>'; });
+    }
+
+    document.addEventListener('click', function(e){
+      var t = e.target;
+      if (!t) return;
+      if (t.dataset.claim) {
+        claimQuests([t.dataset.claim]);
+      }
+      if (t.id === 'claim-all-btn') {
+        try {
+          var ids = JSON.parse(t.dataset.ids || '[]');
+          if (ids.length > 0) claimQuests(ids);
+        } catch(e){}
+      }
+    });
+
+    function claimQuests(ids){
+      fetch((window.API_BASE || '') + '/membership/quests/claim', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({quest_ids: ids})
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if (d && d.ok) {
+          var msg = tr('membership.claim_success', {n: d.coins_earned||0});
+          if (typeof Toast !== 'undefined') Toast.show(msg, 'success');
+          else alert(msg);
+          loadMe();
+          loadQuests();
+        } else {
+          if (typeof Toast !== 'undefined') Toast.show(tr('membership.claim_failed', {msg: d.error||''}), 'error');
+        }
+      })
+      .catch(function(){
+        if (typeof Toast !== 'undefined') Toast.show(tr('membership.network_error'), 'error');
+      });
+    }
+
+    document.getElementById('m-copy-link').addEventListener('click', function(){
+      var input = document.getElementById('m-invite-link');
+      input.select();
+      try {
+        navigator.clipboard.writeText(input.value);
+        this.textContent = tr('membership.copy_success');
+        setTimeout(function(){ this.textContent=tr('membership.copy_default'); }.bind(this), 1500);
+      } catch(e){
+        document.execCommand('copy');
+      }
+    });
+
+    checkLogin();
+  })();
+  </script>
+  <script src="/shared/site-header.js?v=ds2-10"></script>
+  <script src="/shared/sso-bridge.js?v=1" defer></script>
+<footer class="sites-footer">
+  <div class="wrap">
+    <div class="sf-title" data-i18n="home.site_network">🎯 Our Brand Portfolio</div>
+    <div class="sf-matrix">
+      <a href="https://mathduel.games/" class="sf-item">
+        <svg class="duel-icon sf-emoji" aria-hidden="true"><use href="/shared/icons.svg#duel-calculator"></use></svg>
+        <span data-i18n="mm_membership_2">MathDuel</span>
+      </a>
+      <a href="https://boardduel.com/" class="sf-item">
+        <svg class="duel-icon sf-emoji" aria-hidden="true"><use href="/shared/icons.svg#duel-chess"></use></svg>
+        <span data-i18n="mm_membership_3">BoardDuel</span>
+      </a>
+      <a href="https://memoryduel.com/" class="sf-item current">
+        <svg class="duel-icon sf-emoji" aria-hidden="true"><use href="/shared/icons.svg#duel-brain"></use></svg>
+        <span data-i18n="mm_membership_4">MemoryDuel</span>
+      </a>
+    </div>
+    <div class="sf-links">
+      <a href="/about/" data-i18n="nav.about">About</a>
+      <a href="/privacy/" data-i18n="nav.privacy">Privacy</a>
+      <a href="/terms/" data-i18n="nav.terms">Terms</a>
+      <a href="/contact/" data-i18n="nav.contact">Contact</a>
+    </div>
+    <div class="sf-copy" data-i18n="home.footer">© 2026 MemoryDuel · No Ads · No Tracking · Pure Static</div>
+  </div>
+</footer>
+  </body>
+</html>
