@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-site="memory">
+<html lang="en" data-site="memory" data-build="%VITE_SHOW_BETA%">
 <head>
   <script>
     // 全局API配置 - 根据站点自动选择API服务器
@@ -131,7 +131,7 @@
     <div class="sidebar-group-label" data-i18n="nav.lobby_group">Lobby</div>
     <a href="#lobby" class="sidebar-link"><span class="ico">⚔️</span><span data-i18n="nav.1v1_duel">1v1 Duel</span></a>
     <a href="#online" class="sidebar-link"><span class="ico">🌐</span><span data-i18n="nav.online_match">Online Match</span></a>
-    <a href="/train.html" class="sidebar-link"><span class="ico">🤖</span><span data-i18n="nav.train">Training</span></a>
+    <a href="/train.html" class="sidebar-link" data-stage="live"><span class="ico">🤖</span><span data-i18n="nav.train">Training</span></a>
     <div class="sidebar-group-label" data-i18n="nav.features_group">Features</div>
     <a href="#features" class="sidebar-link"><span class="ico">✨</span><span data-i18n="nav.features">How to Play</span></a>
     <div class="sidebar-spacer"></div>
@@ -318,10 +318,7 @@
 <script src="/shared/site-header.js?v=ds2-10"></script>
   <script src="/js/coins-bar.js?v=20260924" defer></script>
   <script src="/shared/sso-bridge.js?v=1" defer></script>
-<script type="module">
-import { initHome } from '/assets/js/home.mjs';
-initHome();
-</script>
+<script type="module" src="/assets/js/home.mjs"></script>
 
 <script>
 (function() {
@@ -337,5 +334,5 @@ initHome();
   setInterval(loadOnline, 30000);
 })();
 </script>
-<script src="/shared/onboard.js?v=20260917"></script><script src="/shared/achievements.js"></script></body>
+<script src="/shared/onboard.js?v=20260917"></script><script src="/shared/achievements.js"></script><script type="module" src="/src/pages/home.ts"></script></body>
 </html>

@@ -313,3 +313,6 @@ export function initHome() {
     try { window.i18n.onChange(() => renderCategories()); } catch (e) {}
   }
 }
+
+// 首页加载即初始化（本文件仅由 index.html 以 module 方式加载）
+initHome();
