@@ -19,10 +19,18 @@ function bindModeToggle() {
   if (!aiBtn || !onlineBtn || !aiPanel || !onlinePanel) return;
 
   const switchTo = (mode) => {
-    aiBtn.classList.toggle('on', mode === 'ai');
-    onlineBtn.classList.toggle('on', mode === 'online');
-    aiPanel.style.display = mode === 'ai' ? '' : 'none';
-    onlinePanel.style.display = mode === 'online' ? '' : 'none';
+    const isAi = mode === 'ai';
+    aiBtn.classList.toggle('on', isAi);
+    onlineBtn.classList.toggle('on', !isAi);
+    // aria-selected 必须跟着走，否则屏幕阅读器读到的是旧状态
+    aiBtn.setAttribute('aria-selected', String(isAi));
+    onlineBtn.setAttribute('aria-selected', String(!isAi));
+    // hidden 属性和 style.display 要一起开合：
+    // 元素上带 hidden 时，只清 style.display 是没用的（[hidden] 由 UA 样式表提供）
+    aiPanel.style.display = isAi ? '' : 'none';
+    aiPanel.hidden = !isAi;
+    onlinePanel.style.display = isAi ? 'none' : '';
+    onlinePanel.hidden = isAi;
   };
   aiBtn.addEventListener('click', () => switchTo('ai'));
   onlineBtn.addEventListener('click', () => switchTo('online'));
@@ -30,6 +38,16 @@ function bindModeToggle() {
 }
 
 // ---------- 分类网格 ----------
+// 右上角「已选」小字：显示真实分类名 + 一局的规格
+function updateSelLabel(card, fallbackName) {
+  const sel = $('catSel');
+  if (!sel) return;
+  const name = (card && card.querySelector && card.querySelector('.cn'))
+    ? card.querySelector('.cn').textContent
+    : (fallbackName || '');
+  sel.textContent = name ? name + ' \u00b7 10 questions \u00b7 15s each' : 'Pick one to start';
+}
+
 function renderCategories() {
   const grid = $('catGrid');
   if (!grid || !window.MemoryDuelQuiz) return;
@@ -49,28 +67,41 @@ function renderCategories() {
   // 防止重复绑定 click listener：每次重建时清理旧的事件
   grid.onclick = null;
 
+  const firstName = (list) => {
+    const first = list.find((c) => (byCategory(c.id) || []).length > 0);
+    if (!first) return null;
+    return first[lang] || first.en || first.id;
+  };
+  const stillLoading = (loading && loading()) || QUESTIONS.length === 0;
+
   grid.innerHTML = CATEGORIES.map((c) => {
     const count = (byCategory(c.id) || []).length;
     const name = c[lang] || c.en || c.id;
     // 还在加载中：禁用按钮，显示 loading 文字
     // 加载完成但该分类无题：禁用按钮，显示 empty 文字
     // 加载完成且有题：可点击
-    const isLoading = (loading && loading()) || QUESTIONS.length === 0;
-    const disabled = isLoading || count === 0;
-    const countText = isLoading ? t.loading : (count > 0 ? count : t.empty);
+    const disabled = stillLoading || count === 0;
+    const countText = stillLoading ? t.loading : (count > 0 ? count : t.empty);
+    // 两套 class 同时给：.cat/.ci/.cn/.cq 是设计稿皮肤，.cat-card/.selected 是旧 JS 契约
     return `
-      <button class="cat-card${disabled ? ' locked' : ''}" data-cat="${c.id}" ${disabled ? 'disabled' : ''}>
-        <div class="cat-icon">${c.icon || '🧩'}</div>
-        <div class="cat-name">${name}</div>
-        <div class="cat-count">${countText}</div>
+      <button class="cat cat-card${disabled ? ' locked' : ''}" data-cat="${c.id}" ${disabled ? 'disabled' : ''}>
+        <span class="ci cat-icon">${c.icon || '🧩'}</span>
+        <span class="cn cat-name">${name}</span>
+        <span class="cq cat-count">${countText}</span>
       </button>`;
   }).join('');
 
+  // 默认选中第一个有题的分类，右上角小字同步（搜索引擎与真人看到的都是真数据）
+  const firstEnabled = grid.querySelector('.cat:not([disabled])');
+  if (firstEnabled) firstEnabled.classList.add('on', 'selected');
+  updateSelLabel(firstEnabled ? firstEnabled : null, firstName(CATEGORIES) || '');
+
   grid.addEventListener('click', (e) => {
-    const card = e.target.closest('.cat-card');
+    const card = e.target.closest('.cat, .cat-card');
     if (!card || card.disabled) return;
-    grid.querySelectorAll('.cat-card').forEach((x) => x.classList.remove('selected'));
-    card.classList.add('selected');
+    grid.querySelectorAll('.cat').forEach((x) => x.classList.remove('on', 'selected'));
+    card.classList.add('on', 'selected');
+    updateSelLabel(card, card.querySelector('.cn') ? card.querySelector('.cn').textContent : '');
   });
 }
 
@@ -224,14 +255,24 @@ function bindRoomActions() {
   const status = $('matchStatus');
   const lang = (window.i18n && window.i18n.getLang) ? window.i18n.getLang() : 'en';
 
+  const roomErr = $('roomErr');
+  if (input) {
+    input.addEventListener('input', () => {
+      const clean = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      if (clean !== input.value) input.value = clean;
+      if (roomErr) roomErr.style.display = 'none';
+    });
+  }
   if (join && input) {
     join.addEventListener('click', async () => {
       const code = (input.value || '').trim().toUpperCase();
       // F-005: 严格校验 6 位房间码格式, 过短/非法给出明确提示(不再静默)
       if (!/^[A-Z2-9]{6}$/.test(code)) {
-        if (status) status.textContent = '❌ Room code must be 6 letters/digits (e.g. A3B7K9).';
+        if (roomErr) roomErr.style.display = 'block';
+        if (status) status.textContent = '';
         return;
       }
+      if (roomErr) roomErr.style.display = 'none';
       // F-005: 跳转前先经服务端校验房间存在
       try {
         const s = await getSession();

@@ -1,265 +1,271 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-site="memory" data-theme="dark" data-build="%VITE_SHOW_BETA%">
+<html lang="en" data-site="memory" data-build="%VITE_SHOW_BETA%">
 <head>
-  <script>
-    // 全局API配置 - 根据站点自动选择API服务器
-    (function() {
-      var site = document.documentElement.getAttribute('data-site') || 'memory';
-      var apiHosts = {
-        'memory': 'api.memoryduel.com',
-        'math': 'api.mathduel.games',
-        'board': 'api.boardduel.com'
-      };
-      window.API_BASE = 'https://' + (apiHosts[site] || 'api.memoryduel.com');
-      window.WS_BASE = 'wss://' + (apiHosts[site] || 'ws.memoryduel.com');
-    })();
-  </script>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MemoryDuel · 记忆对决 — 泛百科知识对战</title>
-  <meta name="description" content="泛百科知识对战：46,000+ 题库，12 大类别，6 种语言。十道题，每题十五秒，先答对者得分。免登录，无广告，免安装。">
-  <meta name="keywords" content="知识对战,trivia,quiz duel,1v1,ai sparring,online quiz,multiplayer trivia,记忆对决">
-  <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="MemoryDuel">
-  <meta property="og:title" content="MemoryDuel · 记忆对决 — 泛百科知识对战">
-  <meta property="og:description" content="46,000+ 题库 · 12 大类别 · 6 种语言 · 1v1 实时对决。点开即玩，免登录，无广告。">
-  <meta property="og:url" content="https://memoryduel.com/">
-  <meta property="og:locale" content="zh_CN">
-  <meta name="og:image" content="https://memoryduel.com/og-default.jpg">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="MemoryDuel · 记忆对决 — 泛百科知识对战">
-  <meta name="twitter:description" content="46,000+ 题库 · 12 大类别 · 6 种语言 · 免登录实时对决。">
-  <meta name="twitter:image" content="https://memoryduel.com/og-default.jpg">
-  <link rel="canonical" href="https://memoryduel.com/">
-  <link rel="alternate" hreflang="zh-CN" href="https://memoryduel.com/" />
-  <link rel="alternate" hreflang="en" href="https://memoryduel.com/?lang=en" />
-  <link rel="alternate" hreflang="ja" href="https://memoryduel.com/?lang=ja" />
-  <link rel="alternate" hreflang="es" href="https://memoryduel.com/?lang=es" />
-  <link rel="alternate" hreflang="fr" href="https://memoryduel.com/?lang=fr" />
-  <link rel="alternate" hreflang="de" href="https://memoryduel.com/?lang=de" />
-  <link rel="alternate" hreflang="x-default" href="https://memoryduel.com/" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#FAF6F1">
+<title>MemoryDuel — Knowledge Battle, 5 minutes at a time</title>
+<meta name="description" content="1v1 knowledge duel across science, history, geography, sports, movies and more. Ten questions, 15 seconds each, answer first to score. No login, no install, no ads.">
+<meta name="keywords" content="knowledge battle,trivia,quiz duel,1v1,ai sparring,online quiz,multiplayer trivia">
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MemoryDuel">
+<meta property="og:title" content="MemoryDuel — Knowledge Battle, 5 minutes at a time">
+<meta property="og:description" content="Ten questions, 15 seconds each. Answer first to score. Play AI or a real opponent, no login required.">
+<meta property="og:url" content="https://memoryduel.com/">
+<meta property="og:image" content="https://memoryduel.com/og-default.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="MemoryDuel — Knowledge Battle, 5 minutes at a time">
+<meta name="twitter:description" content="Ten questions, 15 seconds each. Answer first to score. No login, no install.">
+<meta name="twitter:image" content="https://memoryduel.com/og-default.jpg">
+<link rel="canonical" href="https://memoryduel.com/">
+<link rel="alternate" hreflang="en" href="https://memoryduel.com/">
+<link rel="alternate" hreflang="zh-CN" href="https://memoryduel.com/zh/">
+<link rel="alternate" hreflang="ja" href="https://memoryduel.com/ja/">
+<link rel="alternate" hreflang="es" href="https://memoryduel.com/es/">
+<link rel="alternate" hreflang="fr" href="https://memoryduel.com/fr/">
+<link rel="alternate" hreflang="de" href="https://memoryduel.com/de/">
+<link rel="alternate" hreflang="x-default" href="https://memoryduel.com/">
+<link rel="manifest" href="/manifest.webmanifest">
 <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "VideoGame",
     "name": "MemoryDuel - Knowledge Battle",
     "url": "https://memoryduel.com/",
-    "description": "Real-time 1v1 knowledge battle covering 12+ categories, 46,000+ questions in 6 languages.",
+    "description": "Real-time 1v1 knowledge battle covering 12 categories in 6 languages.",
     "genre": ["Trivia", "Quiz", "Multiplayer"],
     "operatingSystem": "Any (Web Browser)",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
   }
-  </script>
-  <link rel="manifest" href="/manifest.zh.webmanifest">
-  <link rel="stylesheet" href="/css/shared/tokens.css?v=md-p3">
-  <link rel="stylesheet" href="/css/shared/components.css?v=md-c8">
-  <link rel="stylesheet" href="/css/shared/toast.css?v=md-t3">
-  <link rel="stylesheet" href="/css/home-redesign.css?v=md-home4">
+</script>
+<link rel="stylesheet" href="/src/styles/home-papergames.css">
 </head>
-<body>
+<body class="home-v2">
 
-<!-- APP BAR -->
-<div class="appbar">
-  <div class="in">
-    <span class="logo">MEMORY<span class="em">DUEL</span></span>
-    <nav class="tabs">
-      <a class="tab active" href="#sec0">对战</a>
-      <a class="tab" href="#sec1">题库</a>
-      <a class="tab" href="#sec4">排行</a>
-      <a class="tab" href="#sec6">商店</a>
-    </nav>
-    <div class="right">
-      <button id="coins-bar-btn" class="coin num" type="button">◎ —</button>
-      <span class="lang">中 · EN · 日</span>
-      <a class="btn primary small" href="#" data-open-auth="register">登录</a>
-    </div>
-  </div>
+<!-- ═══════════ 移动端顶栏（<1120px 显示） ═══════════ -->
+<div class="topbar">
+  <button class="burger" id="burger" aria-label="Open navigation" aria-expanded="false">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+  </button>
+  <a class="logo" href="/">Memory<b>Duel</b></a>
+  <a class="btn-login" href="#lobby">Start a duel</a>
 </div>
+<div class="overlay" id="overlay"></div>
 
-<!-- HERO -->
-<header class="hero" id="sec0">
-  <div class="wrap grid">
-    <div>
-      <span class="badge"><i></i>泛百科知识对战 · 46,000+ 题库 · 12 大类别</span>
-      <h1>两颗大脑。<br>同一道题。<br><span class="em">十五秒。</span></h1>
-      <p class="sub">挑一个类别，十道题，每题十五秒——<b>先答对者得分</b>，速度与正确率双计分。和好友同卷对决，或找 AI 陪练。免登录，无广告。</p>
+<!-- ═══════════ 侧边导航 ═══════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-top">
+    <a class="logo" href="/"><span>Memory</span><b>Duel</b></a>
+    <button class="sb-collapse" id="collapse" title="Collapse navigation" aria-label="Collapse navigation">&laquo;</button>
+  </div>
+  <div class="sb-login">
+    <a class="btn-login" href="#lobby"><span>Start a duel</span></a>
+  </div>
+  <nav class="sb-nav" aria-label="Site navigation">
+    <a class="nav-item active" href="/">
+      <svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg><label>Home</label>
+    </a>
+    <a class="nav-item" href="#lobby">
+      <svg viewBox="0 0 24 24"><path d="M14.5 4.5l5 5-9 9H5.5v-5z"/><path d="M12 7l5 5"/></svg><label>1v1 Duel</label>
+    </a>
+    <a class="nav-item" href="#online">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.7 2.5 13.3 0 16.9M12 3.5c-2.5 2.7-2.5 13.3 0 16.9"/></svg><label>Online Match</label>
+    </a>
+    <a class="nav-item" href="/train.html">
+      <svg viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="11" rx="3"/><path d="M12 4.5V8M9 13h.01M15 13h.01"/></svg><label>Solo Train</label>
+    </a>
+
+    <div class="nav-group">Progress</div>
+    <a class="nav-item" href="#globalTop">
+      <svg viewBox="0 0 24 24"><path d="M8 21h8m-4-4v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 5M17 6h3a3 3 0 0 1-3 5"/></svg><label>Leaderboard</label>
+    </a>
+    <a class="nav-item" href="#features">
+      <svg viewBox="0 0 24 24"><path d="M4 20V10m5 10V4m5 16v-7m5 7V8"/></svg><label>Features</label>
+    </a>
+    <a class="nav-item" href="#how">
+      <svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19a2 2 0 0 1 2-2h13"/></svg><label>How to Play</label>
+    </a>
+
+    <div class="nav-group">Help</div>
+    <a class="nav-item" href="/about/">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8h.01"/></svg><label>About</label>
+    </a>
+    <a class="nav-item" href="/membership/">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 2.5"/></svg><label>Membership</label>
+    </a>
+  </nav>
+  <div class="nav-foot">
+    <span class="lang-pill"><b>EN</b></span>
+    <span class="sb-copy">&copy; 2026</span>
+  </div>
+</aside>
+
+<!-- ═══════════ 主区 ═══════════ -->
+<main class="main">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="wrap">
+      <span class="badge"><span class="bi">&#129504;</span>Knowledge Battle</span>
+      <h1>Outsmart your opponents, <em>5 minutes</em> at a time</h1>
+      <p class="sub">1v1 knowledge duel spanning science, history, geography, sports, movies and more.<br><b>No login, no install</b> — pick a category and tap to play.</p>
       <div class="cta-row">
-        <a class="btn primary" href="#sec1">开始对战</a>
-        <a class="btn" href="#sec4">挑战好友</a>
+        <a class="btn btn-ember" href="#lobby">
+          <svg viewBox="0 0 24 24"><path d="M14.5 4.5l5 5-9 9H5.5v-5z"/><path d="M12 7l5 5"/></svg>
+          Start a duel
+        </a>
+        <a class="btn btn-ghost" href="#online">Find an online match</a>
       </div>
       <div class="chips">
-        <span class="chip-t">免登录</span><span class="chip-t">无广告</span><span class="chip-t">免安装</span><span class="chip-t">6 种语言</span>
+        <span class="chip"><span class="dot"></span>12 categories</span>
+        <span class="chip"><span class="dot"></span>15s per question</span>
+        <span class="chip"><span class="dot"></span>Ten questions a round</span>
+        <span class="chip"><span class="dot"></span>No ads &middot; no tracking</span>
       </div>
     </div>
-    <div class="duel">
-      <div class="dhead2">
-        <span class="dsnap">对决进行中 · 快照</span>
-        <span class="dot-live"><i></i>同卷实时</span>
+  </section>
+
+  <!-- 首屏双面板：左 模式+分类 | 右 榜单 -->
+  <section class="duo wrap" id="lobby" aria-label="Battle modes and leaderboard">
+
+    <!-- 左：选择模式 + 分类 -->
+    <div class="panel">
+      <div class="panel-title">Choose your battle</div>
+      <div class="panel-sub">AI sparring is always ready. Online match looks for a real opponent.</div>
+
+      <div class="mode-row" id="modeToggle" role="tablist" aria-label="Battle mode">
+        <button class="mode-btn on" data-m="ai" role="tab" aria-selected="true" type="button">&#129302; vs AI</button>
+        <button class="mode-btn" data-m="online" role="tab" aria-selected="false" type="button">&#127760; Online</button>
       </div>
-      <div class="dhead">
-        <span class="dp me"><i>你</i><b>7</b><small>/10</small></span>
-        <div class="dtimer"><span class="dnum num">9.4s</span><div class="dbar"><i style="width:37%"></i></div></div>
-        <span class="dp opp"><b>6</b><small>/10</small><i>Ken</i></span>
-      </div>
-      <div class="dcat">科学 · 第 8 题</div>
-      <p class="dq">国际单位制中，力的单位是什么？</p>
-      <div class="dopts">
-        <button class="opt mine"><span class="key">A</span>牛顿<em class="you">你 · 2.1s</em></button>
-        <button class="opt"><span class="key">B</span>焦耳</button>
-        <button class="opt"><span class="key">C</span>瓦特</button>
-        <button class="opt"><span class="key">D</span>帕斯卡</button>
-      </div>
-      <div class="dfoot"><span class="dot-live"><i></i>Ken 已作答</span><span class="num">先答对者得分</span></div>
-    </div>
-  </div>
-</header>
 
-<!-- CATEGORIES -->
-<section id="sec1">
-  <div class="wrap">
-    <p class="kicker">十二大类 · 四万六千题</p>
-    <h2>一个问题库，装下所有好奇心。</h2>
-    <p class="lead">只有一个游戏，但没有两场对决是一样的——<b>类别就是变体</b>。每个类别独立计榜，答完每道题都附解析。</p>
-    <div class="catgrid">
-      <div class="cat"><span class="glyph">科</span><b>科学</b><small>science</small></div>
-      <div class="cat"><span class="glyph">史</span><b>历史</b><small>history</small></div>
-      <div class="cat"><span class="glyph">地</span><b>地理</b><small>geography</small></div>
-      <div class="cat"><span class="glyph">体</span><b>体育</b><small>sports</small></div>
-      <div class="cat"><span class="glyph">影</span><b>电影</b><small>movies</small></div>
-      <div class="cat"><span class="glyph">技</span><b>科技</b><small>tech</small></div>
-      <div class="cat"><span class="glyph">乐</span><b>音乐</b><small>music</small></div>
-      <div class="cat"><span class="glyph">文</span><b>文化</b><small>culture</small></div>
-      <div class="cat"><span class="glyph">戏</span><b>游戏</b><small>games</small></div>
-      <div class="cat"><span class="glyph">然</span><b>自然</b><small>nature</small></div>
-      <div class="cat"><span class="glyph">艺</span><b>艺术</b><small>arts</small></div>
-      <div class="cat"><span class="glyph">识</span><b>通识</b><small>general</small></div>
-    </div>
-  </div>
-</section>
-
-<!-- HOW -->
-<section id="sec2">
-  <div class="wrap">
-    <p class="kicker">一局怎么打</p>
-    <h2>三步进入第一道题。</h2>
-    <p class="lead">没有匹配队列，没有大厅要学——<b>选类别、同卷、比快</b>。</p>
-    <div class="steps">
-      <div class="step2"><b>1</b><div><strong>挑一个类别，开卷。</strong><span>科学、历史、地理、体育……十二大类，四万六千题，见哪类答哪类。</span></div></div>
-      <div class="step2"><b>2</b><div><strong>同题同钟，十五秒。</strong><span>服务端把同一份十题卷发给双方——没有谁抽到更简单的题。</span></div></div>
-      <div class="step2"><b>3</b><div><strong>先答对者得分。</strong><span>速度与正确率双计分：答得快得分高，十题之后见分晓。</span></div></div>
-    </div>
-  </div>
-</section>
-
-<!-- MODES -->
-<section id="sec3">
-  <div class="wrap">
-    <p class="kicker">四种进入方式</p>
-    <h2>一个人练，两个人打，一群人比。</h2>
-    <p class="lead">「每日十题」是把已建好但未接线的每日模块接上——<b>设计提案</b>，上线即全球同卷。</p>
-    <div class="modes4">
-      <div class="mode4"><span class="mi"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><div><b>1v1 好友对战</b><span>六位房间码，或一条链接直入</span></div></div>
-      <div class="mode4"><span class="mi"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg></span><div><b>AI 陪练</b><span>零等待练习，难度自适应</span></div></div>
-      <div class="mode4"><span class="mi"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span><div><b>每日十题</b><span>全球同卷 · 上线提案</span></div></div>
-      <div class="mode4"><span class="mi"><svg viewBox="0 0 24 24"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M6 3h12v6a6 6 0 0 1-12 0V3z"/><path d="M18 5h2a2 2 0 0 1-2 4"/><path d="M6 5H4a2 2 0 0 0 2 4"/></svg></span><div><b>排行榜</b><span>周榜月榜，段位通三站</span></div></div>
-    </div>
-  </div>
-</section>
-
-<!-- STAKES -->
-<section id="sec4">
-  <div class="wrap">
-    <p class="kicker">筹码</p>
-    <h2>看得见的天梯，摸得着的周榜。</h2>
-    <p class="lead">段位与 MathDuel、BoardDuel 通用——<b>青铜到大师，一站冲上去，三站都算数</b>。</p>
-    <div class="stakes">
-      <div class="card">
-        <h3>六段天梯 · 跨站统一 Elo</h3>
-        <div class="ladder">
-          <div class="rung"><i style="height:10px"></i><span>青铜</span></div>
-          <div class="rung"><i style="height:15px"></i><span>白银</span></div>
-          <div class="rung"><i style="height:20px"></i><span>黄金</span></div>
-          <div class="rung"><i style="height:25px"></i><span>铂金</span></div>
-          <div class="rung"><i style="height:30px"></i><span>钻石</span></div>
-          <div class="rung top"><i style="height:35px"></i><span>大师</span></div>
+      <!-- AI 面板 -->
+      <div id="aiPanel" role="tabpanel">
+        <div class="cat-label">
+          <h3>Select a category</h3>
+          <span class="sel" id="catSel">Pick one to start</span>
+        </div>
+        <!-- 分类由 assets/js/home.mjs 按 assets/quiz-data.js 的真实题量注入 -->
+        <div class="cat-grid" id="catGrid"></div>
+        <div class="home-actions">
+          <button class="btn btn-ember" id="startAiBtn" type="button">
+            <svg viewBox="0 0 24 24"><path d="M14.5 4.5l5 5-9 9H5.5v-5z"/><path d="M12 7l5 5"/></svg>
+            Start AI battle
+          </button>
+          <a class="btn-ghost2" href="/train.html">Practice solo first</a>
         </div>
       </div>
-      <div class="side-card">
-        <h4>本周科学类 · Top 5</h4>
-        <div class="lb-row"><span>1 <span class="n">阿哲</span></span><span>10/10 · 41s</span></div>
-        <div class="lb-row"><span>2 <span class="n">Mira</span></span><span>10/10 · 48s</span></div>
-        <div class="lb-row"><span>3 <span class="n">小鹿</span></span><span>9/10 · 52s</span></div>
-        <div class="lb-row me"><span>37 <span class="n">你</span></span><span>8/10 · 1:12</span></div>
-        <div class="cd" id="weeklyCd">每周一 00:00（UTC）重新计算</div>
-      </div>
-    </div>
-  </div>
-</section>
 
-<!-- VALUES -->
-<section id="sec5">
-  <div class="wrap">
-    <p class="kicker">为什么留下</p>
-    <h2>答完一道，还想再来一道。</h2>
-    <div class="vals">
-      <div class="val"><b>四万六千道真题</b><span>每道题带解析——答完不是结束，是弄懂的开始。</span></div>
-      <div class="val"><b>速度 × 正确率</b><span>十五秒倒计时逼出直觉，答得快得分高，蒙的不算。</span></div>
-      <div class="val"><b>中英双语题库</b><span>今天中文英文，日 / 西 / 法 / 德在路上——和全球玩家同卷。</span></div>
-      <div class="val"><b>免登录 · 无广告</b><span>点开即玩，不装 App 不注册，答完即走。</span></div>
-    </div>
-  </div>
-</section>
+      <!-- Online 面板 -->
+      <div id="onlinePanel" role="tabpanel" hidden style="display:none">
+        <div class="online" id="online">
+          <h3>&#9889; Quick match</h3>
+          <p>We pair you with a random real player — no room code needed.</p>
+          <div class="match-row">
+            <button class="btn btn-ember" id="startMatchBtn" type="button" style="flex:1;min-width:170px;justify-content:center;padding:12px 18px;font-size:.94rem">Start matching</button>
+            <button class="btn-ghost2" id="cancelMatchBtn" type="button" style="display:none">Cancel</button>
+          </div>
+          <!-- 匹配状态由 JS 写入，HTML 里保持为空 -->
+          <div id="matchStatus" style="margin-top:12px;font-size:.85rem;color:var(--mute);min-height:1.4em"></div>
+        </div>
 
-<!-- FAQ -->
-<section id="sec6">
-  <div class="wrap">
-    <p class="kicker">常见问题</p>
-    <h2>开战之前。</h2>
-    <div class="faq">
-      <details><summary>真的不用注册？</summary><p>对。打开就能答题对战。账号只在你想要跨站段位、金币和头像时才需要。</p></details>
-      <details><summary>题目从哪来的？</summary><p>自建泛百科题库，每道题附解析与来源校对，按类别与语言组织，持续扩充。</p></details>
-      <details><summary>AI 陪练有多强？</summary><p>难度自适应。设计稿同时提议把 AI 难度做成三档并明示给玩家——这也是评测报告要求的。</p></details>
-      <details><summary>和 MathDuel 什么关系？</summary><p>同一个对决家族：同一套段位、金币与头像体系。那边拼计算，这边拼知识。</p></details>
-    </div>
-  </div>
-</section>
+        <div class="divider"><span>or play a friend</span></div>
 
-<footer>
+        <div class="online" style="border-top:0;margin-top:0;padding-top:0">
+          <div class="room-row">
+            <input type="text" id="roomInput" class="room-input" placeholder="Enter room code" maxlength="6" inputmode="latin" autocomplete="off" spellcheck="false" aria-label="Room code">
+            <button class="btn btn-ghost" id="joinBtn" type="button" style="padding:11px 20px;font-size:.92rem">Join</button>
+          </div>
+          <div class="room-err" id="roomErr">Room codes are 6 letters or digits.</div>
+          <button class="btn-ghost2" id="createRoomBtn" type="button" style="width:100%;margin-top:10px">&#10133; Create private room</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右：排行榜 -->
+    <div class="panel" id="globalTop">
+      <div class="panel-title">&#127942; Top players</div>
+      <div class="panel-sub">The best minds dueling right now</div>
+      <div class="rank-list" id="topRankList"></div>
+      <div class="rank-foot">
+        <a href="/membership/">How scoring works &rarr;</a>
+        <span id="onlineRooms"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- How to play -->
+  <section class="step-sec wrap" id="how" aria-label="How to play">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px">
+      <h2 class="panel-title" style="font-size:1.3rem">New here? Three steps.</h2>
+      <a href="#lobby" style="font-size:.85rem;font-weight:600;color:var(--ember-d)">Jump to the lobby &uarr;</a>
+    </div>
+    <div class="steps">
+      <div class="step"><span class="no">1</span><b>Pick a category</b></div>
+      <div class="step"><span class="no">2</span><b>Start a duel or invite a friend</b></div>
+      <div class="step"><span class="no">3</span><b>Answer first to score</b></div>
+    </div>
+  </section>
+
+  <!-- 六段天梯 -->
+  <section class="ladder wrap" aria-label="Rank ladder">
+    <div class="ladder-panel">
+      <div class="ladder-title">Six-tier ladder<small>Weekly reset &middot; badges for the top 10%</small></div>
+      <div class="tiers">
+        <div class="tier"><i style="height:16px"></i><span>Bronze</span></div>
+        <div class="tier"><i style="height:22px"></i><span>Silver</span></div>
+        <div class="tier"><i style="height:28px"></i><span>Gold</span></div>
+        <div class="tier"><i style="height:34px"></i><span>Platinum</span></div>
+        <div class="tier"><i style="height:40px"></i><span>Diamond</span></div>
+        <div class="tier master"><i style="height:48px"></i><span>Master</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 特性 -->
+  <section class="feats" id="features">
+    <div class="wrap feats-grid">
+      <div class="feat">
+        <span class="fic"><svg viewBox="0 0 24 24"><path d="M13 2L5 13h6l-1 9 8-11h-6z"/></svg></span>
+        <div><b>Timed duel</b><span>15 seconds per question. Answer first to score — speed wins.</span></div>
+      </div>
+      <div class="feat">
+        <span class="fic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.7 2.5 13.3 0 16.9M12 3.5c-2.5 2.7-2.5 13.3 0 16.9"/></svg></span>
+        <div><b>Twelve categories</b><span>Science through arts — your call every round.</span></div>
+      </div>
+      <div class="feat">
+        <span class="fic"><svg viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="11" rx="3"/><path d="M12 4.5V8M9 13h.01M15 13h.01"/></svg></span>
+        <div><b>AI sparring</b><span>Practise any time against the house, no waiting.</span></div>
+      </div>
+      <div class="feat">
+        <span class="fic"><svg viewBox="0 0 24 24"><path d="M12 4l2.5 5.1 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8z"/></svg></span>
+        <div><b>Ranked ladder</b><span>Climb six tiers, earn badges, track every battle.</span></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ═══════════ 页脚 ═══════════ -->
+<footer class="site-footer">
   <div class="wrap">
-    <div class="cols">
-      <div>
-        <b>MEMORY<span style="color:var(--ember)">DUEL</span> 记忆对决</b>
-        <span>泛百科知识对战。两颗大脑，同一道题，十五秒。</span>
-      </div>
-      <div>
-        <b>对决家族</b>
-        <a href="https://memoryduel.com/">MemoryDuel — 你在这里</a>
-        <a href="https://mathduel.games/">MathDuel · 六大数学竞技场</a>
-        <a href="https://boardduel.com/">BoardDuel · 五种经典棋盘</a>
-      </div>
-      <div>
-        <b>开始与规则</b>
-        <a href="/how-to-play/">玩法说明</a>
-        <a href="/membership/">段位与积分规则</a>
-        <a href="#">中文 · English · 日本語</a>
-      </div>
+    <div class="sf-title">Explore the Duel family</div>
+    <div class="sf-matrix">
+      <a class="sf-item" href="https://boardduel.com"><span class="pip" style="background:#2FC4C9"></span>BoardDuel &middot; Chess &amp; Board Games</a>
+      <a class="sf-item" href="https://mathduel.games"><span class="pip" style="background:#F59E0B"></span>MathDuel &middot; Math Puzzle Games</a>
+      <a class="sf-item current" href="https://memoryduel.com"><span class="pip" style="background:#4F46E5"></span>MemoryDuel &middot; Knowledge Battles</a>
     </div>
-    <div class="base">
-      <span>24 ARENA FAMILY · MEMORYDUEL 首页设计稿 — 令牌与六个游戏稿及 MathDuel 首页完全一致。</span>
-      <span>稿内题目全部真实：取自 memoryduel.com 线上题库 API（science/history/geography/sports/movies/tech/music）。</span>
+    <div class="sf-links">
+      <a href="/about/">About</a><a href="/contact/">Contact</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="/how-to-play/memory-match/">How to play</a>
     </div>
+    <div class="sf-copy">&copy; 2026 MemoryDuel &middot; Pure static &middot; No ads &middot; No tracking</div>
   </div>
 </footer>
 
-<div id="auth-modal-placeholder"></div>
-<script src="/shared/auth-extras.js?v=1"></script>
-<script src="/shared/auth-modal.js?v=20260924"></script>
-<script src="/js/toast.js?v=t6"></script>
-<script src="/js/coins-bar.js?v=20260924" defer></script>
-<script src="/shared/sso-bridge.js?v=1" defer></script>
-<script src="/shared/onboard.js?v=20260917"></script>
-<script src="/shared/achievements.js"></script>
+<!-- 题库数据（经典脚本，触发 memoryduel-ready 事件） -->
+<script src="/assets/quiz-data.js"></script>
+<!-- 首页交互：模式切换 / 分类网格 / 在线匹配 / 房间（依赖上面的 quiz-data） -->
+<script type="module" src="/assets/js/home.mjs"></script>
+<!-- 首页装配：抽屉、收窄导航、真实排行榜 -->
 <script type="module" src="/src/pages/home.ts"></script>
 </body>
 </html>
