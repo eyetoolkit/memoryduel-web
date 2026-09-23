@@ -1,17 +1,15 @@
 /// <reference types="vite/client" />
 
 /**
- * 首页发布阶段兜底。
+ * MemoryDuel 首页 · ARENA 暗色重构动态逻辑
  *
- * 正常情况下不需要这段逻辑——vite.config.ts 的 filter-stage 插件
- * 已在构建时把 data-stage="beta" 的元素从 HTML 中移除。
- * 这里只为一种边缘情况兜底：用户浏览器/CDN 缓存了旧版 HTML，
- * 此时页面里可能仍残留未上线游戏的入口。
- *
- * 保持极简：首页视觉与结构完全沿用原有静态实现，不做任何改版。
+ * - 周榜重置倒计时：每周一 00:00 UTC 重新计算，实时刷新到 #weeklyCd
+ * - 发布阶段兜底：隐藏任何残留的 data-stage="beta" 元素（与 vite filter-stage 双保险）
  */
+
 const SHOW_BETA = import.meta.env.VITE_SHOW_BETA === '1';
 
+// 1) 发布阶段兜底
 if (!SHOW_BETA) {
   document
     .querySelectorAll<HTMLElement>('[data-stage="beta"]')
@@ -19,3 +17,40 @@ if (!SHOW_BETA) {
       el.style.display = 'none';
     });
 }
+
+// 2) 周榜重置倒计时（每周一 00:00 UTC）
+function nextMondayUtcMidnight(now: Date): Date {
+  // UTC 周一为 weekday 1
+  const day = now.getUTCDay(); // 0=Sun .. 6=Sat
+  const daysUntilMonday = (8 - day) % 7; // 今天周一(1) => 7(=下周), 周日(0)=>1
+  const delta = daysUntilMonday === 0 ? 7 : daysUntilMonday;
+  const next = new Date(
+    Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate() + delta,
+      0,
+      0,
+      0,
+      0,
+    ),
+  );
+  return next;
+}
+
+function paintWeeklyCountdown() {
+  const el = document.getElementById('weeklyCd');
+  if (!el) return;
+  const now = new Date();
+  const target = nextMondayUtcMidnight(now).getTime();
+  let diff = Math.max(0, target - now.getTime());
+  const d = Math.floor(diff / 86400000);
+  diff -= d * 86400000;
+  const h = Math.floor(diff / 3600000);
+  diff -= h * 3600000;
+  const m = Math.floor(diff / 60000);
+  el.textContent = `每周一 00:00（UTC）重新计算 · 距重置 ${d}天 ${h}时 ${m}分`;
+}
+
+paintWeeklyCountdown();
+setInterval(paintWeeklyCountdown, 30_000);
