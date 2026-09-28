@@ -157,5 +157,25 @@ async function loadRank(): Promise<void> {
   }
 }
 
+/* ── 4. Online 模式钩子（重设计交付包 README §1 的 ?mode=online 契约） ──
+ * 深链 ?mode=online 预激活 Online tab；「Find an online match」CTA 点击也切到 Online。
+ * 依赖：home.mjs 先行加载并完成 bindModeToggle（script 顺序保证），这里只需模拟点击。
+ */
+function bindModeHooks(): void {
+  const onlineTab = document.querySelector<HTMLButtonElement>('#modeToggle [data-m="online"]');
+  if (!onlineTab) return;
+  const activate = () => onlineTab.click();
+  /* 深链激活必须等 home.mjs 绑好监听：构建后本模块被 vite 提到 <head>，
+     模块按文档顺序执行时 home.mjs（body 末尾）还没跑，立即 click 会落空。 */
+  if (new URLSearchParams(location.search).get('mode') === 'online') {
+    if (document.readyState === 'complete') activate();
+    else window.addEventListener('load', activate, { once: true });
+  }
+  document.querySelectorAll<HTMLAnchorElement>('a[href="#online"]').forEach((a) => {
+    a.addEventListener('click', activate);
+  });
+}
+
 bindNav();
+bindModeHooks();
 void loadRank();
