@@ -228,6 +228,25 @@ html[data-site="memory"] {
   --brand-ring:   rgba(234, 88, 12, 0.35);
   --brand-text:   #C2410C;
   --hero-g:       linear-gradient(135deg, #C2410C 0%, #EA580C 100%);
+
+  /* ── 暖纸底（redesign family，与首页 home.css --paper 同源） ──
+     内容页（about/how-to-play/privacy/terms 等）统一到暖纸家族，
+     冷调石板灰 #F7F8FA 退役；暗色由下方 html[data-theme="dark"] 覆盖，不受影响 */
+  --bg:        #FAF6F1;
+  --bg-subtle: #F4EEE5;
+}
+
+/* MemoryDuel 全站纸感纹理：32px 网格 + 橙色氤氲（与首页/对战页同源，纯 CSS 零图片）。
+   特异性 (0,1,2) 高于 brand-ds2.css 20.0 的 body{background:var(--bg)} 简写，
+   故 background-image 生效而底色仍走 --bg。 */
+html[data-site="memory"] body{
+  background-image:
+    radial-gradient(circle at 18% 12%, rgba(234,88,12,.05) 0, transparent 42%),
+    radial-gradient(circle at 84% 78%, rgba(245,158,11,.045) 0, transparent 40%),
+    linear-gradient(rgba(180,120,60,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(180,120,60,.045) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+  background-attachment: fixed;
 }
 
 /* 暗色层已合并至文件末尾 B4 统一块,避免两个 html[data-theme="dark"] 互相覆盖 */
