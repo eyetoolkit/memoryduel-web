@@ -8,12 +8,28 @@
   'use strict';
 
   var API = typeof window !== 'undefined' && window.API_BASE ? window.API_BASE : '';
-  var LANG = (navigator.language || 'en').toLowerCase();
-  if (LANG.startsWith('zh')) LANG = 'zh';
-  else if (LANG.startsWith('es')) LANG = 'es';
-  else if (LANG.startsWith('fr')) LANG = 'fr';
-  else if (LANG.startsWith('de')) LANG = 'de';
-  else LANG = 'en';
+  /* 题目语言：优先跟随站内语言开关(window.i18n)，否则回落浏览器语言。
+     注：Worker 侧题库已具备 en/zh/ja/es/fr/de 六语数据（线上实测通过）。 */
+  var QUIZ_LANGS = ['en', 'zh', 'ja', 'es', 'fr', 'de'];
+  function langFromNavigator() {
+    var raw = (navigator.language || 'en').toLowerCase();
+    if (raw.indexOf('zh') === 0) return 'zh';
+    if (raw.indexOf('ja') === 0) return 'ja';
+    if (raw.indexOf('es') === 0) return 'es';
+    if (raw.indexOf('fr') === 0) return 'fr';
+    if (raw.indexOf('de') === 0) return 'de';
+    return 'en';
+  }
+  function detectQuizLang() {
+    try {
+      if (window.i18n && window.i18n.getLang) {
+        var l = String(window.i18n.getLang() || '').split('-')[0].toLowerCase();
+        if (QUIZ_LANGS.indexOf(l) >= 0) return l;
+      }
+    } catch (e) {}
+    return langFromNavigator();
+  }
+  var LANG = detectQuizLang();
 
   var CATEGORIES = [
     { id: 'science',  icon: '🔬', zh: '科学',   en: 'Science',   es: 'Ciencia',     fr: 'Sciences', de: 'Wissenschaft' },
@@ -47,7 +63,7 @@
   function getLang() { return LANG; }
   function setLang(l) {
     var old = LANG;
-    if (['en','zh','es','fr','de'].indexOf(l) >= 0) LANG = l;
+    if (QUIZ_LANGS.indexOf(l) >= 0) LANG = l;
     if (LANG !== old) {
       QUESTIONS.length = 0;
       loaded = null;
@@ -56,14 +72,28 @@
     }
   }
 
+  // 站内切换语言 → 题库跟随重载
+  (function wireI18nFollow() {
+    function follow(e) {
+      try {
+        var l = (e && e.detail && e.detail.lang)
+          || (window.i18n && window.i18n.getLang && window.i18n.getLang());
+        if (l) setLang(l);
+      } catch (err) {}
+    }
+    window.addEventListener('i18n:change', follow);
+    window.addEventListener('language-changed', follow);
+  })();
+
   function wrap(apiQ, catId) {
     return {
       cn: catId,
       diff: ({ easy: 1, medium: 2, hard: 3 })[apiQ.difficulty] || 2,
-      qn: { zh: apiQ.q, en: apiQ.q },
-      op: { zh: apiQ.options.slice(), en: apiQ.options.slice() },
+      // 按「实际语言」归位，避免非中/英以外语言被塞进无关槽位
+      qn: (function () { var o = { en: apiQ.q }; o[LANG] = apiQ.q; return o; })(),
+      op: (function () { var o = { en: apiQ.options.slice() }; o[LANG] = apiQ.options.slice(); return o; })(),
       ans: Number(apiQ.correct_index) || 0,
-      ex: { zh: apiQ.explain || '', en: apiQ.explain || '' },
+      ex: (function () { var v = apiQ.explain || ''; var o = { en: v }; o[LANG] = v; return o; })(),
       _qid: apiQ.qid,
       _rawLang: LANG,
     };
