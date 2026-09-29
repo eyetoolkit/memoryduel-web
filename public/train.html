@@ -39,211 +39,134 @@
   <link rel="alternate" hreflang="x-default" href="https://memoryduel.com/train.html" />
 <!-- SEO: hreflang -->
 
-  <style>
-    /* ===== 复刻 mathduel 设计系统 ===== */
-    :root {
-      --p: #4f46e5; --p-d: #4338ca; --p-l: #eef2ff;
-      --g: #22b573; --g-l: #e7f9f0;
-      --o: #ff9f43; --o-l: #fff3e4;
-      --bg: #faf9ff; --card: #ffffff;
-      --t: #1e1b4b; --m: #6b7280;
-      --line: rgba(23, 24, 40, 0.08);
-      --r: 16px;
-      --shadow: 0 4px 16px rgba(60, 60, 120, 0.06);
-      --shadow-hover: 0 8px 24px rgba(60, 60, 120, 0.1);
-      --red: #dc2626; --red-l: #fee2e2;
-      --flip-dur: 0.4s;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body { font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--t); line-height: 1.6; }
-    a { color: inherit; text-decoration: none; }
-    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
-    nav { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
-    .nav-in { display: flex; align-items: center; gap: 18px; height: 60px; }
-    .logo { font-weight: 800; font-size: 19px; }
-    .logo span { color: var(--p); }
-    .nav-links { display: flex; gap: 4px; margin-left: auto; }
-    .nav-links a { color: var(--m); font-size: 14px; padding: 8px 12px; border-radius: 999px; transition: all 0.15s; }
-    .nav-links a:hover, .nav-links a.active { color: var(--p); background: var(--p-l); }
-    .hero { padding: 44px 0 26px; text-align: center; }
-    .hero h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.2; margin-bottom: 12px; }
-    .hero h1 em { font-style: normal; color: var(--p); }
-    .hero p { color: var(--m); font-size: 16px; max-width: 620px; margin: 0 auto 8px; }
-    .badge { display: inline-block; background: var(--p-l); color: var(--p-d); font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 999px; margin-bottom: 16px; }
-    section { padding: 36px 0 8px; }
-    .sec-head { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
-    .sec-head .no { font-size: 13px; font-weight: 700; color: var(--p); background: var(--p-l); width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; }
-    .sec-head h2 { font-size: 24px; margin: 0; }
-    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
-    .feature { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--card); border-radius: 12px; border: 1px solid var(--line); }
-    .feature .icon { font-size: 20px; }
-    .feature span { font-size: 14px; color: var(--m); }
-    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
-    .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 20px; box-shadow: var(--shadow); transition: all 0.2s; cursor: pointer; display: block; }
-    .card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); border-color: var(--p); }
-    .card h3 { margin: 12px 0 6px; font-size: 17px; display: flex; align-items: center; gap: 8px; }
-    .card p { margin: 0; color: var(--m); font-size: 14px; }
-    .card .icon { font-size: 28px; }
-    .card .tag { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--p-l); color: var(--p-d); font-weight: 600; }
-    .card .tag.hot { background: var(--o-l); color: #b45309; }
-    .card.active { border-color: var(--p); box-shadow: 0 8px 24px rgba(99,102,241,0.18); }
-    .card.active .icon { filter: none; }
-    .btn { display: inline-block; background: var(--p); color:#fff; border:none; border-radius:10px; padding:10px 18px; font-size:14px; font-weight:600; cursor:pointer; margin-top:12px; }
-    .btn.ghost { background: var(--p-l); color: var(--p-d); }
-    .account-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 20px; }
-    .account-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
-    .account-row:last-child { border-bottom: none; }
-    .account-row .icon { font-size: 20px; }
-    .account-row .label { color: var(--m); font-size: 14px; flex: 1; }
-    .account-row .value { font-weight: 600; font-size: 14px; }
-    .account-row .value.highlight { color: var(--p); }
-    .stats-card { background: linear-gradient(135deg, var(--p-l), var(--g-l)); border-radius: 20px; padding: 24px; text-align: center; }
-    .stats-card h3 { font-size: 18px; margin-bottom: 16px; }
-    .stats-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-    .stat-item { text-align: center; min-width: 80px; }
-    .stat-item .val { font-size: 26px; font-weight: 800; color: var(--p); }
-    .stat-item .lab { font-size: 13px; color: var(--m); }
-    .stat-item .score { font-size: 12px; color: var(--m); }
-    footer { margin-top: 60px; border-top: 1px solid var(--line); background: var(--card); padding: 28px 0 40px; text-align: center; color: var(--m); font-size: 13px; }
-    footer a { color: var(--p); font-weight: 600; margin: 0 8px; }
-    footer a:hover { text-decoration: underline; }
-    @media (max-width: 640px) { .nav-links { display: none; } .hero { padding: 30px 0 20px; } .cards { grid-template-columns: 1fr; } }
+    <style>
+  /* ═══════════════════════════════════════════════════════════════
+     MemoryDuel 对战页 · 重设计皮肤（redesign-package 落地版）
+     ---------------------------------------------------------------
+     真源依据：design/memoryduel-game.html（重设计交付包）
+     落地约束（README §4）：CSP font-src 'self' → 字体走 tokens.css 自托管
+       （Space Grotesk 400/700 · Inter 400/500/700 · JetBrains Mono 500/700）；
+       白字压品牌一律 #C2410C；AI 对手用跨站商标靛蓝 #4F46E5。
+     红线：JS 对战引擎（battle IIFE）一行未动，所有 id/class 契约保留。
+     ═══════════════════════════════════════════════════════════════ */
+  :root{
+    --orange:#EA580C; --orange-deep:#C2410C; --orange-bright:#F97316;
+    --paper:#FAF6F1; --card:#fff; --ink:#1C1408; --mute:#6B5A45; --line:#EAD9C7;
+    --amber:#F59E0B; --green:#22C55E; --red:#DC2626; --indigo-sig:#4F46E5;
+    --disp:'Space Grotesk',system-ui,sans-serif;
+    --ui:'Inter',system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --rd:20px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  :focus-visible{outline:2px solid var(--orange);outline-offset:3px}
 
-    /* ===== 游戏专属样式（沿用同一设计语言） ===== */
-    .diff-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 8px 0 4px; }
-    .diff-btn { border: 1px solid var(--line); background: var(--card); color: var(--m); padding: 6px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
-    .diff-btn:hover { border-color: var(--p); color: var(--p); }
-    .diff-btn.active { background: var(--p-l); color: var(--p-d); border-color: var(--p); }
-    .stats { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 14px 0 18px; }
-    .stat { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 10px 18px; text-align: center; min-width: 84px; box-shadow: var(--shadow); }
-    .stat .lab { font-size: 12px; color: var(--m); }
-    .stat .val { font-size: 22px; font-weight: 800; color: var(--p); }
-    .stat .val.warn { color: var(--red); }
+  /* ===== 对战舞台：暖纸 + 网格 + 橙色氤氲（与首页同源） ===== */
+  .battle-stage{
+    position:fixed; inset:0; z-index:1000; display:none;
+    background-color:var(--paper);
+    background-image:
+      radial-gradient(circle at 16% 12%,rgba(234,88,12,.06) 0,transparent 42%),
+      radial-gradient(circle at 86% 80%,rgba(245,158,11,.05) 0,transparent 40%),
+      linear-gradient(rgba(180,120,60,.05) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(180,120,60,.05) 1px,transparent 1px);
+    background-size:100% 100%,100% 100%,32px 32px,32px 32px;
+    background-attachment:fixed;
+    overflow-y:auto; -webkit-font-smoothing:antialiased; color:var(--ink);
+  }
+  .battle-stage.active{display:flex; flex-direction:column; align-items:center; min-height:100%}
 
-    .board { display: grid; gap: 10px; justify-content: center; margin-bottom: 8px; }
-    .card2 { position: relative; width: 76px; height: 84px; cursor: pointer; perspective: 600px; -webkit-tap-highlight-color: transparent; }
-    .card2 .inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform var(--flip-dur); border-radius: 12px; }
-    .card2.flipped .inner, .card2.matched .inner { transform: rotateY(180deg); }
-    .card2 .face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; display: grid; place-items: center; border-radius: 12px; border: 1px solid var(--line); box-shadow: var(--shadow); }
-    .card2 .face.back { background: linear-gradient(135deg, var(--p-d), var(--p)); color: rgba(255,255,255,0.5); font-size: 20px; }
-    .card2 .face.front { background: var(--card); transform: rotateY(180deg); color: var(--p-d); }
-    .card2.matched .face.front { background: var(--g-l); color: var(--g); }
-    .card2 .face.front .glyph { font-size: 30px; font-weight: 700; }
+  /* 顶栏：返回 / 模式 / 回合 / 计时 */
+  .battle-top{
+    position:sticky; top:0; width:100%; max-width:720px;
+    display:flex; align-items:center; gap:12px; padding:12px 18px;
+    background:rgba(250,246,241,.86); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line); z-index:2;
+  }
+  .battle-back{font-size:24px; font-weight:700; color:var(--mute); text-decoration:none; padding:2px 10px; border-radius:10px; line-height:1}
+  .battle-back:hover{color:var(--orange-deep); background:rgba(234,88,12,.08)}
+  .battle-pill{font-weight:700; font-size:13px; background:#FFF6F0; color:var(--orange-deep); padding:6px 13px; border-radius:999px; border:1px solid var(--line); font-family:var(--disp); white-space:nowrap}
+  .battle-spacer{flex:1}
+  .battle-round{font-family:var(--mono); font-weight:700; font-size:13px; color:var(--mute); white-space:nowrap}
+  .battle-round b{color:var(--orange-deep); font-size:15px}
+  .battle-timer{display:flex; align-items:center; gap:9px}
+  .battle-timer .timer-val{font-family:var(--mono); font-weight:700; font-size:14px; color:var(--orange-deep); min-width:26px; text-align:right}
+  .battle-timer .timer-bar{width:84px; height:8px; border-radius:999px; background:var(--line); overflow:hidden}
+  .battle-timer .timer-fill{display:block; height:100%; width:100%; background:var(--amber); transition:width .2s linear}
+  .battle-timer .timer-fill.warn{background:var(--red)}
 
-    .result { display: none; text-align: center; background: linear-gradient(135deg, var(--p-l), var(--g-l)); border-radius: 20px; padding: 26px 20px; margin-bottom: 24px; }
-    .result.show { display: block; }
-    .result h2 { font-size: 26px; margin-bottom: 6px; }
-    .result .stats-row { margin: 14px 0; }
-    .result .stat-item .val { font-size: 26px; }
-    .result .best { color: var(--g); font-weight: 700; }
+  /* 主卡 */
+  .battle-card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--rd);
+    box-shadow:0 18px 44px rgba(120,70,20,.10);
+    max-width:720px; width:100%; padding:24px; margin:20px auto 40px;
+  }
 
-    .game-box { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 24px 18px; box-shadow: var(--shadow); display: flex; flex-direction: column; }
-    .nkey { font-size: 18px; min-width: 46px; padding: 8px 0; }
+  /* 记分板 */
+  .battle-scores{display:grid; grid-template-columns:1fr auto 1fr; gap:12px; align-items:center; margin-bottom:18px}
+  .score-card{display:flex; align-items:center; gap:11px; background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:12px 14px}
+  .score-card.bot{flex-direction:row-reverse; text-align:right}
+  .score-card .av{width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; font-size:16px; font-family:var(--disp); flex:none}
+  .score-card .av.you{background:var(--orange)}
+  .score-card .av.ai{background:var(--indigo-sig); font-size:20px}
+  .score-meta{min-width:0}
+  .score-name{font-size:13px; color:var(--mute); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .score-val{font-family:var(--mono); font-weight:700; font-size:24px; color:var(--orange-deep); line-height:1.1}
+  .vs-badge{background:var(--orange); color:#fff; padding:6px 12px; border-radius:999px; font-size:12px; font-weight:700; font-family:var(--disp)}
 
-    @media (max-width: 460px) { .card2 { width: 64px; height: 72px; } .card2 .face.front .glyph { font-size: 26px; } .board { gap: 8px; } }
+  /* 题干 */
+  .battle-question{font-family:var(--disp); font-weight:700; font-size:clamp(19px,3.2vw,26px); line-height:1.22; letter-spacing:-.01em; margin:6px 0 20px; min-height:54px}
 
-    /* ===== 对战模式样式 (MemoryDuel AI Battle) ===== */
-    .battle-stage {
-      position: fixed; inset: 0;
-      background: linear-gradient(135deg, var(--p-l) 0%, var(--bg) 100%);
-      z-index: 100; padding: 20px;
-      overflow-y: auto;
-      display: none;
-    }
-    .battle-stage.active { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
-    .battle-card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      box-shadow: 0 8px 24px rgba(60, 60, 120, 0.12);
-      max-width: 720px; width: 100%; padding: 24px; margin: 0 auto;
-    }
-    .battle-header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 20px; padding-bottom: 16px;
-      border-bottom: 1px solid var(--line);
-    }
-    .battle-header h2 { margin: 0; font-size: 18px; color: var(--p-d); }
-    .battle-progress { font-size: 13px; color: var(--m); }
-    .battle-progress b { color: var(--p); font-size: 18px; }
-    .battle-scores {
-      display: grid; grid-template-columns: 1fr auto 1fr;
-      gap: 12px; align-items: center; margin-bottom: 20px;
-    }
-    .score-card {
-      background: var(--bg); border: 1px solid var(--line);
-      border-radius: 14px; padding: 12px 14px; text-align: center;
-    }
-    .score-card.you { background: linear-gradient(135deg, var(--p-l), #fff); }
-    .score-card.bot { background: linear-gradient(135deg, #fef3e4, #fff); }
-    .score-name { font-size: 13px; color: var(--m); margin-bottom: 4px; }
-    .score-val { font-size: 28px; font-weight: 800; color: var(--p); }
-    .score-card.bot .score-val { color: var(--o); }
-    .vs-badge {
-      background: var(--p); color: #fff; padding: 6px 12px;
-      border-radius: 999px; font-size: 12px; font-weight: 700;
-    }
-    .battle-timer {
-      display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
-    }
-    .timer-bar {
-      flex: 1; height: 8px; background: var(--line);
-      border-radius: 999px; overflow: hidden;
-    }
-    .timer-fill {
-      height: 100%; background: linear-gradient(90deg, var(--g), var(--o), #dc2626);
-      transition: width 0.2s linear;
-    }
-    .timer-val { font-size: 14px; font-weight: 700; color: var(--p-d); min-width: 32px; text-align: right; }
-    .battle-question {
-      font-size: 19px; line-height: 1.55; color: var(--t);
-      margin: 16px 0 20px; min-height: 60px;
-    }
-    .battle-options { display: grid; gap: 10px; }
-    .battle-opt {
-      display: flex; align-items: center; gap: 12px;
-      padding: 14px 16px; border: 2px solid var(--line);
-      border-radius: 12px; background: var(--card);
-      font-size: 15px; cursor: pointer; transition: all 0.15s;
-      text-align: left; width: 100%; color: var(--t);
-    }
-    .battle-opt:hover:not(:disabled) { border-color: var(--p); background: var(--p-l); }
-    .battle-opt:disabled { cursor: not-allowed; opacity: 0.7; }
-    .battle-opt.correct { border-color: var(--g); background: var(--g-l); }
-    .battle-opt.wrong { border-color: #dc2626; background: #fee2e2; }
-    .battle-opt .opt-letter {
-      width: 28px; height: 28px; border-radius: 50%;
-      background: var(--p-l); color: var(--p-d);
-      display: grid; place-items: center; font-weight: 700; font-size: 14px;
-      flex-shrink: 0;
-    }
-    .battle-opt.correct .opt-letter { background: var(--g); color: #fff; }
-    .battle-opt.wrong .opt-letter { background: #dc2626; color: #fff; }
-    .battle-explain {
-      margin-top: 14px; padding: 12px 14px;
-      background: var(--p-l); border-radius: 10px;
-      font-size: 13px; color: var(--m); line-height: 1.5;
-      display: none;
-    }
-    .battle-explain.show { display: block; }
-    .battle-explain b { color: var(--p-d); }
-    .battle-result {
-      text-align: center; padding: 32px 20px;
-    }
-    .battle-result h2 { font-size: 32px; margin-bottom: 8px; }
-    .battle-result.win h2 { color: var(--g); }
-    .battle-result.lose h2 { color: #dc2626; }
-    .battle-result.draw h2 { color: var(--m); }
-    .battle-result .score-big {
-      font-size: 48px; font-weight: 900; color: var(--p);
-      margin: 16px 0;
-    }
-    .battle-actions { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
-    .battle-bot-thinking {
-      text-align: center; padding: 14px;
-      color: var(--m); font-size: 13px; font-style: italic;
-    }
+  /* 选项 */
+  .battle-options{display:grid; grid-template-columns:1fr 1fr; gap:11px}
+  .battle-opt{
+    display:flex; align-items:center; gap:12px; width:100%; text-align:left;
+    border:2px solid var(--line); background:#fff; border-radius:14px;
+    padding:14px 16px; font-size:15px; font-weight:600; color:var(--ink); cursor:pointer;
+    font-family:var(--ui); transition:transform .1s,border-color .1s,background .1s;
+  }
+  .battle-opt:hover:not(:disabled){transform:translateY(-1px); border-color:var(--orange); background:#FFF6F0}
+  .battle-opt:disabled{cursor:default; opacity:.92}
+  .battle-opt .opt-letter{width:28px; height:28px; border-radius:50%; background:rgba(234,88,12,.1); color:var(--orange-deep); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; font-family:var(--mono); flex:none}
+  .battle-opt.correct{border-color:var(--green); background:rgba(34,197,94,.14)}
+  .battle-opt.correct .opt-letter{background:var(--green); color:#fff}
+  .battle-opt.wrong{border-color:var(--red); background:rgba(220,38,38,.08)}
+  .battle-opt.wrong .opt-letter{background:var(--red); color:#fff}
+
+  /* 解释 / 思考 / 操作 */
+  .battle-explain{margin-top:14px; padding:12px 14px; background:rgba(234,88,12,.07); border-radius:12px; font-size:13px; color:var(--mute); line-height:1.5; display:none}
+  .battle-explain.show{display:block}
+  .battle-explain b{color:var(--orange-deep)}
+  .battle-bot-thinking{text-align:center; padding:12px; color:var(--mute); font-size:13px; font-style:italic}
+  .battle-actions{display:flex; gap:10px; justify-content:center; margin-top:18px; flex-wrap:wrap}
+
+  /* 结算（JS 注入：.battle-result .win/.lose/.draw） */
+  .battle-result{text-align:center; padding:8px 4px}
+  .battle-result h2{font-family:var(--disp); font-weight:700; font-size:30px; margin-bottom:10px}
+  .battle-result.win h2{color:var(--green)}
+  .battle-result.lose h2{color:var(--red)}
+  .battle-result.draw h2{color:var(--mute)}
+  .battle-result .score-big{font-family:var(--mono); font-weight:900; font-size:48px; color:var(--orange-deep); margin:14px 0}
+  .battle-result p{color:var(--mute); font-size:14px; margin-top:6px}
+
+  /* 按钮（与首页一致：.btn=实心琥珀主按钮，.btn.ghost=描边次按钮） */
+  .btn{border:0; font-family:var(--ui); font-weight:700; cursor:pointer; border-radius:12px; font-size:15px; padding:12px 20px; transition:transform .12s,background .12s; display:inline-flex; align-items:center; gap:8px; justify-content:center; background:var(--orange); color:#fff}
+  .btn:hover{background:var(--orange-deep); transform:translateY(-1px)}
+  .btn.ghost,.btn-ghost{background:transparent; color:var(--ink); border:1px solid var(--line)}
+  .btn.ghost:hover,.btn-ghost:hover{background:transparent; border-color:var(--orange); color:var(--orange-deep); transform:none}
+
+  @media(max-width:560px){
+    .battle-top{padding:10px 14px; gap:8px}
+    .battle-round{font-size:12px}
+    .battle-card{padding:18px; margin:14px auto 30px}
+    .battle-options{grid-template-columns:1fr}
+    .battle-question{font-size:19px}
+    .score-val{font-size:20px}
+    .score-card{padding:10px}
+    .score-card .av{width:36px; height:36px; font-size:13px}
+    .score-card .av.ai{font-size:16px}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.battle-timer .timer-fill{transition:none!important}}
   </style>
   <link rel="stylesheet" href="/css/shared/tokens.css?v=p4fix2">
   <link rel="stylesheet" href="/css/shared/brand-ds2.css?v=ds2-22">
@@ -256,39 +179,44 @@
      data-nav='[{"label":"Home","href":"/","i18n":"nav.home"}]'
      data-cta-label="Home" data-cta-href="/" data-cta-i18n="nav.home"></div>
 
-<!-- Battle Stage (AI / Online duel) -->
+  <!-- Battle Stage (AI / Online duel) -->
   <div class="battle-stage" id="battleStage">
+    <div class="battle-top">
+      <a class="battle-back" href="/" aria-label="Back to lobby">‹</a>
+      <span class="battle-pill" id="battleTitle">⚔️ AI Battle</span>
+      <span class="battle-spacer"></span>
+      <span class="battle-round">Round <b id="battleCur">1</b> / <span id="battleTotal">10</span></span>
+      <span class="battle-timer">
+        <span class="timer-val" id="battleTimerVal">15</span>
+        <span class="timer-bar"><i class="timer-fill" id="battleTimerFill"></i></span>
+      </span>
+    </div>
     <div class="battle-card" id="battleCard">
-      <div class="battle-header">
-        <h2 id="battleTitle">⚔️ AI Battle</h2>
-        <div class="battle-progress">
-          Question <b id="battleCur">1</b> / <span id="battleTotal">10</span>
-        </div>
-      </div>
       <div class="battle-scores">
         <div class="score-card you">
-          <div class="score-name" id="battleYouName" data-i18n="mm_train_4">You</div>
-          <div class="score-val" id="battleYouScore">0</div>
+          <span class="av you">Y</span>
+          <div class="score-meta">
+            <div class="score-name" id="battleYouName" data-i18n="mm_train_4">You</div>
+            <div class="score-val" id="battleYouScore">0</div>
+          </div>
         </div>
         <div class="vs-badge">VS</div>
         <div class="score-card bot">
-          <div class="score-name" id="battleBotName">AI</div>
-          <div class="score-val" id="battleBotScore">0</div>
+          <div class="score-meta">
+            <div class="score-name" id="battleBotName">AI</div>
+            <div class="score-val" id="battleBotScore">0</div>
+          </div>
+          <span class="av ai">🤖</span>
         </div>
       </div>
-      <div class="battle-timer">
-        <div class="timer-bar"><div class="timer-fill" id="battleTimerFill"></div></div>
-        <div class="timer-val" id="battleTimerVal">15</div>
-      </div>
-      <div class="battle-question" id="battleQuestion">Loading...</div>
+      <div class="battle-question" id="battleQuestion">Loading…</div>
       <div class="battle-options" id="battleOptions"></div>
       <div class="battle-explain" id="battleExplain"></div>
-      <div class="battle-bot-thinking" id="battleBotThinking" style="display:none">🤖 Bot is thinking...</div>
+      <div class="battle-bot-thinking" id="battleBotThinking" style="display:none">🤖 Bot is thinking…</div>
       <div class="battle-actions" id="battleActions"></div>
     </div>
   </div>
-
-  <script>
+<script>
 
 <!-- Shared JS (load order: i18n -> quiz-data -> battle engine) -->
 <script defer src="/js/toast.js?v=p3"></script>
