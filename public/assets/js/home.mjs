@@ -128,7 +128,7 @@ function getSession() {
     let s = null;
     try { s = JSON.parse(localStorage.getItem('md_session') || 'null'); } catch (e) {}
     if (s && s.pid && s.token) return s;
-    const r = await fetch((window.API_BASE || '') + '/md/session', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+    const r = await fetch((window.API_BASE || '') + '/api/md/session', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
     const j = await r.json();
     if (!j || !j.ok || !j.data || !j.data.pid) throw new Error('session failed');
     s = { pid: j.data.pid, token: j.data.token };
@@ -165,7 +165,7 @@ async function startMatch() {
 
   try {
     const s = await getSession();
-    const r = await fetch((window.API_BASE || '') + '/md/match/join', {
+    const r = await fetch((window.API_BASE || '') + '/api/md/match/join', {
       method: 'POST',
       headers: authHeaders(s),
       body: JSON.stringify({ category, name: 'Player' })
@@ -202,7 +202,7 @@ async function pollMatch(matchId, s, startedAt, attempt) {
     return;
   }
   try {
-    const r = await fetch((window.API_BASE || '') + '/md/match/poll?matchId=' + encodeURIComponent(matchId), { headers: authHeaders(s) });
+    const r = await fetch((window.API_BASE || '') + '/api/md/match/poll?matchId=' + encodeURIComponent(matchId), { headers: authHeaders(s) });
     const j = await r.json();
     if (j.ok && j.data && j.data.code) {
       if (status) status.textContent = '✅ Matched!';
@@ -232,7 +232,7 @@ function cancelMatch() {
     const mid = currentMatchId;
     currentMatchId = null;
     getSession().then((s) =>
-      fetch((window.API_BASE || '') + '/md/match/cancel', { method: 'POST', headers: authHeaders(s), body: JSON.stringify({ matchId: mid }) })
+      fetch((window.API_BASE || '') + '/api/md/match/cancel', { method: 'POST', headers: authHeaders(s), body: JSON.stringify({ matchId: mid }) })
     ).catch(() => {});
   }
   if (btn) { btn.style.display = ''; delete btn.dataset.busy; }
@@ -276,7 +276,7 @@ function bindRoomActions() {
       // F-005: 跳转前先经服务端校验房间存在
       try {
         const s = await getSession();
-        const r = await fetch((window.API_BASE || '') + '/md/room/status?code=' + encodeURIComponent(code), { headers: authHeaders(s) });
+        const r = await fetch((window.API_BASE || '') + '/api/md/room/status?code=' + encodeURIComponent(code), { headers: authHeaders(s) });
         const j = await r.json();
         if (!j.ok) throw new Error('not_found');
       } catch (e) {
@@ -296,7 +296,7 @@ function bindRoomActions() {
       create.textContent = '⏳ Creating…';
       try {
         const s = await getSession();
-        const r = await fetch((window.API_BASE || '') + '/md/room/create', {
+        const r = await fetch((window.API_BASE || '') + '/api/md/room/create', {
           method: 'POST',
           headers: authHeaders(s),
           body: JSON.stringify({ mode: '1v1', rounds: 10, maxPlayers: 2 })

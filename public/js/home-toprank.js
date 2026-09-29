@@ -21,7 +21,7 @@
     }
     el.innerHTML = h;
   }
-  fetch((window.API_BASE || '') + '/md/rank?limit=10').then(function(r){return r.json();}).then(function(d){
+  fetch((window.API_BASE || '') + '/api/md/rank?limit=10').then(function(r){return r.json();}).then(function(d){
     if (d && d.ok && d.list) render(d.list);
     else el.innerHTML = '<div class="tr-empty">Rankings unavailable</div>';
   }).catch(function(){ el.innerHTML = '<div class="tr-empty">Rankings unavailable</div>'; });
