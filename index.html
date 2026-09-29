@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" data-site="memory" data-build="%VITE_SHOW_BETA%">
 <head>
+<script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:35,fallback:"en"};</script>
+<script src="/i18n/i18n.js?v=34"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#FAF6F1">
@@ -20,11 +22,6 @@
 <meta name="twitter:image" content="https://memoryduel.com/og-default.jpg">
 <link rel="canonical" href="https://memoryduel.com/">
 <link rel="alternate" hreflang="en" href="https://memoryduel.com/">
-<link rel="alternate" hreflang="zh-CN" href="https://memoryduel.com/zh/">
-<link rel="alternate" hreflang="ja" href="https://memoryduel.com/ja/">
-<link rel="alternate" hreflang="es" href="https://memoryduel.com/es/">
-<link rel="alternate" hreflang="fr" href="https://memoryduel.com/fr/">
-<link rel="alternate" hreflang="de" href="https://memoryduel.com/de/">
 <link rel="alternate" hreflang="x-default" href="https://memoryduel.com/">
 <link rel="manifest" href="/manifest.webmanifest">
 <script type="application/ld+json">
@@ -47,31 +44,30 @@
 <nav class="nav"><div class="nav-in">
   <a class="logo" href="/"><span class="mk"></span>MemoryDuel</a>
   <div class="nav-links">
-    <a href="#lobby">Play</a><a href="#how">How to play</a><a href="#features">Features</a><a href="#globalTop">Leaderboard</a>
+    <a href="#lobby" data-i18n="home_v2.nav_play">Play</a><a href="#how" data-i18n="home_v2.nav_how">How to play</a><a href="#features" data-i18n="home_v2.features_nav">Features</a><a href="#globalTop" data-i18n="home_v2.nav_leaderboard">Leaderboard</a>
   </div>
   <span class="spacer"></span>
-  <span class="lang">EN</span>
-  <a class="btn btn-ghost" href="/membership/">Sign in</a>
+  <a class="btn btn-ghost" href="/membership/" data-i18n="home_v2.sign_in">Sign in</a>
 </div></nav>
 
 <!-- ═══════════ Hero：左文案 + 右实战预览卡（首屏即产品） ═══════════ -->
 <section class="hero wrap">
   <div>
-    <span class="badge">🧠 Knowledge Battle</span>
-    <h1>Outsmart your opponents, <em>one question</em> at a time.</h1>
-    <p class="sub">1v1 knowledge duel across science, history, geography and more. No login, no install — tap to play.</p>
+    <span class="badge" data-i18n="home_v2.badge">🧠 Knowledge Battle</span>
+    <h1 data-i18n-html="home_v2.hero_h1">Outsmart your opponents, <em>one question</em> at a time.</h1>
+    <p class="sub" data-i18n="home_v2.hero_sub">1v1 knowledge duel across science, history, geography and more. No login, no install — tap to play.</p>
     <div class="cta-row">
-      <a class="btn btn-primary" href="#lobby">Start a Duel</a>
-      <a class="btn btn-ghost" href="#online" id="ctaOnline">Find an online match</a>
+      <a class="btn btn-primary" href="#lobby" data-i18n="home_v2.cta_start">Start a Duel</a>
+      <a class="btn btn-ghost" href="#online" id="ctaOnline" data-i18n="home_v2.cta_online">Find an online match</a>
     </div>
     <div class="chips">
-      <span>📚 <b>46,000+</b> questions</span><span>🌐 <b>6</b> languages</span><span>⏱ <b>15s</b> per question</span><span>🔒 No ads · no tracking</span>
+      <span data-i18n-html="home_v2.chip_questions">📚 <b>46,000+</b> questions</span><span data-i18n-html="home_v2.chip_languages">🌐 <b>6</b> languages</span><span data-i18n-html="home_v2.chip_perq">⏱ <b>15s</b> per question</span><span data-i18n-html="home_v2.chip_private">🔒 No ads · no tracking</span>
     </div>
   </div>
   <div class="preview" aria-hidden="true">
-    <div class="pv-top"><span class="pv-tag">vs AI</span><span class="timer">⏱ 09s<span class="bar"><i></i></span></span></div>
-    <div class="pv-q">Which planet is known as the Red Planet?</div>
-    <div class="pv-cat">🔬 Science · 15s each</div>
+    <div class="pv-top"><span class="pv-tag" data-i18n="home_v2.preview_vs_ai">vs AI</span><span class="timer">⏱ 09s<span class="bar"><i></i></span></span></div>
+    <div class="pv-q" data-i18n="home_v2.preview_q">Which planet is known as the Red Planet?</div>
+    <div class="pv-cat" data-i18n="home_v2.preview_cat">🔬 Science · 15s each</div>
     <div class="pv-opts">
       <div class="pv-opt">Venus</div><div class="pv-opt ok">Mars</div>
       <div class="pv-opt">Jupiter</div><div class="pv-opt">Saturn</div>
@@ -84,12 +80,12 @@
 <section class="duo wrap" id="lobby" aria-label="Battle modes and leaderboard">
   <div>
     <div class="panel">
-      <div class="sec-ttl">Choose your battle</div>
-      <div class="sec-sub">AI sparring is always ready. Online match looks for a real opponent.</div>
+      <div class="sec-ttl" data-i18n="home_v2.sec_battle_title">Choose your battle</div>
+      <div class="sec-sub" data-i18n="home_v2.sec_battle_sub">AI sparring is always ready. Online match looks for a real opponent.</div>
 
       <div class="tabs" id="modeToggle" role="tablist" aria-label="Battle mode">
-        <button class="tab on" data-m="ai" role="tab" aria-selected="true" type="button">🤖 vs AI</button>
-        <button class="tab" data-m="online" role="tab" aria-selected="false" type="button">🌐 Online</button>
+        <button class="tab on" data-m="ai" role="tab" aria-selected="true" type="button" data-i18n="home_v2.tab_ai">🤖 vs AI</button>
+        <button class="tab" data-m="online" role="tab" aria-selected="false" type="button" data-i18n="home_v2.tab_online">🌐 Online</button>
       </div>
 
       <!-- AI 面板：分类由 home.mjs 按 /api/md/quiz/bundle 真实题量注入 -->
@@ -97,26 +93,26 @@
         <div class="cat-grid" id="catGrid"></div>
         <!-- 已选分类小字：home.mjs 写入「<分类名> · 10 questions · 15s each」 -->
         <div class="sel-note" id="catSel">Pick one to start</div>
-        <button class="btn btn-primary" id="startAiBtn" type="button" style="width:100%">⚔️ Start Duel</button>
-        <a class="solo-link" href="/train.html">Practice solo first →</a>
+        <button class="btn btn-primary" id="startAiBtn" type="button" style="width:100%" data-i18n="home_v2.start_duel">⚔️ Start Duel</button>
+        <a class="solo-link" href="/train.html" data-i18n="home_v2.practice_solo">Practice solo first →</a>
       </div>
 
       <!-- Online 面板：匹配/房间逻辑全在 home.mjs，状态文字由 JS 写入，HTML 保持为空 -->
       <div id="onlinePanel" role="tabpanel" hidden style="display:none">
         <div class="field" id="online">
-          <label>Quick match</label>
-          <button class="btn btn-primary" id="startMatchBtn" type="button" style="width:100%">⚡ Start Matching</button>
+          <label data-i18n="home_v2.quick_match">Quick match</label>
+          <button class="btn btn-primary" id="startMatchBtn" type="button" style="width:100%" data-i18n="home_v2.start_matching">⚡ Start Matching</button>
           <div class="match-status" id="matchStatus"></div>
-          <button class="btn btn-ghost" id="cancelMatchBtn" type="button" style="width:100%;display:none">Cancel</button>
+          <button class="btn btn-ghost" id="cancelMatchBtn" type="button" style="width:100%;display:none" data-i18n="home_v2.cancel">Cancel</button>
         </div>
-        <div class="divider">or play a friend</div>
+        <div class="divider" data-i18n="home_v2.or_friend">or play a friend</div>
         <div class="field">
-          <label for="roomInput">Enter room code</label>
-          <input class="room-in" id="roomInput" maxlength="6" inputmode="latin" autocomplete="off" spellcheck="false" aria-label="Room code" placeholder="ABC123">
-          <div class="room-err" id="roomErr">Room codes are 6 letters or digits.</div>
+          <label for="roomInput" data-i18n="home_v2.room_code_label">Enter room code</label>
+          <input class="room-in" id="roomInput" maxlength="6" inputmode="latin" autocomplete="off" spellcheck="false" aria-label="Room code" data-i18n-aria-label="home_v2.room_code_label" placeholder="ABC123">
+          <div class="room-err" id="roomErr" data-i18n="home_v2.room_err">Room codes are 6 letters or digits.</div>
         </div>
         <div class="row2">
-          <button class="btn btn-ghost" id="joinBtn" type="button">Join Room</button>
+          <button class="btn btn-ghost" id="joinBtn" type="button" data-i18n="home_v2.join_room">Join Room</button>
           <button class="btn btn-ghost" id="createRoomBtn" type="button">➕ Create</button>
         </div>
         <div class="match-status" id="onlineRooms"></div>
@@ -124,13 +120,13 @@
     </div>
 
     <div class="panel" id="features">
-      <div class="sec-ttl">Why MemoryDuel</div>
-      <div class="sec-sub">Built for fast, fair, private knowledge duels.</div>
+      <div class="sec-ttl" data-i18n="home_v2.features_title">Why MemoryDuel</div>
+      <div class="sec-sub" data-i18n="home_v2.features_sub">Built for fast, fair, private knowledge duels.</div>
       <div class="feats">
-        <div class="feat"><div class="fi">⏱</div><h4>Timed quizzes</h4><p>15s pressure makes every round sharp.</p></div>
-        <div class="feat"><div class="fi">🌍</div><h4>6 languages</h4><p>Play in your language, anywhere.</p></div>
-        <div class="feat"><div class="fi">🤖</div><h4>AI sparring</h4><p>Always-ready opponent, any time.</p></div>
-        <div class="feat"><div class="fi">🏆</div><h4>Leaderboards</h4><p>Weekly reset, badges for top 10%.</p></div>
+        <div class="feat"><div class="fi">⏱</div><h4 data-i18n="home_v2.feat1_t">Timed quizzes</h4><p data-i18n="home_v2.feat1_d">15s pressure makes every round sharp.</p></div>
+        <div class="feat"><div class="fi">🌍</div><h4 data-i18n="home_v2.feat2_t">6 languages</h4><p data-i18n="home_v2.feat2_d">Play in your language, anywhere.</p></div>
+        <div class="feat"><div class="fi">🤖</div><h4 data-i18n="home_v2.feat3_t">AI sparring</h4><p data-i18n="home_v2.feat3_d">Always-ready opponent, any time.</p></div>
+        <div class="feat"><div class="fi">🏆</div><h4 data-i18n="home_v2.feat4_t">Leaderboards</h4><p data-i18n="home_v2.feat4_d">Weekly reset, badges for top 10%.</p></div>
       </div>
     </div>
   </div>
@@ -138,11 +134,11 @@
   <!-- 右：真实排行榜（home.ts 拉 /api/md/rank） -->
   <div id="globalTop">
     <div class="panel">
-      <div class="sec-ttl">🏆 Top players</div>
-      <div class="sec-sub">The best minds dueling right now.</div>
+      <div class="sec-ttl" data-i18n="home_v2.top_title">🏆 Top players</div>
+      <div class="sec-sub" data-i18n="home_v2.top_sub">The best minds dueling right now.</div>
       <div class="rank-list" id="topRankList"></div>
       <div class="rank-foot">
-        <a href="/membership/">How scoring works →</a>
+        <a href="/membership/" data-i18n="home_v2.scoring">How scoring works →</a>
       </div>
       <div class="ladder" aria-hidden="true">
         <div class="seg">B1</div><div class="seg">B2</div><div class="seg">S1</div>
@@ -154,11 +150,11 @@
 
 <!-- ═══════════ 三步上手 ═══════════ -->
 <section class="block wrap" id="how" aria-label="How to play">
-  <div class="how-ttl">New here? Three steps.</div>
+  <div class="how-ttl" data-i18n="home_v2.how_title">New here? Three steps.</div>
   <div class="steps" style="margin-top:20px">
-    <div class="step"><div class="n">Step 1</div><h3>Pick a category</h3><p>Science, history, movies — choose what you know best.</p></div>
-    <div class="step"><div class="n">Step 2</div><h3>Start a duel</h3><p>Face the AI, match a random player, or share a room code with a friend.</p></div>
-    <div class="step"><div class="n">Step 3</div><h3>Answer first to win</h3><p>Beat the clock and your rival. Climb the ladder, earn badges.</p></div>
+    <div class="step"><div class="n" data-i18n="home_v2.step1_n">Step 1</div><h3 data-i18n="home_v2.step1_t">Pick a category</h3><p data-i18n="home_v2.step1_d">Science, history, movies — choose what you know best.</p></div>
+    <div class="step"><div class="n" data-i18n="home_v2.step2_n">Step 2</div><h3 data-i18n="home_v2.step2_t">Start a duel</h3><p data-i18n="home_v2.step2_d">Face the AI, match a random player, or share a room code with a friend.</p></div>
+    <div class="step"><div class="n" data-i18n="home_v2.step3_n">Step 3</div><h3 data-i18n="home_v2.step3_t">Answer first to win</h3><p data-i18n="home_v2.step3_d">Beat the clock and your rival. Climb the ladder, earn badges.</p></div>
   </div>
 </section>
 
@@ -167,7 +163,7 @@
   <div class="foot-in">
     <div>
       <div class="foot-brand"><span class="mk"></span>MemoryDuel</div>
-      <p class="foot-blurb">Knowledge battles, 5 minutes at a time. Ad-free and private by default.</p>
+      <p class="foot-blurb" data-i18n="home_v2.footer_blurb">Knowledge battles, 5 minutes at a time. Ad-free and private by default.</p>
     </div>
     <div class="sites">
       <a href="https://boardduel.com"><span class="pip" style="background:#2FC4C9"></span>BoardDuel</a>
@@ -175,10 +171,10 @@
       <a class="cur" href="https://memoryduel.com"><span class="pip" style="background:#4F46E5"></span>MemoryDuel</a>
     </div>
     <div class="foot-links">
-      <a href="/about/">About</a><a href="/contact/">Contact</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="/how-to-play/memory-match/">How to play</a>
+      <a href="/about/" data-i18n="nav.about">About</a><a href="/contact/" data-i18n="nav.contact">Contact</a><a href="/privacy/" data-i18n="nav.privacy">Privacy</a><a href="/terms/" data-i18n="nav.terms">Terms</a><a href="/how-to-play/memory-match/" data-i18n="home_v2.nav_how">How to play</a>
     </div>
   </div>
-  <div class="copy">© 2026 MemoryDuel · Explore the Duel family</div>
+  <div class="copy" data-i18n="home_v2.footer_copy">© 2026 MemoryDuel · Explore the Duel family</div>
 </footer>
 
 <!-- 题库数据（经典脚本，触发 memoryduel-ready 事件） -->
@@ -187,5 +183,7 @@
 <script type="module" src="/assets/js/home.mjs"></script>
 <!-- 首页装配：真实排行榜 + Online 模式钩子 -->
 <script type="module" src="/src/pages/home.ts"></script>
+<div id="lang-switcher"></div>
+<script src="/i18n/lang-switcher.js?v=34" defer></script>
 </body>
 </html>
