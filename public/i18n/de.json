@@ -38,7 +38,8 @@
     "lobby": "Lobby",
     "blog": "Blog",
     "contact": "Kontakt",
-    "register": "Registrieren"
+    "register": "Registrieren",
+    "teacher": "Lehrkräfte"
   },
   "auth": {
     "welcome_title": "Willkommen",
@@ -926,5 +927,32 @@
     "mm_bv_p40": "<strong>Transfer ist real, aber begrenzt</strong> — Training mit Gedächtnisspielen verbessert die Gedächtnistest-Werte. Einige Transfers auf Alltagsaufgaben (Namen merken, Termine einprägen) sind dokumentiert.",
     "mm_bv_p41": "<strong>Konstanz schlägt Intensität</strong> — 15 Minuten täglich für 3 Monate bringen bessere Ergebnisse als 2 Stunden einmal pro Woche.",
     "mm_bv_p42": "<strong>Vielfalt zählt</strong> — Das Training verschiedener Gedächtnisarten (visuell, verbal, räumlich) bringt umfassendere kognitive Vorteile als die Konzentration auf nur eine Art."
+  },
+  "md_teacher": {
+    "h1": "🧑‍🏫 MemoryDuel Lehrkraft-Konsole",
+    "subtitle": "Eröffnen Sie einen Wissen-Duellraum für Ihre Klasse. Teilen Sie den Code oder Link — Schüler scannen und spielen. Kostenlos, ohne Anmeldung, anonym.",
+    "meta_desc": "MemoryDuel Lehrkraft-Konsole — Klassenraum eröffnen, Join-Link oder QR-Code erhalten, 1v1-Wissensduell durchführen.",
+    "nav_home": "MemoryDuel Start",
+    "nav_privacy": "Datenschutz",
+    "nav_contact": "Kontakt",
+    "footer_copy": "© 2026 MemoryDuel · Datenschutz zuerst · Kostenlos",
+    "setup_title": "1. Kategorie wählen & Raum eröffnen",
+    "setup_hint": "Wählen Sie Kategorie und Rundenzahl. Schüler können nach Eröffnung beitreten. Auto-Start bei 8 oder per Start-Knopf.",
+    "cat_label": "Kategorie",
+    "rounds_label": "Runden",
+    "open_btn": "Klassenraum eröffnen",
+    "share_title": "2. Mit Klasse teilen",
+    "code_hint": "Schreiben Sie diesen 6-Zeichen-Code an die Tafel oder teilen Sie den Link rechts.",
+    "link_label": "Direkter Beitritts-Link",
+    "copy_btn": "Kopieren",
+    "lang_label": "Schülersprache (pro Sitzung gespeichert)",
+    "live_title": "3. Live-Fortschritt",
+    "live_idle": "Warte auf Schüler…",
+    "start_btn": "Diese Runde starten",
+    "end_btn": "Sitzung beenden",
+    "new_btn": "Neuen Raum",
+    "compliance": "Keine Schülerdaten gespeichert. UUIDs verfallen in 90 Tagen.",
+    "classroom_pill": "Klasse",
+    "title": "MemoryDuel Lehrkraft-Konsole · Kostenlose 1v1-Wissensduelle für Klassenzimmer"
   }
 }

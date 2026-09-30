@@ -184,6 +184,7 @@
   <div class="battle-stage" id="battleStage">
     <div class="battle-top">
       <a class="battle-back" href="/" aria-label="Back to lobby">‹</a>
+      <span class="battle-pill" id="classroomPill" style="display:none" data-i18n="md_teacher.classroom_pill">Classroom</span>
       <span class="battle-pill" id="battleTitle">⚔️ AI Battle</span>
       <span class="battle-spacer"></span>
       <span class="battle-round">Round <b id="battleCur">1</b> / <span id="battleTotal">10</span></span>
@@ -246,6 +247,11 @@
     var room = params.get('room');     // room code (online)
     var cat  = params.get('cat') || 'general';
     if (!mode && !room) return;        // 直接打开 train.html 时不启动 duel
+    // 教师端进房提示（classroom pill）
+    if (room) {
+      var pill = document.getElementById('classroomPill');
+      if (pill) { pill.style.display = 'inline-block'; pill.textContent = '🏫 ' + (window.t ? window.t('md_teacher.classroom_pill', 'Classroom') : 'Classroom') + ' · ' + room; }
+    }
 
     /* ===== Battle 配置 ===== */
     var TOTAL_ROUNDS = 10;

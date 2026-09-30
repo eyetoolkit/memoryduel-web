@@ -36,7 +36,8 @@
     "lobby": "游戏大厅",
     "blog": "博客",
     "contact": "联系",
-    "register": "注册"
+    "register": "注册",
+    "teacher": "教师"
   },
   "auth": {
     "welcome_title": "欢迎加入",
@@ -921,5 +922,32 @@
     "mm_bv_p40": "<strong>迁移效应真实但有限</strong> —— 记忆游戏训练能提升记忆测试分数。部分迁移效应已在日常任务（记人名、记日程）中得到记录。",
     "mm_bv_p41": "<strong>持续胜过强度</strong> —— 每天 15 分钟坚持 3 个月，比每周 1 次 2 小时更有效。",
     "mm_bv_p42": "<strong>多样性很重要</strong> —— 同时训练视觉、语言、空间等多种记忆，比只训练一种获得更全面的认知收益。"
+  },
+  "md_teacher": {
+    "h1": "🧑‍🏫 MemoryDuel 教师控制台",
+    "subtitle": "为你的班级开启一局知识对抗房间。分享房间码或链接给学生扫码即玩。免费、无需注册、匿名。",
+    "meta_desc": "MemoryDuel 教师控制台——开启班级房间，生成加入链接或二维码，全班 1v1 知识对抗。免费、无需注册、匿名 UUID。",
+    "nav_home": "MemoryDuel 首页",
+    "nav_privacy": "隐私",
+    "nav_contact": "联系",
+    "footer_copy": "© 2026 MemoryDuel · 隐私优先 · 免费畅玩",
+    "setup_title": "1. 选择类目与开启房间",
+    "setup_hint": "选择类目与轮数。学生可在房间开启后随时加入；满 8 人或教师按\"开始\"自动开局。",
+    "cat_label": "类目",
+    "rounds_label": "轮数",
+    "open_btn": "开启班级房间",
+    "share_title": "2. 分享给全班",
+    "code_hint": "把这个 6 位房间码写在黑板上，或分享右侧的链接。",
+    "link_label": "直接加入链接",
+    "copy_btn": "复制",
+    "lang_label": "学生语言（按会话保存）",
+    "live_title": "3. 实时进度",
+    "live_idle": "等待学生加入…",
+    "start_btn": "开始本轮",
+    "end_btn": "结束本节课",
+    "new_btn": "开新房间",
+    "compliance": "不存储任何学生数据。UUID 90 天自动过期。详见隐私政策。",
+    "classroom_pill": "教室",
+    "title": "MemoryDuel 教师控制台 · 免费课堂 1v1 知识对抗"
   }
 }

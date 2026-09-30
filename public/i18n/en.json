@@ -36,7 +36,8 @@
     "lobby": "Lobby",
     "blog": "Blog",
     "contact": "Contact",
-    "register": "Register"
+    "register": "Register",
+    "teacher": "Teachers"
   },
   "auth": {
     "welcome_title": "Welcome",
@@ -921,5 +922,32 @@
     "mm_bv_p40": "<strong>Transfer is real but limited</strong> — Training on memory games improves memory test scores. Some transfer to daily tasks (name recall, appointment remembering) has been documented.",
     "mm_bv_p41": "<strong>Consistency beats intensity</strong> — 15 minutes daily for 3 months produces better results than 2 hours once a week.",
     "mm_bv_p42": "<strong>Variety matters</strong> — Training different types of memory (visual, verbal, spatial) provides more comprehensive cognitive benefits than focusing on one type alone."
+  },
+  "md_teacher": {
+    "h1": "🧑‍🏫 MemoryDuel Teacher Console",
+    "subtitle": "Open a knowledge-duel room for your class. Share the code or QR — students scan and play. Free, no signup, anonymous.",
+    "meta_desc": "MemoryDuel teacher console — open a classroom room, get a join link or QR code, and run a 1v1 knowledge duel with your class. Free, no signup, anonymous UUIDs.",
+    "nav_home": "MemoryDuel Home",
+    "nav_privacy": "Privacy",
+    "nav_contact": "Contact",
+    "footer_copy": "© 2026 MemoryDuel · Privacy-first · Free to play",
+    "setup_title": "1. Pick a category & open room",
+    "setup_hint": "Choose a category and a round count. Students can join as soon as the room is open. The room auto-starts when 8 players join or when you press Start.",
+    "cat_label": "Category",
+    "rounds_label": "Rounds",
+    "open_btn": "Open classroom room",
+    "share_title": "2. Share with your class",
+    "code_hint": "Write this 6-character code on the board, or share the link on the right.",
+    "link_label": "Direct join link",
+    "copy_btn": "Copy",
+    "lang_label": "Student language (saved per session)",
+    "live_title": "3. Live progress",
+    "live_idle": "Waiting for students…",
+    "start_btn": "Start this round",
+    "end_btn": "End session",
+    "new_btn": "Open new room",
+    "compliance": "No student data is stored. UUIDs expire in 90 days. See our Privacy Policy.",
+    "classroom_pill": "Classroom",
+    "title": "MemoryDuel Teacher Console · Free 1v1 knowledge battles for classrooms"
   }
 }

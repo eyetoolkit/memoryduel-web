@@ -38,7 +38,8 @@
     "lobby": "Lobby",
     "blog": "Blog",
     "contact": "Contact",
-    "register": "S'inscrire"
+    "register": "S'inscrire",
+    "teacher": "Enseignants"
   },
   "auth": {
     "welcome_title": "Bienvenue",
@@ -926,5 +927,32 @@
     "mm_bv_p40": "<strong>Le transfert est réel mais limité</strong> — L'entraînement aux jeux de mémoire améliore les scores aux tests de mémoire. Certains transferts vers les tâches quotidiennes (souvenir des noms, des rendez-vous) ont été documentés.",
     "mm_bv_p41": "<strong>La régularité prime sur l'intensité</strong> — 15 minutes par jour pendant 3 mois donnent de meilleurs résultats que 2 heures une fois par semaine.",
     "mm_bv_p42": "<strong>La variété compte</strong> — Entraîner différents types de mémoire (visuelle, verbale, spatiale) apporte des bénéfices cognitifs plus complets que se limiter à un seul type."
+  },
+  "md_teacher": {
+    "h1": "🧑‍🏫 Console Enseignant MemoryDuel",
+    "subtitle": "Ouvrez une salle de duel de connaissances pour votre classe. Partagez le code ou le lien — les élèves scannent et jouent. Gratuit, sans inscription, anonyme.",
+    "meta_desc": "Console enseignant MemoryDuel — ouvrez une salle, obtenez un lien ou QR code et organisez un duel 1v1 en classe.",
+    "nav_home": "Accueil MemoryDuel",
+    "nav_privacy": "Confidentialité",
+    "nav_contact": "Contact",
+    "footer_copy": "© 2026 MemoryDuel · Confidentialité d'abord · Gratuit",
+    "setup_title": "1. Choisir catégorie et ouvrir la salle",
+    "setup_hint": "Choisissez catégorie et nombre de manches. Les élèves peuvent rejoindre dès l'ouverture. Démarrage auto à 8 ou via le bouton.",
+    "cat_label": "Catégorie",
+    "rounds_label": "Manches",
+    "open_btn": "Ouvrir la salle de classe",
+    "share_title": "2. Partager avec la classe",
+    "code_hint": "Écrivez ce code à 6 caractères au tableau, ou partagez le lien à droite.",
+    "link_label": "Lien de participation direct",
+    "copy_btn": "Copier",
+    "lang_label": "Langue de l'élève (sauvegardée par session)",
+    "live_title": "3. Progression en direct",
+    "live_idle": "En attente d'élèves…",
+    "start_btn": "Démarrer cette manche",
+    "end_btn": "Terminer la session",
+    "new_btn": "Nouvelle salle",
+    "compliance": "Aucune donnée élève stockée. UUID expire en 90 jours.",
+    "classroom_pill": "Classe",
+    "title": "Console Enseignant MemoryDuel · Duels 1v1 gratuits en classe"
   }
 }

@@ -38,7 +38,8 @@
     "lobby": "Lobby",
     "blog": "Blog",
     "contact": "Contacto",
-    "register": "Registrarse"
+    "register": "Registrarse",
+    "teacher": "Profesores"
   },
   "auth": {
     "welcome_title": "Bienvenido",
@@ -926,5 +927,32 @@
     "mm_bv_p40": "<strong>La transferencia es real pero limitada</strong> — Entrenar con juegos de memoria mejora las puntuaciones de tests de memoria. Se ha documentado cierta transferencia a tareas cotidianas (recordar nombres, citas).",
     "mm_bv_p41": "<strong>La constancia supera a la intensidad</strong> — 15 minutos diarios durante 3 meses producen mejores resultados que 2 horas una vez a la semana.",
     "mm_bv_p42": "<strong>La variedad importa</strong> — Entrenar distintos tipos de memoria (visual, verbal, espacial) aporta beneficios cognitivos más completos que centrarse en uno solo."
+  },
+  "md_teacher": {
+    "h1": "🧑‍🏫 Consola de Profesor MemoryDuel",
+    "subtitle": "Abre una sala de duelo de conocimiento para tu clase. Comparte el código o enlace — los estudiantes escanean y juegan. Gratis, sin registro, anónimo.",
+    "meta_desc": "Consola de profesor MemoryDuel — abre una sala, obtén enlace o código QR y organiza un duelo 1v1 con tu clase.",
+    "nav_home": "Inicio MemoryDuel",
+    "nav_privacy": "Privacidad",
+    "nav_contact": "Contacto",
+    "footer_copy": "© 2026 MemoryDuel · Privacidad primero · Gratis",
+    "setup_title": "1. Elige categoría y abre sala",
+    "setup_hint": "Elige una categoría y número de rondas. Los estudiantes pueden unirse cuando la sala esté abierta. Auto-inicia al llegar a 8 o al pulsar Iniciar.",
+    "cat_label": "Categoría",
+    "rounds_label": "Rondas",
+    "open_btn": "Abrir sala de clase",
+    "share_title": "2. Comparte con tu clase",
+    "code_hint": "Escribe este código de 6 caracteres en la pizarra, o comparte el enlace de la derecha.",
+    "link_label": "Enlace de unión directa",
+    "copy_btn": "Copiar",
+    "lang_label": "Idioma del estudiante (guardado por sesión)",
+    "live_title": "3. Progreso en vivo",
+    "live_idle": "Esperando estudiantes…",
+    "start_btn": "Iniciar esta ronda",
+    "end_btn": "Finalizar sesión",
+    "new_btn": "Abrir nueva sala",
+    "compliance": "No se almacenan datos de estudiantes. Los UUID caducan en 90 días.",
+    "classroom_pill": "Aula",
+    "title": "Consola Profesor MemoryDuel · Duelos 1v1 gratuitos para aulas"
   }
 }
