@@ -26,7 +26,7 @@
       name: 'Math Duel',
       nameZh: '数学对决',
       emoji: '🔢',
-      host: 'mathduel.games',
+      host: 'numeriduel.com',
       games: [
         { icon: '24',  name: '24 Game',          zh: '24 点',     href: '/games/24-game/' },
         { icon: '24⁺', name: '24 Easy',         zh: '24 点初级', href: '/games/24-game-easy/' },
