@@ -948,6 +948,8 @@
     "new_btn": "Open new room",
     "compliance": "No student data is stored. UUIDs expire in 90 days. See our Privacy Policy.",
     "classroom_pill": "Classroom",
-    "title": "MemoryDuel Teacher Console · Free 1v1 knowledge battles for classrooms"
+    "title": "MemoryDuel Teacher Console · Free 1v1 knowledge battles for classrooms",
+    "export_btn": "📊 Export CSV",
+    "err_no_status": "No session data available to export yet."
   }
 }

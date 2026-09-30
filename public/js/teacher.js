@@ -10,6 +10,7 @@
   var PID_KEY = 'memoryduel_pid';
   var SESSION_KEY = 'memoryduel_session_v1';
   var ROOM_KEY = 'memoryduel_teacher_room';
+  var STATUS_KEY = 'memoryduel_teacher_status';   // 最近一次 /room/status 缓存（CSV 导出用）
 
   /* ─── 12 个类目（与 quiz-data.js CATEGORIES 对齐）─── */
   var CATEGORIES = [
@@ -279,6 +280,13 @@
   }
 
   function renderLive(st) {
+    // 缓存最近一次 status，供 CSV 导出使用（含每玩家得分）
+    try {
+      var room = currentRoom();
+      if (room) {
+        localStorage.setItem(STATUS_KEY, JSON.stringify({ code: room.code, ts: Date.now(), payload: st }));
+      }
+    } catch (e) {}
     var players = st.players || [];
     var status = st.status || 'waiting';
     var ul = $('playerList');
@@ -321,8 +329,52 @@
   function endSession() {
     var room = currentRoom(); if (!room) return;
     mdApi('POST', '/api/md/room/finish', { code: room.code }).catch(function () {});
-    try { localStorage.removeItem(ROOM_KEY); } catch (e) {}
+    try { localStorage.removeItem(ROOM_KEY); localStorage.removeItem(STATUS_KEY); } catch (e) {}
     location.reload();
+  }
+
+  function newRoom() {
+    try { localStorage.removeItem(ROOM_KEY); localStorage.removeItem(STATUS_KEY); } catch (e) {}
+    location.reload();
+  }
+
+  /* ─── CSV 导出（W2.3 教师复访触发器）─── */
+  function exportCsv() {
+    var cached = null;
+    try { var raw = localStorage.getItem(STATUS_KEY); if (raw) cached = JSON.parse(raw); } catch (e) {}
+    if (!cached || !cached.payload) { showErr(t('err_no_status')); return; }
+    var st = cached.payload;
+    var room = currentRoom() || { code: st.code || '', rounds: 0, cat: '' };
+    var players = (st.players || []).slice();
+    players.sort(function (a, b) { return (b.score || 0) - (a.score || 0); });
+    var rows = [
+      ['rank', 'player_code', 'score', 'pid', 'room_code', 'category', 'round', 'total_rounds', 'status', 'exported_at_iso'],
+    ];
+    var nowIso = new Date().toISOString();
+    players.forEach(function (p, i) {
+      rows.push([
+        String(i + 1),
+        p.name || p.pid || '',
+        String(p.score || 0),
+        p.pid || '',
+        room.code || '',
+        room.cat || '',
+        String(st.round || 0),
+        String(st.totalRounds || ''),
+        st.status || 'unknown',
+        nowIso,
+      ]);
+    });
+    var csv = rows.map(function (r) {
+      return r.map(function (x) { return '"' + String(x).replace(/"/g, '""') + '"'; }).join(',');
+    }).join('\n');
+    var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'memoryduel-' + (room.code || 'room') + '-' + Date.now() + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   function newRoom() {
@@ -352,6 +404,7 @@
     $('endBtn').addEventListener('click', endSession);
     $('newBtn').addEventListener('click', newRoom);
     $('copyBtn').addEventListener('click', copyLink);
+    $('exportBtn').addEventListener('click', exportCsv);
     // 如果上次还有房间（24h 内）自动恢复
     var last = currentRoom();
     if (last && (Date.now() - (last.ts || 0)) < 24 * 3600 * 1000) {

@@ -953,6 +953,8 @@
     "new_btn": "Neuen Raum",
     "compliance": "Keine Schülerdaten gespeichert. UUIDs verfallen in 90 Tagen.",
     "classroom_pill": "Klasse",
-    "title": "MemoryDuel Lehrkraft-Konsole · Kostenlose 1v1-Wissensduelle für Klassenzimmer"
+    "title": "MemoryDuel Lehrkraft-Konsole · Kostenlose 1v1-Wissensduelle für Klassenzimmer",
+    "export_btn": "📊 CSV exportieren",
+    "err_no_status": "Noch keine Sitzungsdaten zum Exportieren."
   }
 }

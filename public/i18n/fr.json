@@ -953,6 +953,8 @@
     "new_btn": "Nouvelle salle",
     "compliance": "Aucune donnée élève stockée. UUID expire en 90 jours.",
     "classroom_pill": "Classe",
-    "title": "Console Enseignant MemoryDuel · Duels 1v1 gratuits en classe"
+    "title": "Console Enseignant MemoryDuel · Duels 1v1 gratuits en classe",
+    "export_btn": "📊 Exporter CSV",
+    "err_no_status": "Aucune donnée de session à exporter."
   }
 }

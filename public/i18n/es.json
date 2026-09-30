@@ -953,6 +953,8 @@
     "new_btn": "Abrir nueva sala",
     "compliance": "No se almacenan datos de estudiantes. Los UUID caducan en 90 días.",
     "classroom_pill": "Aula",
-    "title": "Consola Profesor MemoryDuel · Duelos 1v1 gratuitos para aulas"
+    "title": "Consola Profesor MemoryDuel · Duelos 1v1 gratuitos para aulas",
+    "export_btn": "📊 Exportar CSV",
+    "err_no_status": "Aún no hay datos de sesión para exportar."
   }
 }

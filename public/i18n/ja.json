@@ -953,6 +953,8 @@
     "new_btn": "新しいルーム",
     "compliance": "学生データは保存されません。UUID は 90 日で自動失効。",
     "classroom_pill": "教室",
-    "title": "MemoryDuel 教師コンソール · 教室向け無料 1v1 知識バトル"
+    "title": "MemoryDuel 教師コンソール · 教室向け無料 1v1 知識バトル",
+    "export_btn": "📊 CSVエクスポート",
+    "err_no_status": "エクスポート可能なセッションデータがありません。"
   }
 }

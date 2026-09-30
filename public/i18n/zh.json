@@ -948,6 +948,8 @@
     "new_btn": "开新房间",
     "compliance": "不存储任何学生数据。UUID 90 天自动过期。详见隐私政策。",
     "classroom_pill": "教室",
-    "title": "MemoryDuel 教师控制台 · 免费课堂 1v1 知识对抗"
+    "title": "MemoryDuel 教师控制台 · 免费课堂 1v1 知识对抗",
+    "export_btn": "📊 导出 CSV",
+    "err_no_status": "暂无会话数据可导出。"
   }
 }
