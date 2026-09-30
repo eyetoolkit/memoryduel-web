@@ -955,6 +955,9 @@
     "classroom_pill": "Classe",
     "title": "Console Enseignant MemoryDuel · Duels 1v1 gratuits en classe",
     "export_btn": "📊 Exporter CSV",
-    "err_no_status": "Aucune donnée de session à exporter."
+    "err_no_status": "Aucune donnée de session à exporter.",
+    "cross_ttl": "Découvrez les autres sites Duel",
+    "cross_math": "24 points · Sudoku 4×4-9×9 · Pyramide d'équations · Pyramide numérique",
+    "cross_board": "Échecs · Gomoku · Puissance 4 · Othello · Morpion"
   }
 }

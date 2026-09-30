@@ -950,6 +950,9 @@
     "classroom_pill": "Classroom",
     "title": "MemoryDuel Teacher Console · Free 1v1 knowledge battles for classrooms",
     "export_btn": "📊 Export CSV",
-    "err_no_status": "No session data available to export yet."
+    "err_no_status": "No session data available to export yet.",
+    "cross_ttl": "Try the other Duel family sites",
+    "cross_math": "24-point · Sudoku 4×4-9×9 · Equation pyramid · Number pyramid",
+    "cross_board": "Chess · Gomoku · Connect 4 · Othello · Tic-Tac-Toe"
   }
 }

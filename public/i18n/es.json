@@ -955,6 +955,9 @@
     "classroom_pill": "Aula",
     "title": "Consola Profesor MemoryDuel · Duelos 1v1 gratuitos para aulas",
     "export_btn": "📊 Exportar CSV",
-    "err_no_status": "Aún no hay datos de sesión para exportar."
+    "err_no_status": "Aún no hay datos de sesión para exportar.",
+    "cross_ttl": "Prueba las otras webs de la familia Duel",
+    "cross_math": "24 puntos · Sudoku 4×4-9×9 · Pirámide de ecuaciones · Pirámide numérica",
+    "cross_board": "Ajedrez · Gomoku · Connect 4 · Othello · Tres en raya"
   }
 }

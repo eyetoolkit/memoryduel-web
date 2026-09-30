@@ -955,6 +955,9 @@
     "classroom_pill": "教室",
     "title": "MemoryDuel 教師コンソール · 教室向け無料 1v1 知識バトル",
     "export_btn": "📊 CSVエクスポート",
-    "err_no_status": "エクスポート可能なセッションデータがありません。"
+    "err_no_status": "エクスポート可能なセッションデータがありません。",
+    "cross_ttl": "他の Duel シリーズも試す",
+    "cross_math": "24 点 · 数独 4×4-9×9 · 方程式ピラミッド · 数字ピラミッド",
+    "cross_board": "チェス · 五目並べ · Connect 4 · オセロ · 三目並べ"
   }
 }

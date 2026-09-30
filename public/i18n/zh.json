@@ -950,6 +950,9 @@
     "classroom_pill": "教室",
     "title": "MemoryDuel 教师控制台 · 免费课堂 1v1 知识对抗",
     "export_btn": "📊 导出 CSV",
-    "err_no_status": "暂无会话数据可导出。"
+    "err_no_status": "暂无会话数据可导出。",
+    "cross_ttl": "试试其他 Duel 系列站点",
+    "cross_math": "24 点 · 数独 4×4-9×9 · 方程金字塔 · 数字金字塔",
+    "cross_board": "国际象棋 · 五子棋 · 四子棋 · 黑白棋 · 井字棋"
   }
 }

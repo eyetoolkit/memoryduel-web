@@ -955,6 +955,9 @@
     "classroom_pill": "Klasse",
     "title": "MemoryDuel Lehrkraft-Konsole · Kostenlose 1v1-Wissensduelle für Klassenzimmer",
     "export_btn": "📊 CSV exportieren",
-    "err_no_status": "Noch keine Sitzungsdaten zum Exportieren."
+    "err_no_status": "Noch keine Sitzungsdaten zum Exportieren.",
+    "cross_ttl": "Probiere weitere Duel-Seiten",
+    "cross_math": "24-Punkt · Sudoku 4×4-9×9 · Gleichungs-Pyramide · Zahlen-Pyramide",
+    "cross_board": "Schach · Gomoku · Vier gewinnt · Othello · Tic-Tac-Toe"
   }
 }
