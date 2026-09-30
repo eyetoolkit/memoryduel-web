@@ -228,7 +228,7 @@
     show($('liveCard'));
     $('codeBox').textContent = room.code;
     var lang = (localStorage.getItem(LANG_KEY) || 'en').split('-')[0];
-    var joinUrl = location.origin + '/train/?room=' + encodeURIComponent(room.code) + '&lang=' + encodeURIComponent(lang);
+    var joinUrl = location.origin + '/train.html?room=' + encodeURIComponent(room.code) + '&lang=' + encodeURIComponent(lang);
     $('joinLink').textContent = joinUrl;
     try { renderQR(joinUrl); } catch (e) {}
     pollStatus();
