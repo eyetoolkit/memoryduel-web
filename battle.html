@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" data-site="memory" data-build="%VITE_SHOW_BETA%">
+<head>
+<script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:36,fallback:"en"};</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="theme-color" content="#FAF6F1">
+<title>Knowledge Battle · MemoryDuel</title>
+<meta name="description" content="Teacher's classroom quiz battle · 10 questions · 15s each · Track your progress to your teacher.">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="/favicon.ico">
+<link rel="canonical" href="https://memoryduel.com/battle/">
+<link rel="stylesheet" href="/css/shared/tokens.css">
+</head>
+<body class="battle-v2">
+
+<!-- 简洁顶部（无侧栏 / 无 beta 入口） -->
+<header class="bd-top">
+  <a class="bd-back" href="/" aria-label="Back to home">← Back</a>
+  <div class="bd-meta">
+    <span class="bd-room" id="bd-room">Room —</span>
+    <span class="bd-code" id="bd-code">—</span>
+  </div>
+</header>
+
+<main class="bd-shell">
+
+  <!-- 加载/题目阶段 -->
+  <section id="bd-loading" class="bd-card bd-center">
+    <div class="bd-spinner"></div>
+    <p class="bd-hint">Loading questions…</p>
+  </section>
+
+  <!-- 答题阶段 -->
+  <section id="bd-stage" class="bd-card" hidden>
+    <div class="bd-qhead">
+      <span class="bd-progress" id="bd-progress">Q 1 / 10</span>
+      <span class="bd-timer" id="bd-timer">15s</span>
+    </div>
+    <h2 class="bd-question" id="bd-question">—</h2>
+    <div class="bd-options" id="bd-options"></div>
+    <div class="bd-feedback" id="bd-feedback" aria-live="polite"></div>
+  </section>
+
+  <!-- 终局 -->
+  <section id="bd-result" class="bd-card bd-center" hidden>
+    <h1 class="bd-result-title">Battle complete</h1>
+    <p class="bd-result-score" id="bd-result-score">—</p>
+    <p class="bd-result-detail" id="bd-result-detail">—</p>
+    <div class="bd-result-acts">
+      <a class="bd-btn-prim" href="/">Return home</a>
+    </div>
+  </section>
+
+</main>
+
+<script src="/assets/quiz-data.js"></script>
+<script type="module" src="/src/pages/battle.ts"></script>
+</body>
+</html>

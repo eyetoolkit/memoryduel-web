@@ -42,7 +42,11 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: {
+        // M3（2026-10-01）：battle.html 为第二个 MPA 入口
+        // 教师邀请链接 /?mode=battle&c=XXX 跳转至 /battle/ 时由 home.ts 处理，
+        // 此处只负责静态资源产出。
         main: resolve(here, 'index.html'),
+        battle: resolve(here, 'battle.html'),
       },
     },
   },

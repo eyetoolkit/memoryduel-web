@@ -179,3 +179,16 @@ function bindModeHooks(): void {
 bindNav();
 bindModeHooks();
 void loadRank();
+
+/* ── 5. M3（2026-10-01）：教师邀请深链 ?mode=battle&c=XXX&tid=1 ──
+ * 教师在 numeriduel.com 控制台生成的 memoryduel 邀请链接
+ *   https://memoryduel.com/?mode=battle&c=ABC123&tid=1
+ * 落地到 memoryduel 首页后跳转到 /battle/，query 全保留。
+ * 必须发生在 bindModeHooks() 之后（bindNav 已绑好再跳转更稳）。 */
+(function deepLinkToBattle() {
+  const p = new URLSearchParams(location.search);
+  if (p.get('mode') !== 'battle') return;
+  if (!p.get('c')) return;                  // 无房间码 → 不跳
+  // 一次性跳转，跳完把 URL 改成 /battle/ 让刷新行为一致
+  location.replace('/battle/' + location.search);
+})();
