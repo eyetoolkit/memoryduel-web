@@ -307,10 +307,14 @@
       if (!stage) { alert(msg); return; }
       stage.classList.add('active');
       var card = document.getElementById('battleCard');
+      /* 安全：msg 会原样进 innerHTML，而其中一个调用点拼的是 URL 里的 ?cat=
+         （train.html:248 取参、:553 拼进提示），未消毒 → 反射型 DOM XSS。
+         在 showError 内部统一转义，而不是在每个调用点各自记得转 ——
+         少写一次就少漏一次。其余调用点传的是 i18n 文案，不含 &<>"'，不受影响。 */
       card.innerHTML =
         '<div style="text-align:center;padding:40px 20px">' +
           '<h2 style="color:#dc2626;margin-bottom:12px">⚠️ Error</h2>' +
-          '<p style="color:#6b7280;margin-bottom:20px">' + msg + '</p>' +
+          '<p style="color:#6b7280;margin-bottom:20px">' + escHtml(msg) + '</p>' +
           '<button class="btn" onclick="location.href=\'/\'">Back to Lobby</button>' +
         '</div>';
     }
@@ -582,7 +586,11 @@
             if (j && j.error && j.error.code === 'UNAUTHORIZED' && !retry) {
               try { localStorage.removeItem('md_session'); } catch (e) {}
               sessionPromise = null;
-              return mdApi(method, path, body, true);
+              /* P1-2（2026-10-06）：重试会用**新签发**的 pid，而 PID 变量仍停在旧值。
+                 于是所有 `p.pid === PID` 的比较（对手识别、是否已在房内）全部失配，
+                 且新 pid 是非房内成员 → 服务端不再下发 players。
+                 重试前先把 PID 同步成新值。 */
+              return ensureSession().then(function (s) { PID = s.pid; return mdApi(method, path, body, true); });
             }
             throw new Error((j && j.error && (j.error.msg || j.error.code)) || 'api_error');
           }
@@ -830,8 +838,14 @@
       if (OL.pollTimer) clearInterval(OL.pollTimer);
       OL.pollTimer = setInterval(function () {
         mdApi('GET', '/api/md/room/status?code=' + encodeURIComponent(OL.code)).then(function (st) {
+          /* 健壮：服务端自 2026-10-06 起对**非房内成员**不再下发 players。
+             本页的 PID 一旦落后于实际使用的 pid（例如 mdApi 遇 UNAUTHORIZED
+             重新签发），这里就变成非成员 → st.players 为 undefined → forEach
+             抛 TypeError → 被下面空 catch 吞掉 → 比分永远冻结，玩家只看到一场
+             不动的对局且毫无提示。故一律兜底成空数组。 */
+          var ps = st.players || [];
           var opp = null;
-          st.players.forEach(function (p) { if (p.pid !== PID && !opp) opp = p; });
+          ps.forEach(function (p) { if (p.pid !== PID && !opp) opp = p; });
           if (opp) {
             OL.oppScore = opp.score || 0;
             if (opp.name) document.getElementById('battleBotName').textContent = opp.name;
@@ -845,8 +859,18 @@
       clearInterval(OL.timer);
       if (OL.pollTimer) { clearInterval(OL.pollTimer); OL.pollTimer = null; }
       var zh = getLang() === 'zh';
-      // 结算(幂等:重复 finish 由服务端拒绝,忽略即可)
-      mdApi('POST', '/api/md/room/finish', { code: OL.code }).catch(function () {});
+      /* 结算：这是 memoryduel **唯一**的发币入口（服务端 /room/finish 按 players 发币）。
+         此前是 fire-and-forget（.catch(function(){})），失败时用户看不到任何提示 ——
+         会话失效/网络抖动导致没结算时，整局白打且金币永久丢失。
+         这里等结果：失败就停在结算屏上说明原因，成功才继续展示比分。 */
+      mdApi('POST', '/api/md/room/finish', { code: OL.code }).then(function () {
+        finishOnlineShowResult();
+      }).catch(function (err) {
+        finishOnlineShowResult(err && err.message ? err.message : 'finish_failed');
+      });
+    }
+
+    function finishOnlineShowResult(finishErr) {
       var youVal = OL.myScore, botVal = OL.oppScore, total = OL.questions.length;
       var outcome, title;
       if (youVal > botVal) { outcome = 'win'; title = T('battle.you_win','🎉 You win!'); }
@@ -862,6 +886,12 @@
             '<div class="score-card bot"><div class="score-name">' + escHtml(document.getElementById('battleBotName').textContent) + '</div><div class="score-val">' + botVal + '</div></div>' +
           '</div>' +
           '<div class="score-big">' + youVal + ' : ' + botVal + '</div>' +
+          /* 结算失败必须让用户看见：这一局的服务端发币没有发生。
+             不加提示的话玩家会以为正常结束，金币凭空少掉且无从追查。 */
+          (finishErr
+            ? '<p style="color:#dc2626;margin-top:12px;font-size:13px">⚠️ ' +
+              escHtml(T('train.finish_failed', 'Settlement failed: ') + finishErr) + '</p>'
+            : '') +
           '<p style="color:#6b7280;margin-top:8px">' + T('train.summary_p1','Total ') + total + T('train.summary_p2',' questions · You scored <b style="color:#4f46e5">') + youVal + '</b></p>' +
           '<div class="battle-actions">' +
             '<button class="btn" onclick="location.href=\'/\'">🏠 ' + T('battle.back_lobby','Back to Lobby') + '</button>' +
