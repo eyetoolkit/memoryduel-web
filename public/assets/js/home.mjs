@@ -142,6 +142,18 @@ function authHeaders(s) {
   return { 'Content-Type': 'application/json', 'X-Player-ID': s.pid, 'X-Player-Token': s.token };
 }
 
+// 全站曾经一律叫 'Player'：排行榜上一片同名，服务端又按名字复用座位。
+// 现在取账号名；还没取名就生成一个唯一的，绝不回落成 'Player'。
+function mdName() {
+  var I = window.Identity;
+  var n = (I && I.current && I.current()) || '';
+  if (!n) { try { n = localStorage.getItem('mm_name') || ''; } catch (e) {} }
+  if (n) return n;
+  n = 'Player-' + Math.random().toString(36).slice(2, 6);
+  try { localStorage.setItem('mm_name', n); } catch (e) {}
+  return n;
+}
+
 // ---------- 在线匹配 ----------
 let matchCancelled = false; // 取消标记:停止 pollMatch 轮询
 let currentMatchId = null;  // 当前匹配 id:用于服务端取消(F-003)
@@ -168,7 +180,7 @@ async function startMatch() {
     const r = await fetch((window.API_BASE || '') + '/api/md/match/join', {
       method: 'POST',
       headers: authHeaders(s),
-      body: JSON.stringify({ category, name: 'Player' })
+      body: JSON.stringify({ category, name: mdName() })
     });
     const j = await r.json();
     if (j.ok && j.data && j.data.code) {

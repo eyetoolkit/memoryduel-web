@@ -647,8 +647,20 @@
         .catch(function () { olShowError(T('lobby.session_init_failed','Session init failed. Please refresh and retry.')); });
     }
 
+    // 全站曾经一律叫 'Player'：排行榜上一片同名，服务端又按名字复用座位。
+    // 现在取账号名；还没取名就生成一个唯一的，绝不回落成 'Player'。
+    function mdName() {
+      var I = window.Identity;
+      var n = (I && I.current && I.current()) || '';
+      if (!n) { try { n = localStorage.getItem('mm_name') || ''; } catch (e) {} }
+      if (n) return n;
+      n = 'Player-' + Math.random().toString(36).slice(2, 6);
+      try { localStorage.setItem('mm_name', n); } catch (e) {}
+      return n;
+    }
+
     function joinRoomFlow() {
-      mdApi('POST', '/api/md/room/join', { code: OL.code, name: 'Player' })
+      mdApi('POST', '/api/md/room/join', { code: OL.code, name: mdName() })
         .then(function (room) { showWaiting(room); })
         .catch(function (err) {
           // join 失败 → 查状态:已开局则断线重连拉题;已在房间(预加入)则进等待室;否则报错
