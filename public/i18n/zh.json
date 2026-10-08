@@ -5,7 +5,9 @@
     "h1": "页面走丢了",
     "p": "您访问的页面不存在或已被移除。",
     "btn_home": "← 返回首页",
-    "btn_back": "返回上一页"
+    "btn_back": "返回上一页",
+    "title_msg": "页面未找到",
+    "message": "您访问的页面不存在或已被移除。"
   },
   "_site": {
     "name": "MemoryDuel 记忆对决",
@@ -149,7 +151,7 @@
     "badge": "🧠 泛百科知识对战",
     "h1a": "开动脑筋，",
     "h1em": "打败对手",
-    "h1b": "",
+    "h1b": "一次一局。",
     "desc": "涵盖科学、历史、地理、体育、影视等多样类别，1v1 即时知识对决，速度快者胜。免登录、免安装，点击即玩。",
     "stat_questions": "知识题库",
     "stat_categories": "类别主题",
@@ -267,7 +269,10 @@
     "value_ai": "AI 对决",
     "value_ai_desc": "7×24 自适应 AI 陪练。",
     "value_progress": "成长系统",
-    "value_progress_desc": "追踪数据，冲排行榜。"
+    "value_progress_desc": "追踪数据，冲排行榜。",
+    "mathduel_name": "Math Duel 数学对决",
+    "boardduel_name": "Board Duel 棋盘对决",
+    "memoryduel_name": "Memory Duel 知识对决"
   },
   "result": {
     "title": "🏆 对战结束",

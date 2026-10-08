@@ -1,13 +1,13 @@
 {
   "404": {
-    "title": "404 - Page Not Found",
-    "meta_desc": "404 - Page Not Found",
-    "h1": "Page Not Found",
-    "p": "The page you are looking for does not exist or has been removed.",
+    "title": "404 - ページが見つかりません",
+    "meta_desc": "404 - ページが見つかりません",
+    "h1": "ページが見つかりません",
+    "p": "お探しのページは存在しないか、すでに削除されています。",
     "title_msg": "ページが見つかりません",
     "message": "アクセスしたページは存在しないか、すでに削除されています。",
     "btn_home": "← ホームに戻る",
-    "btn_back": "Go 戻る"
+    "btn_back": "戻る"
   },
   "_site": {
     "name": "MemoryDuel",
@@ -151,7 +151,7 @@
     "badge": "🧠 Knowledge バトル",
     "h1a": "相手を出し抜け、",
     "h1em": "5分",
-    "h1b": "at a 時間",
+    "h1b": "1局ずつ。",
     "desc": "1v1 knowledge デュエル spanning science, history, geography, sports, movies と もっと. No ログイン, no install. Tap to プレイ.",
     "stat_questions": "Questions",
     "stat_categories": "カテゴリ",
