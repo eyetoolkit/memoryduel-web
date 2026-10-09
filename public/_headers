@@ -37,3 +37,13 @@
 # 阻止 .git 暴露（防御性，CF Pages 不暴露 .git）
 /.git/*
   X-Robots-Tag: noindex
+
+# Battle / train HTML: short edge cache so quiz-data ?v= bumps land fast
+/train.html
+  Cache-Control: public, max-age=60, must-revalidate
+/battle
+  Cache-Control: public, max-age=60, must-revalidate
+/battle/
+  Cache-Control: public, max-age=60, must-revalidate
+/assets/quiz-data.js
+  Cache-Control: public, max-age=300, must-revalidate

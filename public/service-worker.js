@@ -4,10 +4,16 @@
 importScripts('/shared/sw-helpers.js');
 
 TriSW.create({
-  CACHE_VERSION: 'memoryduel-v9-authx',
+  /* v10: battle/train HTML must be network-first. v9 cached stale train.html /
+     battle that still pointed at quiz-data.js?v=qd4 (navigator-lang bug), so
+     English UI kept loading Chinese questions after PR #7. */
+  CACHE_VERSION: 'memoryduel-v10-quiz-lang',
   NETWORK_FIRST: [
     '/',
-    '/train/'
+    '/train.html',
+    '/train/',
+    '/battle',
+    '/battle/',
   ],
   CACHE_FIRST: [
     '/manifest.webmanifest',
@@ -17,7 +23,9 @@ TriSW.create({
     '/css/shared/toast.css',
     '/js/sidebar.js',
     '/js/toast.js',
-    '/assets/quiz-data.js'
+    /* quiz-data.js intentionally NOT listed: ?v= cache-bust must hit network
+       when HTML bumps the query; .js regex still cache-firsts by full Request
+       URL (query included), so qd6 ≠ stale qd4. */
   ],
   PRECACHE: [
     '/',

@@ -233,7 +233,7 @@
 <script defer src="/js/toast.js?v=p3"></script>
 <script defer src="/js/sidebar.js?v=sb34"></script>
 <script src="/i18n/i18n.js?v=36" defer></script>
-<script src="/assets/quiz-data.js?v=qd5" defer></script>
+<script src="/assets/quiz-data.js?v=qd6" defer></script>
 
 <!-- Battle Engine: real AI / Online duel game logic -->
   <script>
@@ -278,7 +278,24 @@
       return m;
     })();
 
-    function getLang() { return (window.i18n && window.i18n.getLang) ? window.i18n.getLang() : 'en'; }
+    function getLang() {
+      /* Prefer URL ?lang= (home always passes it into train). i18n may still be
+         null when the inline battle IIFE runs before deferred i18n.js finishes. */
+      try {
+        var u = params.get('lang');
+        if (u) {
+          var ul = String(u).split('-')[0].toLowerCase();
+          if (['en','zh','ja','es','fr','de'].indexOf(ul) >= 0) return ul;
+        }
+      } catch (e0) {}
+      try {
+        if (window.i18n && window.i18n.getLang) {
+          var il = window.i18n.getLang();
+          if (il) return String(il).split('-')[0].toLowerCase();
+        }
+      } catch (e1) {}
+      return 'en';
+    }
     function pickBotName() {
       var list = BOT_NAMES_BY_LANG[getLang()] || BOT_NAMES_BY_LANG.en;
       return list[Math.floor(Math.random() * list.length)];
@@ -373,9 +390,16 @@
 
       var q = B.questions[B.idx];
       var lang = getLang();
-      // 题面/选项优先用 qn[lang]/op[lang]，fallback 到 en，再 fallback 到 q/op（后端字段）
-      var text = (q.qn && (q.qn[lang] || q.qn.en)) || q.q || '';
-      var options = (q.op && (q.op[lang] || q.op.en)) || q.options || [];
+      // Prefer raw q/options when the bundle was fetched for this UI lang (_rawLang).
+      // Avoid qn[lang]||qn.en falling through to a poisoned/mismatched slot.
+      var text, options;
+      if (q._rawLang && q._rawLang === lang && q.q) {
+        text = q.q;
+        options = q.options || [];
+      } else {
+        text = (q.qn && (q.qn[lang] || q.qn.en)) || q.q || '';
+        options = (q.op && (q.op[lang] || q.op.en)) || q.options || [];
+      }
       var correct = q.ans;
 
       document.getElementById('battleQuestion').textContent = text;
@@ -930,8 +954,17 @@
         '</div>';
     }
 
-    if (mode === 'ai') startAiBattle(cat);
-    else if (room) startOnlineRoom(room);
+    function bootBattle() {
+      if (mode === 'ai') startAiBattle(cat);
+      else if (room) startOnlineRoom(room);
+    }
+    /* Inline script runs before defer i18n/quiz-data. Wait for DOMContentLoaded
+       (defer scripts have run) so ?lang + i18n are visible to getLang/setLang. */
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootBattle);
+    } else {
+      bootBattle();
+    }
   })();
   </script>
   <script src="/shared/site-header.js?v=ds2-10"></script>

@@ -31,10 +31,14 @@ declare global {
         c?: string;
         cat?: string;
         opts?: string[];
+        _rawLang?: string;
       }>;
       byCategory: (cat: string) => any[];
       ensureLoaded: () => Promise<{ total: number; categoriesOk: number }>;
       ready: boolean;
+      getLang?: () => string;
+      setLang?: (l: string) => void;
+      detectLang?: () => string;
     };
   }
 }
@@ -87,14 +91,19 @@ function pickQuestions(): Question[] {
   const Q = window.MemoryDuelQuiz;
   if (!Q || Q.QUESTIONS.length === 0) return [];
 
-  const general = Q.byCategory('general') as Question[];
+  const curLang = (Q.getLang && Q.getLang()) || 'en';
+  const general = (Q.byCategory('general') as Question[]).filter(
+    (q: any) => !q._rawLang || q._rawLang === curLang,
+  );
   let pool = general.slice();
   if (pool.length < TOTAL) {
     // 跨分类补足
     const ids = Q.CATEGORIES.map((c) => c.id);
     for (const id of ids) {
       if (id === 'general') continue;
-      const more = Q.byCategory(id) as Question[];
+      const more = (Q.byCategory(id) as Question[]).filter(
+        (q: any) => !q._rawLang || q._rawLang === curLang,
+      );
       pool = pool.concat(more);
       if (pool.length >= TOTAL * 2) break;
     }
@@ -216,7 +225,7 @@ async function bootstrap() {
     await ensureStudentCode(ic);   // 代号落 localStorage，后续 reportRound 自动取
   }
 
-  // 等题目加载
+  // 等题目加载；同步 URL/站点语言（本页无 i18n，chrome 为英文，题库须跟 ?lang / storage）
   const Q = window.MemoryDuelQuiz;
   if (!Q) {
     show('bd-result');
@@ -224,6 +233,11 @@ async function bootstrap() {
     if (s) s.textContent = 'Quiz data failed to load — please refresh.';
     return;
   }
+  try {
+    const want = new URLSearchParams(location.search).get('lang');
+    if (want && Q.setLang) Q.setLang(want);
+    else if (Q.detectLang && Q.setLang) Q.setLang(Q.detectLang());
+  } catch { /* ignore */ }
   try {
     await Q.ensureLoaded();
   } catch {
