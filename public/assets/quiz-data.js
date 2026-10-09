@@ -101,7 +101,7 @@
 
   function fetchBundle(catId, retries) {
     retries = retries || 2;
-    var url = (API || '') + '/api/md/quiz/bundle?category=' + encodeURIComponent(catId) + '&lang=' + LANG + '&count=2000';
+    var url = (API || '') + '/api/md/quiz/bundle?category=' + encodeURIComponent(catId) + '&lang=' + LANG + '&count=100';
 
     function attempt(n) {
       return fetch(url, { cache: 'no-store' })
