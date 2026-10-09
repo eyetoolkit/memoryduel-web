@@ -48,7 +48,7 @@ const PROFANITY = [
 /* ─── 工具: 生成默认昵称 ─── */
 function defaultNickname() {
   const num = Math.floor(Math.random() * 9000) + 1000;
-  return __('account.default_player', '玩家') + num;
+  return __('account.default_player', 'Player') + num;
 }
 
 /* ─── 工具: 验证昵称 ─── */
