@@ -72,7 +72,7 @@ function renderCategories() {
     if (!first) return null;
     return first[lang] || first.en || first.id;
   };
-  const stillLoading = (loading && loading()) || QUESTIONS.length === 0;
+  const stillLoading = !!(loading && loading());
 
   grid.innerHTML = CATEGORIES.map((c) => {
     const count = (byCategory(c.id) || []).length;
