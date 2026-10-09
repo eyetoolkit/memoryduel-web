@@ -68,7 +68,9 @@
       QUESTIONS.length = 0;
       loaded = null;
       loading = false;
-      ensureLoaded().then(function () { window.dispatchEvent(new Event('memoryduel-ready')); });
+      ensureLoaded().then(function (stats) {
+        window.dispatchEvent(new CustomEvent('memoryduel-ready', { detail: stats || null }));
+      });
     }
   }
 
@@ -118,38 +120,120 @@
             // 指数退避: 200ms, 400ms, 800ms
             return new Promise(function (res) { setTimeout(function () { res(attempt(n + 1)); }, (n + 1) * 200); });
           }
-          console.warn('[MemoryDuel] fetchBundle failed for', catId, ':', err.message);
-          return [];
+          console.error('[MD] fetchBundle failed for', catId, ':', err && err.message);
+          beaconClientError({
+            source: 'quiz-data',
+            kind: 'fetch_bundle_failed',
+            category: catId,
+            message: String((err && err.message) || 'fetch_failed').slice(0, 120),
+            lang: LANG,
+            path: (typeof location !== 'undefined' ? location.pathname : ''),
+          });
+          // Keep Array contract for train.html callers; stamp failure for ensureLoaded.
+          var empty = [];
+          empty.__error = true;
+          empty.category = catId;
+          empty.message = (err && err.message) || 'fetch_failed';
+          return empty;
         });
     }
     return attempt(0);
+  }
+
+  var lastLoadError = null; // { total, categoriesOk, categoriesFailed, failedIds, message } | null
+
+  /* P0-5: lightweight client error beacon → existing /api/md/track (MD_EVENTS).
+     Prefer sendBeacon; fall back to fetch keepalive. Never blocks UI. */
+  function beaconClientError(props) {
+    try {
+      var payload = JSON.stringify({
+        events: [{
+          event: 'client_error',
+          sessionId: null,
+          timestamp: new Date().toISOString(),
+          props: props || {},
+        }],
+      });
+      var url = (API || '') + '/api/md/track';
+      if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
+        navigator.sendBeacon(url, new Blob([payload], { type: 'application/json' }));
+        return;
+      }
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: payload,
+        keepalive: true,
+        credentials: 'same-origin',
+      }).catch(function () {});
+    } catch (e) {
+      console.error('[MD] client_error beacon failed', e && e.message);
+    }
   }
 
   // 串行加载 — 避免 12 个并发请求把 D1 打垮
   async function ensureLoaded() {
     if (loaded) return loaded;
     loading = true;
+    lastLoadError = null;
     loaded = (async function () {
       var all = [];
       var successes = 0;
+      var failedIds = [];
       for (var i = 0; i < CATEGORIES.length; i++) {
         var c = CATEGORIES[i];
         try {
           var arr = await fetchBundle(c.id, 2);
-          all = all.concat(arr);
-          if (arr.length > 0) successes++;
-        } catch (e) { /* fetchBundle 内部已处理 */ }
+          if (arr && arr.__error) {
+            failedIds.push(c.id);
+            continue;
+          }
+          all = all.concat(arr || []);
+          if (arr && arr.length > 0) successes++;
+        } catch (e) {
+          failedIds.push(c.id);
+          console.error('[MD] ensureLoaded category crash', c.id, e && e.message);
+        }
       }
       QUESTIONS.length = 0;
       all.forEach(function (q) { QUESTIONS.push(q); });
       loading = false;
-      return { total: all.length, categoriesOk: successes };
+      var stats = {
+        total: all.length,
+        categoriesOk: successes,
+        categoriesFailed: failedIds.length,
+        failedIds: failedIds,
+        lang: LANG,
+      };
+      if (failedIds.length > 0 || all.length === 0) {
+        lastLoadError = Object.assign({
+          message: all.length === 0
+            ? 'quiz_load_empty'
+            : 'quiz_load_partial',
+        }, stats);
+        console.error('[MD] quiz load issue', lastLoadError);
+        // Per-category beacons already fired from fetchBundle; emit one summary if total empty
+        // (covers soft-empty: all 200 OK but 0 questions — no per-cat __error).
+        if (all.length === 0) {
+          beaconClientError({
+            source: 'quiz-data',
+            kind: lastLoadError.message,
+            total: 0,
+            categoriesOk: stats.categoriesOk,
+            categoriesFailed: stats.categoriesFailed,
+            failedIds: failedIds.slice(0, 12),
+            lang: LANG,
+            path: (typeof location !== 'undefined' ? location.pathname : ''),
+          });
+        }
+      }
+      return stats;
     })();
     return loaded;
   }
 
-  ensureLoaded().then(function () {
-    window.dispatchEvent(new Event('memoryduel-ready'));
+  ensureLoaded().then(function (stats) {
+    window.dispatchEvent(new CustomEvent('memoryduel-ready', { detail: stats || null }));
   });
 
   window.MemoryDuelQuiz = {
@@ -161,6 +245,7 @@
     setLang: setLang,
     loaded: loaded,
     loading: function () { return loading; },
+    loadError: function () { return lastLoadError; },
     ensureLoaded: ensureLoaded,
     fetchBundle: fetchBundle,        // exposed for single-category fast-path
   };
