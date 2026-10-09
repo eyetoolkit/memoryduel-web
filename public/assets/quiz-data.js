@@ -3,33 +3,85 @@
    - 串行加载 12 个分类, 带重试 (D1 并发容易失败)
    - 保留旧接口签名: Q.CATEGORIES, Q.QUESTIONS, Q.byCategory()
    - 降级: 全部失败时 QUESTIONS 仍为空, 但不会抛错
+   - 题目语言必须跟随站内 UI 语言（与 i18n 优先级一致），禁止用
+     navigator 覆盖已选的 English UI（否则中文浏览器会拿到中文题）。
    ═══════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
 
   var API = typeof window !== 'undefined' && window.API_BASE ? window.API_BASE : '';
-  /* 题目语言：优先跟随站内语言开关(window.i18n)，否则回落浏览器语言。
-     注：Worker 侧题库已具备 en/zh/ja/es/fr/de 六语数据（线上实测通过）。 */
+  /* 题目语言：与 public/i18n/i18n.js detectInitialLang 对齐
+     优先级：?lang > /xx/ 路径 > <html lang> > window.i18n > localStorage > 默认 en
+     刻意不用 navigator.language：i18n 默认 en，UI 英文时题库也必须英文。 */
   var QUIZ_LANGS = ['en', 'zh', 'ja', 'es', 'fr', 'de'];
-  function langFromNavigator() {
-    var raw = (navigator.language || 'en').toLowerCase();
-    if (raw.indexOf('zh') === 0) return 'zh';
-    if (raw.indexOf('ja') === 0) return 'ja';
-    if (raw.indexOf('es') === 0) return 'es';
-    if (raw.indexOf('fr') === 0) return 'fr';
-    if (raw.indexOf('de') === 0) return 'de';
-    return 'en';
+  var DEFAULT_QUIZ_LANG = 'en';
+
+  function normalizeLang(raw) {
+    if (!raw) return '';
+    var l = String(raw).split('-')[0].toLowerCase();
+    return QUIZ_LANGS.indexOf(l) >= 0 ? l : '';
   }
-  function detectQuizLang() {
+
+  function langFromStorage() {
     try {
-      if (window.i18n && window.i18n.getLang) {
-        var l = String(window.i18n.getLang() || '').split('-')[0].toLowerCase();
-        if (QUIZ_LANGS.indexOf(l) >= 0) return l;
+      var site = '';
+      try {
+        var ds = document.documentElement && document.documentElement.getAttribute('data-site');
+        if (ds) site = String(ds);
+      } catch (e0) {}
+      var keys = [];
+      if (site) keys.push(site + 'duel_lang'); // memoryduel_lang
+      keys.push('lang');
+      for (var i = 0; i < keys.length; i++) {
+        var v = normalizeLang(localStorage.getItem(keys[i]));
+        if (v) return v;
       }
     } catch (e) {}
-    return langFromNavigator();
+    return '';
   }
+
+  function detectQuizLang() {
+    // Align with i18n.js detectInitialLang: ?lang > /xx/ > i18n > localStorage > default en.
+    // Do NOT prefer static <html lang="en"> over localStorage — markup defaults to en
+    // before i18n applies a stored zh/ja/... preference.
+    // 1. URL ?lang=
+    try {
+      var fromUrl = new URLSearchParams(window.location.search).get('lang');
+      var u = normalizeLang(fromUrl);
+      if (u) return u;
+    } catch (e1) {}
+    // 2. Path prefix /xx/
+    try {
+      var m = (window.location.pathname || '').match(/^\/(zh|en|ja|es|fr|de)(\/|$)/);
+      if (m) {
+        var p = normalizeLang(m[1]);
+        if (p) return p;
+      }
+    } catch (e2) {}
+    // 3. window.i18n once currentLang is set (null during early dict fetch → skip)
+    try {
+      if (window.i18n && window.i18n.getLang) {
+        var il = normalizeLang(window.i18n.getLang());
+        if (il) return il;
+      }
+    } catch (e3) {}
+    // 4. localStorage (same keys as i18n)
+    var sl = langFromStorage();
+    if (sl) return sl;
+    // 5. <html lang> only if i18n already wrote a real preference (data-i18n-ready)
+    try {
+      var ready = document.documentElement && document.documentElement.getAttribute('data-i18n-ready');
+      if (ready === 'true') {
+        var hl = normalizeLang(document.documentElement.lang);
+        if (hl) return hl;
+      }
+    } catch (e4) {}
+    // 6. Site default — match i18n DEFAULT_LANG (en). Never navigator.language.
+    return DEFAULT_QUIZ_LANG;
+  }
+
   var LANG = detectQuizLang();
+  var loadGen = 0;
 
   var CATEGORIES = [
     { id: 'science',  icon: '🔬', zh: '科学',   en: 'Science',   es: 'Ciencia',     fr: 'Sciences', de: 'Wissenschaft' },
@@ -62,40 +114,56 @@
 
   function getLang() { return LANG; }
   function setLang(l) {
+    var next = normalizeLang(l);
+    if (!next) return;
     var old = LANG;
-    if (QUIZ_LANGS.indexOf(l) >= 0) LANG = l;
+    LANG = next;
     if (LANG !== old) {
       QUESTIONS.length = 0;
       loaded = null;
       loading = false;
+      loadGen++; // invalidate in-flight ensureLoaded from previous lang
       ensureLoaded().then(function (stats) {
         window.dispatchEvent(new CustomEvent('memoryduel-ready', { detail: stats || null }));
       });
     }
   }
 
-  // 站内切换语言 → 题库跟随重载
+  // 站内切换语言 / i18n 首屏就绪 → 题库跟随重载
   (function wireI18nFollow() {
     function follow(e) {
       try {
         var l = (e && e.detail && e.detail.lang)
-          || (window.i18n && window.i18n.getLang && window.i18n.getLang());
+          || (window.i18n && window.i18n.getLang && window.i18n.getLang())
+          || detectQuizLang();
         if (l) setLang(l);
       } catch (err) {}
     }
     window.addEventListener('i18n:change', follow);
+    window.addEventListener('i18n:ready', follow);
     window.addEventListener('language-changed', follow);
   })();
 
+  /* 只把题面写入实际拉取语言槽位。旧逻辑把任意语言塞进 qn.en，
+     导致 LANG=zh 拉取的中文题在 UI=en 时经 qn[lang]||qn.en 仍显示中文。 */
   function wrap(apiQ, catId) {
+    var qn = {};
+    var op = {};
+    var ex = {};
+    qn[LANG] = apiQ.q;
+    op[LANG] = apiQ.options.slice();
+    ex[LANG] = apiQ.explain || '';
     return {
       cn: catId,
       diff: ({ easy: 1, medium: 2, hard: 3 })[apiQ.difficulty] || 2,
-      // 按「实际语言」归位，避免非中/英以外语言被塞进无关槽位
-      qn: (function () { var o = { en: apiQ.q }; o[LANG] = apiQ.q; return o; })(),
-      op: (function () { var o = { en: apiQ.options.slice() }; o[LANG] = apiQ.options.slice(); return o; })(),
+      qn: qn,
+      op: op,
       ans: Number(apiQ.correct_index) || 0,
-      ex: (function () { var v = apiQ.explain || ''; var o = { en: v }; o[LANG] = v; return o; })(),
+      ex: ex,
+      // raw fields for consumers that don't use qn[lang]
+      q: apiQ.q,
+      options: apiQ.options.slice(),
+      explain: apiQ.explain || '',
       _qid: apiQ.qid,
       _rawLang: LANG,
     };
@@ -176,14 +244,17 @@
     if (loaded) return loaded;
     loading = true;
     lastLoadError = null;
+    var myGen = ++loadGen;
     loaded = (async function () {
       var all = [];
       var successes = 0;
       var failedIds = [];
       for (var i = 0; i < CATEGORIES.length; i++) {
+        if (myGen !== loadGen) return null; // superseded by setLang
         var c = CATEGORIES[i];
         try {
           var arr = await fetchBundle(c.id, 2);
+          if (myGen !== loadGen) return null;
           if (arr && arr.__error) {
             failedIds.push(c.id);
             continue;
@@ -195,6 +266,7 @@
           console.error('[MD] ensureLoaded category crash', c.id, e && e.message);
         }
       }
+      if (myGen !== loadGen) return null;
       QUESTIONS.length = 0;
       all.forEach(function (q) { QUESTIONS.push(q); });
       loading = false;
@@ -243,6 +315,7 @@
     byCategory: byCategory,
     getLang: getLang,
     setLang: setLang,
+    detectLang: detectQuizLang,
     loaded: loaded,
     loading: function () { return loading; },
     loadError: function () { return lastLoadError; },
