@@ -37,6 +37,52 @@ function bindModeToggle() {
   switchTo('ai');
 }
 
+
+// ---------- P0-5: quiz load failure banner (homepage) ----------
+let _quizFailBannerShown = false;
+function showQuizLoadBanner(stats) {
+  if (_quizFailBannerShown) return;
+  const failed = !!(stats && (stats.categoriesFailed > 0 || stats.total === 0));
+  const fromApi = window.MemoryDuelQuiz && window.MemoryDuelQuiz.loadError && window.MemoryDuelQuiz.loadError();
+  if (!failed && !fromApi) return;
+  _quizFailBannerShown = true;
+
+  const lang = (window.i18n && window.i18n.getLang) ? window.i18n.getLang() : 'en';
+  const msgs = {
+    zh: { title: '题库加载失败', msg: '部分或全部题目未能加载，请刷新重试。', retry: '刷新' },
+    en: { title: 'Quiz failed to load', msg: 'Some or all questions could not be loaded. Please refresh and try again.', retry: 'Refresh' },
+    ja: { title: '問題の読み込みに失敗', msg: '問題を読み込めませんでした。更新して再試行してください。', retry: '更新' },
+    es: { title: 'Error al cargar el quiz', msg: 'No se pudieron cargar las preguntas. Actualiza e inténtalo de nuevo.', retry: 'Actualizar' },
+    fr: { title: 'Échec du chargement', msg: 'Impossible de charger les questions. Actualisez et réessayez.', retry: 'Actualiser' },
+    de: { title: 'Quiz-Laden fehlgeschlagen', msg: 'Fragen konnten nicht geladen werden. Bitte aktualisieren.', retry: 'Aktualisieren' },
+  };
+  const t = msgs[lang] || msgs.en;
+
+  if (window.Toast && typeof window.Toast.error === 'function') {
+    window.Toast.error(t.msg);
+  }
+
+  let bar = document.getElementById('mdQuizFailBanner');
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.id = 'mdQuizFailBanner';
+    bar.setAttribute('role', 'alert');
+    bar.style.cssText = 'margin:12px 0;padding:12px 14px;border-radius:10px;background:#fef2f2;color:#991b1b;border:1px solid #fecaca;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:.9rem;';
+    const host = document.getElementById('catGrid') || document.getElementById('aiPanel') || document.getElementById('lobby');
+    if (host && host.parentNode) host.parentNode.insertBefore(bar, host);
+    else document.body.prepend(bar);
+  }
+  bar.innerHTML = '<div><strong style="display:block;margin-bottom:2px">' + t.title + '</strong><span>' + t.msg + '</span></div>';
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.textContent = t.retry;
+  btn.style.cssText = 'flex-shrink:0;padding:8px 12px;border-radius:8px;border:0;background:#991b1b;color:#fff;cursor:pointer;font-weight:600';
+  btn.addEventListener('click', () => { location.reload(); });
+  bar.appendChild(btn);
+
+  console.error('[MD] homepage quiz load failure', stats || fromApi);
+}
+
 // ---------- 分类网格 ----------
 // 右上角「已选」小字：显示真实分类名 + 一局的规格
 function updateSelLabel(card, fallbackName) {
@@ -332,8 +378,9 @@ function bindRoomActions() {
 // ---------- 题库更新时重渲染 ----------
 function bindQuizUpdates() {
   // quiz-data.js 异步加载题目，加载完成后触发 memoryduel-ready
-  window.addEventListener('memoryduel-ready', () => {
+  window.addEventListener('memoryduel-ready', (ev) => {
     renderCategories();
+    showQuizLoadBanner((ev && ev.detail) || null);
   });
 
   // quiz-data.js 文件本身加载完成（题目可能仍在加载）
@@ -345,10 +392,16 @@ function bindQuizUpdates() {
   if (!window.MemoryDuelQuiz) return;
   if (window.MemoryDuelQuiz.ready) {
     renderCategories();
+    showQuizLoadBanner(null);
   } else if (window.MemoryDuelQuiz.ensureLoaded) {
-    window.MemoryDuelQuiz.ensureLoaded().then(() => {
+    window.MemoryDuelQuiz.ensureLoaded().then((stats) => {
       renderCategories();
-    }).catch(() => {});
+      showQuizLoadBanner(stats || null);
+    }).catch((err) => {
+      console.error('[MD] ensureLoaded rejected', err && err.message);
+      renderCategories();
+      showQuizLoadBanner({ total: 0, categoriesFailed: 1, categoriesOk: 0 });
+    });
   }
 }
 
