@@ -99,6 +99,13 @@ function getSession(): Promise<Session | null> {
   return sessionPromise;
 }
 
+function localizeGuestName(name: string | undefined | null, lang: string): string {
+  const raw = String(name || '');
+  const m = raw.match(/^玩家(\d{4})$/);
+  if (m && lang.toLowerCase().slice(0, 2) !== 'zh') return `Player${m[1]}`;
+  return raw || 'Player';
+}
+
 function rowHtml(i: number, p: RankRow): string {
   const cls = ['rank-row'];
   if (i === 0) cls.push('top1');
@@ -133,7 +140,8 @@ async function loadRank(): Promise<void> {
       headers['X-Player-ID'] = s.pid;
       headers['X-Player-Token'] = s.token;
     }
-    const res = await fetch('/api/md/rank?limit=6', { headers });
+    const lang = (document.documentElement.lang || 'en').slice(0, 2);
+    const res = await fetch('/api/md/rank?limit=6&lang=' + encodeURIComponent(lang), { headers });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = (await res.json()) as { ok?: boolean; data?: { list?: RankRow[] } };
     const rows = json.ok && Array.isArray(json.data?.list) ? json.data!.list!.slice(0, 6) : [];
@@ -146,7 +154,7 @@ async function loadRank(): Promise<void> {
     list.innerHTML = rows.map((p, i) => rowHtml(i, p)).join('');
     // 昵称/首字母用 textContent 写，避免把用户可控字符串拼进 HTML
     list.querySelectorAll<HTMLElement>('.rank-row').forEach((el, i) => {
-      const name = rows[i]?.name || `Player ${i + 1}`;
+      const name = localizeGuestName(rows[i]?.name, lang) || `Player ${i + 1}`;
       const nm = el.querySelector('.rank-nm');
       const av = el.querySelector('.rank-av');
       if (nm) nm.textContent = name;
