@@ -63,6 +63,8 @@
   :focus-visible{outline:2px solid var(--orange);outline-offset:3px}
 
   /* ===== 对战舞台：暖纸 + 网格 + 橙色氤氲（与首页同源） ===== */
+  /* [2026-10-09 沉浸增强] safe-area + 动态视口高度：避免刘海/灵动岛/Home Indicator
+     遮挡内容；min-height:100dvh（带 100vh 回退）让移动端工具栏收起后仍占满屏。 */
   .battle-stage{
     position:fixed; inset:0; z-index:1000; display:none;
     background-color:var(--paper);
@@ -74,13 +76,19 @@
     background-size:100% 100%,100% 100%,32px 32px,32px 32px;
     background-attachment:fixed;
     overflow-y:auto; -webkit-font-smoothing:antialiased; color:var(--ink);
+    /* 安全区：左右/底部留出，桌面端 env() 取 0 不占空间 */
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
   }
-  .battle-stage.active{display:flex; flex-direction:column; align-items:center; min-height:100%}
+  .battle-stage.active{display:flex; flex-direction:column; align-items:center; min-height:100vh; min-height:100dvh}
 
   /* 顶栏：返回 / 模式 / 回合 / 计时 */
   .battle-top{
     position:sticky; top:0; width:100%; max-width:720px;
-    display:flex; align-items:center; gap:12px; padding:12px 18px;
+    display:flex; align-items:center; gap:12px;
+    /* [2026-10-09 沉浸增强] 顶部安全区：贴着刘海/灵动岛下沿，不进内容 */
+    padding:calc(12px + env(safe-area-inset-top)) 18px 12px;
     background:rgba(250,246,241,.86); backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line); z-index:2;
   }
@@ -157,9 +165,11 @@
   .btn.ghost:hover,.btn-ghost:hover{background:transparent; border-color:var(--orange); color:var(--orange-deep); transform:none}
 
   @media(max-width:560px){
-    .battle-top{padding:10px 14px; gap:8px}
+    /* [2026-10-09 沉浸增强] 移动端顶栏同样保留安全区上沿 */
+    .battle-top{padding:calc(10px + env(safe-area-inset-top)) 14px 10px; gap:8px}
     .battle-round{font-size:12px}
-    .battle-card{padding:18px; margin:14px auto 30px}
+    /* 卡片撑满：移动端去掉左右留白，贴齐安全区（stage 已留 safe-area） */
+    .battle-card{padding:18px 16px; margin:14px auto 24px; max-width:none}
     .battle-options{grid-template-columns:1fr}
     .battle-question{font-size:19px}
     .score-val{font-size:20px}
