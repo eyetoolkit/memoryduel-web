@@ -194,3 +194,50 @@ footer{background:var(--ink);color:#fff;margin-top:20px;padding:36px 24px}
   .cta-row .btn{width:100%}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}html{scroll-behavior:auto}}
+
+/* ═══════════════════════════════════════════════════════════════
+   iOS 原生 APP 手感层（2026-10-11）
+   ---------------------------------------------------------------------------
+   首页不引用 public/css/shared/tokens.css（走本文件打包进 main-*.css），
+   所以手感层必须在这里再写一份 —— 2026-10-11 首轮只改 tokens.css 后，
+   线上真机复测首页 computed style 仍是浏览器默认值：
+     tap-highlight rgba(51,181,229,.4) / overscroll-y auto / touch-action auto
+   而 train.html、privacy 页因为直接引 tokens.css 已修复。
+
+     ① 点击闪 rgba(51,181,229,.4) 蓝色蒙层（约 100ms）
+     ② 长按弹 iOS Callout（拷贝 / 查询 / 翻译）并整块选中文案
+     ③ 下拉触发 pull-to-refresh（首页 body overflowY:auto 实测可触发）
+     ④ 快速连点被判双击 → 整页缩放
+
+   ⚠️ 必须保住可复制文本 —— 分享文案、邀请码靠这个复制。
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ① 点击不再闪蓝框 */
+html, body, button, a, [role="button"], label, summary {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ② 长按不弹系统 Callout */
+html, body { -webkit-touch-callout: none; }
+
+/* 卡片 / 控件区禁选中 */
+body, .card, .memory-card, .tile, .grid, .board,
+.btn, .tab, .chip, .mc-grid, .mt-card {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* ⚠️ 回退层：这些必须能选中 / 能弹拷贝菜单 */
+input, textarea, select, [contenteditable], [data-copyable],
+.invite-code, .room-code, .shared-text {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
+
+/* ③ 禁下拉刷新 / 橡皮筋 */
+html { overscroll-behavior-y: none; }
+.chat-log, [data-scroll-area] { overscroll-behavior: contain; }
+
+/* ④ 禁双击缩放（保留 pan / pinch） */
+body { touch-action: manipulation; }
