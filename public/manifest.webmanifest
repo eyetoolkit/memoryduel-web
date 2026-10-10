@@ -5,6 +5,7 @@
   "lang": "zh-CN",
   "start_url": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#fff7ed",
   "theme_color": "#fff7ed",
   "icons": [
