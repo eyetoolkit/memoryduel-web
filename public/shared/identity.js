@@ -273,8 +273,8 @@
       '.idt-ask.compact .idt-note{font-size:.75rem;white-space:nowrap}',
       /* iOS Safari for font-size<16px input auto-zooms the page on focus (user must
          zoom out manually). Force a 16px floor on mobile; desktop keeps .85rem. */
-      '@media (max-width:820px){.idt-in,',
-      '.idt-ask.compact .idt-in{font-size:16px}}',
+      '@media (max-width:820px){input.idt-in,',
+      'select.idt-in,textarea.idt-in,.idt-in{font-size:16px!important}}',
       '@media (prefers-reduced-motion:reduce){.idt-go,.idt-edit{transition:none}}'
     ].join('');
     doc.head.appendChild(s);
