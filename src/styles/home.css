@@ -56,7 +56,7 @@ a{color:inherit;text-decoration:none}
 .nav-links{display:flex;gap:18px;font-size:14px;font-weight:600;color:var(--mute)}
 .nav-links a:hover{color:var(--orange-deep)}
 .nav .spacer{flex:1}
-.btn{border:0;font-family:var(--ui);font-weight:700;cursor:pointer;border-radius:11px;font-size:14px;padding:10px 16px;transition:transform .12s,background .12s;display:inline-flex;align-items:center;gap:8px;justify-content:center}
+.btn{border:0;font-family:var(--ui);font-weight:700;cursor:pointer;border-radius:11px;font-size:14px;padding:10px 16px;transition:transform .12s,background .12s;display:inline-flex;align-items:center;gap:8px;justify-content:center;min-height:44px}
 .btn-primary{background:var(--orange);color:#fff}
 .btn-primary:hover{background:var(--orange-deep);transform:translateY(-1px)}
 .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
@@ -101,7 +101,7 @@ h1 em{font-style:normal;color:var(--orange)}
 
 /* ── 模式 tab ── */
 .tabs{display:flex;gap:6px;background:rgba(234,88,12,.08);padding:5px;border-radius:13px;margin-bottom:18px}
-.tab{border:0;background:transparent;flex:1;padding:10px;border-radius:9px;font-weight:700;font-size:14px;color:var(--orange-deep);cursor:pointer;font-family:var(--ui)}
+.tab{border:0;background:transparent;flex:1;padding:10px;border-radius:9px;font-weight:700;font-size:14px;color:var(--orange-deep);cursor:pointer;font-family:var(--ui);min-height:44px;display:inline-flex;align-items:center;justify-content:center}
 .tab.on{background:#fff;color:var(--orange-deep);box-shadow:0 1px 3px rgba(0,0,0,.07)}
 
 /* ── 分类网格（home.mjs 契约：.cat/.ci/.cn/.cq + disabled=加载中/无题） ── */
@@ -115,7 +115,7 @@ h1 em{font-style:normal;color:var(--orange)}
 .cat.locked,.cat:disabled{opacity:.5;cursor:not-allowed}
 .sel-note{font-size:12.5px;color:var(--mute);font-weight:600;margin:14px 0 16px}
 .sel-note b{color:var(--orange-deep)}
-.solo-link{display:inline-block;margin-top:12px;font-size:13px;font-weight:600;color:var(--mute);border:1px solid var(--line);border-radius:10px;padding:9px 14px;transition:border-color .12s,color .12s}
+.solo-link{display:inline-flex;align-items:center;margin-top:12px;font-size:13px;font-weight:600;color:var(--mute);border:1px solid var(--line);border-radius:10px;padding:9px 14px;transition:border-color .12s,color .12s;min-height:44px}
 .solo-link:hover{border-color:var(--orange);color:var(--orange-deep)}
 
 /* ── Online 面板 ── */
@@ -140,7 +140,7 @@ h1 em{font-style:normal;color:var(--orange)}
 .rank-pt{font-family:var(--mono);font-weight:700;color:var(--orange-deep)}
 .rank-empty{font-size:13px;color:var(--mute);padding:12px 0}
 .rank-foot{display:flex;justify-content:space-between;align-items:center;margin-top:14px;font-size:13px;font-weight:600}
-.rank-foot a{color:var(--orange-deep)}
+.rank-foot a{color:var(--orange-deep);min-height:44px;display:inline-flex;align-items:center;touch-action:manipulation}
 .rank-foot a:hover{text-decoration:underline}
 .ladder{display:flex;gap:6px;margin-top:16px;align-items:flex-end}
 .ladder .seg{flex:1;background:rgba(234,88,12,.1);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--orange-deep);padding-top:6px}
@@ -171,6 +171,8 @@ footer{background:var(--ink);color:#fff;margin-top:20px;padding:36px 24px}
 .sites{display:flex;gap:18px;font-size:13px;font-weight:700;align-items:center}
 .sites .pip{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:6px;vertical-align:middle}
 .sites .cur{color:#fff;border-bottom:2px solid var(--orange)}
+/* iOS 44pt 触摸目标兜底：页脚站点互链（P2 · 2026-10-11） */
+.sites a{min-height:44px;display:inline-flex;align-items:center;touch-action:manipulation}
 .foot-links{display:flex;gap:16px;font-size:13px;color:rgba(255,255,255,.6);flex-wrap:wrap;align-items:center}
 .foot-links a:hover{color:#fff}
 /* iOS 44pt 触摸目标兜底：页脚文字链接（P2 · 2026-10-11） */
