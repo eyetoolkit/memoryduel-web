@@ -173,6 +173,8 @@ footer{background:var(--ink);color:#fff;margin-top:20px;padding:36px 24px}
 .sites .cur{color:#fff;border-bottom:2px solid var(--orange)}
 .foot-links{display:flex;gap:16px;font-size:13px;color:rgba(255,255,255,.6);flex-wrap:wrap;align-items:center}
 .foot-links a:hover{color:#fff}
+/* iOS 44pt 触摸目标兜底：页脚文字链接（P2 · 2026-10-11） */
+.foot-links a{min-height:44px;display:inline-flex;align-items:center;touch-action:manipulation}
 .copy{width:100%;text-align:center;color:rgba(255,255,255,.45);font-size:12px;margin-top:24px}
 
 /* ── 断点（原 spec：>979 双列；≤979 单列；≤639 收紧） ── */
