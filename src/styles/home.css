@@ -245,3 +245,45 @@ html { overscroll-behavior-y: none; }
 
 /* ④ 禁双击缩放（保留 pan / pinch） */
 body { touch-action: manipulation; }
+
+/* ── 主题切换按钮（深色皮肤专项 · 2026-10-11） ──
+   用首页自身 token 回退链；内容页复用同一类名，样式在 tokens.css 内（共享 --border/--surface/--text）。 */
+.md-theme{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:38px;height:38px;flex:none;border-radius:50%;padding:0;
+  border:1px solid var(--line, #EAD9C7);
+  background:var(--card, #fff);
+  color:var(--ink, #1C1408);
+  cursor:pointer;touch-action:manipulation;
+}
+.md-theme:hover{border-color:var(--orange)}
+.md-theme:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+
+/* ═════════════════════════════════════════════════════════════
+   深色皮肤（2026-10-11）· 由 <html data-theme="dark"> 触发
+   ----------------------------------------------------------------
+   首页不引共享 tokens.css，故在此自建暗色 token（暖墨家族）；
+   内容页共用层暗色块已存在于 tokens/components/brand-ds2.css。
+   对比度全部 ≥ WCAG 3:1（正文 ≥4.5:1）。
+   ═════════════════════════════════════════════════════════════ */
+html[data-theme="dark"]{
+  --paper:#0B1120; --card:#151C2B; --ink:#ECE6DC; --mute:#9B8E7C; --line:#33313F;
+
+  body{ background-color:var(--paper); background-image:none; }
+
+  .nav{ background:rgba(11,17,32,.85); border-bottom-color:var(--line); }
+
+  /* footer 原用 --ink；暗色下 --ink 翻成浅色，必须固定暗底，否则白底白字 */
+  footer{ background:#080C16; }
+
+  .cat{ background:var(--card); }
+  .cat.on{ background:rgba(249,115,22,.16); }
+  .pv-opt{ background:var(--card); }
+  .pv-opt.ok{ background:rgba(34,197,94,.16); }
+  .room-in{ background:var(--card); color:var(--ink); }
+  .room-in::placeholder{ color:#7C8AA0; }
+
+  .tab.on{ background:#fff; color:var(--orange-deep); }  /* 选中 tab 保持亮片，深色下更跳 */
+  .btn-ghost{ color:var(--ink); }
+  .solo-link{ color:var(--mute); }
+}

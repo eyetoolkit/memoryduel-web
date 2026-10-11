@@ -341,3 +341,16 @@ html { overscroll-behavior-y: none; }
 
 /* ④ 禁双击缩放（保留 pan / pinch） */
 body { touch-action: manipulation; }
+
+/* ── 主题切换按钮（深色皮肤专项 · 2026-10-11） ──
+   内容页按钮由 /shared/theme.js 注入 .sh-actions；token 随 html[data-theme="dark"] 自动翻暗。 */
+.md-theme{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:38px;height:38px;flex:none;border-radius:50%;padding:0;
+  border:1px solid var(--border, #E4E8EE);
+  background:var(--surface, #fff);
+  color:var(--text, #0F172A);
+  cursor:pointer;touch-action:manipulation;
+}
+.md-theme:hover{border-color:var(--brand, #EA580C)}
+.md-theme:focus-visible{outline:2px solid var(--brand, #EA580C);outline-offset:2px}
