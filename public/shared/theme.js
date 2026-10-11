@@ -106,7 +106,10 @@
     var nav = document.querySelector(".nav") || document.querySelector("nav");
     if (nav) {
       var ls = nav.querySelector("#lang-switcher");
-      if (ls) nav.insertBefore(btn, ls);
+      // ⚠️ insertBefore 的参照节点必须是 parent 的直接子节点：
+      // #lang-switcher 在 .nav-in 内（.nav 的孙子），必须插到它的父节点下
+      var parent = ls ? ls.parentNode : nav;
+      if (ls) parent.insertBefore(btn, ls);
       else nav.appendChild(btn);
       return;
     }
