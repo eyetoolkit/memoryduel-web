@@ -3,7 +3,9 @@
 <head>
   <script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:38,fallback:"en"};</script>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <!-- standalone 下 iOS 状态栏取 theme-color，缺失会落回成系统默认色。与 manifest 的 background_color 一致：#fff7ed -->
+  <meta name="theme-color" content="#fff7ed">
   <title data-i18n="md_teacher.title">Teachers · MemoryDuel</title>
   <meta data-i18n="md_teacher.meta_desc" name="description" content="MemoryDuel teacher console — open a classroom room, get a join link or QR code, and run a 1v1 knowledge duel with your class. Free, no signup, anonymous UUIDs.">
   <link rel="canonical" href="https://memoryduel.com/teacher/">
