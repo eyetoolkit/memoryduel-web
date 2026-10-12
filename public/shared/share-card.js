@@ -6,16 +6,69 @@
    算法: Canvas 2D API,无依赖,纯客户端
    输入: canvas 元素 + card JSON
    输出: PNG dataURL / Blob / 文件下载
+
+   🔴 三站共用 (memoryduel P0-4, 2026-10-12)
+   ────────────────────────────────────────────────────────────────
+   改造前本文件硬编码 numeriduel 品牌（页脚文案 / 默认 URL / 靛色配色），
+   直接给 memoryduel 用会显示错品牌。现改为按 site 取站点配置。
+
+   用法（site 默认 'math'，向后兼容，存量调用方零改动）:
+     ShareCard.renderCard(canvas, card)              // = math
+     ShareCard.renderCard(canvas, card, 'memory')
+
+   也可从 <html data-site="..."> 自动推断（见 resolveSite）。
    ═══════════════════════════════════════════════════════════════ */
 
 'use strict';
 
-/* ─── 配色(对齐 /assets/css/style.css)─── */
-const COLORS = {
-  primary:     '#4F46E5',
-  primaryDark: '#3730A3',
-  primaryLight:'#818CF8',
-  accent:      '#FBBF24',
+/* ─── 站点品牌配置 ───
+   🔴 primary 必须与各站 tokens.css 的 --brand-600 保持一致：
+     memory : tokens.css:214 html[data-site="memory"] --brand-600 #EA580C
+     board  : tokens.css:194 html[data-site="board"]  --brand-600 #7F77DD
+   改这里前先核对 tokens.css，不要凭印象填色。 */
+const SITES = {
+  math: {
+    name: '数学对决',
+    host: 'numeriduel.com',
+    url: 'https://numeriduel.com',
+    primary: '#4F46E5',
+    primaryDark: '#3730A3',
+    primaryLight: '#818CF8',
+    accent: '#FBBF24',
+  },
+  board: {
+    name: '棋盘对决',
+    host: 'boardduel.com',
+    url: 'https://boardduel.com',
+    primary: '#7F77DD',
+    primaryDark: '#5B54B0',
+    primaryLight: '#AFA9EC',
+    accent: '#F59E0B',
+  },
+  memory: {
+    name: '记忆对决',
+    host: 'memoryduel.com',
+    url: 'https://memoryduel.com',
+    primary: '#EA580C',
+    primaryDark: '#C2410C',
+    primaryLight: '#FB923C',
+    accent: '#FBBF24',
+  },
+};
+
+/* 解析站点：显式参数 > <html data-site> > 默认 math */
+function resolveSite(site) {
+  if (site && SITES[site]) return site;
+  if (typeof document !== 'undefined') {
+    const el = document.documentElement;
+    const attr = el && el.getAttribute && el.getAttribute('data-site');
+    if (attr && SITES[attr]) return attr;
+  }
+  return 'math';
+}
+
+/* 取站点配色（未在 SITES 覆盖的字段回落到 numeri 原值） */
+const BASE_COLORS = {
   bg:          '#F9FAFB',
   bgDark:      '#1F2937',
   text:        '#111827',
@@ -23,6 +76,24 @@ const COLORS = {
   border:      '#E5E7EB',
   white:       '#FFFFFF',
 };
+
+/* ─── 配色(对齐 /assets/css/style.css)───
+   🔴 COLORS 是可变单例：renderCard/toSVG 每次调用会按 site 重设它，
+   这样下方所有 drawXxx 辅助函数无需逐个改签名即可自动跟随站点品牌。 */
+const COLORS = Object.assign({}, BASE_COLORS);
+
+/* 取站点配色（未在 SITES 覆盖的字段回落到 BASE_COLORS） */
+function colorsFor(site) {
+  const s = SITES[resolveSite(site)];
+  return Object.assign({}, BASE_COLORS, s);
+}
+
+/* 就地把 COLORS 重设为指定站点的品牌色（可变单例，供下游辅助函数读取） */
+function applyColors(siteKey) {
+  const c = colorsFor(siteKey);
+  for (const k of Object.keys(c)) COLORS[k] = c[k];
+  return COLORS;
+}
 
 const W = 1200, H = 630;
 
@@ -161,18 +232,22 @@ function formatDuration(s) {
 }
 
 /* ─── 主函数: 在 canvas 上渲染卡 ─── */
-function renderCard(canvas, card) {
+function renderCard(canvas, card, site) {
   if (!canvas || !card) throw new Error('canvas and card are required');
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('2d context not available');
+
+  const siteKey = resolveSite(site);
+  const S = SITES[siteKey];
+  const C = applyColors(siteKey);
 
   canvas.width = W;
   canvas.height = H;
 
   /* ─── 背景: 渐变 + 装饰圆 ─── */
   const bg = ctx.createLinearGradient(0, 0, W, H);
-  bg.addColorStop(0, COLORS.primary);
-  bg.addColorStop(1, COLORS.primaryDark);
+  bg.addColorStop(0, C.primary);
+  bg.addColorStop(1, C.primaryDark);
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, W, H);
 
@@ -191,17 +266,17 @@ function renderCard(canvas, card) {
 
   /* ─── 白色卡板(主内容)─── */
   const cardX = 80, cardY = 70, cardW = W - 160, cardH = H - 140;
-  ctx.fillStyle = COLORS.white;
+  ctx.fillStyle = C.white;
   roundRect(ctx, cardX, cardY, cardW, cardH, 32);
   ctx.fill();
 
   /* ─── 左上:游戏图标 + 站名 ─── */
   drawGameIcon(ctx, cardX + 40, cardY + 40, card.game);
-  ctx.fillStyle = COLORS.text;
+  ctx.fillStyle = C.text;
   ctx.font = '800 28px "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif';
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
-  ctx.fillText('数学对决 · numeriduel.com', cardX + 140, cardY + 56);
+  ctx.fillText(`${S.name} · ${S.host}`, cardX + 140, cardY + 56);
 
   // 游戏名(右上小标签)
   const gameNames = { '24-game': '24 点', pyramid: '金字塔', sudoku: '数独' };
@@ -281,25 +356,29 @@ function renderCard(canvas, card) {
   ctx.fillStyle = COLORS.textLight;
   ctx.textBaseline = 'bottom';
   ctx.textAlign = 'center';
-  const urlText = card.url || 'numeriduel.com';
+  const urlText = card.url || S.host;
   ctx.fillText(urlText, W/2, H - 32);
 
   return canvas;
 }
 
-/* ─── 工具: 下载 canvas 为 PNG 文件 ─── */
-function downloadCard(canvas, filename = 'mathduel-share.png') {
+/* ─── 工具: 下载 canvas 为 PNG 文件 ───
+   filename 不传时按站点生成（如 memoryduel-share.png），
+   保持向后兼容：显式传 filename 的存量调用方不受影响。 */
+function downloadCard(canvas, filename, site) {
   if (!canvas) throw new Error('canvas required');
+  const siteKey = resolveSite(site);
+  const name = filename || `${siteKey}duel-share.png`;
   // toBlob 是异步,但旧浏览器支持 toDataURL
   if (canvas.toBlob) {
     canvas.toBlob((blob) => {
       const url = URL.createObjectURL(blob);
-      triggerDownload(url, filename);
+      triggerDownload(url, name);
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     }, 'image/png');
   } else {
     const url = canvas.toDataURL('image/png');
-    triggerDownload(url, filename);
+    triggerDownload(url, name);
   }
 }
 
@@ -344,23 +423,33 @@ function buildCardDataURL(card) {
   return toDataURL(canvas);
 }
 
-/* ─── 浏览器全局导出 + CommonJS 兼容 ─── */
+/* ─── 浏览器全局导出 + CommonJS 兼容 ───
+   🔴 所有函数签名末尾追加 site（默认 'math'），存量调用方零改动。
+   site 省略时会自动读 <html data-site="...">，三站页面通常已带该属性。 */
 if (typeof window !== 'undefined') {
-  window.ShareCard = { renderCard, downloadCard, toDataURL, copyToClipboard, buildCardDataURL };
+  window.ShareCard = {
+    renderCard, downloadCard, toDataURL, copyToClipboard, buildCardDataURL, toSVG,
+    /* 调试/测试用：查看当前生效的站点配置与配色 */
+    SITES, resolveSite, colorsFor,
+  };
 }
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
-    renderCard, downloadCard, toDataURL, copyToClipboard, buildCardDataURL,
+    renderCard, downloadCard, toDataURL, copyToClipboard, buildCardDataURL, toSVG,
     // 暴露给 Node 测试用的纯函数
     wrapText, formatDuration, drawBadge, drawGameIcon, drawMeta, roundRect,
+    SITES, resolveSite, colorsFor, applyColors,
     COLORS, W, H,
   };
 }
 
 /* ─── 调试用: SVG 预览(便于无 Canvas 环境下人眼审)─── */
-function toSVG(card) {
+function toSVG(card, site) {
   if (!card) return null;
+  const siteKey = resolveSite(site);
+  const S = SITES[siteKey];
+  applyColors(siteKey);
   const gameNames = { '24-game': '24 点', pyramid: '金字塔', sudoku: '数独' };
   const gameIcons = { '24-game': '🃏', pyramid: '🔺', sudoku: '🔢' };
   const icon = gameIcons[card.game] || '🎮';
@@ -394,7 +483,7 @@ function toSVG(card) {
   <rect x="80" y="70" width="1040" height="490" rx="32" fill="#FFFFFF"/>
   <rect x="120" y="110" width="80" height="80" rx="18" fill="url(#card)"/>
   <text x="160" y="160" font-size="44" text-anchor="middle" fill="white">${icon}</text>
-  <text x="220" y="158" font-size="28" font-weight="800" fill="${COLORS.text}">数学对决 · numeriduel.com</text>
+  <text x="220" y="158" font-size="28" font-weight="800" fill="${COLORS.text}">${escapeXml(S.name + ' · ' + S.host)}</text>
   <text x="1080" y="156" font-size="22" font-weight="600" fill="${COLORS.primary}" text-anchor="end">${name}</text>
   ${card.cta ? (() => {
     // 中英文混合宽度估算: 中文 32px/字, 英文/标点 16px/字
@@ -415,7 +504,7 @@ function toSVG(card) {
   <text x="600" y="335" font-size="56" font-weight="900" fill="${COLORS.text}" text-anchor="middle">${escapeXml(card.title || '')}</text>
   <text x="600" y="400" font-size="28" font-weight="500" fill="${COLORS.textLight}" text-anchor="middle">${escapeXml(card.subtitle || '')}</text>
   <text x="960" y="520" font-size="24" font-weight="500" fill="${COLORS.textLight}">${escapeXml(metaText)}</text>
-  <text x="600" y="595" font-size="20" font-weight="500" fill="${COLORS.textLight}" text-anchor="middle">${escapeXml(card.url || 'numeriduel.com')}</text>
+  <text x="600" y="595" font-size="20" font-weight="500" fill="${COLORS.textLight}" text-anchor="middle">${escapeXml(card.url || S.host)}</text>
 </svg>`;
 }
 
