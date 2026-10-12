@@ -1036,7 +1036,13 @@
     "err_hint": "No se pudo cargar el reto. Suele ser temporal.",
     "number-recall": "Memoria numérica",
     "sequence-memory": "Memoria de secuencia",
-    "color-recall": "Memoria de color"
+    "color-recall": "Memoria de color",
+    "share_hint": "Comparte tu puntuación",
+    "share_download": "Descargar imagen",
+    "share_native": "Compartir…",
+    "share_alt": "Vista previa de la tarjeta",
+    "share_cta": "Los mismos puzzles para todos: ¿puedes superarlo?",
+    "share_failed": "No se pudo crear la imagen. Prueba a copiar el texto."
   },
   "duel": {
     "seq_title": "Duelo de secuencias",

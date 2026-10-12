@@ -1036,7 +1036,13 @@
     "err_hint": "Die Challenge konnte nicht geladen werden. Meist ist das vorübergehend.",
     "number-recall": "Zahlengedächtnis",
     "sequence-memory": "Sequenzgedächtnis",
-    "color-recall": "Farbgedächtnis"
+    "color-recall": "Farbgedächtnis",
+    "share_hint": "Teile deinen Punktestand",
+    "share_download": "Bild herunterladen",
+    "share_native": "Teilen…",
+    "share_alt": "Vorschau der Ergebnis-Karte",
+    "share_cta": "Für alle dieselben Rätsel — schaffst du es besser?",
+    "share_failed": "Bild konnte nicht erstellt werden. Kopiere stattdessen den Text."
   },
   "duel": {
     "seq_title": "Sequenz-Duell",

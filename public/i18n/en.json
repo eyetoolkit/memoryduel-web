@@ -1036,7 +1036,13 @@
     "err_hint": "The challenge could not load. This is usually temporary.",
     "number-recall": "Number Recall",
     "sequence-memory": "Sequence Memory",
-    "color-recall": "Colour Recall"
+    "color-recall": "Colour Recall",
+    "share_hint": "Share your score",
+    "share_download": "Download image",
+    "share_native": "Share…",
+    "share_alt": "Score card preview",
+    "share_cta": "Same puzzles for everyone — can you beat it?",
+    "share_failed": "Could not create the image. Try copying the text instead."
   },
   "duel": {
     "seq_title": "Sequence Memory Duel",

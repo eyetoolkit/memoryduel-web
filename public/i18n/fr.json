@@ -1036,7 +1036,13 @@
     "err_hint": "Le défi n’a pas pu être chargé. C’est souvent temporaire.",
     "number-recall": "Mémoire des chiffres",
     "sequence-memory": "Mémoire de séquence",
-    "color-recall": "Mémoire des couleurs"
+    "color-recall": "Mémoire des couleurs",
+    "share_hint": "Partagez votre score",
+    "share_download": "Télécharger l'image",
+    "share_native": "Partager…",
+    "share_alt": "Aperçu de la carte de score",
+    "share_cta": "Les mêmes énigmes pour tout le monde — pouvez-vous faire mieux ?",
+    "share_failed": "Impossible de créer l'image. Essayez de copier le texte."
   },
   "duel": {
     "seq_title": "Duel de séquences",

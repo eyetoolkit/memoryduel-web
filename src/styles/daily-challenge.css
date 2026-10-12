@@ -570,6 +570,55 @@
 .dc-rank-row .nm { flex: 1; color: var(--dc-ink); }
 .dc-rank-row .sc { color: var(--dc-muted); font-variant-numeric: tabular-nums; }
 
+/* ─── 分享卡（P1-4）───
+   挂在终局卡末尾，视觉上属于「结果的一部分」但不是读成绩的必经之路。 */
+.dc-share {
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid var(--dc-line);
+}
+
+.dc-share-hint {
+  margin: 0 0 12px;
+  font-size: 13.5px;
+  color: var(--dc-muted);
+  text-align: center;
+}
+
+.dc-share-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  border: 1px solid var(--dc-line);
+  background: var(--dc-paper);
+}
+
+.dc-share-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.dc-share-text {
+  display: block;
+  width: 100%;
+  padding: 11px 13px;
+  border-radius: 12px;
+  border: 1.5px solid var(--dc-line);
+  background: var(--dc-paper);
+  color: var(--dc-ink);
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 13px;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+@media (max-width: 420px) {
+  .dc-share-actions { grid-template-columns: 1fr; }
+}
+
 /* 错误提示 */
 .dc-err {
   padding: 11px 14px;

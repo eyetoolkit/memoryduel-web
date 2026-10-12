@@ -20,9 +20,10 @@
  */
 
 import '../styles/daily-challenge.css';
-// window.DailyClient 的类型集中在 ../shared/daily-client.d.ts（单一真相源）
+// window.DailyClient / window.ShareCard 的类型集中在 ../shared/*.d.ts（单一真相源）
 // `import type` = 纯类型导入，Vite 不会尝试解析 .d.ts 为运行时模块
 import type {} from '../shared/daily-client';
+import type {} from '../shared/share-card';
 
 const C = () => {
   const c = window.DailyClient;
@@ -366,6 +367,193 @@ async function showRoundResult(game: string, server: any) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   分享卡（P1-4）
+   ═══════════════════════════════════════════════════════════════
+   🔴 三条红线：
+   1. 引擎缺失（脚本没加载 / CDN 挂了）不能连带打挂终局页 —— 分享区降级为
+      纯文本摘要，玩家的成绩一个都不能少显示。
+   2. Canvas 在部分环境（隐私模式、老 Safari、无 canvas 插件）不可用，
+      getContext('2d') 会返回 null。此时同样降级，绝不抛异常。
+   3. 分享链接不带任何答案信息。日期串取自服务端 today.date，
+      本文件全程不构造日期（见文件头红线）。
+   ═══════════════════════════════════════════════════════════════ */
+
+/** 组装分享卡数据。抽成纯函数是为了能离线单测，不依赖 DOM。 */
+function buildShareCard(): ShareCardInput {
+  const c = C();
+  const sum = Object.values(state.totals).reduce((a, b) => a + b, 0);
+  const max = c.GAME_ORDER.reduce((a, g) => a + c.LEVELS[g].maxScore, 0);
+
+  // metaLines 优先于 meta：每日挑战的维度（连胜/满分关数）与引擎内置的
+  // numeri 字段集（解/连/分/次）完全不同，硬塞进去只会互相踩。
+  const lines: string[] = [];
+  if (state.streak > 0) {
+    lines.push(`🔥 ${state.streak} ${t('dc.streak_days', 'Day streak')}`);
+  }
+  const perfectLevels = c.GAME_ORDER.filter((g) => (state.totals[g] || 0) >= c.LEVELS[g].maxScore);
+  if (perfectLevels.length) {
+    lines.push(`💯 ${perfectLevels.length}/${c.GAME_ORDER.length} ${t('dc.perfect_all', 'all levels maxed')}`);
+  }
+  lines.push(`⭐ ${sum} / ${max}`);
+  // 服务端日期串优先；拿不到就不显示日期行，绝不用本地时区拼一个（会和服务端差一天）
+  if (state.date) lines.push(`📅 ${state.date}`);
+
+  const sid = 'd' + Math.random().toString(36).slice(2, 10);
+  return {
+    game: 'daily-challenge',
+    icon: '🧠',
+    gameName: t('dc.game_title', 'Daily Challenge'),
+    title: `${sum} / ${max}`,
+    subtitle: state.perfect ? t('dc.perfect_all', 'all levels maxed') : t('dc.final_title', "Today's challenge complete"),
+    cta: t('dc.share_cta', 'Same puzzles for everyone — can you beat it?'),
+    url: `${location.origin}${c.LOBBY_URL}?from=s${sid}`,
+    metaLines: lines,
+  };
+}
+
+/** 把卡面渲染进 canvas；返回 null 表示不可用（调用方据此降级）。 */
+function renderShareCanvas(card: ShareCardInput): HTMLCanvasElement | null {
+  const sc = window.ShareCard;
+  if (!sc || typeof sc.renderCard !== 'function') return null;
+  let cv: HTMLCanvasElement | null = null;
+  try {
+    cv = document.createElement('canvas');
+    // 🔴 先探测 2d 上下文再交给引擎：隐私模式等环境下 getContext 返回 null，
+    //    而引擎里 ctx.fillStyle=... 会直接抛 TypeError。
+    if (!cv.getContext('2d')) return null;
+    sc.renderCard(cv, card, 'memory');
+    return cv;
+  } catch (_) {
+    return null;
+  }
+}
+
+/** 无 Canvas 时的纯文本摘要 —— 成绩本身必须仍然可见、可复制。 */
+function shareFallbackText(card: ShareCardInput): string {
+  return [
+    `${card.icon || '🧠'} ${card.gameName || ''}`.trim(),
+    `${card.title}`,
+    card.subtitle,
+    ...(card.metaLines || []),
+    card.url,
+  ].filter(Boolean).join('\n');
+}
+
+/** 在终局卡片下方挂载分享区。可用则给三个动作，不可用只给文本。 */
+function mountShare(host: HTMLElement, card: ShareCardInput) {
+  const sc = window.ShareCard;
+  const box = document.createElement('section');
+  box.className = 'dc-share';
+
+  const cv = renderShareCanvas(card);
+  if (!sc || !cv) {
+    // 🔴 降级：只给文本 + Web Share API（若可用），不给一个点不动的图片按钮
+    box.innerHTML = `
+      <p class="dc-share-hint">${esc(t('dc.share_hint', 'Share your score'))}</p>
+      <textarea class="dc-share-text" id="shareText" readonly rows="5"></textarea>`;
+    const ta = document.getElementById('shareText') as HTMLTextAreaElement | null;
+    if (ta) ta.value = shareFallbackText(card);
+    host.appendChild(box);
+    bindNativeShare(card);
+    return;
+  }
+
+  const previewId = 'sharePreview';
+  box.innerHTML = `
+    <p class="dc-share-hint">${esc(t('dc.share_hint', 'Share your score'))}</p>
+    <img class="dc-share-img" id="${previewId}" alt="${esc(t('dc.share_alt', 'Score card preview'))}"
+         width="600" height="315" />
+    <div class="dc-share-actions">
+      <button class="dc-btn" id="dlBtn" type="button">${esc(t('dc.share_download', 'Download image'))}</button>
+      <button class="dc-btn ghost" id="cpBtn" type="button">${esc(t('duel.copy', 'Copy'))}</button>
+    </div>`;
+  host.appendChild(box);
+
+  const preview = document.getElementById(previewId) as HTMLImageElement | null;
+  if (preview) {
+    try {
+      preview.src = sc.toDataURL(cv);
+    } catch (_) {
+      // toDataURL 偶发在超大 canvas 上抛安全错误：卡片已渲染，隐藏预览即可，不影响下载
+      preview.style.display = 'none';
+    }
+  }
+
+  const dl = document.getElementById('dlBtn');
+  if (dl) {
+    dl.addEventListener('click', () => {
+      try {
+        sc.downloadCard(cv, `memoryduel-daily-${state.date || 'today'}.png`, 'memory');
+      } catch (_) {
+        announce(t('dc.share_failed', 'Could not create the image. Try copying the text instead.'));
+      }
+    });
+  }
+
+  const cp = document.getElementById('cpBtn');
+  if (cp) {
+    cp.addEventListener('click', async () => {
+      // 剪贴板写图片在非 HTTPS / 无 ClipboardItem 时必失败 —— 先试图片，再退文本
+      try {
+        await sc.copyToClipboard(cv);
+        cp.textContent = t('duel.copied', 'Copied!');
+        setTimeout(() => { cp.textContent = t('duel.copy', 'Copy'); }, 1800);
+        return;
+      } catch (_) { /* 落到文本复制 */ }
+      copyTextFallback(shareFallbackText(card), cp);
+    });
+  }
+
+  bindNativeShare(card);
+}
+
+/** Web Share API（移动端原生分享面板）。不支持就静默跳过。 */
+function bindNativeShare(card: ShareCardInput) {
+  if (typeof navigator === 'undefined' || typeof navigator.share !== 'function') return;
+  const host = document.querySelector('.dc-share');
+  if (!host || document.getElementById('nativeBtn')) return;
+  const b = document.createElement('button');
+  b.className = 'dc-btn ghost';
+  b.id = 'nativeBtn';
+  b.type = 'button';
+  b.textContent = t('dc.share_native', 'Share…');
+  b.addEventListener('click', () => {
+    navigator.share({ title: `${card.gameName} ${card.title}`, text: card.subtitle, url: card.url })
+      .catch(() => { /* 用户取消 */ });
+  });
+  host.appendChild(b);
+}
+
+/** 文本复制兜底：Clipboard API 不可用时走 execCommand。 */
+function copyTextFallback(text: string, btn?: HTMLElement) {
+  const done = () => {
+    if (!btn) return;
+    btn.textContent = t('duel.copied', 'Copied!');
+    setTimeout(() => { btn.textContent = t('duel.copy', 'Copy'); }, 1800);
+  };
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(() => {
+        if (document.execCommand && document.execCommand('copy')) { done(); return; }
+        announce(t('dc.share_failed', 'Could not create the image. Try copying the text instead.'));
+      });
+      return;
+    }
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    if (document.execCommand('copy')) done();
+    else announce(t('dc.share_failed', 'Could not create the image. Try copying the text instead.'));
+    document.body.removeChild(ta);
+  } catch (_) {
+    announce(t('dc.share_failed', 'Could not create the image. Try copying the text instead.'));
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
    终局
    ═══════════════════════════════════════════════════════════════ */
 async function showFinal() {
@@ -402,6 +590,14 @@ async function showFinal() {
     </a>`;
 
   announce(`${sum} / ${max}`);
+
+  // 🔴 分享区挂在成绩卡**之后**，且任何异常都不能影响上面的成绩与「再来一次」——
+  //    分享是锦上添花，不是读结果的必经之路。
+  try {
+    mountShare(card, buildShareCard());
+  } catch (err) {
+    console.warn('[daily] share card unavailable:', err);
+  }
 
   document.getElementById('againBtn')!.addEventListener('click', () => {
     location.reload();

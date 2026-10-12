@@ -1036,7 +1036,13 @@
     "err_hint": "挑战没能加载出来，通常是暂时的。",
     "number-recall": "数字广度",
     "sequence-memory": "序列记忆",
-    "color-recall": "颜色还原"
+    "color-recall": "颜色还原",
+    "share_hint": "分享你的成绩",
+    "share_download": "下载图片",
+    "share_native": "分享…",
+    "share_alt": "成绩卡预览",
+    "share_cta": "所有人都是同一套题 —— 你能超过我吗？",
+    "share_failed": "图片生成失败，试试复制文字。"
   },
   "duel": {
     "seq_title": "序列记忆对决",
