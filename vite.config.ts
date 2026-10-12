@@ -54,6 +54,10 @@ export default defineConfig({
         //    验收脚本按 key 搜产物，不是 daily-<hash>.js
         dailyChallenge: resolve(here, 'games/daily-challenge/index.html'),
         dailyChallengeLobby: resolve(here, 'games/daily-challenge/lobby/index.html'),
+
+        // P1-2（2026-10-12）：Sequence Memory 双人对战
+        // ⚠️ key 即产物名：sequenceDuel → assets/sequenceDuel-<hash>.js
+        sequenceDuel: resolve(here, 'games/sequence-memory/index.html'),
       },
     },
   },
