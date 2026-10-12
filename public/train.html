@@ -603,19 +603,15 @@
       var pool = (Q.byCategory && Q.byCategory(category)) || [];
       var curLang = (Q.getLang && Q.getLang()) || 'en';
       pool = pool.filter(function (q) { return !q._rawLang || q._rawLang === curLang; });
-      console.log('[MD startAiBattle]', 'cat=', category, 'curLang=', curLang, 'cachePool=', pool.length);
       if (pool.length > 0) { startBattle(pool); return; }
       // 2) Fast-path: fetch only this category (count=60, ~0.4s)
       Q.fetchBundle(category, 1).then(function(arr) {
-        console.log('[MD fetchBundle] returned', arr.length, 'items, __error=', arr.__error, 'msg=', arr.message);
-        console.log('[MD] first item _rawLang=', arr[0] && arr[0]._rawLang, 'curLang=', curLang);
         // Push to QUESTIONS so byCategory works on retry
         if (arr && arr.length > 0) {
           for (var i = 0; i < arr.length; i++) Q.QUESTIONS.push(arr[i]);
         }
         var pool2 = (Q.byCategory && Q.byCategory(category)) || [];
         pool2 = pool2.filter(function (q) { return !q._rawLang || q._rawLang === curLang; });
-        console.log('[MD after push] pool2=', pool2.length, '(byCat=', Q.byCategory(category).length, ')');
         if (pool2.length > 0) startBattle(pool2);
         else showError('"' + category + '" ' + T('battle.quiz_empty_inline','Quiz bank is empty. Please choose another category.'));
       }).catch(function(err) {

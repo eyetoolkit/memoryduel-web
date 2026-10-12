@@ -175,7 +175,6 @@
     retries = retries || 2;
     var fetchLang = LANG;   // 捕获调用时刻的 LANG，避免闭包读过时值
     var url = (API || '') + '/api/md/quiz/bundle?category=' + encodeURIComponent(catId) + '&lang=' + fetchLang + '&count=100';
-    console.log('[MD fetchBundle] cat=', catId, 'LANG=', LANG, 'fetchLang=', fetchLang, 'url=', url);
 
     function attempt(n) {
       return fetch(url, { cache: 'no-store' })
