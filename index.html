@@ -3,7 +3,7 @@
 <head>
 <!-- md-theme:early -->
 <script>(function(){try{var t=localStorage.getItem('md-theme2');if(t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();</script>
-<script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:38,fallback:"en"};</script>
+<script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:40,fallback:"en"};</script>
 <script src="/i18n/i18n.js?v=36"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -84,6 +84,39 @@
       <div class="pv-opt">Jupiter</div><div class="pv-opt">Saturn</div>
     </div>
     <div class="pv-foot"><span class="you">You 1</span><span class="ai">AI 0</span></div>
+  </div>
+</section>
+
+<!-- ═══════════ 游戏矩阵：平台入口（一个游戏一张卡） ═══════════ -->
+<section class="games-block wrap" id="games" aria-label="Games">
+  <h2 class="games-ttl" data-i18n="home_v2.games_title">Pick a game</h2>
+  <p class="games-sub" data-i18n="home_v2.games_sub">Two ways to train your memory — one against an opponent, one against yourself and the clock.</p>
+  <div class="games-grid">
+
+    <a class="gcard" href="/battle/" data-stage="live">
+      <div class="gcard-icon" aria-hidden="true">⚔️</div>
+      <div class="gcard-title" data-i18n="home_v2.game_knowledge">Knowledge Duel</div>
+      <p class="gcard-desc" data-i18n="home_v2.game_knowledge_d">Head-to-head quizzes across science, history and geography. Race a friend or an AI opponent, 15 seconds per question.</p>
+      <div class="gcard-tags">
+        <span class="gcard-tag live" data-i18n="home_v2.tag_live">Live</span>
+        <span class="gcard-tag" data-i18n="home_v2.tag_pvp">1v1</span>
+        <span class="gcard-tag" data-i18n="home_v2.tag_46k">46,000+ questions</span>
+      </div>
+      <span class="gcard-cta" data-i18n="home_v2.game_play">Play now →</span>
+    </a>
+
+    <a class="gcard" href="/games/daily-challenge/" data-stage="live">
+      <div class="gcard-icon" aria-hidden="true">🧠</div>
+      <div class="gcard-title" data-i18n="dc.game_title">Daily Memory Challenge</div>
+      <p class="gcard-desc" data-i18n="home_v2.game_daily_d">Three fresh memory levels every day — number recall, sequence memory and colour recall. Same puzzle for everyone, streak built daily.</p>
+      <div class="gcard-tags">
+        <span class="gcard-tag new" data-i18n="home_v2.tag_new">New</span>
+        <span class="gcard-tag" data-i18n="home_v2.tag_daily">Daily</span>
+        <span class="gcard-tag" data-i18n="home_v2.tag_streak">Streak</span>
+      </div>
+      <span class="gcard-cta" data-i18n="home_v2.game_modes">See all modes →</span>
+    </a>
+
   </div>
 </section>
 

@@ -47,6 +47,13 @@ export default defineConfig({
         // 此处只负责静态资源产出。
         main: resolve(here, 'index.html'),
         battle: resolve(here, 'battle.html'),
+
+        // 多游戏升级 P0-5（2026-10-12）：每日记忆挑战
+        // 🔴 必须注册进 rollupOptions.input，否则构建不产出页面（静默丢弃，无报错）。
+        // ⚠️ input 的 key 即产物名：dailyChallenge → assets/dailyChallenge-<hash>.js
+        //    验收脚本按 key 搜产物，不是 daily-<hash>.js
+        dailyChallenge: resolve(here, 'games/daily-challenge/index.html'),
+        dailyChallengeLobby: resolve(here, 'games/daily-challenge/lobby/index.html'),
       },
     },
   },

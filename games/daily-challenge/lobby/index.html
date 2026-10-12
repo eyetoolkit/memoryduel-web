@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" data-site="memory">
+<head>
+<script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:39,fallback:"en"};</script>
+<script src="/i18n/i18n.js?v=36"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#FAF6F1">
+<title>Daily Memory Challenge — Choose Your Challenge · MemoryDuel</title>
+<meta name="description" content="Three memory challenges, one shared set of puzzles for everyone, every day. Digit span, sequence recall and colour recall &mdash; same questions worldwide, judged on the server.">
+<link rel="canonical" href="https://memoryduel.com/games/daily-challenge/lobby/" />
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MemoryDuel">
+<meta property="og:url" content="https://memoryduel.com/games/daily-challenge/lobby/" />
+<meta property="og:image" content="https://memoryduel.com/og-default.jpg" />
+<meta property="og:title" content="Daily Memory Challenge — Choose Your Challenge · MemoryDuel" />
+<meta property="og:description" content="Three memory challenges. One shared set of puzzles, every day. Same questions for everyone worldwide." />
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Daily Memory Challenge — Choose Your Challenge · MemoryDuel" />
+<meta name="twitter:description" content="Digit span, sequence recall and colour recall &mdash; same puzzles for everyone, every day." />
+<meta name="twitter:image" content="https://memoryduel.com/og-default.jpg" />
+<link rel="alternate" hreflang="en" href="https://memoryduel.com/games/daily-challenge/lobby/" />
+<link rel="alternate" hreflang="x-default" href="https://memoryduel.com/games/daily-challenge/lobby/" />
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="stylesheet" href="/src/styles/home.css">
+<link rel="stylesheet" href="/src/styles/daily-challenge.css">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Memory Duel">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
+<script src="/js/sw-register.js" defer></script>
+</head>
+<body>
+
+<nav class="nav"><div class="nav-in">
+  <a class="logo" href="/"><span class="mk"></span>MemoryDuel</a>
+  <span class="spacer"></span><div id="lang-switcher"></div>
+  <a class="btn btn-ghost" href="/" data-i18n="dc.lobby_back_home">All games</a>
+</div></nav>
+
+<main class="wrap">
+
+  <!-- ═══════════ Hero ═══════════ -->
+  <section class="dc-hero">
+    <span class="cover" aria-hidden="true">🧠</span>
+    <h1 data-i18n-html="dc.lobby_h1">Three challenges.<br><em>One brain workout.</em></h1>
+    <p class="sub" data-i18n="dc.lobby_sub">Every player worldwide gets the exact same puzzles on the same day. No luck, no guessing &mdash; just how well your memory actually holds up.</p>
+    <div class="dc-chips">
+      <span class="chip"><span class="dot"></span><span data-i18n="dc.lobby_chip_same">Same puzzles for everyone</span></span>
+      <span class="chip"><span class="dot"></span><span data-i18n="dc.lobby_chip_free">Free, no sign-up</span></span>
+      <span class="chip"><span class="dot"></span><span data-i18n="dc.lobby_chip_streak">5 minutes a day</span></span>
+    </div>
+  </section>
+
+  <!-- ═══════════ 模式卡 + 侧栏 ═══════════ -->
+  <div class="dc-grid">
+
+    <section aria-labelledby="modesTitle">
+      <h2 class="dc-sec-h" id="modesTitle" data-i18n="dc.lobby_modes_h2">Choose your challenge<small data-i18n="dc.lobby_modes_h2_small">Tap a card to jump straight in.</small></h2>
+
+      <div class="dc-modes" id="modeGrid">
+
+        <!-- 01 · 每日三关 —— 主推，/?mode=daily -->
+        <a class="dc-mode feat" href="/games/daily-challenge/?mode=daily" data-mode="daily">
+          <div class="mi" aria-hidden="true">📅</div>
+          <div>
+            <div class="mt" data-i18n="dc.lobby_mt_daily">Daily Challenge</div>
+            <div class="md" data-i18n="dc.lobby_md_daily">All three puzzles in one run. Everyone gets the same questions today.</div>
+            <span class="dc-tag is-gold" data-i18n="dc.lobby_tag_main">Main event</span>
+          </div>
+        </a>
+
+        <!-- 02 · 数字广度 —— /?mode=number -->
+        <a class="dc-mode" href="/games/daily-challenge/?mode=number" data-mode="number">
+          <div class="mi" aria-hidden="true">🔢</div>
+          <div>
+            <div class="mt" data-i18n="dc.lobby_mt_number">Number Recall</div>
+            <div class="md" data-i18n="dc.lobby_md_number">Digits flash on screen, then vanish. Type them back. 3, 4, 5 digits.</div>
+            <span class="dc-tag is-live" data-i18n="dc.lobby_tag_live">Live</span>
+          </div>
+        </a>
+
+        <!-- 03 · 序列记忆 —— /?mode=sequence -->
+        <a class="dc-mode" href="/games/daily-challenge/?mode=sequence" data-mode="sequence">
+          <div class="mi" aria-hidden="true">⚡</div>
+          <div>
+            <div class="mt" data-i18n="dc.lobby_mt_sequence">Sequence Memory</div>
+            <div class="md" data-i18n="dc.lobby_md_sequence">Tiles light up one by one. Tap them back in the same order.</div>
+            <span class="dc-tag is-live" data-i18n="dc.lobby_tag_live">Live</span>
+          </div>
+        </a>
+
+        <!-- 04 · 颜色还原 —— /?mode=color -->
+        <a class="dc-mode" href="/games/daily-challenge/?mode=color" data-mode="color">
+          <div class="mi" aria-hidden="true">🎨</div>
+          <div>
+            <div class="mt" data-i18n="dc.lobby_mt_color">Colour Recall</div>
+            <div class="md" data-i18n="dc.lobby_md_color">Five colours appear, then vanish. Rebuild each one on the colour wheel.</div>
+            <span class="dc-tag is-live" data-i18n="dc.lobby_tag_live">Live</span>
+          </div>
+        </a>
+
+        <!-- 05 · 全球榜单 —— 灰态占位，🔴 用 div 不用 a（<a> 灰态仍可 Tab 跳转） -->
+        <div class="dc-mode ghost" aria-disabled="true">
+          <div class="mi" aria-hidden="true">🌍</div>
+          <div>
+            <div class="mt" data-i18n="dc.lobby_mt_global">Global Standings</div>
+            <div class="md" data-i18n="dc.lobby_md_global">Daily ranking across every player. Needs enough traffic to be worth showing.</div>
+            <span class="dc-tag is-mute" data-i18n="dc.lobby_tag_soon">Coming soon</span>
+          </div>
+        </div>
+
+        <!-- 06 · 连胜挑战 —— 灰态占位 -->
+        <div class="dc-mode ghost" aria-disabled="true">
+          <div class="mi" aria-hidden="true">🔥</div>
+          <div>
+            <div class="mt" data-i18n="dc.lobby_mt_streak">Streak Run</div>
+            <div class="md" data-i18n="dc.lobby_md_streak">Chain consecutive days and climb a live leaderboard.</div>
+            <span class="dc-tag is-mute" data-i18n="dc.lobby_tag_soon">Coming soon</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════ 侧栏：诚实展示，不编数据 ═══════════ -->
+    <aside>
+      <section class="dc-panel" aria-labelledby="lvTitle">
+        <h3 id="lvTitle" data-i18n="dc.lobby_side_title">Today's three levels</h3>
+        <p class="pnote" data-i18n="dc.lobby_side_note">Everyone worldwide plays the exact same set today.</p>
+        <div class="dc-side-list" id="lvRows">
+          <div class="dc-side-row"><span class="ico">🔢</span><span class="nm" data-i18n="dc.lobby_mt_number">Number Recall</span><span class="sc">12</span></div>
+          <div class="dc-side-row"><span class="ico">⚡</span><span class="nm" data-i18n="dc.lobby_mt_sequence">Sequence Memory</span><span class="sc">12</span></div>
+          <div class="dc-side-row"><span class="ico">🎨</span><span class="nm" data-i18n="dc.lobby_mt_color">Colour Recall</span><span class="sc">50</span></div>
+        </div>
+      </section>
+
+      <section class="dc-panel" style="margin-top:14px" aria-labelledby="howTitle">
+        <h3 id="howTitle" data-i18n="dc.lobby_how_title">How scoring works</h3>
+        <p class="pnote" data-i18n="dc.lobby_how_note">Your score is judged on the server using today's puzzle seed &mdash; not by the browser. Retrying a level keeps your best result.</p>
+      </section>
+    </aside>
+
+  </div>
+</main>
+
+<footer>
+  <div class="foot-in">
+    <div>
+      <div class="foot-brand"><span class="mk"></span>MemoryDuel</div>
+      <p class="foot-blurb" data-i18n="home_v2.footer_blurb">Knowledge battles, 5 minutes at a time. Ad-free and private by default.</p>
+    </div>
+    <div class="sites">
+      <a href="https://boardduel.com"><span class="pip" style="background:#2FC4C9"></span>BoardDuel</a>
+      <a href="https://numeriduel.com"><span class="pip" style="background:#F59E0B"></span>MathDuel</a>
+      <a class="cur" href="https://memoryduel.com"><span class="pip" style="background:#EA580C"></span>MemoryDuel</a>
+    </div>
+    <div class="foot-links">
+      <a href="/about/" data-i18n="nav.about">About</a><a href="/contact/" data-i18n="nav.contact">Contact</a><a href="/privacy/" data-i18n="nav.privacy">Privacy</a><a href="/terms/" data-i18n="nav.terms">Terms</a>
+    </div>
+  </div>
+  <div class="copy" data-i18n="home_v2.footer_copy">© 2026 MemoryDuel · Explore the Duel family</div>
+</footer>
+
+<script src="/shared/daily-client.js?v=1"></script>
+<script type="module" src="/src/pages/daily-lobby.ts"></script>
+<script src="/i18n/lang-switcher.js?v=40" defer></script>
+<script type="module" src="/shared/theme.js?v=1"></script>
+</body>
+</html>

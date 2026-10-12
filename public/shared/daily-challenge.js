@@ -2,28 +2,36 @@
 /* ═══════════════════════════════════════════════════════════════
    每日题客户端模块
    ────────────────────────────────────────────────────────────────
-   用途: 浏览器侧获取每日题 + 倒计时 + URL 检测
-   依赖: 全局 fetch API (现代浏览器原生)
-   API:
-     getKey(date?)              → 'YYYYMMDD' (UTC 日期)
-     fetch(game, dateKey?)      → { cards, solutions, ... } 或 null
-     nextRollover()             → ms 到下一个 UTC 0 点
-     getCurrentDailyUrl(game)   → 完整的今日 URL (?g=...)
-
-   🔴 三站适配 (memoryduel P0-5, 2026-10-12)
+   🔴🔴 2026-10-12 起：memoryduel 的每日挑战**不要再用本模块**
    ────────────────────────────────────────────────────────────────
-   本模块原先是为 numeri 站写的，只打 /api/daily/<game>。memoryduel 的
-   每日挑战端点是 /api/md/daily/*（三站各自独立，路由不通用）。
+   本模块对接的是 numeri 旧契约 `GET /api/daily/{game}?d=YYYYMMDD`
+   （一次返回 cards + solutions）。memoryduel 后端**没有这条路由**，
+   打过去只会得到 404。
 
-   🔴 同时修掉一个「静默失败」反模式：原代码把所有 404 都当作
-   「今日题尚未生成」返回 null。后果是——后端路由没部署 / 域名配错 /
-   路径写错时，页面会安静地什么都不显示、零报错，线上极难排查。
-   现区分为：
-     · 404 + 响应体带 daily_not_found → 确实没有今天的题（正常情况）
-     · 404 + 无该标记 / 其他状态码   → 路由或部署问题，抛错并 console.error
+   memoryduel 的每日挑战请改用 **`/shared/daily-client.js`**：
+     fetchToday() / fetchPuzzle(game,round) / submitAnswer() /
+     fetchStreak() / fetchRank()
+
+   为什么要另起一个模块而不是改本文件？两个契约的**返回结构完全不同**
+   （本文件要 solutions，本站后端永不下发答案），共用一个 fetch()
+   会让「路由 404」和「今天没出题」再次落进同一个 catch，
+   退回到 2026-10-12 才刚修掉的静默失败反模式。
+
+   保留本模块的原因：numeri / boardduel 仍在用它，且历史页面已引用。
    ═══════════════════════════════════════════════════════════════ */
 
 'use strict';
+
+/* ─── 🔴 使用守卫：memoryduel 站点直接给出可执行的报错 ───
+   与其让调用方拿到一个含义模糊的 404，不如在这里点名道姓。 */
+function _assertNotMemory() {
+  if (detectSite() === 'memory') {
+    throw new Error(
+      '[daily-challenge] memoryduel 不支持本模块的 /api/daily/{game} 契约。' +
+      '每日挑战请改用 /shared/daily-client.js（fetchToday / fetchPuzzle / submitAnswer）。'
+    );
+  }
+}
 
 /* ─── 站点判定：读 <html data-site>，决定用哪套端点 ─── */
 function detectSite() {
@@ -83,6 +91,7 @@ async function safeJson(r) {
 
 /* ─── 主获取函数 ─── */
 async function fetchDaily(game, dateKey) {
+  _assertNotMemory();
   dateKey = dateKey || getKey();
   const cacheKey = `${game}:${dateKey}`;
 
@@ -177,6 +186,8 @@ if (typeof window !== 'undefined') {
     getCurrentDailyUrl, parseUrlParams,
     formatCountdown, clearCache,
     fetch: fetchDaily,
+    /* 🔴 memoryduel 用新契约模块 daily-client.js */
+    isDeprecatedForMemory: SITE === 'memory',
     /* 三站适配诊断用：当前站点与实际使用的 API 前缀 */
     site: SITE, apiPrefix: API_PREFIX, httpBase: HTTP_BASE,
   };
@@ -190,6 +201,7 @@ if (typeof module !== 'undefined' && module.exports) {
     fetch: fetchDaily,
     /* 三站适配诊断用 */
     SITE, API_PREFIX, HTTP_BASE, detectSite, isGenuineNotFound,
+    _assertNotMemory,
   };
 }
 })();

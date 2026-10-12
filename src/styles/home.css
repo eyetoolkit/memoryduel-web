@@ -162,6 +162,35 @@ h1 em{font-style:normal;color:var(--orange)}
 .step p{font-size:13.5px;color:var(--mute)}
 .how-ttl{text-align:center;font-family:var(--disp);font-weight:700;font-size:24px}
 
+/* ═════════════════════════════════════════════════════════════
+   游戏矩阵（多游戏平台 · memoryduel P0-5 · 2026-10-12）
+   ----------------------------------------------------------------
+   平台化后首页要回答「这里有哪些游戏」，所以在 duel 面板之上
+   放一张游戏矩阵卡：一卡 = 一个可玩入口。
+   🔴 每日挑战卡的 href 必须紧跟 data-stage="live"（中间无空白外的
+      其他属性），scripts/filter-sitemap.mjs 靠
+      /href="\/games\/([a-z0-9-]+)\/"\s+data-stage="live"/ 抽取
+      上线游戏列表并据此过滤 sitemap —— 属性顺序或写法一变，
+      生产构建就会把对应游戏从 sitemap 里删掉。
+   ═════════════════════════════════════════════════════════════ */
+.games-block{padding:40px 24px 8px}
+.games-ttl{font-family:var(--disp);font-weight:700;font-size:24px;text-align:center}
+.games-sub{text-align:center;font-size:13.5px;color:var(--mute);margin-top:6px;max-width:56ch;margin-left:auto;margin-right:auto}
+.games-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:22px}
+.gcard{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:var(--rd);padding:20px;min-width:0;position:relative;transition:transform .14s,border-color .14s,box-shadow .14s;cursor:pointer;touch-action:manipulation}
+.gcard:hover{transform:translateY(-3px);border-color:var(--orange);box-shadow:0 8px 22px rgba(234,88,12,.13)}
+.gcard:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+.gcard-icon{font-size:30px;line-height:1}
+.gcard-title{font-family:var(--disp);font-weight:700;font-size:17px;margin:10px 0 5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.gcard-desc{font-size:13px;color:var(--mute);line-height:1.55}
+.gcard-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.gcard-tag{font-size:11px;font-weight:700;letter-spacing:.02em;padding:3px 8px;border-radius:999px;border:1px solid var(--line);color:var(--mute);background:rgba(155,142,124,.08)}
+.gcard-tag.live{color:var(--orange-deep);border-color:rgba(234,88,12,.4);background:rgba(234,88,12,.1)}
+.gcard-tag.new{color:#fff;border-color:transparent;background:var(--orange)}
+.gcard-cta{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-family:var(--ui);font-weight:700;font-size:13px;color:var(--orange-deep)}
+.gcard.ghost{opacity:.62;cursor:default;background:transparent}
+.gcard.ghost:hover{transform:none;border-color:var(--line);box-shadow:none}
+
 /* ── 页脚 ── */
 footer{background:var(--ink);color:#fff;margin-top:20px;padding:36px 24px}
 .foot-in{max-width:1120px;margin:0 auto;display:flex;flex-wrap:wrap;gap:30px;justify-content:space-between}
@@ -185,6 +214,7 @@ footer{background:var(--ink);color:#fff;margin-top:20px;padding:36px 24px}
   .duo{grid-template-columns:1fr}
   .steps{grid-template-columns:1fr}
   .feats{grid-template-columns:repeat(2,1fr)}
+  .games-grid{grid-template-columns:1fr}
 }
 @media(max-width:639px){
   .nav-in{padding:12px 14px;gap:10px}
@@ -286,4 +316,7 @@ html[data-theme="dark"]{
   .tab.on{ background:#fff; color:var(--orange-deep); }  /* 选中 tab 保持亮片，深色下更跳 */
   .btn-ghost{ color:var(--ink); }
   .solo-link{ color:var(--mute); }
+
+  .gcard-tag.new{ color:#fff; }
+  .gcard-cta{ color:var(--orange-bright); }
 }

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" data-site="memory">
+<head>
+<script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:39,fallback:"en"};</script>
+<script src="/i18n/i18n.js?v=36"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#FAF6F1">
+<title>Daily Memory Challenge · MemoryDuel</title>
+<meta name="description" content="Play today's memory challenge: digit span, sequence recall and colour recall. Same puzzles for every player, scored on the server.">
+<link rel="canonical" href="https://memoryduel.com/games/daily-challenge/" />
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MemoryDuel">
+<meta property="og:url" content="https://memoryduel.com/games/daily-challenge/" />
+<meta property="og:image" content="https://memoryduel.com/og-default.jpg" />
+<meta property="og:title" content="Daily Memory Challenge · MemoryDuel" />
+<meta property="og:description" content="Digit span, sequence recall and colour recall &mdash; the same puzzles every player gets today." />
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Daily Memory Challenge · MemoryDuel" />
+<meta name="twitter:description" content="Three memory challenges. Same puzzles for everyone, every day." />
+<meta name="twitter:image" content="https://memoryduel.com/og-default.jpg" />
+<link rel="alternate" hreflang="en" href="https://memoryduel.com/games/daily-challenge/" />
+<link rel="alternate" hreflang="x-default" href="https://memoryduel.com/games/daily-challenge/" />
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="stylesheet" href="/src/styles/home.css">
+<link rel="stylesheet" href="/src/styles/daily-challenge.css">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Memory Duel">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
+<script src="/js/sw-register.js" defer></script>
+</head>
+<body class="dc-page">
+
+<header class="dc-top">
+  <a class="back" href="/games/daily-challenge/lobby/" data-i18n="dc.game_back">← All modes</a>
+  <span class="title" data-i18n="dc.game_title">Daily Challenge</span>
+  <span class="spacer"></span>
+  <div class="dc-steps" id="steps" aria-label="Challenge progress"></div>
+</header>
+
+<main class="dc-body">
+  <div class="dc-card" id="card">
+    <div class="dc-loading" data-i18n="dc.loading">Loading today's puzzle…</div>
+  </div>
+</main>
+
+<div id="live" class="sr-only" aria-live="polite"></div>
+
+<script src="/shared/daily-client.js?v=1"></script>
+<script type="module" src="/src/pages/daily-game.ts"></script>
+<script type="module" src="/shared/theme.js?v=1"></script>
+</body>
+</html>
