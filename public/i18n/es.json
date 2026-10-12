@@ -1074,6 +1074,9 @@
     "again": "Nuevo duelo",
     "err_title": "Algo salió mal",
     "retry": "Reintentar",
-    "foot_hint": "La misma secuencia para ambos. Gana quien mejor recuerde."
+    "foot_hint": "La misma secuencia para ambos. Gana quien mejor recuerde.",
+    "start_failed": "No se pudo iniciar el duelo. Inténtalo de nuevo.",
+    "join_failed": "No se pudo unir al duelo. Revisa el código e inténtalo de nuevo.",
+    "rate_limited": "Demasiadas solicitudes. Espera un momento e inténtalo de nuevo."
   }
 }

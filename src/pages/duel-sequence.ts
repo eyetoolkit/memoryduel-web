@@ -213,7 +213,18 @@ function renderWaiting(code: string, st: any) {
   if (startBtn) {
     startBtn.addEventListener('click', async () => {
       try {
-        await C().startRoom(code, { game: GAME, rounds: ROUNDS });
+        const r = await C().startRoom(code, { game: GAME, rounds: ROUNDS });
+        /* 🔴 只有服务端确认 started 才渲染作答界面。
+           原写法 `await start(); renderPlay()` 把失败都吞进 catch 之外的路径：
+           限流 429 / 网络抖动时 start 实际没生效，房间仍是 waiting，
+           但页面已经跳到「轮到你了」，玩家点半天提交不上去
+           （服务端回 WRONG_TURN: game not playing）。
+           必须先看服务端返回值，不盲信「没抛异常就等于成功」。 */
+        if (!r || r.started !== true) {
+          renderError(t('duel.start_failed', 'Could not start the duel. Please try again.'),
+            () => enterRoom(code));
+          return;
+        }
         renderPlay(code, { status: 'playing', round: 0, totalRounds: ROUNDS });
       } catch (e) {
         renderError((e as Error).message, () => enterRoom(code));
@@ -433,10 +444,30 @@ async function main() {
     // 深链进入：先尝试加入（已在房内则 join 幂等返回）
     try {
       await C().joinRoom(code, {});
+      /* 🔴 加入后必须**回读一次状态确认自己真在房里**。
+         只看「join 没抛异常」不够：限流/重试路径下它可能静默没生效，
+         于是页面显示等待页、玩家干等，而服务端根本不认这个 pid
+         （后续取题直接 FORBIDDEN: not_in_room）。 */
+      const cred = await C().ensureSession();
+      const st = await C().roomStatus(code);
+      const inRoom = (st.players || []).some((p: any) => p.pid === cred.pid);
+      if (!inRoom) {
+        renderError(t('duel.join_failed', 'Could not join that duel. Check the code and try again.'),
+          () => { location.href = '/games/sequence-memory/'; });
+        return;
+      }
       await enterRoom(code);
       return;
     } catch (e) {
       const err = e as any;
+      /* 🔴 限流 429 必须显式告诉用户「稍后再试」：
+         原逻辑把它兜进 renderEntry()，用户以为房码错了反复重试，
+         反而继续撞限流 —— 错误提示要能指导下一步动作。 */
+      if (err.status === 429) {
+        renderError(t('duel.rate_limited', 'Too many requests. Wait a moment and try again.'),
+          () => { location.reload(); });
+        return;
+      }
       if (err.code === 'ROOM_FULL' || err.code === 'UNAUTHORIZED') {
         renderError(err.message, () => { location.href = '/games/sequence-memory/'; });
         return;

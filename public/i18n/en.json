@@ -1074,6 +1074,9 @@
     "again": "New duel",
     "err_title": "Something went wrong",
     "retry": "Try again",
-    "foot_hint": "Same sequence for both players. Sharper memory wins."
+    "foot_hint": "Same sequence for both players. Sharper memory wins.",
+    "start_failed": "Could not start the duel. Please try again.",
+    "join_failed": "Could not join that duel. Check the code and try again.",
+    "rate_limited": "Too many requests. Wait a moment and try again."
   }
 }

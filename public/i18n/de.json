@@ -1074,6 +1074,9 @@
     "again": "Neues Duell",
     "err_title": "Etwas ist schiefgelaufen",
     "retry": "Erneut versuchen",
-    "foot_hint": "Dieselbe Sequenz für beide. Das bessere Gedächtnis gewinnt."
+    "foot_hint": "Dieselbe Sequenz für beide. Das bessere Gedächtnis gewinnt.",
+    "start_failed": "Duell konnte nicht gestartet werden. Bitte erneut versuchen.",
+    "join_failed": "Beitritt zum Duell fehlgeschlagen. Code prüfen und erneut versuchen.",
+    "rate_limited": "Zu viele Anfragen. Warte einen Moment und versuche es erneut."
   }
 }

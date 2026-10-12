@@ -1074,6 +1074,9 @@
     "again": "Nouveau duel",
     "err_title": "Quelque chose a mal tourné",
     "retry": "Réessayer",
-    "foot_hint": "La même séquence pour les deux. La meilleure mémoire gagne."
+    "foot_hint": "La même séquence pour les deux. La meilleure mémoire gagne.",
+    "start_failed": "Impossible de lancer le duel. Réessaie.",
+    "join_failed": "Impossible de rejoindre ce duel. Vérifie le code et réessaie.",
+    "rate_limited": "Trop de requêtes. Patiente un instant et réessaie."
   }
 }
