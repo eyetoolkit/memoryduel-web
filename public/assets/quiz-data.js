@@ -146,13 +146,14 @@
 
   /* 只把题面写入实际拉取语言槽位。旧逻辑把任意语言塞进 qn.en，
      导致 LANG=zh 拉取的中文题在 UI=en 时经 qn[lang]||qn.en 仍显示中文。 */
-  function wrap(apiQ, catId) {
+  function wrap(apiQ, catId, rawLang) {
     var qn = {};
     var op = {};
     var ex = {};
-    qn[LANG] = apiQ.q;
-    op[LANG] = apiQ.options.slice();
-    ex[LANG] = apiQ.explain || '';
+    var L = rawLang || LANG;   // 优先用调用方显式传入的 lang，而非闭包模块级 LANG
+    qn[L] = apiQ.q;
+    op[L] = apiQ.options.slice();
+    ex[L] = apiQ.explain || '';
     var w = {
       cn: catId,
       diff: ({ easy: 1, medium: 2, hard: 3 })[apiQ.difficulty] || 2,
@@ -165,15 +166,16 @@
       options: apiQ.options.slice(),
       explain: apiQ.explain || '',
       _qid: apiQ.qid,
-      _rawLang: LANG,
+      _rawLang: L,
     };
     return w;
   }
 
   function fetchBundle(catId, retries) {
     retries = retries || 2;
-    var url = (API || '') + '/api/md/quiz/bundle?category=' + encodeURIComponent(catId) + '&lang=' + LANG + '&count=100';
-    console.log('[MD fetchBundle] cat=', catId, 'LANG=', LANG, 'url=', url);
+    var fetchLang = LANG;   // 捕获调用时刻的 LANG，避免闭包读过时值
+    var url = (API || '') + '/api/md/quiz/bundle?category=' + encodeURIComponent(catId) + '&lang=' + fetchLang + '&count=100';
+    console.log('[MD fetchBundle] cat=', catId, 'LANG=', LANG, 'fetchLang=', fetchLang, 'url=', url);
 
     function attempt(n) {
       return fetch(url, { cache: 'no-store' })
@@ -183,7 +185,7 @@
         })
         .then(function (j) {
           if (!j || !j.ok || !j.data) throw new Error('bad response');
-          return (j.data.questions || []).map(function (q) { return wrap(q, catId); });
+          return (j.data.questions || []).map(function (q) { return wrap(q, catId, fetchLang); });
         })
         .catch(function (err) {
           if (n < retries) {
