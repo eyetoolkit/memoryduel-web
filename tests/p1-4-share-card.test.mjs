@@ -205,6 +205,44 @@ test('引擎缺失时降级为文本摘要，而不是抛错', () => {
   assert.ok(/dc-share-text/.test(dailySrc), '降级路径要有可复制的文本区');
 });
 
+/* 🔴 这条是 2026-10-13 L3 真机验收抓出来的产品 bug，锁死防止回归：
+ *
+ * 降级分支里写的是
+ *     box.innerHTML = '<textarea id="shareText">…';
+ *     const ta = document.getElementById('shareText');   // ← 此时 box 还没进 DOM
+ *     if (ta) ta.value = shareFallbackText(card);
+ *     host.appendChild(box);
+ *
+ * getElementById 只在 document 上查，box 此刻是游离节点 → ta 恒为 null →
+ * 赋值被静默跳过 → 玩家看到的是一个**空白**文本框，复制不到任何成绩。
+ *
+ * 为什么单测测不出来：这条分支只在引擎缺失 / Canvas 不可用时才走，
+ * 正常路径永远碰不到。必须先 appendChild 再取值。 */
+test('降级文本区必须先挂载再赋值（空白文本框回归防护）', () => {
+  const s = dailySrc.slice(dailySrc.indexOf('function mountShare'));
+  const body = s.slice(0, s.indexOf('\nfunction bindNativeShare'));
+
+  const textIdx = body.indexOf('dc-share-text');
+  const getIdx = body.indexOf("getElementById('shareText')");
+  const appendIdx = body.indexOf('host.appendChild(box)');
+
+  assert.ok(textIdx > -1 && getIdx > -1 && appendIdx > -1, '降级分支应包含文本框、取值与挂载三步');
+  assert.ok(appendIdx < getIdx,
+    `host.appendChild(box) 必须早于 getElementById('shareText')（实际 append@${appendIdx} vs get@${getIdx}）`);
+
+  // 赋值必须在取值之后 —— 这才是「空白文本框」的唯一成因。
+  // 允许保留 if (ta) 这类 null guard：它防的是 DOM 被别处搬走，
+  // 与「先查后挂载导致恒为 null」是两回事，硬禁反而会把安全检查判成缺陷。
+  const assignIdx = body.indexOf('ta.value = shareFallbackText(card)');
+  assert.ok(assignIdx > getIdx, '赋值必须在查到元素之后');
+
+  // 但如果真的取不到元素，必须留痕，不能静默走人 —— 否则空白框又会变成
+  // 「看起来正常但没有内容」的无声故障。
+  const hasGuard = /if \(ta\)/.test(body);
+  assert.ok(!hasGuard || /ta\)\s*\{?[\s\S]{0,160}?(console\.(warn|error))/.test(body),
+    '保留了 if (ta) 守卫时，取不到元素必须 console 留痕，不能静默跳过');
+});
+
 test('Canvas 上下文不可用时先探测再交给引擎', () => {
   // 🔴 关键：getContext('2d') 返回 null 时，引擎内 ctx.fillStyle=... 会抛
   //    TypeError。所以必须在调用 renderCard 之前探测。

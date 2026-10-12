@@ -451,9 +451,18 @@ function mountShare(host: HTMLElement, card: ShareCardInput) {
     box.innerHTML = `
       <p class="dc-share-hint">${esc(t('dc.share_hint', 'Share your score'))}</p>
       <textarea class="dc-share-text" id="shareText" readonly rows="5"></textarea>`;
-    const ta = document.getElementById('shareText') as HTMLTextAreaElement | null;
-    if (ta) ta.value = shareFallbackText(card);
+    // 🔴 必须先 appendChild 再取值：box 是游离节点时 getElementById 查不到它
+    //    （查询只走 document），于是 ta 为 null、赋值被静默跳过 ——
+    //    降级区会挂出一个**空白**文本框，玩家复制不到任何成绩。
+    //    这条分支只在引擎缺失 / Canvas 不可用时才走，正常路径测不出来。
     host.appendChild(box);
+    const ta = document.getElementById('shareText') as HTMLTextAreaElement | null;
+    if (ta) {
+      ta.value = shareFallbackText(card);
+    } else {
+      // 静默跳过就会退化成「空白文本框」——玩家看着像正常，复制却什么都没有
+      console.warn('[daily] share fallback textarea not found');
+    }
     bindNativeShare(card);
     return;
   }
