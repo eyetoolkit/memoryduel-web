@@ -269,7 +269,9 @@
     var mode = params.get('mode');     // 'ai' or 'online'
     var room = params.get('room');     // room code (online)
     var cat  = params.get('cat') || 'general';
-    if (!mode && !room) return;        // 直接打开 train.html 时不启动 duel
+    // 防御性默认：裸 /train.html（侧栏/Header/书签/直接输入 URL）自动当 AI 训练启动。
+    // 此前 mode 和 room 都空时静默 return，页面永远停在 "Loading…"（浏览器冒烟 BUG）。
+    if (!mode && !room) { mode = 'ai'; }
     // 教师端进房提示（classroom pill）
     if (room) {
       var pill = document.getElementById('classroomPill');
