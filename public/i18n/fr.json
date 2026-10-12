@@ -897,7 +897,8 @@
     "game_play": "Jouer →",
     "game_modes": "Voir tous les modes →",
     "game_seq_d": "Mémorise la séquence de tuiles, puis reproduis-la. Même séquence pour les deux, notée côté serveur : envoie un code et compare.",
-    "tag_async": "Asynchrone"
+    "tag_async": "Asynchrone",
+    "game_num_d": "Les chiffres défilent un par un — retapez la série complète de mémoire. Même nombre pour les deux, score calculé côté serveur, sans inscription."
   },
   "mm_bv": {
     "mm_bv_p1": "Meilleurs jeux d'entraînement cérébral pour tous les âges",

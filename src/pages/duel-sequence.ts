@@ -52,10 +52,22 @@ function t(key: string, fallback: string): string {
   return fallback;
 }
 
-const GAME = 'sequence-memory';
+/* ─── 游戏由 URL 决定（P1-3：Number Recall 复用同一套对战内核）─────
+   🔴 为什么不是一个 URL + 参数，而是两个独立页面：
+     每个游戏一条独立 URL 才能各自进 sitemap、各自有 OG/标题，
+     SEO 上是两个落地页而不是一个。但**代码只有一份** ——
+     由路径推断 game，避免复制粘贴出两份会逐渐分叉的实现。
+     只有「题目长什么样 + 玩家怎么作答」两处有差异，其余（建房、
+     等待、轮询、提交、比分）完全共用。 */
+const GAME: string = /\/games\/number-recall\//.test(location.pathname)
+  ? 'number-recall'
+  : 'sequence-memory';
 const ROUNDS = 3;
 const LIT_MS = 600;
 const GAP_MS = 240;
+
+/** 每个游戏的专属文案前缀，避免在两个游戏间写 if 分支 */
+const ICON = GAME === 'number-recall' ? '🔢' : '⚡';
 
 /* 当前房间快照。🔴 保留它不只是为了存 code：
    结果页与轮询都要读 status/round/totalRounds，
@@ -83,9 +95,12 @@ function renderError(msg: string, retry?: () => void) {
 /* ═══════════ 阶段 1：建房 or 加入 ═══════════ */
 function renderEntry() {
   const card = $('#card')!;
+  const isNum = GAME === 'number-recall';
   card.innerHTML = `
-    <h2 class="dc-h2">${esc(t('duel.seq_title', 'Sequence Memory Duel'))}</h2>
-    <p class="dc-help">${esc(t('duel.seq_help', 'Memorise the tile sequence, then tap it back. Your opponent gets the exact same sequence — whoever recalls more wins.'))}</p>
+    <h2 class="dc-h2">${esc(isNum ? t('duel.num_title', 'Number Recall Duel') : t('duel.seq_title', 'Sequence Memory Duel'))}</h2>
+    <p class="dc-help">${esc(isNum
+    ? t('duel.num_help', 'Memorise the digits, then type them back. Your opponent gets the exact same number — whoever recalls more wins.')
+    : t('duel.seq_help', 'Memorise the tile sequence, then tap it back. Your opponent gets the exact same sequence — whoever recalls more wins.'))}</p>
 
     <button class="dc-btn" id="createBtn" type="button">${esc(t('duel.create', 'Create a duel'))}</button>
 
@@ -277,13 +292,16 @@ function showRoundTag(cur: number, total: number) {
 
 async function playRound(code: string, round: number): Promise<boolean> {
   const card = $('#card')!;
+  const isNumber = GAME === 'number-recall';
 
   /* 🔴 取题：必须点「开始记忆」才请求 /room/round。
      服务端在返回题目时才开始计时（速度加成按各自真实耗时算），
      所以不能提前把题取好放在页面上。 */
   card.innerHTML = `
     <h2 class="dc-h2">${esc(t('duel.round', 'Round'))} ${round + 1}</h2>
-    <p class="dc-help">${esc(t('duel.seq_ready_hint', 'Tap start, watch the tiles light up, then tap them back in the same order.'))}</p>
+    <p class="dc-help">${esc(isNumber
+    ? t('duel.num_ready_hint', 'Tap start, watch the digits flash, then type them from memory.')
+    : t('duel.seq_ready_hint', 'Tap start, watch the tiles light up, then tap them back in the same order.'))}</p>
     <button class="dc-btn" id="go" type="button">${esc(t('duel.start_round', 'Start round'))}</button>`;
 
   await new Promise<void>((resolve) => {
@@ -298,59 +316,113 @@ async function playRound(code: string, round: number): Promise<boolean> {
     return false;
   }
 
+  /* ── 按游戏解析题目（两个游戏唯一的差异点之一）── */
   const seq: number[] = (data.puzzle && data.puzzle.seq || []).map((n: number) => Number(n));
   const grid = Number(data.puzzle && data.puzzle.grid) || 3;
-  if (!seq.length) {
-    renderError('[duel-sequence] 服务端未下发序列', () => playRound(code, round));
+  const digits: string = GAME === 'number-recall'
+    ? String((data.puzzle && data.puzzle.digits || []).join(''))
+    : '';
+
+  const target = isNumber ? digits : '';
+  if (isNumber ? !target.length : !seq.length) {
+    renderError(`[duel] 服务端未下发 ${GAME} 题目`, () => playRound(code, round));
     return false;
   }
 
-  /* ── 演示阶段 ── */
-  const cells = Array.from({ length: grid * grid },
-    (_, i) => `<button class="dc-seq-cell" type="button" data-i="${i}" aria-label="${i + 1}"></button>`).join('');
-  card.innerHTML = `
-    <h2 class="dc-h2">${esc(t('duel.watch', 'Watch carefully…'))}</h2>
-    <div class="dc-seq-grid" id="grid" style="grid-template-columns:repeat(${grid},1fr)">${cells}</div>`;
+  /* ── 作答：两个游戏的交互不同，但「发玩家真实作答」这一条完全相同 ── */
+  let answer: unknown;
 
-  const nodes = Array.from(document.querySelectorAll<HTMLElement>('.dc-seq-cell'));
-  nodes.forEach((n) => n.setAttribute('disabled', ''));
+  if (isNumber) {
+    /* Number Recall：逐位闪现 → 输入整串 */
+    card.innerHTML = `
+      <h2 class="dc-h2">${esc(t('duel.watch', 'Watch carefully…'))}</h2>
+      <div class="dc-num-stage hide" id="stage" aria-live="off"></div>`;
+    const stage = $('#stage') as HTMLElement;
 
-  for (const idx of seq) {
-    nodes[idx]?.classList.add('lit');
-    await sleep(LIT_MS);
-    nodes[idx]?.classList.remove('lit');
-    await sleep(GAP_MS);
+    for (let i = 0; i < target.length; i++) {
+      stage.textContent = target[i];
+      stage.classList.remove('hide', 'show');
+      void stage.offsetWidth;   // 强制重排以重启动画
+      stage.classList.add('show');
+      await sleep(LIT_MS);
+    }
+    stage.textContent = target;
+    void stage.offsetWidth;
+    stage.classList.add('show');
+    await sleep(1100);
+    stage.textContent = '';
+    stage.classList.add('hide');
+    stage.classList.remove('show');
+
+    card.innerHTML = `
+      <h2 class="dc-h2">${esc(t('duel.your_turn_num', 'Your turn — type the digits'))}</h2>
+      <input class="dc-input" id="ans" inputmode="numeric" autocomplete="off"
+             maxlength="${target.length}" placeholder="${'0'.repeat(target.length)}"
+             aria-label="${esc(t('dc.num_aria', 'Digits you remember'))}" />`;
+
+    const ans = $('#ans') as HTMLInputElement;
+    ans.focus();
+    // 🔴 同样先声明再进 Promise，避免 TDZ（见下方 sequence 分支的说明）
+    const typedRef: { v: string } = { v: '' };
+    await new Promise<void>((resolve) => {
+      ans.addEventListener('input', () => {
+        ans.value = ans.value.replace(/\D/g, '').slice(0, target.length);
+        if (ans.value.length === target.length) { typedRef.v = ans.value; resolve(); }
+      });
+      ans.addEventListener('keydown', (e) => {
+        if ((e as KeyboardEvent).key === 'Enter' && ans.value.length) { typedRef.v = ans.value; resolve(); }
+      });
+    });
+    answer = typedRef.v;
+  } else {
+    /* Sequence Memory：格子依次点亮 → 按序点回 */
+    const cells = Array.from({ length: grid * grid },
+      (_, i) => `<button class="dc-seq-cell" type="button" data-i="${i}" aria-label="${i + 1}"></button>`).join('');
+    card.innerHTML = `
+      <h2 class="dc-h2">${esc(t('duel.watch', 'Watch carefully…'))}</h2>
+      <div class="dc-seq-grid" id="grid" style="grid-template-columns:repeat(${grid},1fr)">${cells}</div>`;
+
+    const nodes = Array.from(document.querySelectorAll<HTMLElement>('.dc-seq-cell'));
+    nodes.forEach((n) => n.setAttribute('disabled', ''));
+
+    for (const idx of seq) {
+      nodes[idx]?.classList.add('lit');
+      await sleep(LIT_MS);
+      nodes[idx]?.classList.remove('lit');
+      await sleep(GAP_MS);
+    }
+    await sleep(400);
+
+    /* ── 作答阶段：🔴 必须解除 disabled，否则点了没反应 ── */
+    nodes.forEach((n) => n.removeAttribute('disabled'));
+    card.querySelector('.dc-h2')!.textContent = t('duel.your_turn', 'Your turn — tap them back');
+
+    /* 🔴 先在 Promise **外部**声明数组再传入：
+       若写成 `const picked = await new Promise(r => { ... picked.push(i) ... })`，
+       回调里访问 picked 时它还处在暂时性死区（TDZ），
+       点第一下就抛 ReferenceError: Cannot access 'picked' before initialization
+       —— 页面停在「轮到你了」且点了没反应，极难从表象定位。 */
+    const picked: number[] = [];
+    await new Promise<void>((resolve) => {
+      const onClick = (e: Event) => {
+        const el = (e.target as HTMLElement).closest('.dc-seq-cell') as HTMLElement | null;
+        if (!el) return;
+        const i = Number(el.dataset.i);
+        picked.push(i);
+        if (picked.length >= seq.length) {
+          document.getElementById('grid')!.removeEventListener('click', onClick);
+          resolve();
+        }
+      };
+      document.getElementById('grid')!.addEventListener('click', onClick);
+    });
+    answer = picked;
   }
-  await sleep(400);
 
-  /* ── 作答阶段：🔴 必须解除 disabled，否则点了没反应 ── */
-  nodes.forEach((n) => n.removeAttribute('disabled'));
-  card.querySelector('.dc-h2')!.textContent = t('duel.your_turn', 'Your turn — tap them back');
-
-  /* 🔴 先在 Promise **外部**声明数组再传入：
-     若写成 `const picked = await new Promise(r => { ... picked.push(i) ... })`，
-     回调里访问 picked 时它还处在暂时性死区（TDZ），
-     点第一下就抛 ReferenceError: Cannot access 'picked' before initialization
-     —— 页面停在「轮到你了」且点了没反应，极难从表象定位。 */
-  const picked: number[] = [];
-  await new Promise<void>((resolve) => {
-    const onClick = (e: Event) => {
-      const el = (e.target as HTMLElement).closest('.dc-seq-cell') as HTMLElement | null;
-      if (!el) return;
-      const i = Number(el.dataset.i);
-      picked.push(i);
-      if (picked.length >= seq.length) {
-        document.getElementById('grid')!.removeEventListener('click', onClick);
-        resolve();
-      }
-    };
-    document.getElementById('grid')!.addEventListener('click', onClick);
-  });
-
-  /* ── 提交：🔴 发的是玩家真实点击，不是正确答案 ── */
+  /* ── 提交：🔴 发的是玩家真实作答，不是正确答案 ── */
   let res: any;
   try {
-    res = await C().submitAnswer(code, round, picked, {});
+    res = await C().submitAnswer(code, round, answer, {});
   } catch (e) {
     renderError((e as Error).message, () => playRound(code, round));
     return false;
@@ -361,7 +433,7 @@ async function playRound(code: string, round: number): Promise<boolean> {
     <div class="dc-result-score">${esc(res.gained)}</div>
     <div class="dc-result-of">${esc(t('duel.points', 'points this round'))}</div>
     <div class="dc-rank">
-      <div class="dc-rank-row"><span class="ico">⚡</span><span class="nm">${esc(t('duel.your_total', 'Your total'))}</span><span class="sc">${esc(res.score)}</span></div>
+      <div class="dc-rank-row"><span class="ico">${ICON}</span><span class="nm">${esc(t('duel.your_total', 'Your total'))}</span><span class="sc">${esc(res.score)}</span></div>
     </div>
     <button class="dc-btn" id="nextBtn" type="button">${esc(t('duel.next', 'Continue'))}</button>`;
 

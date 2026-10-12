@@ -897,7 +897,8 @@
     "game_play": "Play now →",
     "game_modes": "See all modes →",
     "game_seq_d": "Memorise the tile sequence, then tap it back. Same sequence for both players, server-scored — send a room code and compare.",
-    "tag_async": "Async"
+    "tag_async": "Async",
+    "game_num_d": "Digits flash one by one — type the whole string back. Same number for both players, server-scored, no login."
   },
   "mm_bv": {
     "mm_bv_p1": "Best Brain Training Games for All Ages",

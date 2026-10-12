@@ -3,7 +3,7 @@
 <head>
 <!-- md-theme:early -->
 <script>(function(){try{var t=localStorage.getItem('md-theme2');if(t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();</script>
-<script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:41,fallback:"en"};</script>
+<script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:42,fallback:"en"};</script>
 <script src="/i18n/i18n.js?v=36"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -115,7 +115,9 @@
         <span class="gcard-tag" data-i18n="home_v2.tag_streak">Streak</span>
       </div>
       <span class="gcard-cta" data-i18n="home_v2.game_modes">See all modes →</span>
-        <a class="gcard" href="/games/sequence-memory/" data-stage="live">
+    </a>
+
+    <a class="gcard" href="/games/sequence-memory/" data-stage="live">
       <div class="gcard-icon" aria-hidden="true">⚡</div>
       <div class="gcard-title" data-i18n="duel.seq_title">Sequence Memory Duel</div>
       <p class="gcard-desc" data-i18n="home_v2.game_seq_d">Memorise the tile sequence, then tap it back. Same sequence for both players, server-scored — send a room code and compare.</p>
@@ -127,7 +129,17 @@
       <span class="gcard-cta" data-i18n="duel.create">Create a duel →</span>
     </a>
 
-</a>
+    <a class="gcard" href="/games/number-recall/" data-stage="live">
+      <div class="gcard-icon" aria-hidden="true">🔢</div>
+      <div class="gcard-title" data-i18n="duel.num_title">Number Recall Duel</div>
+      <p class="gcard-desc" data-i18n="home_v2.game_num_d">Digits flash one by one — type the whole string back. Same number for both players, server-scored, no login.</p>
+      <div class="gcard-tags">
+        <span class="gcard-tag new" data-i18n="home_v2.tag_new">New</span>
+        <span class="gcard-tag" data-i18n="home_v2.tag_pvp">1v1</span>
+        <span class="gcard-tag" data-i18n="home_v2.tag_async">Async</span>
+      </div>
+      <span class="gcard-cta" data-i18n="duel.create">Create a duel →</span>
+    </a>
 
   </div>
 </section>

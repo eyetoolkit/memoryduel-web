@@ -897,7 +897,8 @@
     "game_play": "Jugar ahora →",
     "game_modes": "Ver todos los modos →",
     "game_seq_d": "Memoriza la secuencia de casillas y repítela. Misma secuencia para ambos, puntuada en el servidor: envía un código y compara.",
-    "tag_async": "Asíncrono"
+    "tag_async": "Asíncrono",
+    "game_num_d": "Los dígitos aparecen uno a uno: escribe la cadena completa de memoria. El mismo número para ambos, puntuación en servidor, sin registro."
   },
   "mm_bv": {
     "mm_bv_p1": "Mejores juegos de entrenamiento cerebral para todas las edades",

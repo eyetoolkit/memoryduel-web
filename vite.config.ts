@@ -58,6 +58,10 @@ export default defineConfig({
         // P1-2（2026-10-12）：Sequence Memory 双人对战
         // ⚠️ key 即产物名：sequenceDuel → assets/sequenceDuel-<hash>.js
         sequenceDuel: resolve(here, 'games/sequence-memory/index.html'),
+
+        // P1-3（2026-10-12）：Number Recall 对战。
+        // 🔴 两个入口**共用同一个 TS 模块**（按路径推断 game），不是两份实现。
+        numberDuel: resolve(here, 'games/number-recall/index.html'),
       },
     },
   },

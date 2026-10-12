@@ -897,7 +897,8 @@
     "game_play": "Jetzt spielen →",
     "game_modes": "Alle Modi ansehen →",
     "game_seq_d": "Merke dir die Reihenfolge der Felder und tippe sie nach. Dieselbe Sequenz für beide, serverseitig bewertet — Raumcode senden und vergleichen.",
-    "tag_async": "Asynchron"
+    "tag_async": "Asynchron",
+    "game_num_d": "Die Ziffern blitzen nacheinander auf — tippe die ganze Folge aus dem Gedächtnis. Gleiche Zahl für beide, Server-Wertung, ohne Anmeldung."
   },
   "mm_bv": {
     "mm_bv_p1": "Die besten Gehirntrainings-Spiele für alle Altersgruppen",
