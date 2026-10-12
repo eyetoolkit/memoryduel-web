@@ -97,6 +97,18 @@ function applyColors(siteKey) {
 
 const W = 1200, H = 630;
 
+/* ─── 游戏图标 / 名称映射 ───────────────────────────────────────
+   🔴 提到模块作用域是刻意的：原先 canvas 的 renderCard 与 toSVG 各自
+      内联了一份同名字面量对象，两张表会各自漂移（改一张忘另一张，
+      导出 PNG 和导出 SVG 就显示不同游戏名）。
+   🔴 不再为每个新游戏往这两张表里塞条目：调用方传 card.icon /
+      card.gameName 即可覆盖（P1-4 memoryduel 每日挑战就是这么接的）。
+      理由：表里的口味是 numeri 的（24点/金字塔/数独），把三站的游戏
+      都塞进来只会让这张表变成谁都不敢改的共享状态。引擎只管排版，
+      「显示什么」由调用方决定。 */
+const GAME_ICONS = { '24-game': '🃏', pyramid: '🔺', sudoku: '🔢' };
+const GAME_NAMES = { '24-game': '24 点', pyramid: '金字塔', sudoku: '数独' };
+
 /* ─── 工具:文字自动换行(支持中文按字拆,英文按词拆)─── */
 function wrapText(ctx, text, maxWidth) {
   if (!text) return [];
@@ -184,7 +196,7 @@ function drawBadge(ctx, x, y, badge) {
 }
 
 /* ─── 工具:绘制游戏图标(简易,左侧 logo 区)─── */
-function drawGameIcon(ctx, x, y, game) {
+function drawGameIcon(ctx, x, y, game, iconOverride) {
   const size = 80;
   ctx.save();
   // 圆角方形背景
@@ -198,29 +210,42 @@ function drawGameIcon(ctx, x, y, game) {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = COLORS.white;
-  const icon = ({ '24-game': '🃏', 'pyramid': '🔺', 'sudoku': '🔢' })[game] || '🎮';
+  const icon = iconOverride || GAME_ICONS[game] || '🎮';
   ctx.fillText(icon, x + size/2, y + size/2 + 4);
   ctx.restore();
 }
 
-/* ─── 工具:绘制 meta 信息(右下角)─── */
-function drawMeta(ctx, x, y, meta) {
-  if (!meta) return;
+/* ─── meta 行 ───────────────────────────────────────────────────
+   card.metaLines 优先（调用方自定的展示行），否则按 card.meta 的字段
+   自动生成 —— 后者是 numeri 的老路径，逐字保持不变。
+   🔴 为什么允许自定义行：字段集是 numeri 的（解/连/分/次），
+      memoryduel 每日挑战要展示的是「连胜 / 三关满分 / 最佳单轮」这类
+      完全不同的维度。硬把两边口味塞进同一组字段只会互相踩，
+      不如让调用方给行，引擎只负责排版与对齐。 */
+function metaLinesOf(card) {
+  if (Array.isArray(card.metaLines) && card.metaLines.length) {
+    return card.metaLines.filter((s) => typeof s === 'string' && s.length).slice(0, 4);
+  }
+  const m = (card && card.meta) || {};
   const items = [];
-  if (typeof meta.duration === 'number') items.push(`⏱ ${formatDuration(meta.duration)}`);
-  if (typeof meta.solutions_count === 'number') items.push(`💡 ${meta.solutions_count} 解`);
-  if (typeof meta.streak === 'number') items.push(`🔥 ${meta.streak} 连`);
-  if (typeof meta.score === 'number') items.push(`⭐ ${meta.score} 分`);
-  if (typeof meta.attempts === 'number') items.push(`🎯 ${meta.attempts} 次`);
-  if (items.length === 0) return;
+  if (typeof m.duration === 'number') items.push(`⏱ ${formatDuration(m.duration)}`);
+  if (typeof m.solutions_count === 'number') items.push(`💡 ${m.solutions_count} 解`);
+  if (typeof m.streak === 'number') items.push(`🔥 ${m.streak} 连`);
+  if (typeof m.score === 'number') items.push(`⭐ ${m.score} 分`);
+  if (typeof m.attempts === 'number') items.push(`🎯 ${m.attempts} 次`);
+  return items;
+}
 
+/* ─── 工具:绘制 meta 信息(右下角)─── */
+function drawMeta(ctx, x, y, lines) {
+  if (!Array.isArray(lines) || lines.length === 0) return;
   ctx.font = '500 24px "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif';
   ctx.fillStyle = COLORS.textLight;
   ctx.textBaseline = 'top';
 
   const lineHeight = 32;
-  for (let i = 0; i < items.length; i++) {
-    ctx.fillText(items[i], x, y + i * lineHeight);
+  for (let i = 0; i < lines.length; i++) {
+    ctx.fillText(lines[i], x, y + i * lineHeight);
   }
 }
 
@@ -271,7 +296,7 @@ function renderCard(canvas, card, site) {
   ctx.fill();
 
   /* ─── 左上:游戏图标 + 站名 ─── */
-  drawGameIcon(ctx, cardX + 40, cardY + 40, card.game);
+  drawGameIcon(ctx, cardX + 40, cardY + 40, card.game, card.icon);
   ctx.fillStyle = C.text;
   ctx.font = '800 28px "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif';
   ctx.textAlign = 'left';
@@ -279,8 +304,7 @@ function renderCard(canvas, card, site) {
   ctx.fillText(`${S.name} · ${S.host}`, cardX + 140, cardY + 56);
 
   // 游戏名(右上小标签)
-  const gameNames = { '24-game': '24 点', pyramid: '金字塔', sudoku: '数独' };
-  const gameName = gameNames[card.game] || card.game;
+  const gameName = card.gameName || GAME_NAMES[card.game] || card.game;
   ctx.font = '600 22px "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif';
   ctx.fillStyle = COLORS.primary;
   ctx.textAlign = 'right';
@@ -345,10 +369,10 @@ function renderCard(canvas, card, site) {
   }
 
   /* ─── meta 信息(右下角)─── */
-  if (card.meta) {
+  if (card.meta || card.metaLines) {
     const metaX = cardX + cardW - 200;
     const metaY = cardY + cardH - 110;
-    drawMeta(ctx, metaX, metaY, card.meta);
+    drawMeta(ctx, metaX, metaY, metaLinesOf(card));
   }
 
   /* ─── 网址(底部)─── */
@@ -450,20 +474,12 @@ function toSVG(card, site) {
   const siteKey = resolveSite(site);
   const S = SITES[siteKey];
   applyColors(siteKey);
-  const gameNames = { '24-game': '24 点', pyramid: '金字塔', sudoku: '数独' };
-  const gameIcons = { '24-game': '🃏', pyramid: '🔺', sudoku: '🔢' };
-  const icon = gameIcons[card.game] || '🎮';
-  const name = gameNames[card.game] || card.game;
+  // 🔴 与 canvas 的 renderCard 共用同一批映射/同一套 meta 行规则，
+  //     避免两条渲染路径各写一份然后漂移（PNG 与 SVG 显示不同游戏名）。
+  const icon = card.icon || GAME_ICONS[card.game] || '🎮';
+  const name = card.gameName || GAME_NAMES[card.game] || card.game;
 
-  const metaItems = [];
-  if (card.meta) {
-    if (typeof card.meta.duration === 'number') metaItems.push(`⏱ ${formatDuration(card.meta.duration)}`);
-    if (typeof card.meta.solutions_count === 'number') metaItems.push(`💡 ${card.meta.solutions_count} 解`);
-    if (typeof card.meta.streak === 'number') metaItems.push(`🔥 ${card.meta.streak} 连`);
-    if (typeof card.meta.score === 'number') metaItems.push(`⭐ ${card.meta.score} 分`);
-    if (typeof card.meta.attempts === 'number') metaItems.push(`🎯 ${card.meta.attempts} 次`);
-  }
-  const metaText = metaItems.join('  ·  ');
+  const metaText = metaLinesOf(card).join('  ·  ');
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="315" viewBox="0 0 1200 630" font-family="-apple-system, PingFang SC, Microsoft YaHei, sans-serif">
   <defs>
