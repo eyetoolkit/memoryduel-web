@@ -62,6 +62,11 @@ const GAP_MS = 240;
    若每次都重新拉接口，会出现「刚开完局又渲染成等待中」的闪回。 */
 let room: Room | null = null;
 let myPid = '';
+/* 🔴 是否房主必须在 **create 响应里**判定并记住：
+   /room/status 返回的 players 不带 host 字段（后端有意不对外暴露谁是房主），
+   等进房后再靠 p.host 判断会恒为 false —— 房主看不到「开始对决」按钮，
+   房间永远停在等待中，整局打不起来。 */
+let iAmHost = false;
 
 /* ═══════════ 错误卡（不静默留白）═══════════ */
 function renderError(msg: string, retry?: () => void) {
@@ -104,8 +109,15 @@ function renderEntry() {
 
 async function doCreate() {
   try {
+    // 先确保有会话，才能把「自己」和 create 响应里的房主 pid 对上
+    await C().ensureSession();
     const r = await C().createRoom(GAME, { rounds: ROUNDS });
     room = { code: r.code };
+    /* 建房的那一刻自己必然是房主。把 create 响应里 host=true 的 pid 记下来，
+       enterRoom 里与自己的 pid 比对即可 —— 不依赖 status 是否回传 host。 */
+    const hostPid = (r.players || []).find((p: any) => p.host)?.pid || '';
+    const cred = C().loadCred();
+    iAmHost = !!(hostPid && cred && hostPid === cred.pid);
     await enterRoom(r.code);
   } catch (e) {
     renderError((e as Error).message, () => doCreate());
@@ -150,8 +162,12 @@ async function enterRoom(code: string) {
   }
   room = { code, ...st };
 
-  // 深链落盘：刷新后仍在房间内
-  try { sessionStorage.setItem('duel-code', code); } catch (_) {}
+  // 深链落盘：刷新后仍在房间内。
+  // 🔴 房主身份也要一起存：status 不回传 host，刷新后不恢复就再也开不了局。
+  try {
+    sessionStorage.setItem('duel-code', code);
+    if (iAmHost) sessionStorage.setItem('duel-host', '1');
+  } catch (_) {}
 
   if (st.status === 'waiting') renderWaiting(code, st);
   else renderPlay(code, st);
@@ -159,7 +175,7 @@ async function enterRoom(code: string) {
 
 function renderWaiting(code: string, st: any) {
   const card = $('#card')!;
-  const isHost = (st.players || []).some((p: any) => p.pid === myPid && p.host);
+  const isHost = iAmHost;
 
   card.innerHTML = `
     <h2 class="dc-h2">${esc(t('duel.waiting_title', 'Waiting for your opponent'))}</h2>
@@ -168,7 +184,7 @@ function renderWaiting(code: string, st: any) {
       <span class="duel-code-big" id="codeBig">${esc(code)}</span>
       <button class="dc-btn ghost small" id="copyBtn" type="button">${esc(t('duel.copy', 'Copy'))}</button>
     </div>
-    <p class="duel-players" id="playersLine"></p>
+    <p class="duel-players" id="playersLine">${esc(t('duel.players_in', 'In the duel: '))}${esc((st.players || []).map((p: any) => p.name).join(', '))}</p>
     ${isHost ? `<button class="dc-btn" id="startBtn" type="button">${esc(t('duel.start', 'Start duel'))}</button>` : ''}
     <p class="duel-note">${esc(t('duel.polling', 'This page checks for your opponent automatically.'))}</p>`;
 
@@ -384,7 +400,10 @@ async function showResult(code: string) {
     <a class="dc-btn ghost" href="/" style="margin-top:10px;display:block;text-align:center;text-decoration:none">${esc(t('duel.back_home', '← MemoryDuel'))}</a>`;
 
   document.getElementById('againBtn')!.addEventListener('click', () => {
-    try { sessionStorage.removeItem('duel-code'); } catch (_) {}
+    try {
+      sessionStorage.removeItem('duel-code');
+      sessionStorage.removeItem('duel-host');
+    } catch (_) {}
     location.href = '/games/sequence-memory/';
   });
 
@@ -404,7 +423,10 @@ async function main() {
   let code = invite ? C().normalizeCode(invite) : '';
 
   if (!code) {
-    try { code = sessionStorage.getItem('duel-code') || ''; } catch (_) {}
+    try {
+      code = sessionStorage.getItem('duel-code') || '';
+      if (sessionStorage.getItem('duel-host') === '1') iAmHost = true;
+    } catch (_) {}
   }
 
   if (code && C().validCode(code)) {
