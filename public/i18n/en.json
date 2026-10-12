@@ -1078,6 +1078,11 @@
     "foot_hint": "Same sequence for both players. Sharper memory wins.",
     "start_failed": "Could not start the duel. Please try again.",
     "join_failed": "Could not join that duel. Check the code and try again.",
-    "rate_limited": "Too many requests. Wait a moment and try again."
+    "rate_limited": "Too many requests. Wait a moment and try again.",
+    "num_title": "Number Recall Duel",
+    "num_help": "Memorise the digits, then type them back. Your opponent gets the exact same number — whoever recalls more wins.",
+    "num_ready_hint": "Tap start, watch the digits flash, then type them from memory.",
+    "your_turn_num": "Your turn — type the digits",
+    "foot_hint_num": "Same number for both players. Sharper memory wins."
   }
 }

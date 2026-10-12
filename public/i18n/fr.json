@@ -1078,6 +1078,11 @@
     "foot_hint": "La même séquence pour les deux. La meilleure mémoire gagne.",
     "start_failed": "Impossible de lancer le duel. Réessaie.",
     "join_failed": "Impossible de rejoindre ce duel. Vérifie le code et réessaie.",
-    "rate_limited": "Trop de requêtes. Patiente un instant et réessaie."
+    "rate_limited": "Trop de requêtes. Patiente un instant et réessaie.",
+    "num_title": "Duel de nombres",
+    "num_help": "Mémorise les chiffres, puis ressaisis-les. Ton adversaire voit exactement le même nombre — le meilleur souvenir gagne.",
+    "num_ready_hint": "Appuie sur démarrer, regarde les chiffres défiler, puis ressaisis-les de mémoire.",
+    "your_turn_num": "À toi — saisis les chiffres",
+    "foot_hint_num": "Le même nombre pour les deux. La meilleure mémoire gagne."
   }
 }

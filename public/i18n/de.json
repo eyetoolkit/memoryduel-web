@@ -1078,6 +1078,11 @@
     "foot_hint": "Dieselbe Sequenz für beide. Das bessere Gedächtnis gewinnt.",
     "start_failed": "Duell konnte nicht gestartet werden. Bitte erneut versuchen.",
     "join_failed": "Beitritt zum Duell fehlgeschlagen. Code prüfen und erneut versuchen.",
-    "rate_limited": "Zu viele Anfragen. Warte einen Moment und versuche es erneut."
+    "rate_limited": "Zu viele Anfragen. Warte einen Moment und versuche es erneut.",
+    "num_title": "Zahlen-Duell",
+    "num_help": "Merke dir die Ziffern und tippe sie ein. Dein Gegner sieht genau dieselbe Zahl — wer mehr behält, gewinnt.",
+    "num_ready_hint": "Tippe auf Start, sieh dir die Ziffern an und tippe sie aus dem Gedächtnis ein.",
+    "your_turn_num": "Du bist dran — Ziffern eingeben",
+    "foot_hint_num": "Dieselbe Zahl für beide. Das bessere Gedächtnis gewinnt."
   }
 }

@@ -1078,6 +1078,11 @@
     "foot_hint": "La misma secuencia para ambos. Gana quien mejor recuerde.",
     "start_failed": "No se pudo iniciar el duelo. Inténtalo de nuevo.",
     "join_failed": "No se pudo unir al duelo. Revisa el código e inténtalo de nuevo.",
-    "rate_limited": "Demasiadas solicitudes. Espera un momento e inténtalo de nuevo."
+    "rate_limited": "Demasiadas solicitudes. Espera un momento e inténtalo de nuevo.",
+    "num_title": "Duelo de números",
+    "num_help": "Memoriza los dígitos y escríbelos. Tu rival ve exactamente el mismo número — gana quien más recuerde.",
+    "num_ready_hint": "Pulsa empezar, mira los dígitos y escríbelos de memoria.",
+    "your_turn_num": "Tu turno — escribe los dígitos",
+    "foot_hint_num": "El mismo número para ambos. Gana quien mejor recuerde."
   }
 }
