@@ -153,7 +153,7 @@
     qn[LANG] = apiQ.q;
     op[LANG] = apiQ.options.slice();
     ex[LANG] = apiQ.explain || '';
-    return {
+    var w = {
       cn: catId,
       diff: ({ easy: 1, medium: 2, hard: 3 })[apiQ.difficulty] || 2,
       qn: qn,
@@ -167,11 +167,13 @@
       _qid: apiQ.qid,
       _rawLang: LANG,
     };
+    return w;
   }
 
   function fetchBundle(catId, retries) {
     retries = retries || 2;
     var url = (API || '') + '/api/md/quiz/bundle?category=' + encodeURIComponent(catId) + '&lang=' + LANG + '&count=100';
+    console.log('[MD fetchBundle] cat=', catId, 'LANG=', LANG, 'url=', url);
 
     function attempt(n) {
       return fetch(url, { cache: 'no-store' })
