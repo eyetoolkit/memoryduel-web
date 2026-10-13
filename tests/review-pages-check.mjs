@@ -120,18 +120,18 @@ const SNAP_LOBBY = `
   };
 `;
 
-// 每日挑战入局判据：出现游戏主体。
-// 🔴 三关的 DOM 形态不同，必须分别认：
-//    number-recall   → #ans（数字输入框）
-//    sequence-memory → #grid（格子）
-//    color-recall    → #wheel / #h / #s / #b（色轮 + 三个滑块）
-//    只认 #stage/#ans/#grid 会把 color 关误判为「没渲染」。
+// 每日挑战入局判据。
+// 🔴 三关的**准备态** DOM 形态不同（游戏主体要等玩家点「我准备好了」后才渲染）：
+//    number-recall   → #ans（数字输入框，准备态就在）
+//    sequence-memory → #grid（格子，准备态就在）
+//    color-recall    → #row（预览色块容器）+ #go（色轮 #wheel 要到还原阶段才出现）
+//    统一再认一个 #go：「我准备好了」按钮存在 = 关卡已就绪、深链解析成功。
 const SNAP_DC = `
   const has = (s) => !!document.querySelector(s);
   return {
     path: location.pathname,
     search: location.search,
-    stage: has('#stage'), ans: has('#ans'), grid: has('#grid'),
+    ans: has('#ans'), grid: has('#grid'), row: has('#row'), go: has('#go'),
     wheel: has('#wheel'), sliders: has('#h') && has('#s') && has('#b'),
     steps: document.querySelectorAll('.dc-step').length,
     stepText: [...document.querySelectorAll('.dc-step')].map((e) => (e.textContent || '').trim()).join(' / '),
@@ -208,20 +208,22 @@ async function checkLobbyClicks(page) {
   }
 }
 
-async function checkDeepLink(page, mode, expectGame) {
+async function checkDeepLink(page, mode) {
   console.log(`\n══─ C. 深链入局 ?mode=${mode} ───`);
   page.clearEvents();
   const url = `${ORIGIN}/games/daily-challenge/?mode=${mode}`;
   await page.send('Page.navigate', { url });
-  await sleep(3000); // 给 fetchToday + 首关渲染留时间
+  await sleep(3500); // 给 fetchToday + 首关准备态渲染留时间
 
   const s = await page.eval(SNAP_DC);
   ok(s.search.includes(`mode=${mode}`) && !s.path.endsWith('/lobby/'),
     `?mode=${mode} 未被弹回大厅（URL=${s.path}${s.search}）`);
-  // 按关卡形态分别认游戏主体，任一存在即算入局
-  const body = s.ans || s.grid || s.wheel || s.sliders;
-  ok(!!body, `?mode=${mode} 渲染出游戏主体（ans=${s.ans} grid=${s.grid} wheel=${s.wheel} sliders=${s.sliders}）`);
-  ok(s.bodyLen > 80, `?mode=${mode} 页面有实质内容（${s.bodyLen} 字符）`);
+  // 按关卡准备态形态分别认（#go = 「我准备好了」按钮，三关都有）
+  const body = s.ans || s.grid || s.row || s.go;
+  ok(!!body, `?mode=${mode} 渲染出关卡准备态（ans=${s.ans} grid=${s.grid} row=${s.row} go=${s.go}）`);
+  ok(s.go, `?mode=${mode} 出现「我准备好了」按钮（深链解析成功的铁证）`);
+  // 准备态正文很短（header + 标题 + 一句帮助 + 按钮），阈值按 60 计
+  ok(s.bodyLen > 60, `?mode=${mode} 页面有实质内容（${s.bodyLen} 字符）`);
   // 🔴 进度条必须与本局关卡数一致：单关模式只能有 1 个 step，
   //    画成三关会让玩家以为还要再玩两关（2026-10-13 实测修过的 bug）
   const wantSteps = mode === 'daily' ? 3 : 1;
@@ -253,7 +255,7 @@ async function checkBadMode(page) {
   await sleep(2500);
   const s2 = await page.eval(SNAP_DC);
   ok(!s2.path.endsWith('/lobby/'), `无 mode 参数时按每日三关入局（实际 ${s2.path}${s2.search}）`);
-  ok(s2.stage || s2.ans || s2.grid, `无 mode 时渲染出游戏主体`);
+  ok(s2.ans || s2.grid || s2.row || s2.go, `无 mode 时渲染出关卡准备态`);
   ok(s2.steps === 3, `无 mode 时进度条为三关（实测 ${s2.steps}）`);
 
   // D3 邀请码优先：?c= 应被带到大厅（优先于 mode）
@@ -282,7 +284,51 @@ async function checkDuelPage(page, slug, label) {
   ok(probs.length === 0, `${label} 零 console 错误${probs.length ? ' → ' + probs.slice(0, 2).join(' | ') : ''}`);
 }
 
-async function checkLangConsistency(page, slug, label) {
+async function checkGoButton(page) {
+  console.log(`\n═══ G. 点击「我准备好了」→ 进入预览（三关逐一实测）═══`);
+  // 🔴 2026-10-13 实测：playColor 漏了 go.disabled / go.style.display='none'
+  //    （另两关都有），导致 4.2s 预览期间按钮仍可点却不再响应。
+  //    这里逐关点一次，用「预览元素出现 + 按钮已隐藏」两个外部事实锁定。
+  const cases = [
+    { mode: 'color', previewSel: '#row > *', previewCount: 5, label: '颜色还原' },
+    { mode: 'sequence', previewSel: '#grid', previewCount: 0, label: '序列记忆' },
+    { mode: 'number', previewSel: '#stage', previewCount: 0, label: '数字广度' },
+  ];
+  for (const cse of cases) {
+    page.clearEvents();
+    await page.send('Page.navigate', { url: `${ORIGIN}/games/daily-challenge/?mode=${cse.mode}` });
+    const appeared = await page.waitFor(
+      () => page.eval('return !!document.querySelector("#go");'), 20000,
+    );
+    if (!appeared) { ok(false, `${cse.label} 准备态按钮未出现`); continue; }
+    await sleep(600);
+    const before = await page.eval(`
+      const go = document.querySelector('#go');
+      return { rowKids: document.querySelectorAll('#row > *').length,
+               goShown: go ? getComputedStyle(go).display !== 'none' : false };
+    `);
+    // 真实 DOM 点击（与线上用户点击同一路径）
+    await page.eval(`document.querySelector('#go').click();`);
+    await sleep(900);
+    const after = await page.eval(`
+      const go = document.querySelector('#go');
+      return { rowKids: document.querySelectorAll('#row > *').length,
+               goHidden: go ? (go.disabled && getComputedStyle(go).display === 'none') : true,
+               wheel: !!document.querySelector('#wheel') };
+    `);
+    if (cse.mode === 'color') {
+      // color 点击后先展示 5 个目标色（4.2s），此时色轮还没出现
+      ok(after.rowKids === cse.previewCount,
+        `${cse.label} 点击后展示 ${cse.previewCount} 个目标色（实测 ${after.rowKids}）`);
+    }
+    ok(after.goHidden,
+      `${cse.label} 点击后「我准备好了」被停用并隐藏（goHidden=${after.goHidden}）`);
+    const probs = page.problems();
+    ok(probs.length === 0, `${cse.label} 点击后零 console 错误${probs.length ? ' → ' + probs[0] : ''}`);
+  }
+}
+
+
   console.log(`\n═══ F. i18n 一致性 ${label} ═══`);
   for (const lang of ['zh', 'en']) {
     page.clearEvents();
@@ -324,6 +370,7 @@ async function main() {
     await checkDeepLink(page, 'sequence', 'sequence-memory');
     await checkDeepLink(page, 'color', 'color-recall');
     await checkBadMode(page);
+    await checkGoButton(page);
 
     await checkDuelPage(page, '/games/sequence-memory/', '序列对战');
     await checkDuelPage(page, '/games/number-recall/', '数字对战');

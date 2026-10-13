@@ -265,6 +265,12 @@ async function playColor(puzzle: any): Promise<{ answer: Array<{ h: number; s: n
     go.addEventListener('click', () => resolve(), { once: true });
   });
 
+  // 🔴 与 playNumber / playSequence 保持一致：点击后立即停用并隐藏按钮。
+  //    漏掉这两行时，4.2s 预览期间「我准备好了」仍可点却不再响应
+  //    （监听是 { once: true }），玩家会以为页面卡住。
+  go.disabled = true;
+  go.style.display = 'none';
+
   row.innerHTML = colors
     .map((c) => `<div class="dc-color-swatch" style="background:${hsbToCss(c.h, c.s, c.b)}"></div>`)
     .join('');
