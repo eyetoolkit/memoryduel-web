@@ -1097,7 +1097,8 @@
     "col_help": "Mémorisez les couleurs puis reproduisez-les sur la roue. Votre adversaire voit exactement les mêmes couleurs : le plus proche gagne.",
     "col_ready_hint": "Lancez la manche, observez les couleurs, puis reproduisez chacune au plus près.",
     "col_pick": "Couleur {n} sur {total} — approchez-la au plus près.",
-    "col_foot_hint": "Les deux joueurs voient les mêmes couleurs. Le plus proche gagne."
+    "col_foot_hint": "Les deux joueurs voient les mêmes couleurs. Le plus proche gagne.",
+    "room_not_found": "Ce code de duel nexiste pas. Vérifiez le code ou créez un nouveau duel."
   },
   "colduel": {
     "title": "Duel des couleurs · MemoryDuel",

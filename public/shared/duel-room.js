@@ -24,6 +24,28 @@
   const SESSION_KEY = 'md_session';
   const API = '/api/md';
 
+  /* ─── 带超时的 fetch ───
+     🔴 2026-10-13 加固：原先裸调 fetch 无任何超时。实测把 /api/ 挂起时，
+     对战页会**永久停在等待态**—— 房主看不到"对手还没来"的正常等待与
+     "网络卡死了"之间的区别，客人则一直转圈。
+     超时抛错后走既有catch，渲染成可读错误 + 重试入口。 */
+  const FETCH_TIMEOUT_MS = 15000;
+
+  async function fetchTimeout(url, opts) {
+    const ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const timer = ctl ? setTimeout(function () { ctl.abort(); }, FETCH_TIMEOUT_MS) : null;
+    try {
+      return await fetch(url, ctl ? Object.assign({}, opts || {}, { signal: ctl.signal }) : opts);
+    } catch (e) {
+      if (e && e.name === 'AbortError') {
+        throw new Error('请求超时（' + Math.round(FETCH_TIMEOUT_MS / 1000) + 's），请检查网络后重试');
+      }
+      throw e;
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  }
+
   /* ─── 会话（复用全站 md_session）───────────────────────────── */
   function loadCred() {
     try {
@@ -40,7 +62,7 @@
     sessionPromise = (async () => {
       let r;
       try {
-        r = await fetch(`${API}/session`, {
+        r = await fetchTimeout(`${API}/session`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: '{}',
@@ -77,7 +99,7 @@
 
     let r;
     try {
-      r = await fetch(API + path, opt);
+      r = await fetchTimeout(API + path, opt);
     } catch (e) {
       throw new Error(`[duel-room] ${path} 网络失败：${e && e.message}`);
     }

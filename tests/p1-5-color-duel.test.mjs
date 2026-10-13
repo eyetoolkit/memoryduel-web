@@ -300,3 +300,49 @@ test('配色图标三款各不相同', () => {
   const uniq = new Set([m[1], m[2], m[3]]);
   assert.equal(uniq.size, 3, '三款图标必须互不相同（否则比分页分不清谁是谁）');
 });
+/* ═══════════════════════════════════════════════════════════════
+   7. 异常路径回归（2026-10-13 全面复查第四批新增）
+   ═══════════════════════════════════════════════════════════════ */
+test('所有 API fetch 必须带超时（挂起时不得永久转圈）', () => {
+  // 🔴 2026-10-13 实测：daily-client.js 与 duel-room.js 原先全部裸调 fetch。
+  //    把 /api/ 挂起后页面永久停在「正在加载今日题目…」，用户既看不到原因
+  //    也无法重试，刷新又会再次挂起 —— 弱网/地铁/DNS 卡住时的真实故障。
+  for (const rel of ['public/shared/daily-client.js', 'public/shared/duel-room.js']) {
+    const js = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+    assert.ok(js.includes('function fetchTimeout'), `${rel} 应定义 fetchTimeout`);
+    assert.ok(/FETCH_TIMEOUT_MS\s*=\s*\d+/.test(js), `${rel} 应设超时时长`);
+    assert.ok(js.includes('AbortError'), `${rel} 应区分 AbortError 并给出可读提示`);
+
+    // 逐个 fetch 调用点核对：不得再有裸调 fetch(
+    // 排除 fetchTimeout 自身的实现体（它必须裸调一次 fetch 才能加上 signal），
+    // 否则这条断言会永远红，且红得毫无意义。
+    const body = js.slice(js.indexOf('async function fetchTimeout'));
+    const bodyEnd = body.indexOf('\n  }');
+    const impl = body.slice(0, bodyEnd > 0 ? bodyEnd : body.length);
+    const rest = js.replace(impl, '');
+    const bare = [...rest.matchAll(/(?<![\w.])await fetch\(/g)];
+    assert.equal(bare.length, 0,
+      `${rel} 仍有 ${bare.length} 处裸调 fetch（挂起时会永久转圈），应改用 fetchTimeout`);
+  }
+});
+
+test('房码不存在时给出明确提示而不是弹回入口页', () => {
+  // 🔴 后端 room.js:110 抛 {code:'ROOM_NOT_FOUND'}，而前端原分支只认
+  //    ROOM_FULL / UNAUTHORIZED，于是「房码不存在」落进兜底 renderEntry() ——
+  //    用户看到完整入口页，不知道自己的房码已失效，URL 还挂着 ?c=ZZZZZZZZ。
+  assert.ok(src.includes('ROOM_NOT_FOUND'), '应显式判别 ROOM_NOT_FOUND');
+  assert.ok(src.includes('duel.room_not_found'), '应有 room_not_found 文案键');
+  // 兜底不能再是静默 renderEntry()：至少要给可读提示
+  const joinSeg = src.slice(src.indexOf('if (code && C().validCode(code))'));
+  const afterNotFound = joinSeg.slice(joinSeg.indexOf('ROOM_NOT_FOUND'));
+  assert.ok(!/ROOM_NOT_FOUND[\s\S]{0,400}?\n\s*renderEntry\(\)/.test(afterNotFound),
+    'ROOM_NOT_FOUND 分支之后不应直接 renderEntry()（会把用户静默弹回入口）');
+
+  // 六语都要有这个键，少一个页面上就会直接显示 key 原文
+  const LANGS = ['en', 'zh', 'ja', 'es', 'fr', 'de'];
+  for (const lg of LANGS) {
+    const d = JSON.parse(fs.readFileSync(path.join(ROOT, 'public/i18n', lg + '.json'), 'utf8'));
+    assert.ok(d.duel && typeof d.duel.room_not_found === 'string' && d.duel.room_not_found.trim(),
+      `${lg} 缺 duel.room_not_found`);
+  }
+});

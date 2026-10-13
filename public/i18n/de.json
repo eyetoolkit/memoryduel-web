@@ -1097,7 +1097,8 @@
     "col_help": "Merke dir die Farben und stelle sie am Farbkreis nach. Dein Gegner sieht genau dieselben Farben — wer näher dran ist, gewinnt.",
     "col_ready_hint": "Starte die Runde, sieh dir die Farben an und stelle jede so genau wie möglich nach.",
     "col_pick": "Farbe {n} von {total} — so nah wie möglich annähern.",
-    "col_foot_hint": "Beide sehen dieselben Farben. Wer näher dran ist, gewinnt."
+    "col_foot_hint": "Beide sehen dieselben Farben. Wer näher dran ist, gewinnt.",
+    "room_not_found": "Dieser Duell-Code existiert nicht. Prüfe den Code oder starte ein neues Duell."
   },
   "colduel": {
     "title": "Farb-Duell · MemoryDuel",

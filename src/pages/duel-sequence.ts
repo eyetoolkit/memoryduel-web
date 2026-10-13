@@ -673,8 +673,24 @@ async function main() {
         renderError(err.message, () => { location.href = GAME_HOME; });
         return;
       }
-      // 房码不存在 → 回到入口，别把用户卡在死路
-      renderEntry();
+      /* 🔴 房码不存在必须**明确告知**，不能兜进 renderEntry()。
+         2026-10-13 实测：后端 room.js:110 抛 {code:'ROOM_NOT_FOUND'}，
+         而这里的分支只认 ROOM_FULL / UNAUTHORIZED，于是「房码不存在」
+         落进最后的 renderEntry() —— 用户看到的是**完整入口页**，
+         既不知道自己的房码已失效，URL 上还挂着 ?c=ZZZZZZZZ，
+         看起来像页面坏了。表现与「点了没反应」几乎无法区分。
+         注意：此时 URL 仍带失效房码，必须先清掉再跳，否则刷新会再次失败。 */
+      if (err.code === 'ROOM_NOT_FOUND' || err.status === 404) {
+        renderError(t('duel.room_not_found', 'That duel code does not exist. Check the code, or start a new duel.'),
+          () => {
+            try { history.replaceState(null, '', GAME_HOME); } catch (_) {}
+            location.href = GAME_HOME;
+          });
+        return;
+      }
+      // 其余未知错误：也给出可读提示，不要无声吞掉
+      renderError(t('duel.join_failed', 'Could not join that duel. Check the code and try again.'),
+        () => { location.href = GAME_HOME; });
       return;
     }
   }

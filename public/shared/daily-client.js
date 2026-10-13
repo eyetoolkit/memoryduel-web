@@ -85,6 +85,31 @@ async function safeJson(r) {
   try { return await r.json(); } catch (_) { return null; }
 }
 
+/* ─── 带超时的 fetch ───
+   🔴 2026-10-13 加固：原先 7 个 fetch 全部裸调，**没有任何超时**。
+   实测把 /api/ 全部挂起（弱网 / 地铁 / DNS 卡住）时，页面会永久停在
+   「正在加载今日题目…」—— 用户既看不到原因，也没有任何办法重试，
+   只能刷新，而刷新又会再次挂起。
+   超时后抛出的错误走的是既有的 catch 路径，最终会渲染成
+   「加载失败」+ 重试入口，与网络直接 reject 的表现一致。
+   15 秒：CDN 边缘正常响应 <1s，15s 足够覆盖绝大多数弱网抖动。 */
+const FETCH_TIMEOUT_MS = 15000;
+
+async function fetchTimeout(url, opts) {
+  const ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const timer = ctl ? setTimeout(function () { ctl.abort(); }, FETCH_TIMEOUT_MS) : null;
+  try {
+    return await fetch(url, ctl ? Object.assign({}, opts || {}, { signal: ctl.signal }) : opts);
+  } catch (e) {
+    if (e && e.name === 'AbortError') {
+      throw new Error('请求超时（' + Math.round(FETCH_TIMEOUT_MS / 1000) + 's），请检查网络后重试');
+    }
+    throw e;
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
 async function parseFail(r, body) {
   const e = (body && body.error) || {};
   const err = new Error(
@@ -106,7 +131,7 @@ async function ensureSession() {
   sessionPromise = (async () => {
     let r;
     try {
-      r = await fetch('/api/md/session', {
+      r = await fetchTimeout('/api/md/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: '{}',
@@ -134,7 +159,7 @@ async function ensureSession() {
 async function fetchToday() {
   let r;
   try {
-    r = await fetch(`${API}/today`, { headers: authHeaders(loadCred()), cache: 'no-store' });
+    r = await fetchTimeout(`${API}/today`, { headers: authHeaders(loadCred()), cache: 'no-store' });
   } catch (e) {
     throw new Error(`[daily-client] ${API}/today 网络失败：${e && e.message}`);
   }
@@ -151,7 +176,7 @@ async function fetchPuzzle(game, round) {
   const qs = new URLSearchParams({ game: String(game), round: String(round) });
   let r;
   try {
-    r = await fetch(`${API}/puzzle?${qs}`, {
+    r = await fetchTimeout(`${API}/puzzle?${qs}`, {
       headers: authHeaders(loadCred()),
       cache: 'no-store',
     });
@@ -172,7 +197,7 @@ async function submitAnswer(game, round, answer) {
   await ensureSession();
   let r;
   try {
-    r = await fetch(`${API}/submit`, {
+    r = await fetchTimeout(`${API}/submit`, {
       method: 'POST',
       headers: authHeaders(loadCred()),
       body: JSON.stringify({ game, round, answer }),
@@ -194,7 +219,7 @@ async function fetchStreak() {
   await ensureSession();
   let r;
   try {
-    r = await fetch(`${API}/streak`, { headers: authHeaders(loadCred()), cache: 'no-store' });
+    r = await fetchTimeout(`${API}/streak`, { headers: authHeaders(loadCred()), cache: 'no-store' });
   } catch (e) {
     throw new Error(`[daily-client] ${API}/streak 网络失败：${e && e.message}`);
   }
@@ -207,7 +232,7 @@ async function fetchStreak() {
 async function fetchRank() {
   let r;
   try {
-    r = await fetch(`${API}/rank`, { headers: authHeaders(loadCred()), cache: 'no-store' });
+    r = await fetchTimeout(`${API}/rank`, { headers: authHeaders(loadCred()), cache: 'no-store' });
   } catch (e) {
     throw new Error(`[daily-client] ${API}/rank 网络失败：${e && e.message}`);
   }

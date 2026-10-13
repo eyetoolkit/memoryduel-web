@@ -1097,7 +1097,8 @@
     "col_help": "Memoriza los colores y rehácelos en la rueda. Tu rival recibe exactamente los mismos colores: quien se acerque más gana.",
     "col_ready_hint": "Toca iniciar, observa los colores y rehaz cada uno lo más cerca posible.",
     "col_pick": "Color {n} de {total}: acércate lo máximo posible.",
-    "col_foot_hint": "Ambos ven los mismos colores. Gana quien se acerque más."
+    "col_foot_hint": "Ambos ven los mismos colores. Gana quien se acerque más.",
+    "room_not_found": "Ese código de duelo no existe. Verifica el código o crea un duelo nuevo."
   },
   "colduel": {
     "title": "Duelo de colores · MemoryDuel",

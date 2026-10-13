@@ -1097,7 +1097,8 @@
     "col_help": "Memorise the colours, then rebuild them on the wheel. Your opponent gets the exact same colours — whoever is closer wins.",
     "col_ready_hint": "Tap start, watch the colours appear, then rebuild each one as closely as you can.",
     "col_pick": "Colour {n} of {total} — match it as closely as you can.",
-    "col_foot_hint": "Same colours for both players. Closest match wins."
+    "col_foot_hint": "Same colours for both players. Closest match wins.",
+    "room_not_found": "That duel code does not exist. Check the code, or start a new duel."
   },
   "colduel": {
     "title": "Colour Recall Duel · MemoryDuel",
