@@ -1043,7 +1043,9 @@
     "share_native": "Share…",
     "share_alt": "Score card preview",
     "share_cta": "Same puzzles for everyone — can you beat it?",
-    "share_failed": "Could not create the image. Try copying the text instead."
+    "share_failed": "Could not create the image. Try copying the text instead.",
+    "title": "Daily Memory Challenge · MemoryDuel",
+    "meta_desc": "Play today's memory challenge: digit span, sequence recall and colour recall. Same puzzles for every player, scored on the server."
   },
   "duel": {
     "seq_title": "Sequence Memory Duel",
@@ -1096,5 +1098,17 @@
     "col_ready_hint": "Tap start, watch the colours appear, then rebuild each one as closely as you can.",
     "col_pick": "Colour {n} of {total} — match it as closely as you can.",
     "col_foot_hint": "Same colours for both players. Closest match wins."
+  },
+  "colduel": {
+    "title": "Colour Recall Duel · MemoryDuel",
+    "meta_desc": "Memorise a set of colours and rebuild them on the colour wheel. 1v1 colour-memory duel, server-scored, no login required."
+  },
+  "seqduel": {
+    "title": "Sequence Memory Duel · MemoryDuel",
+    "meta_desc": "Memorise the same tile sequence as your opponent and tap it back. 1v1 memory duel, scored on the server, no login required."
+  },
+  "numduel": {
+    "title": "Number Recall Duel · MemoryDuel",
+    "meta_desc": "Memorise a string of digits and type it back before your opponent does. 1v1 number-memory duel, server-scored, no login required."
   }
 }

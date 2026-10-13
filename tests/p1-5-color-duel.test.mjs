@@ -212,13 +212,70 @@ test('sitemap 含 color-recall 落地页', () => {
 test('color 页面 SEO 头与另两款对齐（title/canonical/OG/hreflang）', () => {
   const html = fs.readFileSync(COLOR_HTML, 'utf8');
   for (const needle of [
-    '<title>Colour Recall Duel · MemoryDuel</title>',
+    // 2026-10-13：title/meta_desc 已接入 i18n 范式（data-i18n-title + data-i18n），
+    // 裸标签断言会随范式升级而误报，故改为断言「属性齐全 + 键名正确 + 英文兜底文案不变」。
+    '<title data-i18n-title="colduel.title">Colour Recall Duel · MemoryDuel</title>',
+    '<meta name="description" data-i18n="colduel.meta_desc"',
     '<link rel="canonical" href="https://memoryduel.com/games/color-recall/" />',
     'property="og:url" content="https://memoryduel.com/games/color-recall/"',
     'name="twitter:card" content="summary_large_image"',
     'hreflang="x-default"',
   ]) {
     assert.ok(html.includes(needle), `color 页缺 ${needle}`);
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   5b. SEO i18n 完整性（2026-10-13 全面复查新增）
+   原来四页的 title/description 全是硬编码英文，切到中/日/西/法/德时
+   浏览器标签页与搜索结果标题仍是英文。已按站点既有范式接入 data-i18n-title。
+   ═══════════════════════════════════════════════════════════════ */
+test('三款对战页 + 每日挑战的 title/description 均接入六语 i18n', () => {
+  const NS = {
+    'games/color-recall/index.html': 'colduel',
+    'games/sequence-memory/index.html': 'seqduel',
+    'games/number-recall/index.html': 'numduel',
+    'games/daily-challenge/index.html': 'dc',
+  };
+  const LANGS = ['en', 'zh', 'ja', 'es', 'fr', 'de'];
+  const dicts = {};
+  for (const l of LANGS) {
+    dicts[l] = JSON.parse(fs.readFileSync(path.join(ROOT, 'public/i18n', l + '.json'), 'utf8'));
+  }
+
+  for (const [rel, ns] of Object.entries(NS)) {
+    const html = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+    assert.ok(html.includes(`data-i18n-title="${ns}.title"`), `${rel} 未接 data-i18n-title`);
+    assert.ok(html.includes(`data-i18n="${ns}.meta_desc"`), `${rel} 未接 data-i18n meta_desc`);
+
+    // 六语都必须在，且**互不相同**（防「复制英文到六语」这种假翻译）
+    const titles = LANGS.map((l) => dicts[l][ns] && dicts[l][ns].title);
+    const descs = LANGS.map((l) => dicts[l][ns] && dicts[l][ns].meta_desc);
+    for (const [i, l] of LANGS.entries()) {
+      assert.ok(titles[i] && titles[i].trim(), `${rel} ${l} 缺 ${ns}.title`);
+      assert.ok(descs[i] && descs[i].trim(), `${rel} ${l} 缺 ${ns}.meta_desc`);
+    }
+    // 允许 en 之外的偶然相同（如产品名 MemoryDuel），但不能六语完全一致
+    assert.ok(new Set(titles).size >= 3, `${rel} 六语 title 几乎相同，疑似未翻译：${JSON.stringify(titles)}`);
+    assert.ok(new Set(descs).size >= 3, `${rel} 六语 meta_desc 几乎相同，疑似未翻译`);
+  }
+});
+
+test('四页 hreflang 覆盖六语 + x-default（此前只有 en + x-default）', () => {
+  for (const rel of [
+    'games/color-recall/index.html',
+    'games/sequence-memory/index.html',
+    'games/number-recall/index.html',
+    'games/daily-challenge/index.html',
+  ]) {
+    const html = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+    for (const c of ['zh-CN', 'en', 'ja', 'es', 'fr', 'de']) {
+      assert.ok(
+        html.includes(`hreflang="${c}"`),
+        `${rel} 缺 hreflang="${c}"`,
+      );
+    }
+    assert.ok(html.includes('hreflang="x-default"'), `${rel} 缺 x-default`);
   }
 });
 

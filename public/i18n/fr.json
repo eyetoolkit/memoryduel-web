@@ -440,7 +440,7 @@
     "login_prompt_desc": "Inscrivez-vous et obtenez 100 pièces. Gagnez des pièces en jouant pour l'accès sans pub.",
     "login_prompt_btn": "S'inscrire / Se Connecter",
     "coins_title": "Solde de Pièces",
-    "coins_total": "Total gagné {n} pièces",
+    "coins_total": "Total gagné <span id=\"m-coins-total\">--</span> pièces",
     "adfree_title": "État Sans Pub",
     "adfree_days": "{n} jours",
     "adfree_expires": "Expire : {date}",
@@ -1043,7 +1043,9 @@
     "share_native": "Partager…",
     "share_alt": "Aperçu de la carte de score",
     "share_cta": "Les mêmes énigmes pour tout le monde — pouvez-vous faire mieux ?",
-    "share_failed": "Impossible de créer l'image. Essayez de copier le texte."
+    "share_failed": "Impossible de créer l'image. Essayez de copier le texte.",
+    "title": "Défi mémoire quotidien · MemoryDuel",
+    "meta_desc": "Relevez le défi mémoire du jour : ampleur de chiffres, séquence et couleurs. Les mêmes énigmes pour tous, noté par le serveur."
   },
   "duel": {
     "seq_title": "Duel de séquences",
@@ -1096,5 +1098,17 @@
     "col_ready_hint": "Lancez la manche, observez les couleurs, puis reproduisez chacune au plus près.",
     "col_pick": "Couleur {n} sur {total} — approchez-la au plus près.",
     "col_foot_hint": "Les deux joueurs voient les mêmes couleurs. Le plus proche gagne."
+  },
+  "colduel": {
+    "title": "Duel des couleurs · MemoryDuel",
+    "meta_desc": "Mémorisez une série de couleurs et reconstruisez-les sur la roue chromatique. Duel de mémoire chromatique 1v1, noté par le serveur, sans inscription."
+  },
+  "seqduel": {
+    "title": "Duel de séquence · MemoryDuel",
+    "meta_desc": "Mémorisez la même suite de cases que votre adversaire et reproduisez-la. Duel de mémoire 1v1, noté par le serveur, sans inscription."
+  },
+  "numduel": {
+    "title": "Duel de chiffres · MemoryDuel",
+    "meta_desc": "Mémorisez une suite de chiffres et retappez-la avant votre adversaire. Duel de mémoire numérique 1v1, noté par le serveur, sans inscription."
   }
 }

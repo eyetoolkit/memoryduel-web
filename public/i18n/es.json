@@ -440,7 +440,7 @@
     "login_prompt_desc": "Regístrate y obtén 100 monedas. Gana monedas jugando para acceso sin anuncios.",
     "login_prompt_btn": "Registrarse / Iniciar Sesión",
     "coins_title": "Saldo de Monedas",
-    "coins_total": "Total ganadas {n} monedas",
+    "coins_total": "Total ganadas <span id=\"m-coins-total\">--</span> monedas",
     "adfree_title": "Estado sin Anuncios",
     "adfree_days": "{n} días",
     "adfree_expires": "Expira: {date}",
@@ -1043,7 +1043,9 @@
     "share_native": "Compartir…",
     "share_alt": "Vista previa de la tarjeta",
     "share_cta": "Los mismos puzzles para todos: ¿puedes superarlo?",
-    "share_failed": "No se pudo crear la imagen. Prueba a copiar el texto."
+    "share_failed": "No se pudo crear la imagen. Prueba a copiar el texto.",
+    "title": "Desafío diario de memoria · MemoryDuel",
+    "meta_desc": "Juega el reto de memoria de hoy: amplitud de dígitos, secuencia y colores. Los mismos puzzles para todos, puntuación en el servidor."
   },
   "duel": {
     "seq_title": "Duelo de secuencias",
@@ -1096,5 +1098,17 @@
     "col_ready_hint": "Toca iniciar, observa los colores y rehaz cada uno lo más cerca posible.",
     "col_pick": "Color {n} de {total}: acércate lo máximo posible.",
     "col_foot_hint": "Ambos ven los mismos colores. Gana quien se acerque más."
+  },
+  "colduel": {
+    "title": "Duelo de colores · MemoryDuel",
+    "meta_desc": "Memoriza una serie de colores y reconstruyelos en la rueda cromática. Duelo de memoria cromática 1v1, puntuación en el servidor, sin registro."
+  },
+  "seqduel": {
+    "title": "Duelo de secuencia · MemoryDuel",
+    "meta_desc": "Memoriza la misma secuencia de casillas que tu rival y repítela. Duelo de memoria 1v1, puntuación en el servidor, sin registro."
+  },
+  "numduel": {
+    "title": "Duelo de números · MemoryDuel",
+    "meta_desc": "Memoriza una cadena de dígitos y escríbela antes que tu rival. Duelo de memoria numérica 1v1, puntuación en el servidor, sin registro."
   }
 }

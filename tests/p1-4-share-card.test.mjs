@@ -338,6 +338,15 @@ test('全站 dictVersion 统一，避免字典缓存碎片', () => {
   const versions = [...seen.keys()];
   assert.equal(versions.length, 1,
     `dictVersion 出现 ${versions.length} 个版本 ${JSON.stringify(Object.fromEntries(seen))}`);
+
+  // 🔴 「全站统一」只保证一致，不保证是最新的 —— 只改 JSON 忘了升版，
+  // 老用户会继续命中旧缓存拿不到新文案，且没有任何测试会红。
+  // 单一真相源改为独立清单文件，改字典时必须同步升它。
+  const MANIFEST = path.join(ROOT, 'public', 'i18n', 'VERSION');
+  assert.ok(fs.existsSync(MANIFEST), '缺少 public/i18n/VERSION（dictVersion 真相源）');
+  const want = fs.readFileSync(MANIFEST, 'utf8').trim();
+  assert.equal(versions[0], want,
+    `dictVersion=${versions[0]} 与 public/i18n/VERSION=${want} 不一致 —— 改了字典必须升版并同步 VERSION`);
 });
 
 test('share-card.d.ts 是类型声明而非运行时模块', () => {

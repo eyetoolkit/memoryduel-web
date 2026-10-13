@@ -440,7 +440,7 @@
     "login_prompt_desc": "Registriere dich und erhalte 100 Münzen. Verdiene Münzen durch Spielen für werbefreien Zugang.",
     "login_prompt_btn": "Registrieren / Anmelden",
     "coins_title": "Münzguthaben",
-    "coins_total": "Insgesamt {n} Münzen verdient",
+    "coins_total": "Insgesamt <span id=\"m-coins-total\">--</span> Münzen verdient",
     "adfree_title": "Werbefreier Status",
     "adfree_days": "{n} Tage",
     "adfree_expires": "Läuft ab: {date}",
@@ -1043,7 +1043,9 @@
     "share_native": "Teilen…",
     "share_alt": "Vorschau der Ergebnis-Karte",
     "share_cta": "Für alle dieselben Rätsel — schaffst du es besser?",
-    "share_failed": "Bild konnte nicht erstellt werden. Kopiere stattdessen den Text."
+    "share_failed": "Bild konnte nicht erstellt werden. Kopiere stattdessen den Text.",
+    "title": "Tägliche Gedächtnis-Challenge · MemoryDuel",
+    "meta_desc": "Spiele die tägliche Gedächtnis-Challenge: Ziffernspanne, Folge und Farben. Für alle dieselben Rätsel, serverseitig gewertet."
   },
   "duel": {
     "seq_title": "Sequenz-Duell",
@@ -1096,5 +1098,17 @@
     "col_ready_hint": "Starte die Runde, sieh dir die Farben an und stelle jede so genau wie möglich nach.",
     "col_pick": "Farbe {n} von {total} — so nah wie möglich annähern.",
     "col_foot_hint": "Beide sehen dieselben Farben. Wer näher dran ist, gewinnt."
+  },
+  "colduel": {
+    "title": "Farb-Duell · MemoryDuel",
+    "meta_desc": "Merke dir eine Farbfolge und stelle sie am Farbkreis wieder her. 1v1-Farbgedächtnisduell, serverseitig gewertet, ohne Anmeldung."
+  },
+  "seqduel": {
+    "title": "Folgen-Duell · MemoryDuel",
+    "meta_desc": "Merke dir dieselbe Kachel Folge wie dein Gegner und tippe sie zurück. 1v1-Gedächtnisduell, serverseitig gewertet, ohne Anmeldung."
+  },
+  "numduel": {
+    "title": "Zahlen-Duell · MemoryDuel",
+    "meta_desc": "Merke dir eine Ziffernfolge und tippe sie vor deinem Gegner zurück. 1v1-Zahlengedächtnisduell, serverseitig gewertet, ohne Anmeldung."
   }
 }

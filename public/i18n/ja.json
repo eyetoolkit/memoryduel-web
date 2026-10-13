@@ -440,7 +440,7 @@
     "login_prompt_desc": "登録すると 100 コイン獲得。ゲームでコインを貯めよう。",
     "login_prompt_btn": "登録 / ログイン",
     "coins_title": "コイン残高",
-    "coins_total": "Total earned {n} コイン",
+    "coins_total": "累計獲得 <span id=\"m-coins-total\">--</span> コイン",
     "adfree_title": "広告なしステータス",
     "adfree_days": "{n} days",
     "adfree_expires": "Expires: {date}",
@@ -1043,7 +1043,9 @@
     "share_native": "シェア…",
     "share_alt": "スコアカードのプレビュー",
     "share_cta": "全員同じ問題です —— 君には勝てるかな？",
-    "share_failed": "画像を作成できませんでした。テキストのコピーを試してください。"
+    "share_failed": "画像を作成できませんでした。テキストのコピーを試してください。",
+    "title": "デイリー記憶チャレンジ · MemoryDuel",
+    "meta_desc": "今日の記憶チャレンジに挑戦：数字スパン、数列再現、色彩再現。全員同じ問題で、サーバー側で採点。"
   },
   "duel": {
     "seq_title": "シーケンス記憶デュエル",
@@ -1096,5 +1098,17 @@
     "col_ready_hint": "スタートを押して色を確認し、ひとつずつできるだけ再現してください。",
     "col_pick": "色 {n} / {total} —— できるだけ近づけてください。",
     "col_foot_hint": "両者に見える色は同じです。より近い方が勝ちます。"
+  },
+  "colduel": {
+    "title": "色彩記憶対戦 · MemoryDuel",
+    "meta_desc": "一組の色を記憶し、色相環上で再現する。1v1 の色彩記憶対戦、サーバー側で採点、ログイン不要。"
+  },
+  "seqduel": {
+    "title": "数列記憶対戦 · MemoryDuel",
+    "meta_desc": "相手と同じタイル列を記憶して同じ順にタップする。1v1 の記憶対戦、サーバー側で採点、ログイン不要。"
+  },
+  "numduel": {
+    "title": "数字記憶対戦 · MemoryDuel",
+    "meta_desc": "数字列を記憶し、相手より先に打ち戻す。1v1 の数字記憶対戦、サーバー側で採点、ログイン不要。"
   }
 }
