@@ -193,18 +193,60 @@ def main():
         p = os.path.join(I18N, f"{lang}.json")
         with open(p, encoding="utf-8") as f:
             d = json.load(f)
+
+        # 🔴 2026-10-13 修复「28 个键写到了顶层而不是 dc 命名空间里」：
+        #   运行时 i18n.js 的 get() 按 '.' 分层取值（`dc.emoji_h2` → d.dc.emoji_h2），
+        #   而本脚本原先执行 `d["dc.emoji_h2"] = v` —— 那是**顶层扁平键**，
+        #   解析成 JSON 就是一行 `"dc.emoji_h2": "…"` 挂在最外层，运行时永远取不到。
+        #   现象：t() 缺键 → 返回 key 本身 → 页面上直接出现
+        #   「Emoji Ghost」「👻 emoji-ghost 30」，且**零报错**。
+        #   为什么只有新三关露馅：老三关的 dc.number-recall 等 3 个连字符键
+        #   恰好同时存在于 dc 对象内（早期手工加过），所以它们能取到值；
+        #   新三关只有扁平副本，取不到 → 泄露原始 id。
+        #
+        # 正确写法：拆成命名空间 + 键名，写进嵌套对象。
+        ns = d.setdefault("dc", {})
         for k, v in NAMES[lang].items():
-            d[f"dc.{k}"] = v
+            ns[k] = v
         for k, v in T[lang].items():
-            d[k] = v
+            # T 的键形如 "dc.emoji_h2" / "dc.lobby_mt_emoji"，剥掉 "dc." 前缀
+            assert k.startswith("dc."), f"命名空间异常：{k}"
+            ns[k[3:]] = v
+
+        # 清理上一版遗留的顶层扁平键（只删 dc.* 前缀的，不碰其他顶层键）
+        stale = [k for k in d if k.startswith("dc.")]
+        for k in stale:
+            del d[k]
+
         with open(p, "w", encoding="utf-8") as f:
             json.dump(d, f, ensure_ascii=False, indent=2)
             f.write("\n")
-        for k in list(NAMES[lang]) + list(T[lang]):
-            key = f"dc.{k}" if not k.startswith("dc.") else k
-            with open(p, encoding="utf-8") as f:
-                if key not in json.load(f):
-                    missing.append(f"{lang}:{key}")
+
+        # 🔴 校验必须走**运行时同款取值方式**（嵌套），不能只判 key 在不在文件里
+        with open(p, encoding="utf-8") as f:
+            chk = json.load(f)
+
+        def get(o, key):
+            cur = o
+            for part in key.split("."):
+                if not isinstance(cur, dict):
+                    return None
+                cur = cur.get(part)
+            return cur
+
+        for k in list(NAMES[lang]):
+            key = f"dc.{k}"
+            val = get(chk, key)
+            if not val or val == key:
+                missing.append(f"{lang}:{key}(嵌套取值={val!r})")
+        for k in T[lang]:
+            val = get(chk, k)
+            if not val or val == k:
+                missing.append(f"{lang}:{k}(嵌套取值={val!r})")
+        # 顶层不该再有 dc.* 扁平键
+        leftovers = [k for k in chk if k.startswith("dc.")]
+        if leftovers:
+            missing.append(f"{lang}:顶层残留扁平键 {leftovers[:3]}")
 
     # dictVersion 递增（真相源是 public/i18n/VERSION）
     # 🔴 dictVersion 内联在**每一个** HTML 的 window.__I18N_CONFIG__ 里

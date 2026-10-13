@@ -272,6 +272,23 @@ test('大厅三张新卡片都存在且指向正确 mode', () => {
 });
 
 /* ═══════════ 9. 六语文案齐全 ═══════════ */
+
+/* 🔴 2026-10-13 必须用**运行时同款取值方式**。
+   运行时 i18n.js 的 get() 按 '.' 分层走：'dc.emoji-ghost' → d.dc['emoji-ghost']。
+   原断言写的是 d['dc.emoji-ghost'] —— 那是顶层扁平键，
+   于是 add-p2-games-i18n.py 把 28 个键写到顶层时测试照样全绿，
+   而真实页面取不到值、i18n.t() 回退成返回 key 本身，
+   页面上直接显示「👻 emoji-ghost 30」「Emoji Ghost」，且零报错。
+   这是「测试假绿 → 线上暴露」的典型案例：断言方式与被测代码的取值方式不一致。 */
+function i18nGet(dict, key) {
+  let cur = dict;
+  for (const part of String(key).split('.')) {
+    if (!cur || typeof cur !== 'object') return undefined;
+    cur = cur[part];
+  }
+  return cur;
+}
+
 test('六关名在六语下都齐全（进度条不得退回显示游戏 id）', () => {
   /* 🔴 回归防线：老三关的 dc.<game-id> 键曾**一直缺失**（字典里它们叫
      numduel.* / seqduel.* / colduel.*），而 renderSteps 用的正是 dc.${g}，
@@ -281,9 +298,10 @@ test('六关名在六语下都齐全（进度条不得退回显示游戏 id）',
   for (const lang of ['en', 'zh', 'ja', 'es', 'fr', 'de']) {
     const d = JSON.parse(fs.readFileSync(path.join(ROOT, `public/i18n/${lang}.json`), 'utf8'));
     for (const g of games) {
-      const v = d[`dc.${g}`];
-      assert.ok(typeof v === 'string' && v.length > 0, `${lang} 缺 dc.${g}`);
-      assert.notStrictEqual(v, g, `${lang} 的 dc.${g} 不能等于游戏 id（等于没翻译）`);
+      const key = `dc.${g}`;
+      const v = i18nGet(d, key);
+      assert.ok(typeof v === 'string' && v.length > 0, `${lang} 缺 ${key}（嵌套取值）`);
+      assert.notStrictEqual(v, g, `${lang} 的 ${key} 不能等于游戏 id（等于没翻译）`);
     }
   }
 });
@@ -302,8 +320,20 @@ test('六语 25 个新键齐全（缺一语会把 key 本身显示给用户）',
   for (const lang of ['en', 'zh', 'ja', 'es', 'fr', 'de']) {
     const d = JSON.parse(fs.readFileSync(path.join(ROOT, `public/i18n/${lang}.json`), 'utf8'));
     for (const k of keys) {
-      assert.ok(typeof d[k] === 'string' && d[k].length > 0, `${lang} 缺 ${k}`);
+      const v = i18nGet(d, k);
+      assert.ok(typeof v === 'string' && v.length > 0, `${lang} 缺 ${k}（嵌套取值）`);
+      assert.notStrictEqual(v, k, `${lang} 的 ${k} 取值等于 key 本身（等于没翻译）`);
     }
+  }
+});
+
+test('六语字典顶层不得残留 dc.* 扁平键（写错命名空间 = 运行时取不到）', () => {
+  /* 🔴 回归防线：写入脚本若用 d['dc.xxx']=v 会生成顶层扁平键，
+     运行时永远取不到，且因为测试也用扁平取值而长期假绿。 */
+  for (const lang of ['en', 'zh', 'ja', 'es', 'fr', 'de']) {
+    const d = JSON.parse(fs.readFileSync(path.join(ROOT, `public/i18n/${lang}.json`), 'utf8'));
+    const flat = Object.keys(d).filter((k) => k.startsWith('dc.'));
+    assert.strictEqual(flat.length, 0, `${lang} 顶层残留 dc.* 扁平键：${flat.slice(0, 5).join(', ')}`);
   }
 });
 
