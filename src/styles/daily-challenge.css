@@ -280,23 +280,37 @@
   color: var(--dc-muted);
   text-decoration: none;
   font-size: 14px;
+  /* 移动端触摸目标：实测原为 103x22，远低于 44pt 下限 */
+  min-height: 44px;
+  padding: 0 4px;
+  margin: -10px 0;
+  touch-action: manipulation;
 }
 
 .dc-top .back:hover { color: var(--dc-primary); }
 
+/* 标题语义化：2026-10-13 四页原本无任何 h1-h6，VoiceOver/读屏无法播报页面主题。
+   这里从 <span class="title"> 改为 <h1 class="title">，视觉样式由下方规则接管，
+   需显式清掉 h1 默认 margin，否则布局会被浏览器撑开。 */
 .dc-top .title {
   font-family: var(--disp, system-ui, sans-serif);
   font-size: 17px;
   font-weight: 700;
   color: var(--dc-ink);
+  margin: 0;
 }
 
 .dc-top .spacer { flex: 1; }
 
-/* 进度：三关 */
+/* 进度：三关
+   2026-10-13：英文态实测横向溢出（scrollW=484 > clientW=390），溢出元素正是
+   .dc-steps / .dc-step。原因是无换行约束，英文关卡名比中文长一截就撑破视口。
+   修法：允许换行 + 子项不收缩 + 长名允许断行。 */
 .dc-steps {
   display: flex;
   gap: 6px;
+  flex-wrap: wrap;
+  min-width: 0;
 }
 
 .dc-step {
@@ -308,6 +322,8 @@
   background: var(--dc-paper);
   font-size: 12.5px;
   color: var(--dc-muted);
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .dc-step .n {
