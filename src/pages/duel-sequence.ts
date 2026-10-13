@@ -373,6 +373,7 @@ async function playRound(code: string, round: number): Promise<boolean> {
   const isEmoji = GAME === 'emoji-ghost';
   const isChimp = GAME === 'chimp-test';
   const isWord = GAME === 'word-recall';
+  const isSeq = GAME === 'sequence-memory';
 
   /* 🔴 取题：必须点「开始记忆」才请求 /room/round。
      服务端在返回题目时才开始计时（速度加成按各自真实耗时算），
@@ -395,8 +396,16 @@ async function playRound(code: string, round: number): Promise<boolean> {
   }
 
   /* ── 按游戏解析题目（三款游戏唯一的差异点之一）── */
-  const seq: number[] = (data.puzzle && data.puzzle.seq || []).map((n: number) => Number(n));
-  const grid = Number(data.puzzle && data.puzzle.grid) || 3;
+  /* 🔴 `puzzle.grid` 是**按游戏多态**的字段，不是统一的「网格」：
+       sequence-memory / chimp-test → 数字边长（3 / 5）
+       emoji-ghost                 → 字符串数组（闪现集合）
+     所以绝对不能无条件 `.map()`——sequence 下会拿到数字 3 并抛
+     `TypeError: (q.grid || []).map is not a function`。每个游戏各自按需解析。 */
+  const pz: any = data.puzzle || {};
+  const seq: number[] = isSeq
+    ? (Array.isArray(pz.seq) ? pz.seq : []).map((n: unknown) => Number(n))
+    : [];
+  const seqGrid: number = isSeq ? (Number(pz.grid) || 3) : 3;
   const digits: string = GAME === 'number-recall'
     ? String((data.puzzle && data.puzzle.digits || []).join(''))
     : '';
@@ -409,12 +418,19 @@ async function playRound(code: string, round: number): Promise<boolean> {
 
   /* 🔴 P2 三款新游戏的题目字段。publicView 已按游戏脱敏下发，
      这里只做「拿到就解析、拿不到就报明确错」，不自行生成任何内容。 */
-  const pz = data.puzzle || {};
-  const emojiSet: string[] = (pz.grid || []).map((e: unknown) => String(e));
-  const emojiOptions: string[] = (pz.options || []).map((e: unknown) => String(e));
-  const chimpGrid: number = Number(pz.grid) || 5;
-  const chimpPositions: number[] = (pz.positions || []).map((n: unknown) => Number(n));
-  const words: string[] = (pz.words || []).map((w: unknown) => String(w));
+  const emojiSet: string[] = isEmoji && Array.isArray(pz.grid)
+    ? pz.grid.map((e: unknown) => String(e))
+    : [];
+  const emojiOptions: string[] = isEmoji && Array.isArray(pz.options)
+    ? pz.options.map((e: unknown) => String(e))
+    : [];
+  const chimpGrid: number = isChimp ? (Number(pz.grid) || 5) : 5;
+  const chimpPositions: number[] = isChimp && Array.isArray(pz.positions)
+    ? pz.positions.map((n: unknown) => Number(n))
+    : [];
+  const words: string[] = isWord && Array.isArray(pz.words)
+    ? pz.words.map((w: unknown) => String(w))
+    : [];
 
   const target = isNumber ? digits : '';
   const noPuzzle = isNumber ? !target.length
@@ -707,11 +723,11 @@ async function playRound(code: string, round: number): Promise<boolean> {
     answer = marks.map((v) => v || 'new');
   } else {
     /* Sequence Memory：格子依次点亮 → 按序点回 */
-    const cells = Array.from({ length: grid * grid },
+    const cells = Array.from({ length: seqGrid * seqGrid },
       (_, i) => `<button class="dc-seq-cell" type="button" data-i="${i}" aria-label="${i + 1}"></button>`).join('');
     card.innerHTML = `
       <h2 class="dc-h2">${esc(t('duel.watch', 'Watch carefully…'))}</h2>
-      <div class="dc-seq-grid" id="grid" style="grid-template-columns:repeat(${grid},1fr)">${cells}</div>`;
+      <div class="dc-seq-grid" id="grid" style="grid-template-columns:repeat(${seqGrid},1fr)">${cells}</div>`;
 
     const nodes = Array.from(document.querySelectorAll<HTMLElement>('.dc-seq-cell'));
     nodes.forEach((n) => n.setAttribute('disabled', ''));

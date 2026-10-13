@@ -161,23 +161,30 @@ try {
     }
   }
 
-  /* ── B. 旧对战页端到端：建房 → 开局 → 作答 → 成绩 ─────── */
-  section('B. 旧对战页端到端回归（验 #45 的 room/start 修复）');
-  for (const g of ['sequence-memory', 'number-recall']) {
+  /* ── B. 六款对战页端到端：建房 → 开局 → 逐轮作答 → 成绩 ──── */
+  section('B. 六款对战页端到端（验 #45 room/start 修复 + #46 新对战页）');
+  /* 判据：每款都必须能建房、拿到房码、点开始进入第 1 轮、
+     且取到题目后渲染出**该游戏专属**的可作答 DOM。
+     ⚠️ 必须等题目真的渲染出来，不能只看「没报错」——
+        start 失败时页面也会渲染出一张错误卡，同样零 console.error。 */
+  const DUEL_SEL = {
+    'sequence-memory': 'cells',       // .dc-seq-cell:not([disabled])
+    'number-recall': 'input',         // #ans
+    'color-recall': 'wheel',          // #wheel
+    'emoji-ghost': 'emojiopts',       // .dc-emoji-opt
+    'chimp-test': 'chimpdone',        // #done（数字已闪现完毕，等点格）
+    'word-recall': 'wordlock',        // #lock
+  };
+  for (const g of [...OLD_GAMES, ...NEW_GAMES]) {
     page.clearEvents();
     await page.send('Page.navigate', { url: `${ORIGIN}/games/${g}/` });
     await page.waitFor(() => page.eval('return document.readyState === "complete";'));
-    await sleep(800);
-    page.clearEvents();
+    await sleep(900);
 
-    // 建房
-    const created = await page.eval(`
-      const b = document.getElementById('createBtn');
-      if (!b) return { err: 'no createBtn' };
-      b.click();
-      return { clicked: true };`);
-    if (created.err) { ok(false, `${g} 建房按钮缺失`); continue; }
+    const hasCreate = await page.eval(`return !!document.getElementById('createBtn');`);
+    if (!hasCreate) { ok(false, `${g} 建房按钮缺失`); continue; }
 
+    await page.eval(`document.getElementById('createBtn').click(); return true;`);
     const gotWaiting = await page.waitFor(() => page.eval(
       `return !!document.getElementById('codeBig') || !!document.getElementById('startBtn');`), 20000);
     ok(gotWaiting, `${g} 建房后进入等待页并拿到房码`);
@@ -186,33 +193,33 @@ try {
       continue;
     }
 
-    // 房主自己就是唯一玩家 → 直接点开始（后端允许 1 人开局）
-    const started = await page.eval(`
-      const b = document.getElementById('startBtn');
-      if (!b) return { err: 'no startBtn (iAmHost=false?)' };
-      b.click();
-      return { clicked: true };`);
-    if (started.err) { ok(false, `${g} ${started.err}`); continue; }
+    const hasStart = await page.eval(`return !!document.getElementById('startBtn');`);
+    if (!hasStart) { ok(false, `${g} 房主看不到「开始对决」按钮（iAmHost 判定失败）`); continue; }
+    await page.eval(`document.getElementById('startBtn').click(); return true;`);
 
     const gotRound = await page.waitFor(() => page.eval(
       `return !!document.getElementById('go');`), 20000);
     ok(gotRound, `${g} 开局后进入第 1 轮「开始本轮」态`);
     if (!gotRound) {
       info('页面正文：' + await page.eval(`return (document.body.textContent||'').replace(/\\s+/g,' ').trim().slice(0,200);`));
-      const p = page.problems();
-      if (p.length) info('问题：' + p.slice(0, 3).join(' | '));
+      const p0 = page.problems();
+      if (p0.length) info('问题：' + p0.slice(0, 3).join(' | '));
       continue;
     }
 
-    // 点开始本轮 → 题目出现
     await page.eval(`document.getElementById('go').click(); return true;`);
+    const sel = DUEL_SEL[g];
     const gotPuzzle = await page.waitFor(() => page.eval(`
-      const cells = document.querySelectorAll('.dc-seq-cell:not([disabled])');
-      const input = document.getElementById('ans');
-      const wheel = document.getElementById('wheel');
-      return cells.length > 0 || !!input || !!wheel;
-    `), 25000);
-    ok(gotPuzzle, `${g} 第 1 轮题目成功渲染（可作答）`);
+      switch ('${sel}') {
+        case 'cells':      return document.querySelectorAll('.dc-seq-cell:not([disabled])').length > 0;
+        case 'input':      return !!document.getElementById('ans');
+        case 'wheel':      return !!document.getElementById('wheel');
+        case 'emojiopts':   return document.querySelectorAll('.dc-emoji-opt').length === 4;
+        case 'chimpdone':   return !!document.getElementById('done');
+        case 'wordlock':    return !!document.getElementById('lock');
+        default: return false;
+      }`), 30000);
+    ok(gotPuzzle, `${g} 第 1 轮题目成功渲染并可作答`);
 
     const probs = page.problems();
     ok(probs.length === 0, `${g} 对战流程零 console.error / 零未捕获异常`);
@@ -240,33 +247,54 @@ try {
 
   /* ── D. 三款新游戏每日深链 + 中文语言一致性 ────────────── */
   section('D. 三款新游戏每日深链');
-  for (const [mode, sel] of [['emoji', '.dc-emoji-opt'], ['chimp', '.dc-chimp-cell'], ['word', '.dc-word-row']]) {
+  /* 🔴 判据必须绑定**语言无关的结构特征**，不能匹配按钮文案：
+     上一版用 /准备好了|ready|开始/i 找按钮，而英文态文案是 "Show me"、
+     中文态是「开始」—— 两种都匹配不到/误匹配，导致三款全部假失败，
+     差点被当成「深链坏了」去改本来正确的 resolveMode 逻辑。
+     正确做法：直接查「点开始后该游戏专属 DOM 是否出现」。 */
+  const DAILY_SEL = {
+    emoji: { js: 'document.querySelectorAll(".dc-emoji-opt").length === 4', chk: (s) => s.emoji > 0 && s.opts === 4 },
+    chimp: { js: 'document.querySelectorAll(".dc-chimp-cell").length === 25', chk: (s) => s.chimp === 25 },
+    word:  { js: '!!document.getElementById("lock")', chk: (s) => s.wordRows > 0 },
+  };
+  for (const mode of ['emoji', 'chimp', 'word']) {
     page.clearEvents();
+    await page.send('Page.navigate', { url: `${ORIGIN}/games/daily-challenge/?mode=${mode}` });
+    await page.waitFor(() => page.eval('return document.readyState === "complete";'));
+    await sleep(1600);
+
+    // 先预置 zh，走真实中文玩家路径
+    await page.eval(`try{localStorage.setItem('memoryduel_lang','zh');localStorage.setItem('lang','zh');}catch(e){} return true;`);
     await page.send('Page.navigate', { url: `${ORIGIN}/games/daily-challenge/?mode=${mode}&lang=zh` });
     await page.waitFor(() => page.eval('return document.readyState === "complete";'));
-    await sleep(1400);
-    // 走完「我准备好了」
-    const ready = await page.eval(`
-      const b = [...document.querySelectorAll('button')].find(x => /准备好了|ready|开始/i.test(x.textContent||''));
-      if (b) { b.click(); return true; }
-      return false;`);
-    if (ready) await sleep(1600);
+    await sleep(2200);
+
+    // 结构化的「开始」按钮：取 #card 内第一个 button（不含 aria-hidden）
+    const clicked = await page.eval(`
+      const b = document.querySelector('#card button:not([aria-hidden])');
+      if (!b) return false;
+      b.click(); return true;`);
+    ok(clicked, `mode=${mode} 入局后出现「开始」按钮`);
+
+    const got = await page.waitFor(() => page.eval(DAILY_SEL[mode].js), 30000);
     const s = await page.eval(`
-      const q = (s) => document.querySelectorAll(s).length;
+      const q = (x) => document.querySelectorAll(x).length;
+      const card = document.getElementById('card');
       return {
         htmlLang: document.documentElement.lang || '',
         emoji: q('.dc-emoji'), opts: q('.dc-emoji-opt'),
         chimp: q('.dc-chimp-cell'),
         wordRows: q('.dc-word-row'),
-        wordText: [...document.querySelectorAll('.dc-word-row')].slice(0,4).map(e => (e.textContent||'').replace(/\\s+/g,' ').trim()).join(' | '),
-        steps: q('.dc-step'),
+        wordText: [...document.querySelectorAll('.dc-word-row .w')].slice(0,4).map(e => (e.textContent||'').trim()).join(' | '),
+        cardText: card ? (card.textContent||'').replace(/\\s+/g,' ').trim().slice(0,110) : '',
       };`);
-    const has = mode === 'emoji' ? (s.emoji > 0 && s.opts === 4) : mode === 'chimp' ? s.chimp === 25 : s.wordRows > 0;
-    ok(has, `mode=${mode} 入局后渲染出该游戏专属 DOM（emoji=${s.emoji}/opts=${s.opts} chimp=${s.chimp} word=${s.wordRows}）`);
+    ok(got, `mode=${mode} 题目渲染成功（emoji=${s.emoji}/${s.opts} chimp=${s.chimp} word=${s.wordRows}）`);
+    ok(s.htmlLang === 'zh', `mode=${mode} 落在中文态（html lang=${s.htmlLang}）`);
+    ok(!/Emoji Ghost|Chimp Test|Word Recall/.test(s.cardText),
+      `mode=${mode} 中文态无英文兜底文案：「${s.cardText.slice(0, 70)}」`);
     if (mode === 'word' && s.wordRows > 0) {
-      // 中文态必须拿到中文词：判据 = 出现 CJK 字符
       const cjk = /[\u4e00-\u9fff]/.test(s.wordText);
-      ok(cjk, `word-recall 在 lang=zh 下取到中文词：${s.wordText.slice(0, 60)}`);
+      ok(cjk, `word-recall 在 lang=zh 下取到中文词：${s.wordText.slice(0, 50)}`);
     }
     const p = page.problems();
     ok(p.length === 0, `mode=${mode} 零 console.error / 零未捕获异常`);
