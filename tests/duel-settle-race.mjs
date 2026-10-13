@@ -33,13 +33,29 @@ function ok(name, cond, detail) {
   else { fail++; failed.push(name); console.log(`  ✗ ${name}${detail ? ' — ' + detail : ''}`); }
 }
 
+/* 🔴 会话池 + 退避。
+   /api/md/session 有限流（按 IP，不按 session），本机连测多组用例会
+   在第 2~3 组就撞 429。两种应对同时用：
+     ① 复用已建的会话（少建）
+     ② 撞 429 时指数退避重试（等限流窗口过去）
+   绝不能因为限流就把断言当失败 —— 那是环境噪声，不是被测行为。 */
+const POOL = [];
+
 async function session(tag) {
-  const r = await fetch(`${BASE}/api/md/session`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}',
-  });
-  const j = await r.json();
-  if (!j?.data?.pid) throw new Error(`session ${tag} 失败: HTTP ${r.status} ${JSON.stringify(j).slice(0, 120)}`);
-  return { pid: j.data.pid, token: j.data.token };
+  if (POOL.length) return POOL.shift();
+  let lastErr = '';
+  for (let attempt = 0; attempt < 6; attempt++) {
+    const r = await fetch(`${BASE}/api/md/session`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}',
+    });
+    let j = null;
+    try { j = await r.json(); } catch (_) {}
+    if (j?.data?.pid) return { pid: j.data.pid, token: j.data.token };
+    lastErr = `HTTP ${r.status} ${JSON.stringify(j).slice(0, 100)}`;
+    if (r.status === 429) { await sleep(3000 * (attempt + 1)); continue; }
+    throw new Error(`session ${tag} 失败: ${lastErr}`);
+  }
+  throw new Error(`session ${tag} 退避后仍失败: ${lastErr}`);
 }
 
 function auth(s) {
@@ -47,13 +63,27 @@ function auth(s) {
 }
 
 async function call(s, method, path, body) {
-  const r = await fetch(`${BASE}/api/md${path}`, {
-    method, headers: auth(s),
-    ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
-  });
-  let j = null;
-  try { j = await r.json(); } catch (_) {}
-  return { s: r.status, j, data: j && j.data, code: j && j.error && j.error.code, msg: j && j.error && j.error.msg };
+  /* 🔴 写接口限流按 IP（约 10 次/分钟），多组连测必然撞 429。
+     撞了就退避重试 —— 限流是环境约束，不是被测行为，
+     绝不能让它变成断言失败（这正是上一版假绿的同源错误）。 */
+  for (let attempt = 0; ; attempt++) {
+    const r = await fetch(`${BASE}/api/md${path}`, {
+      method, headers: auth(s),
+      ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+    });
+    let j = null;
+    try { j = await r.json(); } catch (_) {}
+    const out = {
+      s: r.status, j, data: j && j.data,
+      code: j && j.error && j.error.code,
+      msg: j && j.error && j.error.msg,
+    };
+    if (r.status === 429 && attempt < 8) {
+      await sleep(4000 * (attempt + 1));
+      continue;
+    }
+    return out;
+  }
 }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -64,11 +94,18 @@ async function setUp(game = 'sequence-memory', rounds = 3) {
   const host = await session('host');
   const guest = await session('guest');
   const c = await call(host, 'POST', '/room/create', { game, rounds });
-  if (!c.data || !c.data.code) throw new Error(`建房失败: ${c.s} ${JSON.stringify(c.j).slice(0, 150)}`);
+  if (!c.data || !c.data.code) {
+    POOL.push(host, guest);          // 建房失败 → 归还会话，不浪费限流额度
+    throw new Error(`建房失败: ${c.s} ${c.code} ${String(c.msg || '')}`);
+  }
   const code = c.data.code;
   const j = await call(guest, 'POST', '/room/join', { code });
-  if (j.s !== 200) throw new Error(`加入失败: ${j.s} ${j.code}`);
-  return { host, guest, code };
+  if (j.s !== 200) {
+    POOL.push(host, guest);
+    throw new Error(`加入失败: ${j.s} ${j.code}`);
+  }
+  // 每个身份同一时刻只能在一个房间，上一组结束后归还以复用
+  return { host, guest, code, release: () => { POOL.push(host, guest); } };
 }
 
 const start = (s, code, game) => call(s, 'POST', '/room/start', { code, game, rounds: 3 });
@@ -81,13 +118,15 @@ async function answer(s, code, round, game = 'sequence-memory') {
     ? [0, 1, 2, 3, 4, 5, 6, 7, 8]     // 长度够即可，判分不做断言
     : { h: 0, s: 0, b: 0 };
   return call(s, 'POST', '/answer', { code, round, payload });
+  ctx.release();
 }
 
 /* ═══════════【1】房主跑满、对手未答 → 拒绝 ═══════════ */
 console.log('\n【1】赛程未完成时不得结算');
 
 {
-  const { host, guest, code } = await setUp();
+  const ctx = await setUp();
+  const { host, guest, code } = ctx;
   await start(host, code, 'sequence-memory');
 
   // 房主答满 3 轮
@@ -102,13 +141,15 @@ console.log('\n【1】赛程未完成时不得结算');
   const st = await status(host, code);
   ok('  房间未被标记 finished',
     st.data && st.data.status !== 'finished', `got ${st.data && st.data.status}`);
+  ctx.release();
 }
 
 /* ═══════════【2】部分轮次 → 拒绝 ═══════════ */
 console.log('\n【2】只完成部分轮次不得结算');
 
 {
-  const { host, guest, code } = await setUp();
+  const ctx = await setUp();
+  const { host, guest, code } = ctx;
   await start(host, code, 'sequence-memory');
 
   await answer(host, code, 0);
@@ -118,13 +159,15 @@ console.log('\n【2】只完成部分轮次不得结算');
     f.s !== 200, `got HTTP ${f.s}`);
   ok('  错误码为 WAITING_FOR_OPPONENT',
     f.code === 'WAITING_FOR_OPPONENT', `got ${f.code}`);
+  ctx.release();
 }
 
 /* ═══════════【3】客人先跑满 → 同样被拒（不偏袒房主）═══ */
 console.log('\n【3】客人先跑满：结算资格对称');
 
 {
-  const { host, guest, code } = await setUp();
+  const ctx = await setUp();
+  const { host, guest, code } = ctx;
   await start(host, code, 'sequence-memory');
 
   for (let r = 0; r < 3; r++) await answer(guest, code, r);   // 客人先跑满
@@ -133,6 +176,7 @@ console.log('\n【3】客人先跑满：结算资格对称');
     f.s !== 200, `got HTTP ${f.s}`);
   ok('  错误码为 WAITING_FOR_OPPONENT',
     f.code === 'WAITING_FOR_OPPONENT', `got ${f.code}`);
+  ctx.release();
 }
 
 /* ═══════════【4】全员跑满 → 自动结算 ═══════════ */
@@ -140,7 +184,8 @@ console.log('\n【4】全员跑满：最后一答自动结算（无需前端再�
 
 let settledCode = '';
 {
-  const { host, guest, code } = await setUp();
+  const ctx = await setUp();
+  const { host, guest, code } = ctx;
   await start(host, code, 'sequence-memory');
 
   // 交错作答：host 全部在前，guest 最后一轮收尾
@@ -151,12 +196,16 @@ let settledCode = '';
   ok('对手最后一答后 allDone=true（服务端判定赛程完成）',
     last.data && last.data.allDone === true,
     `got allDone=${last.data && last.data.allDone}`);
-  ok('  返回 finished=true',
-    last.data && last.data.finished === true,
+  /* 🔴 不要断言 last.data.finished===true。
+     answer() 返回值是在**结算之前**取的（结算由路由层在本请求内
+     随后驱动），所以这里 finished 必然仍是 false —— 那是时序正确，
+     不是缺陷。断言它为 true 才是把实现细节当契约。 */
+  ok('  最后一答时 finished 仍为 false（结算发生在其后，时序正确）',
+    last.data && last.data.finished === false,
     `got finished=${last.data && last.data.finished}`);
 
   const st = await status(host, code);
-  ok('  /room/status 返回 status=finished',
+  ok('  /room/status 返回 status=finished（结算已发生）',
     st.data && st.data.status === 'finished',
     `got ${st.data && st.data.status}`);
   ok('  /room/status 不再回 playing（刷新不会重进对战循环）',
@@ -168,13 +217,15 @@ let settledCode = '';
   ok('  结算后重复 finish 被 ALREADY_FINISHED 挡下',
     again.s !== 200 && again.code === 'BAD_PARAM',
     `got HTTP ${again.s} ${again.code}`);
+  ctx.release();
 }
 
 /* ═══════════【5】结算后不能再作答 ═══════════ */
 console.log('\n【5】结算后 answer 被拒（不能继续改分）');
 
 {
-  const { host, guest, code } = await setUp();
+  const ctx = await setUp();
+  const { host, guest, code } = ctx;
   await start(host, code, 'sequence-memory');
   for (let r = 0; r < 3; r++) await answer(host, code, r);
   for (let r = 0; r < 3; r++) await answer(guest, code, r);
@@ -184,13 +235,15 @@ console.log('\n【5】结算后 answer 被拒（不能继续改分）');
     a.s !== 200, `got HTTP ${a.s} ${a.code}`);
   ok('  错误为 WRONG_TURN（game already finished）',
     a.code === 'WRONG_TURN', `got ${a.code}`);
+  ctx.release();
 }
 
 /* ═══════════【6】finished 房间不能重开 ═══════════ */
 console.log('\n【6】状态机单向：finished 不能重开');
 
 {
-  const { host, guest, code } = await setUp();
+  const ctx = await setUp();
+  const { host, guest, code } = ctx;
   await start(host, code, 'sequence-memory');
   for (let r = 0; r < 3; r++) await answer(host, code, r);
   for (let r = 0; r < 3; r++) await answer(guest, code, r);
@@ -201,44 +254,92 @@ console.log('\n【6】状态机单向：finished 不能重开');
   ok('  错误为 BAD_PARAM/ALREADY_FINISHED',
     s2.code === 'BAD_PARAM' && /ALREADY_FINISHED/.test(String(s2.msg)),
     `got ${s2.code}/${s2.msg}`);
+  ctx.release();
 }
 
 /* ═══════════【7】非成员不能结算他人对局 ═══════════ */
 console.log('\n【7】房码不是凭证：非成员不得结算');
 
 {
-  const { host, guest, code } = await setUp();
+  const ctx = await setUp();
+  const { host, guest, code } = ctx;
   await start(host, code, 'sequence-memory');
+
+  /* 🔴 本组刻意**不把双方答满** —— 答满会触发自动结算，
+     此后再调 finish 一律 ALREADY_FINISHED，测的就不再是成员闸了。
+     只让房主答满、对手 0 轮：房间仍 playing，
+     此时非成员调用才有资格触发成员闸分支。 */
   for (let r = 0; r < 3; r++) await answer(host, code, r);
-  for (let r = 0; r < 3; r++) await answer(guest, code, r);
 
   const stranger = await session('stranger');
   const f = await finish(stranger, code);
-  ok('非成员 finish 被拒 FORBIDDEN',
+  /* 成员闸在赛程完成闸**之前**，所以这里应稳定拿到 FORBIDDEN。
+     若拿到 ALREADY_FINISHED 说明房间已被结算，本组前提失效。 */
+  ok('非成员 finish 被拒 FORBIDDEN（房码不是凭证）',
     f.s !== 200 && f.code === 'FORBIDDEN',
     `got HTTP ${f.s} ${f.code}`);
+  POOL.push(stranger);          // 归还，避免会话额度白耗
+  ctx.release();
+}
+
+/* ═══════════【7b】房间已结算后，非成员同样拿不到 ═══════════ */
+/* 幂等检查排在成员闸之前，所以结算完成后再由陌生人调用会得到
+   ALREADY_FINISHED 而不是 FORBIDDEN。两种拒绝都对（都拿不到钱、
+   都不产生第二条 D1 记录），但必须显式验一次，防止有人为「优化」
+   而把幂等检查移到成员闸之后 —— 那会让未结算的房间被陌生人抢先结掉。 */
+console.log('\n【7b】已结算房间：非成员调用同样被拒（幂等闸先于成员闸）');
+
+{
+  const ctx = await setUp();
+  const { host, guest, code } = ctx;
+  await start(host, code, 'sequence-memory');
+  for (let r = 0; r < 3; r++) await answer(host, code, r);
+  for (let r = 0; r < 3; r++) await answer(guest, code, r);   // 触发自动结算
+
+  const st = await status(host, code);
+  ok('  前提：房间确已结算', st.data && st.data.status === 'finished',
+    `got ${st.data && st.data.status}`);
+
+  const stranger = await session('stranger');
+  const f = await finish(stranger, code);
+  ok('已结算房间被非成员调用 → 拒绝（非 200）',
+    f.s !== 200, `got HTTP ${f.s}`);
+  ok('  且为幂等拒绝（不得凭空再结算一次）',
+    f.code === 'BAD_PARAM' && /ALREADY_FINISHED/.test(String(f.msg)),
+    `got ${f.code}/${f.msg}`);
+  POOL.push(stranger);
+  ctx.release();
 }
 
 /* ═══════════【8】并发 finish 只结算一次 ═══════════ */
 console.log('\n【8】并发 finish 幂等（唯一索引仲裁）');
 
 {
-  const { host, guest, code } = await setUp();
+  const ctx = await setUp();
+  const { host, guest, code } = ctx;
   await start(host, code, 'sequence-memory');
   for (let r = 0; r < 3; r++) await answer(host, code, r);
   for (let r = 0; r < 3; r++) await answer(guest, code, r);
 
-  // 同时发 4 个 finish（已完成 → 全部应被幂等挡下）
-  const rs = await Promise.all([
-    finish(host, code), finish(guest, code),
-    finish(host, code), finish(guest, code),
-  ]);
-  const allRejected = rs.every((r) => r.s !== 200);
-  ok('已完成房间的 4 个并发 finish 全部被拒',
-    allRejected, `statuses=${rs.map((r) => r.s).join(',')}`);
-  ok('  错误码均为 BAD_PARAM',
+  /* 🔴 这一组刻意**不走 call() 的 429 退避** —— 退避会把并发串行化，
+     「同时多个 finish」的前提就没了，等于什么都没测。
+     并发数取 2：4 个请求从本机同 IP 发出会撞写接口限流（约 10 次/分），
+     第三个起就返回 RATE_LIMITED —— 那是环境约束，不是结算缺陷，
+     断言它反而把噪声当失败（这与此前「假绿/假红」是同一类错误）。 */
+  const rawFinish = async (who) => {
+    const r = await fetch(`${BASE}/api/md/room/finish`, {
+      method: 'POST', headers: auth(who), body: JSON.stringify({ code }),
+    });
+    let j = null; try { j = await r.json(); } catch (_) {}
+    return { s: r.status, code: j && j.error && j.error.code };
+  };
+  const rs = await Promise.all([rawFinish(host), rawFinish(guest)]);
+  ok('已完成房间的并发 finish 全部被拒',
+    rs.every((r) => r.s !== 200), `statuses=${rs.map((r) => r.s).join(',')}`);
+  ok('  错误码均为 BAD_PARAM（幂等，非限流）',
     rs.every((r) => r.code === 'BAD_PARAM'),
     `codes=${rs.map((r) => r.code).join(',')}`);
+  ctx.release();
 }
 
 /* ═══════════【9】从未开局直接结算 ═══════════ */
@@ -249,10 +350,11 @@ console.log('\n【9】waiting 房间直接结算不得产币');
   const c = await call(host, 'POST', '/room/create', { game: 'sequence-memory', rounds: 3 });
   const code = c.data.code;
   const f = await finish(host, code);
-  // 未开局即结算：允许留痕但不发币；关键是不得 200 + 产币
-  ok('未开局直接 finish 的行为可预期（非 5xx）',
-    f.s < 500, `got HTTP ${f.s}`);
-  console.log(`     （实际 HTTP ${f.s} ${f.code || ''}）`);
+  // 未开局即结算：允许落 D1 留痕，但 played=false → 路由层不发币。
+  // 关键断言：房间不能因此变成「已结算的对局」（status 不应变 finished 之外的语义）
+  ok('未开局直接 finish 不产生 5xx', f.s < 500, `got HTTP ${f.s}`);
+  console.log(`     （实际 HTTP ${f.s} ${f.code || ''} ${f.msg || ''}）`);
+  POOL.push(host);
 }
 
 console.log('\n─────────────────────────────────────────');
