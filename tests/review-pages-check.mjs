@@ -328,7 +328,7 @@ async function checkGoButton(page) {
   }
 }
 
-
+async function checkLangConsistency(page, slug, label) {
   console.log(`\n═══ F. i18n 一致性 ${label} ═══`);
   for (const lang of ['zh', 'en']) {
     page.clearEvents();
