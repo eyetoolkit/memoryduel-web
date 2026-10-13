@@ -652,7 +652,16 @@
                  重试前先把 PID 同步成新值。 */
               return ensureSession().then(function (s) { PID = s.pid; return mdApi(method, path, body, true); });
             }
-            throw new Error((j && j.error && (j.error.msg || j.error.code)) || 'api_error');
+            /* 🔴 2026-10-13：把 code / msg 挂到错误对象上。
+               finishOnline() 靠 code 区分「等对手 / 已结算 / 未开局」，
+               只抛 message 的裸 Error 只能显示结算失败 ——
+               把「对手还没答完」这个正常等待态误报成金币丢失。 */
+            var ecode = j && j.error && j.error.code;
+            var emsg2 = j && j.error && j.error.msg;
+            var err = new Error(emsg2 || ecode || 'api_error');
+            err.code = ecode || '';
+            err.msg = emsg2 || '';
+            throw err;
           }
           return j.data;
         });
@@ -930,16 +939,71 @@
     function finishOnline() {
       clearInterval(OL.timer);
       if (OL.pollTimer) { clearInterval(OL.pollTimer); OL.pollTimer = null; }
-      var zh = getLang() === 'zh';
-      /* 结算：这是 memoryduel **唯一**的发币入口（服务端 /room/finish 按 players 发币）。
-         此前是 fire-and-forget（.catch(function(){})），失败时用户看不到任何提示 ——
-         会话失效/网络抖动导致没结算时，整局白打且金币永久丢失。
-         这里等结果：失败就停在结算屏上说明原因，成功才继续展示比分。 */
+      /* 结算：/room/finish 同时是「赛程是否打完」的询问。
+         🔴 2026-10-13 深度审核：服务端要求**全员答满**才结算，
+         所以学生先答完时会拿到 WAITING_FOR_OPPONENT —— 正常等待态，
+         不是「金币丢了」。旧代码一律当失败显示红字，属误报。 */
       mdApi('POST', '/api/md/room/finish', { code: OL.code }).then(function () {
         finishOnlineShowResult();
       }).catch(function (err) {
+        var code = err && err.code;
+        var msg = err && err.msg;
+
+        if (code === 'WAITING_FOR_OPPONENT') {
+          finishOnlineWaitOpponent();
+          return;
+        }
+        if (code === 'BAD_PARAM' && /ALREADY_FINISHED/i.test(msg || '')) {
+          finishOnlineShowResult();   // 幂等：已结算，按成功展示
+          return;
+        }
         finishOnlineShowResult(err && err.message ? err.message : 'finish_failed');
       });
+    }
+
+    /** 等待对手界面：与 duel-sequence.ts 的 waitOpponent 同一套形态 */
+    function finishOnlineWaitOpponent() {
+      var zh = getLang() === 'zh';
+      var card = document.getElementById('battleCard');
+      if (!card) return;
+      card.innerHTML =
+        '<div class="battle-result draw">' +
+          '<h2>' + (zh ? '⏳ 等待对手完成' : '⏳ Waiting for your opponent') + '</h2>' +
+          '<p style="color:#6b7280;margin-top:10px;font-size:13px">' +
+            (zh ? '你的作答已全部提交，等对方答完后会自动结算并显示最终比分。'
+                : 'All your answers are in. The result will be settled automatically once your opponent finishes.') +
+          '</p>' +
+          '<p id="olWaitHint" style="color:#9ca3af;margin-top:10px;font-size:12px">' +
+            (zh ? '正在检查结算状态…' : 'Checking settlement status…') +
+          '</p>' +
+          '<div class="score-big" style="margin-top:16px">' +
+            (OL.myScore || 0) + ' : ' + (OL.oppScore || 0) +
+          '</div>' +
+        '</div>';
+
+      var tries = 0;
+      var iv = setInterval(function () {
+        if (++tries > 100) { clearInterval(iv); return; }   // 约 5 分钟
+        mdApi('GET', '/api/md/room/status?code=' + encodeURIComponent(OL.code))
+          .then(function (st) {
+            if (st && st.status === 'finished') {
+              clearInterval(iv);
+              finishOnlineShowResult();
+              return;
+            }
+            if (st && Array.isArray(st.players)) {
+              var opp = null, me = null;
+              for (var i = 0; i < st.players.length; i++) {
+                if (st.players[i].pid === PID) me = st.players[i]; else opp = st.players[i];
+              }
+              if (me) OL.myScore = me.score || 0;
+              if (opp) { OL.oppScore = opp.score || 0; }
+              var big = card.querySelector('.score-big');
+              if (big) big.textContent = OL.myScore + ' : ' + OL.oppScore;
+            }
+          })
+          .catch(function () { /* 网络抖动：下一拍再试 */ });
+      }, 3000);
     }
 
     function finishOnlineShowResult(finishErr) {

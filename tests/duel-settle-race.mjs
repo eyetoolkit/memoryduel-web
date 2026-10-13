@@ -20,6 +20,7 @@
      ⑦ 并发 finish 只落一条 D1 记录
      ⑧ finished 房间不能重开
      ⑨ 房码被别人拿到也不能结算（成员闸回归）
+     ⑩ 两人同时交最后一答 → 不出 5xx、只结算一次
 
    运行: node tests/duel-settle-race.mjs
    ═══════════════════════════════════════════════════════════════ */
@@ -118,7 +119,6 @@ async function answer(s, code, round, game = 'sequence-memory') {
     ? [0, 1, 2, 3, 4, 5, 6, 7, 8]     // 长度够即可，判分不做断言
     : { h: 0, s: 0, b: 0 };
   return call(s, 'POST', '/answer', { code, round, payload });
-  ctx.release();
 }
 
 /* ═══════════【1】房主跑满、对手未答 → 拒绝 ═══════════ */
@@ -343,18 +343,83 @@ console.log('\n【8】并发 finish 幂等（唯一索引仲裁）');
 }
 
 /* ═══════════【9】从未开局直接结算 ═══════════ */
-console.log('\n【9】waiting 房间直接结算不得产币');
+console.log('\n【9】waiting 房间直接结算必须被显式拒绝');
 
 {
   const host = await session('w-host');
   const c = await call(host, 'POST', '/room/create', { game: 'sequence-memory', rounds: 3 });
   const code = c.data.code;
   const f = await finish(host, code);
-  // 未开局即结算：允许落 D1 留痕，但 played=false → 路由层不发币。
-  // 关键断言：房间不能因此变成「已结算的对局」（status 不应变 finished 之外的语义）
-  ok('未开局直接 finish 不产生 5xx', f.s < 500, `got HTTP ${f.s}`);
-  console.log(`     （实际 HTTP ${f.s} ${f.code || ''} ${f.msg || ''}）`);
+
+  /* 🔴 这里必须**精确**断言，不能只断言「不是 5xx」。
+     未开局就结算过去是「允许落 D1 留痕、不发币」，而那正是假战绩的来源：
+     房间被标 finished=true 且占住 room_code 唯一索引，
+     玩家随后拉人开局，这一局**永远无法再结算**。
+     现在 store 层直接抛 BAD_PARAM/NOT_STARTED。
+     「非 5xx」这种宽断言会让「返回 500 但没建假局」也通过 —— 假绿。 */
+  ok('未开局直接 finish → HTTP 400', f.s === 400, `got HTTP ${f.s}`);
+  ok('  错误为 BAD_PARAM', f.code === 'BAD_PARAM', `got ${f.code}`);
+  ok('  msg 为 NOT_STARTED（而非 ALREADY_FINISHED / WAITING_FOR_OPPONENT）',
+    f.msg === 'NOT_STARTED', `got ${f.msg}`);
+
+  /* 且房间状态不能被这次调用翻掉 —— 仍是 waiting，玩家还能正常开局 */
+  const st = await status(host, code);
+  ok('  前提：房间仍为 waiting（可继续开局）',
+    st.data && st.data.status === 'waiting',
+    `got ${st.data && st.data.status}`);
+
+  const s2 = await start(host, code, 'sequence-memory');
+  ok('  房间未被废掉：房主仍能正常开局', s2.s === 200, `got HTTP ${s2.s}`);
   POOL.push(host);
+}
+
+/* ═══════════【10】两人同时交最后一答 ═══════════ */
+/* 🔴 这是异步对战最真实的竞态：两人卡着同一时刻完成，
+   两个 /answer 会**同时**看到 allDone=true 并同时调 finish()。
+   要求：两边 HTTP 都 200（不该有 500）、房间只结算一次、
+   且不能因为抢不到结算权就把请求打成失败。 */
+console.log('\n【10】两人同时交最后一答（真并发终局）');
+
+{
+  const ctx = await setUp();
+  const { host, guest, code } = ctx;
+  await start(host, code, 'sequence-memory');
+
+  /* 先各自跑到最后一轮之前（2/3 轮），把「最后一答」留成并发点。
+     这几轮答完后 allDone 仍是 false，不会触发结算。 */
+  for (let r = 0; r < 2; r++) await answer(host, code, r);
+  for (let r = 0; r < 2; r++) await answer(guest, code, r);
+
+  /* 绕过通用 429 退避 —— 退避会把并发串行化，前提就没了 */
+  const rawAnswer = (who, round) => fetch(`${BASE}/api/md/answer`, {
+    method: 'POST', headers: auth(who),
+    body: JSON.stringify({ code, round, payload: [0, 1, 2, 3, 4, 5, 6, 7, 8] }),
+  }).then(async (r) => {
+    let j = null; try { j = await r.json(); } catch (_) {}
+    return { s: r.status, code: j && j.error && j.error.code };
+  });
+
+  const rs = await Promise.all([rawAnswer(host, 2), rawAnswer(guest, 2)]);
+  ok('并发最后一答：两边都不是 5xx',
+    rs.every((r) => r.s < 500),
+    `statuses=${rs.map((r) => r.s).join(',')}`);
+  ok('  且都不是限流（本组刻意并发，撞 429 就是环境约束而非结算缺陷）',
+    rs.every((r) => r.code !== 'RATE_LIMITED'),
+    `codes=${rs.map((r) => r.code).join(',')}`);
+
+  const st = await status(host, code);
+  ok('  房间确已结算为 finished', st.data && st.data.status === 'finished',
+    `got ${st.data && st.data.status}`);
+
+  /* 再补一刀：并发结算后单独 finish 必须是幂等拒绝，
+     说明唯一索引确实已占住，不会二次发币。 */
+  const again = await finish(host, code);
+  ok('  并发后再单独 finish → 幂等拒绝',
+    again.s !== 200 && again.code === 'BAD_PARAM'
+      && /ALREADY_FINISHED/.test(String(again.msg)),
+    `got HTTP ${again.s} ${again.code}/${again.msg}`);
+
+  ctx.release();
 }
 
 console.log('\n─────────────────────────────────────────');

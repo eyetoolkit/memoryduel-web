@@ -66,6 +66,19 @@
     ended:      { en: 'Session ended.', zh: '本节课已结束。', ja: 'セッション終了。', es: 'Sesión finalizada.', fr: 'Session terminée.', de: 'Sitzung beendet.' },
     copy_ok:    { en: 'Link copied!', zh: '链接已复制！', ja: 'リンクをコピーしました！', es: '¡Enlace copiado!', fr: 'Lien copié !', de: 'Link kopiert!' },
     err_finish_failed: { en: 'Settlement failed — the class did not receive coins', zh: '结算失败——本节课未发放积分', ja: '精算に失敗しました — クラスにはコインが支払われませんでした', es: 'Liquidación fallida: la clase no recibió monedas', fr: 'Échec du règlement — la classe n’a pas reçu de pièces', de: 'Abrechnung fehlgeschlagen — die Klasse hat keine Münzen erhalten' },
+    /* 🔴 2026-10-13 深度审核：WAITING_FOR_OPPONENT 是**正常等待态**，不是失败。
+       旧文案只有「结算失败」，教师一看到学生没答完就以为金币丢了，
+       实际只是「本节课还没打完」。要给出明确的下一步指引。 */
+    wait_opponent: {
+      en: 'Not all students have finished yet — the class will be settled automatically once everyone has answered. You can keep this page open or close it and come back later.',
+      zh: '还有学生未作答——等所有人答完后会自动结算。你可以保持本页打开，也可以稍后回来查看。',
+      ja: 'まだ回答していない生徒がいます — 全員が回答すると自動的に精算されます。このページを閉じて後から戻ることもできます。',
+      es: 'Aún no han respondido todos los estudiantes: la clase se liquidará automáticamente cuando todos respondan. Puedes dejar esta página abierta o volver más tarde.',
+      fr: 'Tous les élèves n’ont pas encore répondu — la classe sera réglée automatiquement dès que tout le monde aura répondu. Vous pouvez laisser cette page ouverte ou revenir plus tard.',
+      de: 'Noch nicht alle Schüler haben geantwortet — die Abrechnung erfolgt automatisch, sobald alle geantwortet haben. Du kannst diese Seite geöffnet lassen oder später zurückkommen.',
+    },
+    already_finished: { en: 'This session was already settled.', zh: '本节课已结算过了。', ja: 'このセッションは既に精算済みです。', es: 'Esta sesión ya fue liquidada.', fr: 'Cette session a déjà été réglée.', de: 'Diese Sitzung wurde bereits abgerechnet.' },
+    not_started:   { en: 'This session was never started — nothing to settle.', zh: '本节课尚未开始，无可结算内容。', ja: 'このセッションは開始されていません — 精算対象はありません。', es: 'Esta sesión nunca comenzó: no hay nada que liquidar.', fr: 'Cette session n’a jamais commencé — rien à régler.', de: 'Diese Sitzung wurde nie begonnen — nichts abzurechnen.' },
     copied:     { en: 'Copied', zh: '已复制', ja: 'コピー済', es: 'Copiado', fr: 'Copié', de: 'Kopiert' },
   };
 
@@ -144,13 +157,22 @@
           try { j = JSON.parse(txt); } catch (e) {}
           if (!r.ok || !j || !j.ok) {
             var code = j && j.error && j.error.code;
+            var emsg = j && j.error && j.error.msg;
             // 会话失效(KV 过期/清库)→ 清缓存重新签发并重试一次
             if (code === 'UNAUTHORIZED' && !retry) {
               try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
               sessionPromise = null;
               return mdApi(method, path, body, true);
             }
-            throw new Error((j && j.error && (j.error.msg || code)) || ('HTTP ' + r.status));
+            /* 🔴 2026-10-13：必须把 code / msg 挂到错误对象上。
+               endSession() 要靠 code 区分「等对手 / 已结算 / 未开局」三态，
+               只抛一个 message 的裸 Error 会让它只能显示「结算失败」——
+               把正常等待态误报成金币丢失。 */
+            var err = new Error(emsg || code || ('HTTP ' + r.status));
+            err.status = r.status;
+            err.code = code || '';
+            err.msg = emsg || '';
+            throw err;
           }
           return j.data;   // 解包信封：此前直接返回 {ok,data}，下游全部拿到 undefined
         });
@@ -365,13 +387,38 @@
 
   function endSession() {
     var room = currentRoom(); if (!room) return;
-    /* /room/finish 是 memoryduel **唯一**的发币入口。此前 fire-and-forget +
-       无条件 reload：结算失败（会话失效/网络）时全班金币静默丢失，
-       教师还因为页面刷新而看不到任何线索。改为等结果再决定是否清本地记录。 */
+    /* /room/finish 既是发币入口，也是「赛程是否打完」的询问。
+       🔴 2026-10-13 深度审核：服务端现在要求**全员答满**才允许结算
+       （async/quiz 都一样）。所以教师点「结束课程」时若有学生没答完，
+       会拿到 WAITING_FOR_OPPONENT —— 那是**正常等待态**，
+       旧代码一律显示「结算失败——本节课未发放积分」，
+       教师会以为金币丢了，实际上只是「还没打完」，属误报。 */
     mdApi('POST', '/api/md/room/finish', { code: room.code }).then(function () {
       try { localStorage.removeItem(ROOM_KEY); localStorage.removeItem(STATUS_KEY); } catch (e) {}
       location.reload();
     }).catch(function (err) {
+      var code = err && err.code;
+      var msg = err && err.msg;
+
+      if (code === 'WAITING_FOR_OPPONENT') {
+        // 正常：还有学生没答完。不清 localRoom，允许教师稍后再点。
+        showErr(t('wait_opponent'));
+        pollStatus();
+        return;
+      }
+
+      if (code === 'BAD_PARAM' && /ALREADY_FINISHED/i.test(msg || '')) {
+        // 幂等：已结算过（可能是重复点击或之前已成功）。按成功处理。
+        try { localStorage.removeItem(ROOM_KEY); localStorage.removeItem(STATUS_KEY); } catch (e) {}
+        location.reload();
+        return;
+      }
+
+      if (code === 'BAD_PARAM' && /NOT_STARTED/i.test(msg || '')) {
+        showErr(t('not_started'));
+        return;
+      }
+
       showErr(t('err_finish_failed') + ': ' + (err && err.message ? err.message : 'unknown'));
     });
   }
