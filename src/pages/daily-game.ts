@@ -352,6 +352,212 @@ async function playColor(puzzle: any): Promise<{ answer: Array<{ h: number; s: n
 /* ═══════════════════════════════════════════════════════════════
    单轮结果
    ═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   Emoji Ghost（Kim's Game · 找缺失）—— P2 新增
+   集合闪现 → 其中一个消失 → 四选一指出「刚才在集合里」的那个
+   🔴 返回玩家**实际点的选项下标**（0..3），服务端据此判分
+   🔴 干扰项与缺失项同类（worker 保证），所以不能靠类别/颜色猜，
+      只能靠视觉集合记忆 —— 这正是这个范式的全部意义
+   ═══════════════════════════════════════════════════════════════ */
+async function playEmojiGhost(puzzle: any): Promise<{ answer: number }> {
+  const set: string[] = puzzle.grid || [];
+  const options: string[] = puzzle.options || [];
+
+  const card = $('#card')!;
+  card.innerHTML = `
+    <h2 class="dc-h2">${esc(t('dc.emoji_h2', 'Emoji Ghost'))}</h2>
+    <p class="dc-help">${esc(t('dc.emoji_help', 'A row of symbols flashes. One of them disappears — pick which one it was.'))}</p>
+    <div class="dc-emoji-row" id="row"></div>
+    <button class="dc-btn" id="go" type="button">${esc(t('dc.emoji_ready', 'Show me'))}</button>`;
+
+  const row = $('#row')!;
+  const go = $('#go') as HTMLButtonElement;
+
+  await new Promise<void>((resolve) => {
+    go.addEventListener('click', () => resolve(), { once: true });
+  });
+  // 🔴 三关统一：点击后立刻停用并隐藏（playColor 曾漏掉，导致预览期按钮可点无响应）
+  go.disabled = true;
+  go.style.display = 'none';
+
+  // 集合闪现：逐个淡入再整体消失
+  row.innerHTML = set.map((e) => `<span class="dc-emoji">${esc(e)}</span>`).join('');
+  await sleep(3400);
+  row.innerHTML = '';
+
+  // 四选一
+  card.innerHTML = `
+    <h2 class="dc-h2">${esc(t('dc.emoji_h2', 'Emoji Ghost'))}</h2>
+    <p class="dc-help">${esc(t('dc.emoji_pick', 'Which one was in the set?'))}</p>
+    <div class="dc-emoji-options" id="opts" role="radiogroup" aria-label="${esc(t('dc.emoji_pick', 'Which one was in the set?'))}">
+      ${options.map((e, i) => `<button class="dc-emoji-opt" type="button" role="radio" aria-checked="false" data-i="${i}">${esc(e)}</button>`).join('')}
+    </div>`;
+
+  const opts = $('#opts')!;
+  return new Promise<{ answer: number }>((resolve) => {
+    opts.addEventListener('click', (e) => {
+      const el = (e.target as HTMLElement).closest('.dc-emoji-opt') as HTMLElement | null;
+      if (!el) return;
+      opts.querySelectorAll('.dc-emoji-opt').forEach((n) => {
+        n.setAttribute('aria-checked', 'false');
+        n.classList.remove('picked');
+      });
+      el.setAttribute('aria-checked', 'true');
+      el.classList.add('picked');
+      const pick = Number(el.dataset.i);
+      setTimeout(() => resolve({ answer: pick }), 180);
+    }, { once: false });
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Chimp Test（数字位置记忆）—— P2 新增
+   数字在网格里闪现 → 数字消失 → 点出刚才数字所在的所有格子
+   京都大学 2007 Current Biology Ayumu 实验范式（数字用 5 起始，
+   属公开复现范式，叙事文案按「你比黑猩猩强吗」的中性问法表述）
+   🔴 返回玩家实际点击的格子下标数组（按点击顺序）
+   ═══════════════════════════════════════════════════════════════ */
+async function playChimp(puzzle: any): Promise<{ answer: number[] }> {
+  const positions: number[] = (puzzle.positions || []).map((n: number) => Number(n));
+  const grid = Number(puzzle.grid) || 5;
+  const size = grid * grid;
+
+  const card = $('#card')!;
+  card.innerHTML = `
+    <h2 class="dc-h2">${esc(t('dc.chimp_h2', 'Chimp Test'))}</h2>
+    <p class="dc-help">${esc(t('dc.chimp_help', 'Numbers flash on the grid, then vanish. Tap every cell that held a number.'))}</p>
+    <div class="dc-chimp-grid" id="grid" style="grid-template-columns:repeat(${grid},1fr)"></div>
+    <button class="dc-btn" id="go" type="button">${esc(t('dc.chimp_ready', 'Show me'))}</button>`;
+
+  const gridEl = $('#grid')!;
+  const go = $('#go') as HTMLButtonElement;
+  const cell = (i: number) => `<div class="dc-chimp-cell" data-i="${i}"></div>`;
+
+  await new Promise<void>((resolve) => {
+    go.addEventListener('click', () => resolve(), { once: true });
+  });
+  go.disabled = true;
+  go.style.display = 'none';
+
+  // 网格先铺空格子，再逐个闪数字
+  gridEl.innerHTML = Array.from({ length: size }, (_, i) => cell(i)).join('');
+  const nodes = Array.from(gridEl.querySelectorAll<HTMLElement>('.dc-chimp-cell'));
+  for (const pos of positions) {
+    nodes[pos].textContent = String(positions.indexOf(pos) + 1);
+    nodes[pos].classList.add('lit');
+    await sleep(700);
+    nodes[pos].classList.remove('lit');
+    await sleep(180);
+  }
+  await sleep(500);
+  nodes.forEach((n) => { n.textContent = ''; });
+
+  // 点出所有数字格（点错允许继续，但会多计一格错位）
+  card.innerHTML = `
+    <h2 class="dc-h2">${esc(t('dc.chimp_h2', 'Chimp Test'))}</h2>
+    <p class="dc-help">${esc(t('dc.chimp_pick', `Tap all ${positions.length} cells that held a number.`).replace('{n}', String(positions.length)))}</p>
+    <div class="dc-chimp-grid" id="grid" style="grid-template-columns:repeat(${grid},1fr)">
+      ${Array.from({ length: size }, (_, i) => cell(i)).join('')}
+    </div>
+    <button class="dc-btn" id="go2" type="button" style="margin-top:14px">${esc(t('dc.chimp_done', 'Done'))}</button>`;
+
+  const grid2 = $('#grid')!;
+  const picked: number[] = [];
+  grid2.addEventListener('click', (e) => {
+    const el = (e.target as HTMLElement).closest('.dc-chimp-cell') as HTMLElement | null;
+    if (!el || picked.length >= positions.length) return;
+    const i = Number(el.dataset.i);
+    if (picked.includes(i)) return;
+    picked.push(i);
+    el.classList.add(i === positions[picked.length - 1] ? 'lit' : 'wrong');
+  });
+
+  await new Promise<void>((resolve) => {
+    document.getElementById('go2')!.addEventListener('click', () => resolve(), { once: true });
+  });
+
+  return { answer: picked };
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Word Recall（见过 / 没见过）—— P2 新增 · 六语护城河款
+   词逐个出现 → 全部消失 → 逐词判断「见过还是没见过」
+   🔴 返回玩家逐词判断数组（'seen'/'new'），服务端按同语言词库复算
+   🔴 语言一致性红线：题目与判分必须用**同一个 lang**。
+      取题漏传 lang 时后端静默回落 en → 中文玩家看英文词，
+      而且不报错（最难查的静默失败）。故此处 lang 由 daily-client
+      统一注入，判分也带同一个 lang。
+   ═══════════════════════════════════════════════════════════════ */
+async function playWordRecall(puzzle: any): Promise<{ answer: string[] }> {
+  const words: string[] = puzzle.words || [];
+
+  const card = $('#card')!;
+  card.innerHTML = `
+    <h2 class="dc-h2">${esc(t('dc.word_h2', 'Word Recall'))}</h2>
+    <p class="dc-help">${esc(t('dc.word_help', 'Words appear one by one. Afterwards, mark each as seen or new.'))}</p>
+    <div class="dc-word-stage" id="stage"></div>
+    <button class="dc-btn" id="go" type="button">${esc(t('dc.word_ready', 'Show me'))}</button>`;
+
+  const stage = $('#stage')!;
+  const go = $('#go') as HTMLButtonElement;
+
+  await new Promise<void>((resolve) => {
+    go.addEventListener('click', () => resolve(), { once: true });
+  });
+  go.disabled = true;
+  go.style.display = 'none';
+
+  // 逐词闪现
+  stage.innerHTML = `<div class="dc-word-now" id="now"></div><div class="dc-word-prog" id="prog"></div>`;
+  const now = document.getElementById('now') as HTMLElement;
+  const prog = document.getElementById('prog') as HTMLElement;
+  for (let i = 0; i < words.length; i++) {
+    now.textContent = words[i];
+    prog.textContent = `${i + 1} / ${words.length}`;
+    await sleep(760);
+  }
+  now.textContent = '';
+  prog.textContent = '';
+  await sleep(350);
+
+  // 逐词判定：全部列出，玩家点 Seen / New
+  card.innerHTML = `
+    <h2 class="dc-h2">${esc(t('dc.word_h2', 'Word Recall'))}</h2>
+    <p class="dc-help">${esc(t('dc.word_pick', 'For each word, decide whether you saw it earlier in this round.'))}</p>
+    <div class="dc-word-list" id="list">
+      ${words.map((w, i) => `
+        <div class="dc-word-row" data-i="${i}">
+          <span class="w">${esc(w)}</span>
+          <span class="opts">
+            <button class="dc-word-btn" type="button" data-i="${i}" data-v="new">${esc(t('dc.word_new', 'New'))}</button>
+            <button class="dc-word-btn" type="button" data-i="${i}" data-v="seen">${esc(t('dc.word_seen', 'Seen'))}</button>
+          </span>
+        </div>`).join('')}
+    </div>
+    <button class="dc-btn" id="lock" type="button" style="margin-top:14px">${esc(t('dc.word_lock', 'Submit answers'))}</button>`;
+
+  const answers = new Array(words.length).fill('');
+  const list = document.getElementById('list')!;
+  list.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('.dc-word-btn') as HTMLElement | null;
+    if (!btn) return;
+    const i = Number(btn.dataset.i);
+    answers[i] = btn.dataset.v || '';
+    const row = list.querySelector(`.dc-word-row[data-i="${i}"]`);
+    if (row) row.classList.toggle('answered', !!answers[i]);
+    // 标记已答的按钮高亮
+    list.querySelectorAll(`.dc-word-btn[data-i="${i}"]`).forEach((b) => {
+      b.classList.toggle('on', (b as HTMLElement).dataset.v === answers[i]);
+    });
+  });
+
+  await new Promise<void>((resolve) => {
+    document.getElementById('lock')!.addEventListener('click', () => resolve(), { once: true });
+  });
+
+  return { answer: answers.map((v) => v || 'new') };
+}
+
 async function showRoundResult(game: string, server: any) {
   const c = C();
   const meta = c.LEVELS[game];
@@ -655,7 +861,11 @@ async function runLevel(game: string, startRound: number) {
 
     let puzzle: any;
     try {
-      puzzle = (await c.fetchPuzzle(game, round)).puzzle;
+      // 🔴 word-recall 必须带 lang 取题：它的题目按语言分裂（六语词库），
+      //    漏传 lang 会静默拿到英语词库 —— 中文玩家看英文词却零报错。
+      puzzle = game === 'word-recall'
+        ? (await c.fetchPuzzleInLang(game, round, c.fetchAnswerLang())).puzzle
+        : (await c.fetchPuzzle(game, round)).puzzle;
     } catch (e) {
       renderError((e as Error).message, () => { runLevel(game, round); });
       return;
@@ -665,7 +875,11 @@ async function runLevel(game: string, startRound: number) {
     try {
       if (game === 'number-recall')   played = await playNumber(puzzle);
       else if (game === 'sequence-memory') played = await playSequence(puzzle);
-      else played = await playColor(puzzle);
+      else if (game === 'color-recall')    played = await playColor(puzzle);
+      else if (game === 'emoji-ghost')     played = await playEmojiGhost(puzzle);
+      else if (game === 'chimp-test')      played = await playChimp(puzzle);
+      else if (game === 'word-recall')     played = await playWordRecall(puzzle);
+      else { renderError(`unknown game: ${game}`, () => { runLevel(game, round); }); return; }
     } catch (e) {
       renderError((e as Error).message, () => { runLevel(game, round); });
       return;
@@ -674,7 +888,9 @@ async function runLevel(game: string, startRound: number) {
     let server: any;
     try {
       // 🔴 提交玩家真实作答，服务端用同 seed 复算判分
-      server = await c.submitAnswer(game, round, played.answer);
+      server = game === 'word-recall'
+        ? await c.submitAnswer(game, round, played.answer, c.fetchAnswerLang())
+        : await c.submitAnswer(game, round, played.answer);
     } catch (e) {
       renderError((e as Error).message, () => { runLevel(game, round); });
       return;
@@ -731,19 +947,36 @@ async function main() {
   state.date = today.date;
   state.streak = today.streak || 0;
   (window as any).__dcDone = {};
-  // 先落 queue 再画进度条，否则首帧会按 GAME_ORDER 画出三关
-  state.queue = mode.queue.slice();
-  renderSteps(mode.game);
+
+  /* 🔴 每日模式的队列必须以**服务端** today.queue 为准。
+     2026-10-13 P2 起每日挑战改为「seeded 抽 3 关」轮换（5 款池），
+     客户端硬编码的三关 GAME_ORDER 已经和后端不一致了 ——
+     继续用本地队列会出现「进度条画 3 关、后端判的却是另外 3 关」。
+     服务端没给 queue（旧版后端）时才回落 resolveMode 的默认值。 */
+  const queue = (mode.daily && Array.isArray(today.queue) && today.queue.length)
+    ? today.queue.slice()
+    : mode.queue.slice();
+  // 兜底：队列里的关卡若客户端 LEVELS 不认识（后端先发版），先过滤掉
+  //   并显示错误，而不是让 renderSteps 在 undefined.icon 上崩掉整页
+  const unknown = queue.filter((g: string) => !c.LEVELS[g]);
+  if (unknown.length) {
+    renderError(`服务端下发了未知关卡：${unknown.join(', ')}（客户端与后端版本不一致）`);
+    return;
+  }
+
+  state.queue = queue;
+  // 进度条第一格高亮的是队列第一关（daily 模式下未必是 number-recall）
+  renderSteps(queue[0]);
 
   // 3) 单关模式：只玩这一关，结束进终局页
-  if (mode.queue.length === 1) {
-    await runLevel(mode.game, mode.round);
+  if (queue.length === 1) {
+    await runLevel(queue[0], mode.round);
     await showFinal();
     return;
   }
 
   // 4) 每日三关：依次通关
-  for (const g of mode.queue) {
+  for (const g of queue) {
     await runLevel(g, 1);
     if (!(window as any).__dcDone[g]) return;   // 出错已渲染，等用户重试
   }

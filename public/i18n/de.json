@@ -1113,5 +1113,30 @@
   "numduel": {
     "title": "Zahlen-Duell · MemoryDuel",
     "meta_desc": "Merke dir eine Ziffernfolge und tippe sie vor deinem Gegner zurück. 1v1-Zahlengedächtnisduell, serverseitig gewertet, ohne Anmeldung."
-  }
+  },
+  "dc.emoji-ghost": "Emoji-Geist",
+  "dc.chimp-test": "Schimpansen-Test",
+  "dc.word-recall": "Wörter-Gedächtnis",
+  "dc.emoji_h2": "Emoji-Geist",
+  "dc.emoji_help": "Eine Reihe Symbole blinkt auf, eines verschwindet – welches war es?",
+  "dc.emoji_ready": "Anzeigen",
+  "dc.emoji_pick": "Welches war in der Menge?",
+  "dc.chimp_h2": "Schimpansen-Test",
+  "dc.chimp_help": "Zahlen blinken im Raster auf und verschwinden. Tippe jedes Feld, das eine Zahl trug.",
+  "dc.chimp_ready": "Anzeigen",
+  "dc.chimp_pick": "Tippe alle {n} Felder, die eine Zahl trugen.",
+  "dc.chimp_done": "Fertig",
+  "dc.word_h2": "Wörter-Gedächtnis",
+  "dc.word_help": "Wörter erscheinen nacheinander. Markiere danach jedes als gesehen oder neu.",
+  "dc.word_ready": "Anzeigen",
+  "dc.word_pick": "Entscheide für jedes Wort, ob du es in dieser Runde schon gesehen hast.",
+  "dc.word_new": "Neu",
+  "dc.word_seen": "Gesehen",
+  "dc.word_lock": "Antworten senden",
+  "dc.lobby_mt_emoji": "Emoji-Geist",
+  "dc.lobby_md_emoji": "Eine Reihe Symbole blinkt auf, eines verschwindet – welches war es?",
+  "dc.lobby_mt_chimp": "Schimpansen-Test",
+  "dc.lobby_md_chimp": "Zahlen blinken im Raster auf und verschwinden. Tippe jedes Feld mit einer Zahl.",
+  "dc.lobby_mt_word": "Wörter-Gedächtnis",
+  "dc.lobby_md_word": "Wörter erscheinen nacheinander. Markiere danach jedes als gesehen oder neu."
 }

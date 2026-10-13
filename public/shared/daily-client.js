@@ -191,27 +191,62 @@ async function fetchPuzzle(game, round) {
   return body.data;
 }
 
+/** 当前界面语言（word-recall 取题用；跟随 html[lang]，六语兜底 en） */
+function fetchAnswerLang() {
+  const l = String((document.documentElement.getAttribute('lang') || '')).toLowerCase();
+  return ['en', 'zh', 'ja', 'es', 'fr', 'de'].includes(l) ? l : 'en';
+}
+
+/* 🔴 word-recall 取题专用：带 lang 走同一条 /puzzle 出口。
+   不能让 daily-game.ts 自己去拼 query —— lang 漏传时后端会静默回落 en，
+   中文玩家拿到英文单词却不报错，是最难查的一类静默失败。 */
+async function fetchPuzzleInLang(game, round, lang) {
+  const l = String(lang || fetchAnswerLang()).toLowerCase();
+  const qs = new URLSearchParams({ game: String(game), round: String(round), lang: l });
+  let r;
+  try {
+    r = await fetchTimeout(`${API}/puzzle?${qs}`, {
+      headers: authHeaders(loadCred()),
+      cache: 'no-store',
+    });
+  } catch (e) {
+    throw new Error(`[daily-client] ${API}/puzzle 网络失败：${e && e.message}`);
+  }
+  const body = await safeJson(r);
+  if (!r.ok) throw await parseFail(r, body);
+  if (!body || !body.ok || !body.data || !body.data.puzzle) {
+    throw new Error(`[daily-client] ${API}/puzzle 响应缺少 puzzle`);
+  }
+  return body.data;
+}
+
 /* ─── 端点 3：提交作答（服务端用同 seed 复算判分）─────────────────
-   🔴 不传 dateKey —— 传了服务端也不采信，传了反而误导后来读代码的人。 */
-async function submitAnswer(game, round, answer) {
+   🔴 不传 dateKey —— 传了服务端也不采信，传了反而误导后来读代码的人。
+   🔴 lang 仅 word-recall 需要：判分端要用**与取题同一个**词库重建基准。
+      取题传了 lang 而提交不传（或反过来）时，服务端会拿另一语言的词库
+      判分，判出来的「正确答案」与玩家看到的题目完全无关。 */
+async function submitAnswer(game, round, answer, lang) {
   await ensureSession();
+  const body = JSON.stringify(
+    lang ? { game, round, answer, lang: String(lang).toLowerCase() } : { game, round, answer }
+  );
   let r;
   try {
     r = await fetchTimeout(`${API}/submit`, {
       method: 'POST',
       headers: authHeaders(loadCred()),
-      body: JSON.stringify({ game, round, answer }),
+      body,
       cache: 'no-store',
     });
   } catch (e) {
     throw new Error(`[daily-client] ${API}/submit 网络失败：${e && e.message}`);
   }
-  const body = await safeJson(r);
-  if (!r.ok) throw await parseFail(r, body);
-  if (!body || !body.ok || !body.data) {
+  const body2 = await safeJson(r);
+  if (!r.ok) throw await parseFail(r, body2);
+  if (!body2 || !body2.ok || !body2.data) {
     throw new Error(`[daily-client] ${API}/submit 响应格式异常`);
   }
-  return body.data;
+  return body2.data;
 }
 
 /* ─── 端点 4：连胜状态 ─── */
@@ -241,34 +276,66 @@ async function fetchRank() {
   return body.data;
 }
 
-/* ─── 关卡定义（与后端 LEVELS/maxScoreOf 对齐，改动需两边同步）────
-   🔴 maxScore = **整关**满分（三轮累加），单轮满分另有 roundMax()。
-     两者混用会让「本轮满分」永不显示（单轮 3 分 ≠ 关卡 12 分）。 */
+/* ─── 关卡定义（与后端 LEVELS/maxScoreOf/roundLen 对齐，改动需两边同步）──
+   🔴 maxScore = **整关**满分（各轮累加），单轮满分另有 roundMax()。
+     两者混用会让「本轮满分」永不显示（单轮 3 分 ≠ 关卡 12 分）。
+   🔴 2026-10-13 P2 扩至 6 关，三款新增：
+     emoji-ghost（Kim's Game 找缺失，四选一）/ chimp-test（数字位置）/
+     word-recall（六语 Seen/New 识别记忆）。
+   🔴 step = 每轮长度步进。老三关为 1；emoji-ghost 为 2（4/6/8，
+     集合记忆负荷随网格增长）；word-recall 为 4（6/10/14）。
+     🔴 这三个 step 必须与 worker routes/daily.js 的 roundLen() 完全一致，
+     否则满分算错、进度条关数对不上。 */
 const LEVELS = {
-  'number-recall':   { rounds: 3, startLen: 3, maxLen: 9, maxScore: 12, icon: '🔢' },
-  'sequence-memory': { rounds: 3, startLen: 3, maxLen: 9, maxScore: 12, icon: '⚡' },
-  'color-recall':    { rounds: 1, startLen: 5, maxLen: 5, maxScore: 50, icon: '🎨' },
+  'number-recall':   { rounds: 3, startLen: 3, maxLen: 9, maxScore: 12, step: 1, icon: '🔢' },
+  'sequence-memory': { rounds: 3, startLen: 3, maxLen: 9, maxScore: 12, step: 1, icon: '⚡' },
+  'color-recall':    { rounds: 1, startLen: 5, maxLen: 5, maxScore: 50, step: 0, icon: '🎨' },
+  'emoji-ghost':     { rounds: 3, startLen: 4, maxLen: 8, maxScore: 30, step: 2, icon: '👻' },
+  'chimp-test':      { rounds: 3, startLen: 5, maxLen: 7, maxScore: 18, step: 1, icon: '🐒' },
+  'word-recall':     { rounds: 3, startLen: 6, maxLen: 14, maxScore: 30, step: 4, icon: '📝' },
 };
+/* 每日挑战轮换池：5 款（word-recall **不进每日**——它的题目按语言分裂，
+   进了每日挑战会破坏「全球同一套题」的承诺）。顺序 = 固定展示顺序。 */
+const ROTATION_POOL = ['number-recall', 'sequence-memory', 'color-recall', 'emoji-ghost', 'chimp-test'];
+/* 兜底队列：后端还没下发 queue 时用（仅首帧）。🔴 只作兜底，
+   正常路径一律以 today.queue 为准，否则同一天不同玩家看到不同关卡。 */
 const GAME_ORDER = ['number-recall', 'sequence-memory', 'color-recall'];
 
-/** 第 n 轮（1 起）的满分。color-recall 单轮即整关；其余按 长度 = startLen+(n-1) */
+/** 第 n 轮（1 起）的题目长度：startLen + step*(n-1)，封顶 maxLen */
+function roundLen(game, round) {
+  const meta = LEVELS[game];
+  if (!meta) return 0;
+  return Math.min(meta.startLen + (meta.step || 0) * (round - 1), meta.maxLen);
+}
+
+/** 第 n 轮（1 起）的满分。
+   🔴 三类计分范式：
+     · 逐位命中型（number/sequence/chimp）：满分 = 本轮长度
+     · 四选一型（emoji-ghost）：每轮固定 10 分
+     · 连续还原型（color-recall）：5 色 × 10 = 50（单轮即整关） */
 function roundMax(game, round) {
   const meta = LEVELS[game];
   if (!meta) return 0;
-  if (game === 'color-recall') return meta.startLen * 10;   // 5 色 × 10 分
-  const len = Math.min(meta.startLen + (round - 1), meta.maxLen);
-  return len;
+  if (game === 'emoji-ghost') return 10;
+  if (game === 'color-recall') return meta.startLen * 10;
+  if (game === 'word-recall') return roundLen(game, round);
+  return roundLen(game, round);
 }
 
-/** 把 ?mode=xxx 映射成游戏 + 起始关卡；无效 mode 回大厅（技能要求） */
+/** 把 ?mode=xxx 映射成游戏 + 起始关卡；无效 mode 回大厅（技能要求）。
+    🔴 daily 模式不在这里定队列——每日轮换是服务端 seeded 的，
+      客户端必须用 today.queue；queue 缺失时才回落 GAME_ORDER。 */
 function resolveMode(raw) {
   const mode = String(raw || '').toLowerCase();
   if (mode === 'daily' || mode === '') {
-    return { game: 'number-recall', round: 1, queue: GAME_ORDER.slice() };
+    return { game: 'number-recall', round: 1, queue: GAME_ORDER.slice(), daily: true };
   }
   if (mode === 'number')   return { game: 'number-recall',   round: 1, queue: ['number-recall'] };
   if (mode === 'sequence') return { game: 'sequence-memory', round: 1, queue: ['sequence-memory'] };
   if (mode === 'color')    return { game: 'color-recall',    round: 1, queue: ['color-recall'] };
+  if (mode === 'emoji')    return { game: 'emoji-ghost',     round: 1, queue: ['emoji-ghost'] };
+  if (mode === 'chimp')    return { game: 'chimp-test',      round: 1, queue: ['chimp-test'] };
+  if (mode === 'word')     return { game: 'word-recall',     round: 1, queue: ['word-recall'] };
   return null;
 }
 
@@ -278,11 +345,15 @@ const api = {
   API,
   LEVELS,
   GAME_ORDER,
+  ROTATION_POOL,
   LOBBY_URL,
+  roundLen,
   roundMax,
   ensureSession,
   fetchToday,
   fetchPuzzle,
+  fetchPuzzleInLang,
+  fetchAnswerLang,   // 🔴 取题必须带语言：word-recall 题目按语言分裂
   submitAnswer,
   fetchStreak,
   fetchRank,

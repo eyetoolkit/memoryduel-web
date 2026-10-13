@@ -386,12 +386,18 @@ test('进度条 / 终局 / 分享卡的范围都必须跟随本局 queue，不�
   assert.ok(!/host\.innerHTML\s*=\s*c\.GAME_ORDER\.map/.test(stepsFn.slice(0, 1200)),
     'renderSteps 不得无条件 map GAME_ORDER');
 
-  // 2) 入口处必须先落 queue 再画进度条（顺序反了首帧仍会画出三关）
-  const entryIdx = src.indexOf('state.queue = mode.queue.slice()');
-  assert.ok(entryIdx > 0, '入口处必须把 mode.queue 落进 state.queue');
+  // 2) 入口处必须先落 queue 再画进度条（顺序反了首帧仍会画出全量关卡）
+  //    🔴 2026-10-13 P2：每日队列改为服务端 today.queue 下发（seeded 抽 3 关），
+  //    入口不再直接用 mode.queue —— 但「先赋值、后画条」的顺序红线不变，
+  //    否则首帧会按 GAME_ORDER 画出兜底三关。
+  const entryIdx = src.indexOf('state.queue = queue');
+  assert.ok(entryIdx > 0, '入口处必须把本局队列落进 state.queue');
   const afterEntry = src.slice(entryIdx);
-  assert.ok(/renderSteps\(mode\.game\)/.test(afterEntry.slice(0, 200)),
+  assert.ok(/renderSteps\(queue\[0\]\)/.test(afterEntry.slice(0, 300)),
     'state.queue 赋值之后才调用 renderSteps');
+  // 🔴 每日模式的队列必须以服务端下发为准，否则客户端硬编码三关
+  //    与后端「seeded 抽 3 关」不一致：进度条画的和实际判分的不是同一批。
+  assert.ok(/today\.queue/.test(src), '每日队列必须以服务端 today.queue 为准');
 
   // 3) 终局成绩行与满分：不得再用 GAME_ORDER
   const finalFn = src.slice(src.indexOf('async function showFinal'));

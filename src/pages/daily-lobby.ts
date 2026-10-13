@@ -21,16 +21,35 @@ function esc(s: string): string {
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m] as string));
 }
 
+/** i18n 取值（与 daily-game.ts 同一套降级识别：
+    i18n.t() 缺 key 时返回 key 本身，不能靠「非空」判断成功） */
+function t(key: string, fallback: string): string {
+  const g = window as any;
+  const fn = (typeof g.t === 'function' && g.t)
+    || (g.i18n && typeof g.i18n.t === 'function' ? g.i18n.t.bind(g.i18n) : null);
+  if (fn) {
+    try {
+      const val = fn(key);
+      if (typeof val === 'string' && val && val !== key) return val;
+    } catch (_) { /* 字典未加载完，走兜底 */ }
+  }
+  return fallback;
+}
+
 async function main() {
   // 🔴 无效 mode 深链：直接回大厅，避免停在一个什么都不做的页面
+  //    合法值交给契约层 resolveMode() 判定 —— 单一真相源，不在页面重抄一份。
+  //    硬编码列表漏一个 mode（如 P2 新增的 emoji/chimp/word），
+  //    玩家点大厅卡片过来会被静默踢回大厅，且看不出哪里错。
   const params = new URLSearchParams(location.search);
   const mode = params.get('mode');
-  if (mode) {
-    const valid = ['daily', 'number', 'sequence', 'color'];
-    if (!valid.includes(mode.toLowerCase())) {
-      location.replace('/games/daily-challenge/lobby/');
-      return;
-    }
+  if (mode && !window.DailyClient) {
+    location.replace('/games/daily-challenge/lobby/');
+    return;
+  }
+  if (mode && window.DailyClient && !window.DailyClient.resolveMode(mode)) {
+    location.replace('/games/daily-challenge/lobby/');
+    return;
   }
 
   // 等契约层就绪
@@ -50,15 +69,18 @@ async function main() {
   // 侧栏：真实完成态 + 分数
   const host = document.getElementById('lvRows');
   if (host) {
+    /* 🔴 关卡名与图标一律取自契约层 LEVELS + i18n，不再在页面上手抄一份。
+       硬编码的后果：P2 加了三款新关，这里仍只认老三关，
+       侧栏会把 emoji-ghost 显示成「Colour Recall」（图标和名字都错），
+       而且**不报错** —— 轮换队列抽到新关时玩家看到的是错的关卡名。 */
     host.innerHTML = today.levels.map((l) => {
       const done = !!today.done[l.game];
       const sc = (today.score && (today.score as any)[l.game]) || 0;
-      const icon = l.game === 'number-recall' ? '🔢'
-        : l.game === 'sequence-memory' ? '⚡' : '🎨';
-      const name = l.game === 'number-recall' ? 'Number Recall'
-        : l.game === 'sequence-memory' ? 'Sequence Memory' : 'Colour Recall';
+      const meta = c.LEVELS[l.game];
+      const icon = (meta && meta.icon) || '🧠';
+      const name = t(`dc.${l.game}`, l.game);
       return `<div class="dc-side-row ${done ? 'done' : ''}">
-        <span class="ico">${done ? '✅' : icon}</span>
+        <span class="ico">${done ? '✅' : esc(icon)}</span>
         <span class="nm">${esc(name)}</span>
         <span class="sc">${done ? `${sc} / ${l.maxScore}` : l.maxScore}</span>
       </div>`;

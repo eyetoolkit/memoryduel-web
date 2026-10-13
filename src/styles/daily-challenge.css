@@ -668,7 +668,153 @@
   border: 0;
 }
 
+/* ─── P2 新增：Emoji Ghost / Chimp Test / Word Recall ───
+   🔴 触摸目标一律 ≥44px（移动端主战场，见 site-compliance 复查结论） */
+
+/* Emoji Ghost：集合闪现行 + 四选一 */
+.dc-emoji-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  padding: 22px 0;
+  min-height: 96px;
+  align-items: center;
+}
+
+.dc-emoji {
+  font-size: 38px;
+  line-height: 1;
+  animation: dc-pop .28s ease both;
+}
+
+@keyframes dc-pop {
+  from { transform: scale(.4); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.dc-emoji-options {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.dc-emoji-opt {
+  aspect-ratio: 1;
+  min-height: 64px;
+  border: 2px solid var(--dc-line);
+  border-radius: 16px;
+  background: var(--dc-surface);
+  font-size: 34px;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform .1s ease, border-color .1s ease, background .1s ease;
+}
+
+.dc-emoji-opt.picked {
+  border-color: var(--dc-primary);
+  background: #FFF7ED;
+  transform: scale(1.06);
+}
+
+/* Chimp Test：5×5 网格 */
+.dc-chimp-grid {
+  display: grid;
+  gap: 8px;
+  margin: 18px 0;
+  max-width: 420px;
+  margin-inline: auto;
+}
+
+.dc-chimp-cell {
+  aspect-ratio: 1;
+  min-height: 56px;
+  border: 2px solid var(--dc-line);
+  border-radius: 12px;
+  background: var(--dc-paper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--dc-ink);
+  cursor: pointer;
+  user-select: none;
+}
+
+.dc-chimp-cell.lit { background: var(--dc-primary); border-color: var(--dc-primary); color: #fff; }
+.dc-chimp-cell.wrong { background: #FEE2E2; border-color: #DC2626; }
+
+/* Word Recall：逐词闪现 + 逐行判定 */
+.dc-word-stage {
+  min-height: 132px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 0;
+}
+
+.dc-word-now {
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--dc-primary);
+  min-height: 42px;
+  text-align: center;
+}
+
+.dc-word-prog { font-size: 13px; color: var(--dc-muted); }
+
+.dc-word-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.dc-word-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--dc-line);
+  border-radius: 12px;
+  background: var(--dc-surface);
+}
+
+.dc-word-row.answered { border-color: var(--dc-primary-light); background: #FFF7ED; }
+.dc-word-row .w { font-size: 17px; font-weight: 600; }
+
+.dc-word-btn {
+  min-height: 44px;
+  min-width: 76px;
+  padding: 8px 14px;
+  border: 2px solid var(--dc-line);
+  border-radius: 10px;
+  background: var(--dc-paper);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dc-word-btn.on {
+  border-color: var(--dc-primary);
+  background: var(--dc-primary);
+  color: #fff;
+}
+
+@media (max-width: 420px) {
+  .dc-emoji { font-size: 30px; }
+  .dc-emoji-options { gap: 8px; }
+  .dc-chimp-cell { min-height: 46px; font-size: 20px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .dc-num-stage.show { animation: none; }
   .dc-mode, .dc-btn, .dc-seq-cell { transition: none; }
+  .dc-emoji { animation: none; }
+  .dc-emoji-opt { transition: none; }
 }

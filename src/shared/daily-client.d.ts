@@ -16,22 +16,30 @@ declare global {
     DailyClient?: {
       /** 端点前缀，与后端 /api/md/daily 对齐 */
       API: string;
-      /** 关卡定义，与后端 LEVELS/maxScoreOf 对齐（maxScore = 整关满分） */
+      /** 关卡定义，与后端 LEVELS/maxScoreOf 对齐（maxScore = 整关满分）
+          step = 每轮长度步进（老三关 1 / emoji-ghost 2 / word-recall 4） */
       LEVELS: Record<string, {
         rounds: number;
         startLen: number;
         maxLen: number;
         maxScore: number;
+        step: number;
         icon: string;
       }>;
-      /** 每日三关的固定顺序 */
+      /** 兜底队列（仅首帧用）；每日轮换队列以服务端 today.queue 为准 */
       GAME_ORDER: string[];
+      /** 每日轮换池（word-recall 不在内） */
+      ROTATION_POOL: string[];
       LOBBY_URL: string;
+      /** 第 n 轮（1 起）的题目长度 */
+      roundLen: (game: string, round: number) => number;
       /** 第 n 轮（1 起）的满分，与后端 round 长度规则一致 */
       roundMax: (game: string, round: number) => number;
       ensureSession: () => Promise<{ pid: string; token: string }>;
       fetchToday: () => Promise<{
         date: string;
+        /** 🔴 服务端 seeded 的今日关卡队列（3 关），客户端不得自造 */
+        queue: string[];
         levels: Array<{ game: string; rounds: number; maxScore: number }>;
         done: Record<string, boolean>;
         score: Record<string, number>;
@@ -43,7 +51,17 @@ declare global {
         round: number;
         puzzle: any;
       }>;
-      submitAnswer: (game: string, round: number, answer: unknown) => Promise<{
+      /** word-recall 专用：带 lang 取题（漏传会静默拿到英语词库） */
+      fetchPuzzleInLang: (game: string, round: number, lang: string) => Promise<{
+        date: string;
+        game: string;
+        round: number;
+        puzzle: any;
+      }>;
+      /** 当前界面语言（六语兜底 en） */
+      fetchAnswerLang: () => string;
+      /** 🔴 lang 仅 word-recall 需要，必须与取题时传同一个 */
+      submitAnswer: (game: string, round: number, answer: unknown, lang?: string) => Promise<{
         game: string;
         round: number;
         correct: boolean;
@@ -57,7 +75,8 @@ declare global {
       }>;
       fetchStreak: () => Promise<{ date: string; streak: number; done: boolean }>;
       fetchRank: () => Promise<{ date: string; entries: any[]; note?: string }>;
-      resolveMode: (raw: string | null) => { game: string; round: number; queue: string[] } | null;
+      /** daily: true 表示该 mode 的队列应由服务端 today.queue 决定 */
+      resolveMode: (raw: string | null) => { game: string; round: number; queue: string[]; daily?: boolean } | null;
       loadCred: () => { pid: string; token: string } | null;
     };
   }

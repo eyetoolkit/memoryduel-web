@@ -1113,5 +1113,30 @@
   "numduel": {
     "title": "Duel de chiffres · MemoryDuel",
     "meta_desc": "Mémorisez une suite de chiffres et retappez-la avant votre adversaire. Duel de mémoire numérique 1v1, noté par le serveur, sans inscription."
-  }
+  },
+  "dc.emoji-ghost": "Fantôme Émoji",
+  "dc.chimp-test": "Test du Chimpanzé",
+  "dc.word-recall": "Mémoire des Mots",
+  "dc.emoji_h2": "Fantôme Émoji",
+  "dc.emoji_help": "Une rangée de symboles s'affiche puis l'un d'eux disparaît : lequel était dans l'ensemble ?",
+  "dc.emoji_ready": "Afficher",
+  "dc.emoji_pick": "Lequel était dans l'ensemble ?",
+  "dc.chimp_h2": "Test du Chimpanzé",
+  "dc.chimp_help": "Des chiffres apparaissent sur la grille puis disparaissent. Touchez chaque case qui portait un chiffre.",
+  "dc.chimp_ready": "Afficher",
+  "dc.chimp_pick": "Touchez les {n} cases qui portaient un chiffre.",
+  "dc.chimp_done": "Terminé",
+  "dc.word_h2": "Mémoire des Mots",
+  "dc.word_help": "Les mots apparaissent un par un. Ensuite, indiquez pour chacun s'il a déjà été vu.",
+  "dc.word_ready": "Afficher",
+  "dc.word_pick": "Pour chaque mot, dites si vous l'avez vu plus tôt dans cette manche.",
+  "dc.word_new": "Nouveau",
+  "dc.word_seen": "Vu",
+  "dc.word_lock": "Envoyer",
+  "dc.lobby_mt_emoji": "Fantôme Émoji",
+  "dc.lobby_md_emoji": "Une rangée de symboles s'affiche, l'un disparaît : lequel était-ce ?",
+  "dc.lobby_mt_chimp": "Test du Chimpanzé",
+  "dc.lobby_md_chimp": "Des chiffres apparaissent sur la grille puis disparaissent. Touchez chaque case qui en portait un.",
+  "dc.lobby_mt_word": "Mémoire des Mots",
+  "dc.lobby_md_word": "Les mots apparaissent un par un. Ensuite, indiquez pour chacun s'il a été vu."
 }
