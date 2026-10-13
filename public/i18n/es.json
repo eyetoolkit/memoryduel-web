@@ -1045,7 +1045,9 @@
     "share_cta": "Los mismos puzzles para todos: ¿puedes superarlo?",
     "share_failed": "No se pudo crear la imagen. Prueba a copiar el texto.",
     "title": "Desafío diario de memoria · MemoryDuel",
-    "meta_desc": "Juega el reto de memoria de hoy: amplitud de dígitos, secuencia y colores. Los mismos puzzles para todos, puntuación en el servidor."
+    "meta_desc": "Juega el reto de memoria de hoy: amplitud de dígitos, secuencia y colores. Los mismos puzzles para todos, puntuación en el servidor.",
+    "final_title_single": "{game} completado",
+    "final_perfect_single": "¡Perfecto!"
   },
   "duel": {
     "seq_title": "Duelo de secuencias",

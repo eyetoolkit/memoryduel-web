@@ -368,3 +368,61 @@ test('share-card.d.ts 是类型声明而非运行时模块', () => {
 test('pathToFileURL 被引用（审计器需识别动态 import 测试）', () => {
   assert.ok(pathToFileURL, '确保 node:url 已引入');
 });
+/* ═══════════════════════════════════════════════════════════════
+   单关模式（?mode=number/sequence/color）不得混用三关范围
+   ────────────────────────────────────────────────────────────────
+   🔴 2026-10-13 页面核查实测：单关模式下顶栏进度条、终局成绩行、
+      分享卡满分全部按 GAME_ORDER（三关）渲染 —— 玩家只玩一关却看到
+      另外两关 0/12 与「of 74」，会以为成绩被算错。
+      根因：renderSteps / showFinal / buildShareCard 无条件取 GAME_ORDER。
+   ═══════════════════════════════════════════════════════════════ */
+test('进度条 / 终局 / 分享卡的范围都必须跟随本局 queue，不得写死 GAME_ORDER', () => {
+  const src = fs.readFileSync(DAILY_TS, 'utf8');
+
+  // 1) renderSteps：必须按 state.queue 取关卡，回落 GAME_ORDER 只能是 queue 为空时
+  const stepsFn = src.slice(src.indexOf('function renderSteps'));
+  assert.ok(/state\.queue/.test(stepsFn.slice(0, 1200)),
+    'renderSteps 必须按 state.queue 渲染（单关模式只能画 1 个 step）');
+  assert.ok(!/host\.innerHTML\s*=\s*c\.GAME_ORDER\.map/.test(stepsFn.slice(0, 1200)),
+    'renderSteps 不得无条件 map GAME_ORDER');
+
+  // 2) 入口处必须先落 queue 再画进度条（顺序反了首帧仍会画出三关）
+  const entryIdx = src.indexOf('state.queue = mode.queue.slice()');
+  assert.ok(entryIdx > 0, '入口处必须把 mode.queue 落进 state.queue');
+  const afterEntry = src.slice(entryIdx);
+  assert.ok(/renderSteps\(mode\.game\)/.test(afterEntry.slice(0, 200)),
+    'state.queue 赋值之后才调用 renderSteps');
+
+  // 3) 终局成绩行与满分：不得再用 GAME_ORDER
+  const finalFn = src.slice(src.indexOf('async function showFinal'));
+  const finalHead = finalFn.slice(0, 2200);
+  assert.ok(/const rows = games\.map/.test(finalHead),
+    '终局成绩行必须按 games（= state.queue）渲染，不得无条件 GAME_ORDER');
+  assert.ok(/const max = games\.reduce/.test(finalHead),
+    '终局满分必须按 games 计算（单关模式应为 12/12/50，不是 74）');
+  assert.ok(!/const rows = c\.GAME_ORDER\.map/.test(finalHead),
+    '终局成绩行不得写死 GAME_ORDER');
+  assert.ok(!/const max = c\.GAME_ORDER\.reduce/.test(finalHead),
+    '终局满分不得写死 GAME_ORDER');
+
+  // 4) 分享卡：同样不得按三关算满分
+  const shareFn = src.slice(src.indexOf('function buildShareCard'));
+  const shareHead = shareFn.slice(0, 1600);
+  assert.ok(!/const max = c\.GAME_ORDER\.reduce/.test(shareHead),
+    '分享卡满分不得写死 GAME_ORDER（否则单关模式会写出「x / 74」）');
+  assert.ok(!/c\.GAME_ORDER\.filter\(\(g\) => \(state\.totals/.test(shareHead),
+    '分享卡满分关数统计不得写死 GAME_ORDER');
+
+  // 5) 单关终局标题/满分文案必须分流
+  assert.ok(/final_title_single/.test(src), '单关终局应有专属标题键 dc.final_title_single');
+  assert.ok(/final_perfect_single/.test(src), '单关满分应有专属文案键 dc.final_perfect_single');
+
+  // 6) 六语都必须有这两个键（少一个页面会直接显示 key 原文）
+  for (const lg of ['en', 'zh', 'ja', 'es', 'fr', 'de']) {
+    const d = JSON.parse(fs.readFileSync(path.join(ROOT, 'public/i18n', lg + '.json'), 'utf8'));
+    for (const k of ['final_title_single', 'final_perfect_single']) {
+      assert.ok(typeof d.dc?.[k] === 'string' && d.dc[k].trim(),
+        `${lg} 缺 dc.${k}`);
+    }
+  }
+});

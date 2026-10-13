@@ -1045,7 +1045,9 @@
     "share_cta": "Les mêmes énigmes pour tout le monde — pouvez-vous faire mieux ?",
     "share_failed": "Impossible de créer l'image. Essayez de copier le texte.",
     "title": "Défi mémoire quotidien · MemoryDuel",
-    "meta_desc": "Relevez le défi mémoire du jour : ampleur de chiffres, séquence et couleurs. Les mêmes énigmes pour tous, noté par le serveur."
+    "meta_desc": "Relevez le défi mémoire du jour : ampleur de chiffres, séquence et couleurs. Les mêmes énigmes pour tous, noté par le serveur.",
+    "final_title_single": "{game} terminé",
+    "final_perfect_single": "Parfait !"
   },
   "duel": {
     "seq_title": "Duel de séquences",

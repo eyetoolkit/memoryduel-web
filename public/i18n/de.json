@@ -1045,7 +1045,9 @@
     "share_cta": "Für alle dieselben Rätsel — schaffst du es besser?",
     "share_failed": "Bild konnte nicht erstellt werden. Kopiere stattdessen den Text.",
     "title": "Tägliche Gedächtnis-Challenge · MemoryDuel",
-    "meta_desc": "Spiele die tägliche Gedächtnis-Challenge: Ziffernspanne, Folge und Farben. Für alle dieselben Rätsel, serverseitig gewertet."
+    "meta_desc": "Spiele die tägliche Gedächtnis-Challenge: Ziffernspanne, Folge und Farben. Für alle dieselben Rätsel, serverseitig gewertet.",
+    "final_title_single": "{game} abgeschlossen",
+    "final_perfect_single": "Perfekt!"
   },
   "duel": {
     "seq_title": "Sequenz-Duell",

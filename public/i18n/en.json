@@ -1045,7 +1045,9 @@
     "share_cta": "Same puzzles for everyone — can you beat it?",
     "share_failed": "Could not create the image. Try copying the text instead.",
     "title": "Daily Memory Challenge · MemoryDuel",
-    "meta_desc": "Play today's memory challenge: digit span, sequence recall and colour recall. Same puzzles for every player, scored on the server."
+    "meta_desc": "Play today's memory challenge: digit span, sequence recall and colour recall. Same puzzles for every player, scored on the server.",
+    "final_title_single": "{game} complete",
+    "final_perfect_single": "Perfect!"
   },
   "duel": {
     "seq_title": "Sequence Memory Duel",

@@ -77,13 +77,18 @@ interface RunState {
 
 let state: RunState = { queue: [], totals: {}, perfect: true, streak: 0, date: '' };
 
-/* ─── 顶栏三关进度 ─── */
+/* ─── 顶栏关卡进度 ─── */
+// 🔴 只渲染「本局真的要玩的关卡」。单关模式（?mode=number/sequence/color）
+//    的 queue 长度是 1，若沿用 GAME_ORDER 会把三关全画出来 —— 玩家看到两关
+//    永远停在「·」，会以为还得再玩两关，与 lobby 卡片上的单关描述直接矛盾。
+//    默认回落 GAME_ORDER 仅供 queue 尚未赋值时的首帧兜底。
 function renderSteps(current?: string) {
   const host = $('#steps');
   if (!host) return;
   const c = C();
   const doneMap = (window as any).__dcDone || {};
-  host.innerHTML = c.GAME_ORDER.map((g) => {
+  const games = state.queue.length ? state.queue : c.GAME_ORDER;
+  host.innerHTML = games.map((g) => {
     const meta = c.LEVELS[g];
     const cls = doneMap[g] ? 'ok' : (current === g ? 'on' : '');
     const mark = doneMap[g] ? '✓' : '·';
@@ -381,8 +386,11 @@ async function showRoundResult(game: string, server: any) {
 /** 组装分享卡数据。抽成纯函数是为了能离线单测，不依赖 DOM。 */
 function buildShareCard(): ShareCardInput {
   const c = C();
+  // 与终局页同一套范围：单关模式只算本关满分，否则分享卡会写出「x / 74」
+  // 而玩家实际只玩了 12 分的一关。
+  const games = state.queue.length ? state.queue : c.GAME_ORDER;
   const sum = Object.values(state.totals).reduce((a, b) => a + b, 0);
-  const max = c.GAME_ORDER.reduce((a, g) => a + c.LEVELS[g].maxScore, 0);
+  const max = games.reduce((a, g) => a + c.LEVELS[g].maxScore, 0);
 
   // metaLines 优先于 meta：每日挑战的维度（连胜/满分关数）与引擎内置的
   // numeri 字段集（解/连/分/次）完全不同，硬塞进去只会互相踩。
@@ -390,9 +398,9 @@ function buildShareCard(): ShareCardInput {
   if (state.streak > 0) {
     lines.push(`🔥 ${state.streak} ${t('dc.streak_days', 'Day streak')}`);
   }
-  const perfectLevels = c.GAME_ORDER.filter((g) => (state.totals[g] || 0) >= c.LEVELS[g].maxScore);
+  const perfectLevels = games.filter((g) => (state.totals[g] || 0) >= c.LEVELS[g].maxScore);
   if (perfectLevels.length) {
-    lines.push(`💯 ${perfectLevels.length}/${c.GAME_ORDER.length} ${t('dc.perfect_all', 'all levels maxed')}`);
+    lines.push(`💯 ${perfectLevels.length}/${games.length} ${t('dc.perfect_all', 'all levels maxed')}`);
   }
   lines.push(`⭐ ${sum} / ${max}`);
   // 服务端日期串优先；拿不到就不显示日期行，绝不用本地时区拼一个（会和服务端差一天）
@@ -573,7 +581,11 @@ async function showFinal() {
   try { streak = (await c.fetchStreak()).streak; } catch (_) { /* 用提交时返回的值兜底 */ }
   state.streak = streak;
 
-  const rows = c.GAME_ORDER.map((g) => {
+  // 🔴 只列「本局真玩过的关卡」。单关模式（?mode=number 等）的 queue 长度是 1，
+  //    若沿用 GAME_ORDER 会把另外两关以 0/max 画出来，总分也按三关满分 74 计 ——
+  //    玩家只玩了一关却看到两个 0 分和「of 74」，会以为成绩被算错。
+  const games = state.queue.length ? state.queue : c.GAME_ORDER;
+  const rows = games.map((g) => {
     const meta = c.LEVELS[g];
     const got = state.totals[g] || 0;
     const done = got >= meta.maxScore;
@@ -585,12 +597,23 @@ async function showFinal() {
   }).join('');
 
   const sum = Object.values(state.totals).reduce((a, b) => a + b, 0);
-  const max = c.GAME_ORDER.reduce((a, g) => a + c.LEVELS[g].maxScore, 0);
+  const max = games.reduce((a, g) => a + c.LEVELS[g].maxScore, 0);
+
+  // 🔴 单关模式终局不能沿用三关文案：只玩一关却写「今日挑战完成 /
+  //    all levels maxed / of 74」，玩家会以为成绩被算错。按关卡数分流。
+  const isSingle = games.length === 1;
+  const finalTitle = isSingle
+    ? t('dc.final_title_single', '{game} complete')
+        .replace('{game}', t(`dc.${games[0]}`, games[0]))
+    : t('dc.final_title', "Today's challenge complete");
+  const perfectText = isSingle
+    ? t('dc.final_perfect_single', 'Perfect!')
+    : t('dc.perfect_all', 'all levels maxed');
 
   card.innerHTML = `
-    <h2 class="dc-h2">${esc(t('dc.final_title', "Today's challenge complete"))}</h2>
+    <h2 class="dc-h2">${esc(finalTitle)}</h2>
     <div class="dc-result-score">${sum}</div>
-    <div class="dc-result-of">${esc(t('dc.of_max', 'of'))} ${max}${state.perfect ? ' · ' + esc(t('dc.perfect_all', 'all levels maxed')) : ''}</div>
+    <div class="dc-result-of">${esc(t('dc.of_max', 'of'))} ${max}${state.perfect ? ' · ' + esc(perfectText) : ''}</div>
     <div class="dc-streak">🔥 ${esc(t('dc.streak_days', 'Day streak'))}: ${streak}</div>
     <div class="dc-rank">${rows}</div>
     <button class="dc-btn" id="againBtn" type="button">${esc(t('dc.play_again', 'Play again'))}</button>
@@ -702,6 +725,8 @@ async function main() {
   state.date = today.date;
   state.streak = today.streak || 0;
   (window as any).__dcDone = {};
+  // 先落 queue 再画进度条，否则首帧会按 GAME_ORDER 画出三关
+  state.queue = mode.queue.slice();
   renderSteps(mode.game);
 
   // 3) 单关模式：只玩这一关，结束进终局页
