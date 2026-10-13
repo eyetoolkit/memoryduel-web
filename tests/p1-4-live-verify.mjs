@@ -115,13 +115,23 @@ class CDP {
    ═══════════════════════════════════════════════════════════════ */
 const TOTALS = { 'number-recall': 12, 'sequence-memory': 12, 'color-recall': 50 };
 const roundMax = (g, r) => (g === 'color-recall' ? 50 : r);
+// 🔴 修订（2026-10-13）：原TOTALS 以满分作初值，submit 时又 `+= roundMax(...)`，
+//    于是 number 打1轮=12+1、sequence 打N轮=12+12+12…、color 每轮 +50，
+//    三关相加总分虚高到 136，而真实满分是 12+12+50=74。
+//    修法：mock 内部用从 0 开始的累计值（__acc），TOTALS 只作为「该关满分」查询表。
+const GAME_MAX = TOTALS;
 
 /** submit 走 mock：返回与真实后端同构的报文，避免打真接口写连胜/榜单 */
 const SHIM = `
 (function () {
-  var TOTALS = ${JSON.stringify(TOTALS)};
+  var GAME_MAX = ${JSON.stringify(GAME_MAX)};
   var roundMax = function (g, r) { return g === 'color-recall' ? 50 : r; };
   window.__submits = [];
+  // 从 0 开始累计，与真实后端「本关累计得分」语义一致
+  window.__acc = { 'number-recall': 0, 'sequence-memory': 0, 'color-recall': 0 };
+  window.__finalTotal = function () {
+    return GAME_MAX['number-recall'] + GAME_MAX['sequence-memory'] + GAME_MAX['color-recall'];
+  };
   var _fetch = window.fetch;
   // 🔴 硬门：submit 绝不允许走到真实网络。无论后面套几层包装、
   //    换什么调用姿势，一旦真发出去就立刻炸出来，不给「污染榜单」留缝。
@@ -141,18 +151,19 @@ const SHIM = `
     try { body = init && init.body ? JSON.parse(init.body) : null; } catch (_) {}
     var g = (body && body.game) || 'unknown';
     var r = (body && body.round) || 0;
-    TOTALS[g] = (TOTALS[g] || 0) + roundMax(g, r);
+    // 从 0 累计，且按该关满分封顶（防 mock 越界掩盖前端问题）
+    var cap = GAME_MAX[g] != null ? GAME_MAX[g] : 999;
+    window.__acc[g] = Math.min((window.__acc[g] || 0) + roundMax(g, r), cap);
     window.__submits.push({ game: g, round: r, hasAnswer: !!(body && body.answer !== undefined) });
 
-    var total = TOTALS[g];
-    var max = roundMax(g, r) + (g === 'color-recall' ? 0 : 0);
+    var total = window.__acc[g];
     var payload = {
       ok: true,
       data: {
         game: g, round: r, correct: true,
         score: roundMax(g, r), total: total,
-        maxScore: g === 'color-recall' ? 50 : 12,
-        perfect: total >= (g === 'color-recall' ? 50 : 12),
+        maxScore: cap,
+        perfect: total >= cap,
         levelDone: true, allDone: true, streak: 4,
       },
     };
@@ -353,6 +364,8 @@ await withPage('线上', async (c) => {
     finalTitle: (document.querySelector('.dc-h2')||{}).textContent || '',
     rankRows: document.querySelectorAll('.dc-rank-row').length,
     score: (document.querySelector('.dc-result-score')||{}).textContent || '',
+    finalTotal: typeof window.__finalTotal === 'function' ? window.__finalTotal() : null,
+    acc: window.__acc,
     today: window.__liveToday,
     submits: window.__submits,
     diag: window.__diag,
@@ -362,6 +375,14 @@ await withPage('线上', async (c) => {
   ok(st.rankRows === 3, `终局三关成绩行都在（${st.rankRows}/3）`);
   ok(/^\d+$/.test(String(st.score).trim()) && Number(st.score) > 0,
     `终局总分已渲染（${st.score}）`);
+  // 🔴 总分上限断言（2026-10-13 新增）。此前 mock 从满分初值再累加，
+  //    渲染出 136 而真实满分是 74，却因为只断言 >0 而一路绿灯放过。
+  const FINAL_MAX = 12 + 12 + 50;
+  const shown = Number(String(st.score).replace(/[^0-9]/g, ''));
+  ok(shown <= FINAL_MAX,
+    `终局总分不超过满分上限 ${FINAL_MAX}（实测 ${shown}）`);
+  ok(st.acc && Object.values(st.acc).every((v) => v >= 0 && v <= 50),
+    `各关累计分未越界（${JSON.stringify(st.acc)}）`);
   ok(Array.isArray(st.submits) && st.submits.length >= 3,
     `submit 被 mock 拦截（记录 ${(st.submits || []).length} 次）`);
   // 🔴 长度必须先于 every：空数组的 every 恒为 true，

@@ -1,7 +1,13 @@
 // B-M3 集成测试（2026-10-01）：memoryduel battle page 上线验证
+// 修订（2026-10-13）：
+//   ① BASE 改直连 www。apex→www 301 是 GET 安全的，但 fetch 跟随 301 时会把 POST 降级成 GET
+//      并丢弃 body，导致 /api/teacher/join 收到空 body 返 bad_json（假失败，不是产品 bug）。
+//   ② /api/teacher/* 与 /api/play/* 的 worker route 原先只挂 apex、漏 www，
+//      被 301 甩到 www 后落回 Pages 返软 404（首页 HTML）。已补 route，见 STATE.md。
 import assert from 'node:assert/strict';
 
 const BASE = 'https://memoryduel.com';
+const API_BASE = 'https://www.memoryduel.com'; // API 一律直连 www，避开 apex 301 对 POST body 的降级
 
 async function fetchText(url, timeoutMs = 25000) {
   const r = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
@@ -30,15 +36,24 @@ assert.match(battleJs, /api\/teacher\/track/, 'reportRound 上报端点');
 assert.match(battleJs, /tid/, 'classroom 检测的 tid=1 关键字');
 console.log('✓ test 2: battle chunk 内嵌 teacher-track 完整逻辑（mem_class + 弹窗 + track + tid）');
 
-// 3. /api/teacher/games 在 memoryduel.com 端返回三站 11 游戏
-const games = (await fetchJson(`${BASE}/api/teacher/games`)).games;
+// 3. /api/teacher/games 在 memoryduel.com 端包含 memory 站的 quiz-battle
+// 修订（2026-10-13）：原断言写死 length===1，但目录已扩容到 2 个 memory 游戏
+// （新增 quiz「My Question Bank」）。故不再锁数量，只守真正的不变量——
+// memory 站存在、且 quiz-battle 在其中且 dataReady 可为 false 但字段完整。
+const games = (await fetchJson(`https://www.memoryduel.com/api/teacher/games`)).games;
 const memoryGames = games.filter((g) => g.site === 'memory');
-assert.equal(memoryGames.length, 1, 'memory site 至少 1 个游戏');
-assert.equal(memoryGames[0].slug, 'quiz-battle', 'memory 站游戏 slug 应为 quiz-battle');
-console.log('✓ test 3: /api/teacher/games 在 memoryduel.com 端返回 memory quiz-battle');
+assert.ok(memoryGames.length >= 1, `memory site 至少 1 个游戏，实际 ${memoryGames.length}`);
+const qb = memoryGames.find((g) => g.slug === 'quiz-battle');
+assert.ok(qb, 'memory 站游戏列表必须含 quiz-battle');
+for (const k of ['slug', 'site', 'gameType', 'label', 'note', 'dataReady']) {
+  assert.ok(k in qb, `quiz-battle 缺少字段 ${k}`);
+}
+console.log(
+  `✓ test 3: /api/teacher/games 返回 ${games.length} 游戏，其中 memory 站 ${memoryGames.length} 个（含 quiz-battle）`,
+);
 
 // 4. /api/teacher/track CORS preflight 在 memoryduel.com 通过 + 回显 Allow-Origin
-const preflight = await fetch(`${BASE}/api/teacher/track`, {
+const preflight = await fetch(`${API_BASE}/api/teacher/track`, {
   method: 'OPTIONS',
   headers: {
     'Origin': BASE,
@@ -52,7 +67,7 @@ assert.equal(preflight.headers.get('access-control-allow-credentials'), 'true');
 console.log('✓ test 4: /api/teacher/track CORS preflight 在 memoryduel.com 通过');
 
 // 5. /api/teacher/join 端点可达（NOEXIST 返 room_not_found）
-const joinRes = await fetch(`${BASE}/api/teacher/join`, {
+const joinRes = await fetch(`${API_BASE}/api/teacher/join`, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json', 'Origin': BASE },
   body: JSON.stringify({ roomCode: 'NOEXIST_MEM_M3_TEST', code: 'S99' }),

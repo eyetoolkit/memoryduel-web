@@ -133,10 +133,22 @@ function loadQuiz(env) {
 {
   const Q = loadQuiz({ search: '?lang=zh', navigatorLang: 'en-US' });
   assert.equal(Q.getLang(), 'zh');
-  // Simulate wrap via fetching is hard; instead inspect source contract:
+  // 修订（2026-10-13）：原断言写死 qn[LANG] = apiQ.q，但 wrap 后来加了显式 rawLang 入参
+  // （commit 4c74e92「wrap 用 fetchLang 避免模块级 LANG 竞态」），
+  // 现在是 qn[L]，L = rawLang || LANG。真正的契约是「只写一个语言槽位，绝不写死 en」：
+  //   ① 必须仍以 qn[...]=apiQ.q 形式写入
+  //   ② 绝不能再出现把任意语言塞进 en 的旧写法
   const srcText = fs.readFileSync(path.join(root, 'public/assets/quiz-data.js'), 'utf8');
   assert.ok(!/o = \{ en: apiQ\.q \}/.test(srcText), 'old wrap that stamps en with any lang must be gone');
-  assert.ok(/qn\[LANG\] = apiQ\.q/.test(srcText), 'wrap must write only LANG slot');
+  assert.ok(
+    /qn\[\w+\] = apiQ\.q/.test(srcText),
+    'wrap 必须只写实际拉取的语言槽位（qn[L] = apiQ.q，L 来自 rawLang || LANG）',
+  );
+  // op/ex 两个槽位同样只能按 L 写，不得按 en 写
+  assert.ok(/op\[\w+\] = apiQ\.options\.slice\(\)/.test(srcText), 'op 槽位同样只写 L');
+  assert.ok(/ex\[\w+\] = apiQ\.explain \|\| ''/.test(srcText), 'ex 槽位同样只写 L');
+  assert.ok(!/op\.en = apiQ\.options/.test(srcText), '不得把任意语言 options 写进 op.en');
+  assert.ok(!/ex\.en = apiQ\.explain/.test(srcText), '不得把任意语言 explain 写进 ex.en');
   console.log('✓ Case E: wrap no longer poisons qn.en');
 }
 
