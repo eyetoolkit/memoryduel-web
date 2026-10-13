@@ -1138,5 +1138,8 @@
   "dc.lobby_mt_chimp": "Prueba del Chimpancé",
   "dc.lobby_md_chimp": "Los números aparecen en la cuadrícula y desaparecen. Pulsa todas las casillas que tenían uno.",
   "dc.lobby_mt_word": "Memoria de Palabras",
-  "dc.lobby_md_word": "Las palabras aparecen una a una. Luego marca cada una como vista o nueva."
+  "dc.lobby_md_word": "Las palabras aparecen una a una. Luego marca cada una como vista o nueva.",
+  "dc.number-recall": "Memoria Numérica",
+  "dc.sequence-memory": "Memoria de Secuencia",
+  "dc.color-recall": "Memoria de Colores"
 }

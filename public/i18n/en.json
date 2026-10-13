@@ -1138,5 +1138,8 @@
   "dc.lobby_mt_chimp": "Chimp Test",
   "dc.lobby_md_chimp": "Numbers flash on a grid, then vanish. Tap every cell that held one.",
   "dc.lobby_mt_word": "Word Recall",
-  "dc.lobby_md_word": "Words appear one by one. Then mark each as seen or new."
+  "dc.lobby_md_word": "Words appear one by one. Then mark each as seen or new.",
+  "dc.number-recall": "Number Recall",
+  "dc.sequence-memory": "Sequence Memory",
+  "dc.color-recall": "Colour Recall"
 }

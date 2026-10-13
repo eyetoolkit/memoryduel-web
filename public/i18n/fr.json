@@ -1138,5 +1138,8 @@
   "dc.lobby_mt_chimp": "Test du Chimpanzé",
   "dc.lobby_md_chimp": "Des chiffres apparaissent sur la grille puis disparaissent. Touchez chaque case qui en portait un.",
   "dc.lobby_mt_word": "Mémoire des Mots",
-  "dc.lobby_md_word": "Les mots apparaissent un par un. Ensuite, indiquez pour chacun s'il a été vu."
+  "dc.lobby_md_word": "Les mots apparaissent un par un. Ensuite, indiquez pour chacun s'il a été vu.",
+  "dc.number-recall": "Mémoire des Chiffres",
+  "dc.sequence-memory": "Mémoire des Séquences",
+  "dc.color-recall": "Mémoire des Couleurs"
 }

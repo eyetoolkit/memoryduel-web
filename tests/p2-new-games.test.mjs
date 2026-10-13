@@ -272,6 +272,22 @@ test('大厅三张新卡片都存在且指向正确 mode', () => {
 });
 
 /* ═══════════ 9. 六语文案齐全 ═══════════ */
+test('六关名在六语下都齐全（进度条不得退回显示游戏 id）', () => {
+  /* 🔴 回归防线：老三关的 dc.<game-id> 键曾**一直缺失**（字典里它们叫
+     numduel.* / seqduel.* / colduel.*），而 renderSteps 用的正是 dc.${g}，
+     于是进度条永远显示「number-recall」而不是「数字广度」，
+     且**零报错**——i18n.t 缺键时返回 key 本身，被 fallback 原样显示。 */
+  const games = Object.keys(c.LEVELS);
+  for (const lang of ['en', 'zh', 'ja', 'es', 'fr', 'de']) {
+    const d = JSON.parse(fs.readFileSync(path.join(ROOT, `public/i18n/${lang}.json`), 'utf8'));
+    for (const g of games) {
+      const v = d[`dc.${g}`];
+      assert.ok(typeof v === 'string' && v.length > 0, `${lang} 缺 dc.${g}`);
+      assert.notStrictEqual(v, g, `${lang} 的 dc.${g} 不能等于游戏 id（等于没翻译）`);
+    }
+  }
+});
+
 test('六语 25 个新键齐全（缺一语会把 key 本身显示给用户）', () => {
   const keys = [
     'dc.emoji-ghost', 'dc.chimp-test', 'dc.word-recall',

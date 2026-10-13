@@ -18,13 +18,24 @@ I18N = os.path.join(ROOT, "public", "i18n")
 LANGS = ["en", "zh", "ja", "es", "fr", "de"]
 
 # ── 关卡名（进度条 / 成绩行 / 分享卡共用 dc.<game>）────────────────
+# 🔴 2026-10-13 补齐：老三关（number/sequence/color）在 dc.<game-id> 这套
+#    键下**一直缺键**——字典里它们叫 numduel.*/seqduel.*/colduel.*（按对站分组）。
+#    而 renderSteps/showFinal 用的恰恰是 `dc.${g}`，于是进度条上
+#    永远显示原始 id「number-recall」而不是「数字广度」，且零报错
+#    （i18n.t 缺键时返回 key 本身，被 fallback 参数原样显示）。
 NAMES = {
-    "en": {"emoji-ghost": "Emoji Ghost", "chimp-test": "Chimp Test", "word-recall": "Word Recall"},
-    "zh": {"emoji-ghost": "表情幽灵", "chimp-test": "猩猩测试", "word-recall": "词语记忆"},
-    "ja": {"emoji-ghost": "絵文字ゴースト", "chimp-test": "チンパー・テスト", "word-recall": "単語記憶"},
-    "es": {"emoji-ghost": "Fantasma Emoji", "chimp-test": "Prueba del Chimpancé", "word-recall": "Memoria de Palabras"},
-    "fr": {"emoji-ghost": "Fantôme Émoji", "chimp-test": "Test du Chimpanzé", "word-recall": "Mémoire des Mots"},
-    "de": {"emoji-ghost": "Emoji-Geist", "chimp-test": "Schimpansen-Test", "word-recall": "Wörter-Gedächtnis"},
+    "en": {"emoji-ghost": "Emoji Ghost", "chimp-test": "Chimp Test", "word-recall": "Word Recall",
+           "number-recall": "Number Recall", "sequence-memory": "Sequence Memory", "color-recall": "Colour Recall"},
+    "zh": {"emoji-ghost": "表情幽灵", "chimp-test": "猩猩测试", "word-recall": "词语记忆",
+           "number-recall": "数字广度", "sequence-memory": "序列记忆", "color-recall": "颜色还原"},
+    "ja": {"emoji-ghost": "絵文字ゴースト", "chimp-test": "チンパー・テスト", "word-recall": "単語記憶",
+           "number-recall": "数字記憶", "sequence-memory": "数列記憶", "color-recall": "色記憶"},
+    "es": {"emoji-ghost": "Fantasma Emoji", "chimp-test": "Prueba del Chimpancé", "word-recall": "Memoria de Palabras",
+           "number-recall": "Memoria Numérica", "sequence-memory": "Memoria de Secuencia", "color-recall": "Memoria de Colores"},
+    "fr": {"emoji-ghost": "Fantôme Émoji", "chimp-test": "Test du Chimpanzé", "word-recall": "Mémoire des Mots",
+           "number-recall": "Mémoire des Chiffres", "sequence-memory": "Mémoire des Séquences", "color-recall": "Mémoire des Couleurs"},
+    "de": {"emoji-ghost": "Emoji-Geist", "chimp-test": "Schimpansen-Test", "word-recall": "Wörter-Gedächtnis",
+           "number-recall": "Zahlengedächtnis", "sequence-memory": "Reihen-Gedächtnis", "color-recall": "Farb-Gedächtnis"},
 }
 
 # ── 玩法文案 ─────────────────────────────────────────────────────

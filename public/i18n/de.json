@@ -1138,5 +1138,8 @@
   "dc.lobby_mt_chimp": "Schimpansen-Test",
   "dc.lobby_md_chimp": "Zahlen blinken im Raster auf und verschwinden. Tippe jedes Feld mit einer Zahl.",
   "dc.lobby_mt_word": "Wörter-Gedächtnis",
-  "dc.lobby_md_word": "Wörter erscheinen nacheinander. Markiere danach jedes als gesehen oder neu."
+  "dc.lobby_md_word": "Wörter erscheinen nacheinander. Markiere danach jedes als gesehen oder neu.",
+  "dc.number-recall": "Zahlengedächtnis",
+  "dc.sequence-memory": "Reihen-Gedächtnis",
+  "dc.color-recall": "Farb-Gedächtnis"
 }

@@ -1138,5 +1138,8 @@
   "dc.lobby_mt_chimp": "チンパー・テスト",
   "dc.lobby_md_chimp": "グリッドの数字が点滅して消えます。数字があったマスをすべてタップ。",
   "dc.lobby_mt_word": "単語記憶",
-  "dc.lobby_md_word": "単語が1つずつ表示され、それぞれを「見た／初めて」と判定します。"
+  "dc.lobby_md_word": "単語が1つずつ表示され、それぞれを「見た／初めて」と判定します。",
+  "dc.number-recall": "数字記憶",
+  "dc.sequence-memory": "数列記憶",
+  "dc.color-recall": "色記憶"
 }

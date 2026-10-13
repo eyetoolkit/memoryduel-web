@@ -1138,5 +1138,8 @@
   "dc.lobby_mt_chimp": "猩猩测试",
   "dc.lobby_md_chimp": "数字在网格上闪现后消失，点出所有刚才显示过数字的格子。",
   "dc.lobby_mt_word": "词语记忆",
-  "dc.lobby_md_word": "词语逐个出现，之后为每个词标记「见过」或「没见过」。"
+  "dc.lobby_md_word": "词语逐个出现，之后为每个词标记「见过」或「没见过」。",
+  "dc.number-recall": "数字广度",
+  "dc.sequence-memory": "序列记忆",
+  "dc.color-recall": "颜色还原"
 }
