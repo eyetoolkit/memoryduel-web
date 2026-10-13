@@ -1141,7 +1141,8 @@
     "word_help": "Words appear one by one. Your opponent gets the exact same words — mark each as seen or new.",
     "word_ready_hint": "Tap start, watch the words appear, then mark each as seen or new.",
     "word_judge": "Your turn — mark each word",
-    "word_foot_hint": "Same words for both players. Server-scored."
+    "word_foot_hint": "Same words for both players. Server-scored.",
+    "settle_failed": "Scores saved, but rewards could not be issued this time. Play again later."
   },
   "colduel": {
     "title": "Colour Recall Duel · MemoryDuel",

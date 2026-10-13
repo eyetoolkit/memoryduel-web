@@ -79,7 +79,7 @@ try {
     await raw(guest, 'POST', '/room/join', { code });
     await sleep(3000);
     const mem = await raw(guest, 'GET', `/room/status?code=${code}`);
-    check(guest, mem.j.data?.status === 'waiting', 'guest 已加入且房间 waiting');
+    check('guest', mem.j.data?.status === 'waiting', 'guest 已加入且房间 waiting');
     const r = await raw(guest, 'GET', `/room/round?code=${code}&round=0&game=sequence-memory`);
     ok(r.s !== 200 || !r.j.data?.puzzle,
       `waiting 状态取题被拒（HTTP ${r.s} ${r.j.error?.code || ''}）`);

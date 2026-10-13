@@ -1141,7 +1141,8 @@
     "word_help": "Las palabras aparecen una a una. Tu rival recibe exactamente las mismas palabras.",
     "word_ready_hint": "Pulsa iniciar, observa las palabras y marca cada una como vista o nueva.",
     "word_judge": "Tu turno: marca cada palabra",
-    "word_foot_hint": "Las mismas palabras para ambos. Puntuado por el servidor."
+    "word_foot_hint": "Las mismas palabras para ambos. Puntuado por el servidor.",
+    "settle_failed": "Puntuación guardada, pero esta vez no se pudieron entregar las recompensas. Inténtalo más tarde."
   },
   "colduel": {
     "title": "Duelo de colores · MemoryDuel",

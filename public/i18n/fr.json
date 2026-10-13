@@ -1141,7 +1141,8 @@
     "word_help": "Les mots apparaissent un par un. Votre adversaire reçoit exactement les mêmes mots.",
     "word_ready_hint": "Lancez, observez les mots, puis indiquez pour chacun s'il a été vu.",
     "word_judge": "À vous : indiquez chaque mot",
-    "word_foot_hint": "Les mêmes mots pour les deux. Noté par le serveur."
+    "word_foot_hint": "Les mêmes mots pour les deux. Noté par le serveur.",
+    "settle_failed": "Score enregistré, mais les récompenses n'ont pas pu être attribuées cette fois. Réessayez plus tard."
   },
   "colduel": {
     "title": "Duel des couleurs · MemoryDuel",

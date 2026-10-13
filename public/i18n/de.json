@@ -1141,7 +1141,8 @@
     "word_help": "Wörter erscheinen nacheinander. Dein Gegner bekommt genau dieselben Wörter.",
     "word_ready_hint": "Start drücken, Wörter ansehen, dann jedes als gesehen oder neu markieren.",
     "word_judge": "Du bist dran – Wörter markieren",
-    "word_foot_hint": "Dieselben Wörter für beide. Server-seitig gewertet."
+    "word_foot_hint": "Dieselben Wörter für beide. Server-seitig gewertet.",
+    "settle_failed": "Punkte gespeichert, aber die Belohnung konnte diesmal nicht ausgegeben werden. Bitte später erneut versuchen."
   },
   "colduel": {
     "title": "Farb-Duell · MemoryDuel",

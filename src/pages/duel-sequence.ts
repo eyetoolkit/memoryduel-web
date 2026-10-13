@@ -791,10 +791,52 @@ async function playRound(code: string, round: number): Promise<boolean> {
 }
 
 /* ═══════════ 阶段 4：比分 ═══════════ */
+/* 🔴 2026-10-13 深度审核发现：这一段此前**只读比分、从不结算**。
+   showResult 原来直接 `roomStatus()` 渲染榜单就结束，全文件搜不到
+   `finishRoom`。而 /room/finish 是 memoryduel **唯一**的发币入口
+   （index.js 在那里 settlePlayerOnce 给每个 pid 发 15/5 币，
+   并落 D1 matches / match_players）。
+   后果：六款记忆游戏（sequence / number / color / emoji / chimp / word）
+   玩家打完整局 → 比分正常显示 → **金币 0 增长、战绩不落库**。
+   只有 quiz 的两条老链路（train.html 在线对战、teacher.js 课堂）
+   调了 finish，所以「对战能产币」这件事在站点上一直是半残的。
+
+   为什么原来没炸：结算失败也不会有任何报错 —— 页面已经渲染完了，
+   玩家看不到任何线索，只是金币悄悄没加。 */
 async function showResult(code: string) {
   showRoundTag(ROUNDS, ROUNDS);
   const card = $('#card')!;
   card.innerHTML = `<div class="dc-loading">${esc(t('duel.scoring', 'Scoring…'))}</div>`;
+
+  /* ① 先结算，再拉比分。
+     顺序很重要：finish 内部会把最终比分写进 D1 并发币，
+     若先读 status 拿到的是「结算前」的分数（异步对战下
+     对手可能还在打），榜单会显示一个中间态。 */
+  let settled = false;
+  try {
+    await C().finishRoom(code);
+    settled = true;
+  } catch (e) {
+    /* 服务端 /room/finish 对「重复结算」回 4xx ALREADY_FINISHED。
+       那不是错误 —— 说明这一局早就结过了。异步对战里对手先打完、
+       或用户刷新后重新进房走到这里，都会命中，属正常形态。
+       判据用 err.code（duel-room.js 把后端 error.code 挂在异常上），
+       不用正则去 match message 文本 —— 那是拿文案当契约，
+       一旦有人改文案或加前缀就静默失效。 */
+    const code2 = (e as any)?.code || '';
+    settled = code2 === 'BAD_PARAM' && /ALREADY_FINISHED/i.test((e as Error).message || '');
+    if (!settled) console.warn('[duel] finish failed:', (e as Error).message);
+    else console.info('[duel] already settled by opponent');
+  }
+
+  /* ② 结算失败也要把比分给玩家看。
+     金币没发不等于这一局白打了 —— 玩家该知道自己得了几分。
+     所以这里只加一条提示，不换成错误卡（那会让玩家以为整局无效）。 */
+  if (!settled) {
+    try {
+      sessionStorage.setItem('duel-settle-failed', '1');
+    } catch (_) {}
+  }
 
   let st: any;
   try {
@@ -820,6 +862,7 @@ async function showResult(code: string) {
 
   card.innerHTML = `
     <h2 class="dc-h2">${esc(t('duel.result_title', 'Duel complete'))}</h2>
+    ${settled ? '' : `<p class="dc-help error">${esc(t('duel.settle_failed', 'Scores saved, but rewards could not be issued this time. Play again later.'))}</p>`}
     <div class="dc-rank">${rows}</div>
     <div class="duel-code-box">
       <span class="duel-code-big">${esc(code)}</span>
