@@ -218,13 +218,15 @@ async function checkEmoji(page) {
   const scored = await page.waitFor(() => page.eval(`return !!document.querySelector('#nextBtn');`), 15000);
   ok(scored, '提交后进入成绩页');
   if (scored) {
-    // 🔴 必须 trim：成绩节点由多行模板字符串生成，textContent 带换行与缩进
+    // 🔴 必须 trim：成绩节点由多行模板字符串生成，textContent 带换行与缩进。
+    //    🔴 满分断言只认**数字**，不认「of/共」这个字——文案随语言变
+    //    （中文态渲染「共 10」），绑英文会把正常页面判成失败。
     const r = await page.eval(`
       return { score: ((document.querySelector('.dc-result-score')||{}).textContent||'').trim(),
                of: ((document.querySelector('.dc-result-of')||{}).textContent||'').trim() };`);
     info(`成绩：${r.score} ${r.of}`);
-    ok(/^\\d+$/.test((r.score || '').trim()), '  分数为数字（服务端判分）');
-    ok(/of\\s*10/.test(r.of || ''), '  单轮满分是 10（不是三关总分 74）');
+    ok(/^\d+$/.test(r.score), '  分数为数字（服务端判分）');
+    ok(/(^|\D)10(\D|$)/.test(r.of), '  单轮满分是 10（不是三关总分 74）');
   }
   const probs = page.problems();
   ok(probs.length === 0, `零报错${probs.length ? '：' + probs.slice(0, 2).join(' | ') : ''}`);
@@ -273,13 +275,15 @@ async function checkChimp(page) {
   const scored = await page.waitFor(() => page.eval(`return !!document.querySelector('#nextBtn');`), 15000);
   ok(scored, '提交后进入成绩页');
   if (scored) {
-    // 🔴 必须 trim：成绩节点由多行模板字符串生成，textContent 带换行与缩进
+    // 🔴 必须 trim：成绩节点由多行模板字符串生成，textContent 带换行与缩进。
+    //    🔴 满分断言只认**数字**，不认「of/共」这个字——文案随语言变
+    //    （中文态渲染「共 10」），绑英文会把正常页面判成失败。
     const r = await page.eval(`
       return { score: ((document.querySelector('.dc-result-score')||{}).textContent||'').trim(),
                of: ((document.querySelector('.dc-result-of')||{}).textContent||'').trim() };`);
     info(`成绩：${r.score} ${r.of}`);
-    ok(/^\\d+$/.test((r.score || '').trim()), '分数为数字');
-    ok(/of\\s*5/.test(r.of || ''), '第 1 轮满分是 5（不是关卡 18）');
+    ok(/^\d+$/.test(r.score), '分数为数字');
+    ok(/(^|\D)5(\D|$)/.test(r.of), '第 1 轮满分是 5（不是关卡 18）');
   }
   const probs = page.problems();
   ok(probs.length === 0, `零报错${probs.length ? '：' + probs.slice(0, 2).join(' | ') : ''}`);
@@ -338,13 +342,15 @@ async function checkWord(page) {
   const scored = await page.waitFor(() => page.eval(`return !!document.querySelector('#nextBtn');`), 15000);
   ok(scored, '提交后进入成绩页');
   if (scored) {
-    // 🔴 必须 trim：成绩节点由多行模板字符串生成，textContent 带换行与缩进
+    // 🔴 必须 trim：成绩节点由多行模板字符串生成，textContent 带换行与缩进。
+    //    🔴 满分断言只认**数字**，不认「of/共」这个字——文案随语言变
+    //    （中文态渲染「共 10」），绑英文会把正常页面判成失败。
     const r = await page.eval(`
       return { score: ((document.querySelector('.dc-result-score')||{}).textContent||'').trim(),
                of: ((document.querySelector('.dc-result-of')||{}).textContent||'').trim() };`);
     info(`成绩：${r.score} ${r.of}`);
-    ok(/^\\d+$/.test((r.score || '').trim()), '分数为数字');
-    ok(/of\\s*6/.test(r.of || ''), '第 1 轮满分是 6（不是关卡 30）');
+    ok(/^\d+$/.test(r.score), '分数为数字');
+    ok(/(^|\D)6(\D|$)/.test(r.of), '第 1 轮满分是 6（不是关卡 30）');
   }
   const probs = page.problems();
   ok(probs.length === 0, `零报错${probs.length ? '：' + probs.slice(0, 2).join(' | ') : ''}`);
