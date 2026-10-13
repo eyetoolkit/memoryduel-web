@@ -898,7 +898,8 @@
     "game_modes": "See all modes →",
     "game_seq_d": "Memorise the tile sequence, then tap it back. Same sequence for both players, server-scored — send a room code and compare.",
     "tag_async": "Async",
-    "game_num_d": "Digits flash one by one — type the whole string back. Same number for both players, server-scored, no login."
+    "game_num_d": "Digits flash one by one — type the whole string back. Same number for both players, server-scored, no login.",
+    "game_col_d": "Five colours appear, then vanish — rebuild each one on the wheel. Same colours for both players, closest match wins."
   },
   "mm_bv": {
     "mm_bv_p1": "Best Brain Training Games for All Ages",
@@ -1089,6 +1090,11 @@
     "num_help": "Memorise the digits, then type them back. Your opponent gets the exact same number — whoever recalls more wins.",
     "num_ready_hint": "Tap start, watch the digits flash, then type them from memory.",
     "your_turn_num": "Your turn — type the digits",
-    "foot_hint_num": "Same number for both players. Sharper memory wins."
+    "foot_hint_num": "Same number for both players. Sharper memory wins.",
+    "col_title": "Colour Recall Duel",
+    "col_help": "Memorise the colours, then rebuild them on the wheel. Your opponent gets the exact same colours — whoever is closer wins.",
+    "col_ready_hint": "Tap start, watch the colours appear, then rebuild each one as closely as you can.",
+    "col_pick": "Colour {n} of {total} — match it as closely as you can.",
+    "col_foot_hint": "Same colours for both players. Closest match wins."
   }
 }

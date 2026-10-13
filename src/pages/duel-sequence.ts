@@ -52,22 +52,46 @@ function t(key: string, fallback: string): string {
   return fallback;
 }
 
-/* ─── 游戏由 URL 决定（P1-3：Number Recall 复用同一套对战内核）─────
-   🔴 为什么不是一个 URL + 参数，而是两个独立页面：
+/* ─── 游戏由 URL 决定（P1-3 Number / P1-5 Color 复用同一套对战内核）──
+   🔴 为什么不是一个 URL + 参数，而是多个独立页面：
      每个游戏一条独立 URL 才能各自进 sitemap、各自有 OG/标题，
-     SEO 上是两个落地页而不是一个。但**代码只有一份** ——
-     由路径推断 game，避免复制粘贴出两份会逐渐分叉的实现。
+     SEO 上是多个落地页而不是一个。但**代码只有一份** ——
+     由路径推断 game，避免复制粘贴出多份会逐渐分叉的实现。
      只有「题目长什么样 + 玩家怎么作答」两处有差异，其余（建房、
      等待、轮询、提交、比分）完全共用。 */
 const GAME: string = /\/games\/number-recall\//.test(location.pathname)
   ? 'number-recall'
-  : 'sequence-memory';
+  : /\/games\/color-recall\//.test(location.pathname)
+    ? 'color-recall'
+    : 'sequence-memory';
 const ROUNDS = 3;
 const LIT_MS = 600;
 const GAP_MS = 240;
+/** 颜色阵列的展示时长。与 daily 的 playColor 保持一致，玩家不必在两种玩法间换预期。 */
+const COLOR_SHOW_MS = 4200;
 
-/** 每个游戏的专属文案前缀，避免在两个游戏间写 if 分支 */
-const ICON = GAME === 'number-recall' ? '🔢' : '⚡';
+/** 每个游戏的专属文案前缀，避免在多款游戏间写 if 分支 */
+const ICON = GAME === 'number-recall' ? '🔢' : GAME === 'color-recall' ? '🎨' : '⚡';
+
+/** 站内跳转必须回本页，不能硬编码 sequence-memory */
+const GAME_HOME = GAME === 'number-recall'
+  ? '/games/number-recall/'
+  : GAME === 'color-recall'
+    ? '/games/color-recall/'
+    : '/games/sequence-memory/';
+
+/* ─── HSB → CSS（Color Recall 用，P1-5）────────────
+   🔴 必须与 daily-game.ts 的 hsbToCss **逐字一致**，不要「顺手优化」。
+     玩家在每日挑战里看到的颜色和在对决里看到的颜色若是两个值，
+     「同一套东西」的说法当场破产；而且这种分叉极难被肉眼发现 ——
+     只在两个页面来回切、盯着同一个色号对比时才看得出来。
+     故此处直接照搬，不做 RGB 转换之���的「更好」实现。
+     为什么复制而不抽公共 util：两个文件是各自独立的 Vite 入口
+     （daily-game / duel-sequence），抽 util 会多出一条跨入口依赖链，
+     而这段只有一行。 */
+function hsbToCss(h: number, s: number, b: number): string {
+  return `hsl(${Math.round(h)} ${Math.round(s)}% ${Math.round(b)}%)`;
+}
 
 /* 当前房间快照。🔴 保留它不只是为了存 code：
    结果页与轮询都要读 status/round/totalRounds，
@@ -93,14 +117,32 @@ function renderError(msg: string, retry?: () => void) {
 }
 
 /* ═══════════ 阶段 1：建房 or 加入 ═══════════ */
+
+/** 每个游戏一组文案。新增游戏只改这张表，不改渲染代码。 */
+const COPY: Record<string, { title: string; help: string; readyHint: string }> = {
+  'sequence-memory': {
+    title: t('duel.seq_title', 'Sequence Memory Duel'),
+    help: t('duel.seq_help', 'Memorise the tile sequence, then tap it back. Your opponent gets the exact same sequence — whoever recalls more wins.'),
+    readyHint: t('duel.seq_ready_hint', 'Tap start, watch the tiles light up, then tap them back in the same order.'),
+  },
+  'number-recall': {
+    title: t('duel.num_title', 'Number Recall Duel'),
+    help: t('duel.num_help', 'Memorise the digits, then type them back. Your opponent gets the exact same number — whoever recalls more wins.'),
+    readyHint: t('duel.num_ready_hint', 'Tap start, watch the digits flash, then type them from memory.'),
+  },
+  'color-recall': {
+    title: t('duel.col_title', 'Colour Recall Duel'),
+    help: t('duel.col_help', 'Memorise the colours, then rebuild them on the wheel. Your opponent gets the exact same colours — closest match wins.'),
+    readyHint: t('duel.col_ready_hint', 'Tap start, watch the colours appear, then rebuild each one as closely as you can.'),
+  },
+};
+const cp = COPY[GAME] || COPY['sequence-memory'];
+
 function renderEntry() {
   const card = $('#card')!;
-  const isNum = GAME === 'number-recall';
   card.innerHTML = `
-    <h2 class="dc-h2">${esc(isNum ? t('duel.num_title', 'Number Recall Duel') : t('duel.seq_title', 'Sequence Memory Duel'))}</h2>
-    <p class="dc-help">${esc(isNum
-    ? t('duel.num_help', 'Memorise the digits, then type them back. Your opponent gets the exact same number — whoever recalls more wins.')
-    : t('duel.seq_help', 'Memorise the tile sequence, then tap it back. Your opponent gets the exact same sequence — whoever recalls more wins.'))}</p>
+    <h2 class="dc-h2">${esc(cp.title)}</h2>
+    <p class="dc-help">${esc(cp.help)}</p>
 
     <button class="dc-btn" id="createBtn" type="button">${esc(t('duel.create', 'Create a duel'))}</button>
 
@@ -293,15 +335,14 @@ function showRoundTag(cur: number, total: number) {
 async function playRound(code: string, round: number): Promise<boolean> {
   const card = $('#card')!;
   const isNumber = GAME === 'number-recall';
+  const isColor = GAME === 'color-recall';
 
   /* 🔴 取题：必须点「开始记忆」才请求 /room/round。
      服务端在返回题目时才开始计时（速度加成按各自真实耗时算），
      所以不能提前把题取好放在页面上。 */
   card.innerHTML = `
     <h2 class="dc-h2">${esc(t('duel.round', 'Round'))} ${round + 1}</h2>
-    <p class="dc-help">${esc(isNumber
-    ? t('duel.num_ready_hint', 'Tap start, watch the digits flash, then type them from memory.')
-    : t('duel.seq_ready_hint', 'Tap start, watch the tiles light up, then tap them back in the same order.'))}</p>
+    <p class="dc-help">${esc(cp.readyHint)}</p>
     <button class="dc-btn" id="go" type="button">${esc(t('duel.start_round', 'Start round'))}</button>`;
 
   await new Promise<void>((resolve) => {
@@ -316,15 +357,22 @@ async function playRound(code: string, round: number): Promise<boolean> {
     return false;
   }
 
-  /* ── 按游戏解析题目（两个游戏唯一的差异点之一）── */
+  /* ── 按游戏解析题目（三款游戏唯一的差异点之一）── */
   const seq: number[] = (data.puzzle && data.puzzle.seq || []).map((n: number) => Number(n));
   const grid = Number(data.puzzle && data.puzzle.grid) || 3;
   const digits: string = GAME === 'number-recall'
     ? String((data.puzzle && data.puzzle.digits || []).join(''))
     : '';
+  /* 🔴 颜色关的契约是 HSB **对象数组** [{h,s,b}]，不是颜色名字符串。
+     喂字符串会让下游 hsbToCss 算出 NaN 度色，界面变成一团黑。 */
+  const colors: Array<{ h: number; s: number; b: number }> =
+    isColor && Array.isArray(data.puzzle && data.puzzle.colors)
+      ? data.puzzle.colors.map((c: any) => ({ h: Number(c && c.h) || 0, s: Number(c && c.s) || 0, b: Number(c && c.b) || 0 }))
+      : [];
 
   const target = isNumber ? digits : '';
-  if (isNumber ? !target.length : !seq.length) {
+  const noPuzzle = isNumber ? !target.length : isColor ? !colors.length : !seq.length;
+  if (noPuzzle) {
     renderError(`[duel] 服务端未下发 ${GAME} 题目`, () => playRound(code, round));
     return false;
   }
@@ -374,6 +422,87 @@ async function playRound(code: string, round: number): Promise<boolean> {
       });
     });
     answer = typedRef.v;
+  } else if (isColor) {
+    /* ── Color Recall：颜色闪现 → 逐色在色轮/滑块上还原 ──
+       交互与 daily 的 playColor 同构（色轮定色相+明度，滑块定饱和度），
+       但**目标色初值不再等于答案**：daily 里滑块默认值就是目标色
+       （单人练习，玩家只是走个形式）；对战里默认给中性值，
+       否则玩家什么都不动就能满分，比赛直接失去意义。 */
+    card.innerHTML = `
+      <h2 class="dc-h2">${esc(t('duel.watch', 'Watch carefully…'))}</h2>
+      <div class="dc-color-row" id="row"></div>`;
+
+    const row = $('#row')!;
+    row.innerHTML = colors
+      .map((c) => `<div class="dc-color-swatch" style="background:${hsbToCss(c.h, c.s, c.b)}"></div>`)
+      .join('');
+    await sleep(COLOR_SHOW_MS);
+    row.innerHTML = '';
+
+    const answers: Array<{ h: number; s: number; b: number }> = [];
+
+    for (let i = 0; i < colors.length; i++) {
+      const tgt = colors[i];
+      const target = hsbToCss(tgt.h, tgt.s, tgt.b);
+
+      card.innerHTML = `
+        <h2 class="dc-h2">${esc(t('duel.col_pick', `Colour ${i + 1} of {total} — match it as closely as you can.`)
+          .replace('{n}', String(i + 1)).replace('{total}', String(colors.length)))}</h2>
+        <div class="dc-color-target" style="width:100%;height:120px;background:${target}" aria-label="${esc(t('dc.col_target', 'Target colour'))}"></div>
+        <div class="dc-wheel" id="wheel" role="application" aria-label="${esc(t('dc.col_wheel', 'Colour wheel'))}"
+             style="background:conic-gradient(from 0deg,#FF0000,#FFFF00,#00FF00,#00FFFF,#0000FF,#FF00FF,#FF0000)"></div>
+        <p class="dc-wheel-hint">${esc(t('dc.col_hint', 'Click or drag on the wheel to set hue and lightness; use the sliders for saturation.'))}</p>
+        <div class="dc-sliders">
+          <div class="dc-slider-row"><span>H</span><input type="range" id="h" min="0" max="359" value="0" /><output id="ho">0</output></div>
+          <div class="dc-slider-row"><span>S</span><input type="range" id="s" min="20" max="100" value="50" /><output id="so">50</output></div>
+          <div class="dc-slider-row"><span>B</span><input type="range" id="b" min="10" max="95" value="50" /><output id="bo">50</output></div>
+        </div>
+        <div class="dc-color-swatch" id="preview" style="width:100%;height:64px;background:${target}"></div>
+        <button class="dc-btn" id="lock" type="button" style="margin-top:14px">${esc(t('dc.col_lock', 'Lock this colour'))}</button>`;
+
+      const h = document.getElementById('h') as HTMLInputElement;
+      const s = document.getElementById('s') as HTMLInputElement;
+      const b = document.getElementById('b') as HTMLInputElement;
+      const ho = document.getElementById('ho') as HTMLOutputElement;
+      const so = document.getElementById('so') as HTMLOutputElement;
+      const bo = document.getElementById('bo') as HTMLOutputElement;
+      const preview = $('#preview') as HTMLElement;
+      const wheel = $('#wheel') as HTMLElement;
+
+      const sync = () => {
+        ho.textContent = h.value; so.textContent = s.value; bo.textContent = b.value;
+        preview.style.background = hsbToCss(+h.value, +s.value, +b.value);
+      };
+      [h, s, b].forEach((el) => el.addEventListener('input', sync));
+
+      const wheelPick = (e: PointerEvent) => {
+        const r = wheel.getBoundingClientRect();
+        const dx = e.clientX - (r.left + r.width / 2);
+        const dy = e.clientY - (r.top + r.height / 2);
+        const dist = Math.hypot(dx, dy) / (r.width / 2);
+        if (dist < 0.08) return;   // 中心是灰盘，忽略
+        let deg = Math.atan2(dy, dx) * (180 / Math.PI);
+        if (deg < 0) deg += 360;
+        h.value = String(Math.round(deg) % 360);
+        const nv = Math.round(95 - Math.min(dist, 1) * 85);
+        b.value = String(Math.max(10, Math.min(95, nv)));
+        sync();
+      };
+      wheel.addEventListener('pointerdown', (e) => {
+        wheel.setPointerCapture((e as PointerEvent).pointerId);
+        wheelPick(e as PointerEvent);
+      });
+      wheel.addEventListener('pointermove', (e) => {
+        if (e.buttons === 1) wheelPick(e);
+      });
+
+      await new Promise<void>((resolve) => {
+        document.getElementById('lock')!.addEventListener('click', () => resolve(), { once: true });
+      });
+
+      answers.push({ h: +h.value, s: +s.value, b: +b.value });
+    }
+    answer = answers;
   } else {
     /* Sequence Memory：格子依次点亮 → 按序点回 */
     const cells = Array.from({ length: grid * grid },
@@ -487,7 +616,7 @@ async function showResult(code: string) {
       sessionStorage.removeItem('duel-code');
       sessionStorage.removeItem('duel-host');
     } catch (_) {}
-    location.href = '/games/sequence-memory/';
+    location.href = GAME_HOME;
   });
 
   const cb2 = document.getElementById('copyBtn2');
@@ -525,7 +654,7 @@ async function main() {
       const inRoom = (st.players || []).some((p: any) => p.pid === cred.pid);
       if (!inRoom) {
         renderError(t('duel.join_failed', 'Could not join that duel. Check the code and try again.'),
-          () => { location.href = '/games/sequence-memory/'; });
+          () => { location.href = GAME_HOME; });
         return;
       }
       await enterRoom(code);
@@ -541,7 +670,7 @@ async function main() {
         return;
       }
       if (err.code === 'ROOM_FULL' || err.code === 'UNAUTHORIZED') {
-        renderError(err.message, () => { location.href = '/games/sequence-memory/'; });
+        renderError(err.message, () => { location.href = GAME_HOME; });
         return;
       }
       // 房码不存在 → 回到入口，别把用户卡在死路

@@ -898,7 +898,8 @@
     "game_modes": "Alle Modi ansehen →",
     "game_seq_d": "Merke dir die Reihenfolge der Felder und tippe sie nach. Dieselbe Sequenz für beide, serverseitig bewertet — Raumcode senden und vergleichen.",
     "tag_async": "Asynchron",
-    "game_num_d": "Die Ziffern blitzen nacheinander auf — tippe die ganze Folge aus dem Gedächtnis. Gleiche Zahl für beide, Server-Wertung, ohne Anmeldung."
+    "game_num_d": "Die Ziffern blitzen nacheinander auf — tippe die ganze Folge aus dem Gedächtnis. Gleiche Zahl für beide, Server-Wertung, ohne Anmeldung.",
+    "game_col_d": "Fünf Farben erscheinen und verschwinden — stelle jede am Farbkreis nach. Gleiche Farben für beide, wer näher dran ist, gewinnt."
   },
   "mm_bv": {
     "mm_bv_p1": "Die besten Gehirntrainings-Spiele für alle Altersgruppen",
@@ -1089,6 +1090,11 @@
     "num_help": "Merke dir die Ziffern und tippe sie ein. Dein Gegner sieht genau dieselbe Zahl — wer mehr behält, gewinnt.",
     "num_ready_hint": "Tippe auf Start, sieh dir die Ziffern an und tippe sie aus dem Gedächtnis ein.",
     "your_turn_num": "Du bist dran — Ziffern eingeben",
-    "foot_hint_num": "Dieselbe Zahl für beide. Das bessere Gedächtnis gewinnt."
+    "foot_hint_num": "Dieselbe Zahl für beide. Das bessere Gedächtnis gewinnt.",
+    "col_title": "Farbgedächtnis-Duell",
+    "col_help": "Merke dir die Farben und stelle sie am Farbkreis nach. Dein Gegner sieht genau dieselben Farben — wer näher dran ist, gewinnt.",
+    "col_ready_hint": "Starte die Runde, sieh dir die Farben an und stelle jede so genau wie möglich nach.",
+    "col_pick": "Farbe {n} von {total} — so nah wie möglich annähern.",
+    "col_foot_hint": "Beide sehen dieselben Farben. Wer näher dran ist, gewinnt."
   }
 }

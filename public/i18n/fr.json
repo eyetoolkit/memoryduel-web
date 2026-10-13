@@ -898,7 +898,8 @@
     "game_modes": "Voir tous les modes →",
     "game_seq_d": "Mémorise la séquence de tuiles, puis reproduis-la. Même séquence pour les deux, notée côté serveur : envoie un code et compare.",
     "tag_async": "Asynchrone",
-    "game_num_d": "Les chiffres défilent un par un — retapez la série complète de mémoire. Même nombre pour les deux, score calculé côté serveur, sans inscription."
+    "game_num_d": "Les chiffres défilent un par un — retapez la série complète de mémoire. Même nombre pour les deux, score calculé côté serveur, sans inscription.",
+    "game_col_d": "Cinq couleurs apparaissent puis disparaissent : reproduisez-les sur la roue. Même palette pour les deux, le plus proche gagne."
   },
   "mm_bv": {
     "mm_bv_p1": "Meilleurs jeux d'entraînement cérébral pour tous les âges",
@@ -1089,6 +1090,11 @@
     "num_help": "Mémorise les chiffres, puis ressaisis-les. Ton adversaire voit exactement le même nombre — le meilleur souvenir gagne.",
     "num_ready_hint": "Appuie sur démarrer, regarde les chiffres défiler, puis ressaisis-les de mémoire.",
     "your_turn_num": "À toi — saisis les chiffres",
-    "foot_hint_num": "Le même nombre pour les deux. La meilleure mémoire gagne."
+    "foot_hint_num": "Le même nombre pour les deux. La meilleure mémoire gagne.",
+    "col_title": "Duel de Mémoire des Couleurs",
+    "col_help": "Mémorisez les couleurs puis reproduisez-les sur la roue. Votre adversaire voit exactement les mêmes couleurs : le plus proche gagne.",
+    "col_ready_hint": "Lancez la manche, observez les couleurs, puis reproduisez chacune au plus près.",
+    "col_pick": "Couleur {n} sur {total} — approchez-la au plus près.",
+    "col_foot_hint": "Les deux joueurs voient les mêmes couleurs. Le plus proche gagne."
   }
 }

@@ -898,7 +898,8 @@
     "game_modes": "Ver todos los modos →",
     "game_seq_d": "Memoriza la secuencia de casillas y repítela. Misma secuencia para ambos, puntuada en el servidor: envía un código y compara.",
     "tag_async": "Asíncrono",
-    "game_num_d": "Los dígitos aparecen uno a uno: escribe la cadena completa de memoria. El mismo número para ambos, puntuación en servidor, sin registro."
+    "game_num_d": "Los dígitos aparecen uno a uno: escribe la cadena completa de memoria. El mismo número para ambos, puntuación en servidor, sin registro.",
+    "game_col_d": "Aparecen cinco colores y desaparecen: rehaz cada uno en la rueda. Los mismos colores para ambos; gana quien se acerque más."
   },
   "mm_bv": {
     "mm_bv_p1": "Mejores juegos de entrenamiento cerebral para todas las edades",
@@ -1089,6 +1090,11 @@
     "num_help": "Memoriza los dígitos y escríbelos. Tu rival ve exactamente el mismo número — gana quien más recuerde.",
     "num_ready_hint": "Pulsa empezar, mira los dígitos y escríbelos de memoria.",
     "your_turn_num": "Tu turno — escribe los dígitos",
-    "foot_hint_num": "El mismo número para ambos. Gana quien mejor recuerde."
+    "foot_hint_num": "El mismo número para ambos. Gana quien mejor recuerde.",
+    "col_title": "Duelo de Recuerdo de Colores",
+    "col_help": "Memoriza los colores y rehácelos en la rueda. Tu rival recibe exactamente los mismos colores: quien se acerque más gana.",
+    "col_ready_hint": "Toca iniciar, observa los colores y rehaz cada uno lo más cerca posible.",
+    "col_pick": "Color {n} de {total}: acércate lo máximo posible.",
+    "col_foot_hint": "Ambos ven los mismos colores. Gana quien se acerque más."
   }
 }
