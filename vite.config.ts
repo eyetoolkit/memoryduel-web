@@ -62,6 +62,12 @@ export default defineConfig({
         // P1-3（2026-10-12）：Number Recall 对战。
         // 🔴 两个入口**共用同一个 TS 模块**（按路径推断 game），不是两份实现。
         numberDuel: resolve(here, 'games/number-recall/index.html'),
+
+        // P1-5（2026-10-13）：Colour Recall 对战。第三个共用 duel-sequence.ts 的入口。
+        // ⚠️ key 即产物名：colorDuel → assets/colorDuel-<hash>.js
+        //    注意：三款对战入口会产出三个各自 hash 的 bundle，内容相同但互不共享 ——
+        //    这是 MPA 的固有代价（浏览器按页面缓存），接受它，不要试图合并。
+        colorDuel: resolve(here, 'games/color-recall/index.html'),
       },
     },
   },

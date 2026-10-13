@@ -180,6 +180,29 @@ test('首页游戏矩阵含 color-recall 卡片', () => {
   assert.ok(home.includes('data-i18n="home_v2.game_col_d"'), '卡片描述应走 i18n');
 });
 
+test('vite.config 必须注册 color 入口（否则构建静默丢弃，线上 404）', () => {
+  // 🔴 本轮真踩：只建了 games/color-recall/index.html 就以为完事，
+  //    构建**零报错**、dist 里根本没有该目录、线上 404。
+  //    Vite 未注册的 MPA 入口就是被静默丢掉，没有任何提示。
+  //    这条断言的作用是让「忘了注册」变成一次明确红灯。
+  const cfg = fs.readFileSync(path.join(ROOT, 'vite.config.ts'), 'utf8');
+  assert.ok(/colorDuel:\s*resolve\(here,\s*'games\/color-recall\/index\.html'\)/.test(cfg),
+    'color 入口未注册进 rollupOptions.input —— 构建会静默丢弃、线上 404');
+});
+
+test('每个 games/<slug>/index.html 都已注册进 vite input', () => {
+  // 通用防回归：不针对 color 写死，任何新页面漏注册都会被抓到
+  const cfg = fs.readFileSync(path.join(ROOT, 'vite.config.ts'), 'utf8');
+  const dirs = fs.readdirSync(path.join(ROOT, 'games'), { withFileTypes: true })
+    .filter((d) => d.isDirectory())
+    .map((d) => d.name);
+  assert.ok(dirs.length > 0, '应有游戏目录');
+  for (const d of dirs) {
+    const rel = `games/${d}/index.html`;
+    assert.ok(cfg.includes(rel), `${rel} 未注册进 vite input —— 构建静默丢弃、线上 404`);
+  }
+});
+
 test('sitemap 含 color-recall 落地页', () => {
   const sm = fs.readFileSync(path.join(ROOT, 'public/sitemap.xml'), 'utf8');
   assert.ok(sm.includes('https://memoryduel.com/games/color-recall/'),
