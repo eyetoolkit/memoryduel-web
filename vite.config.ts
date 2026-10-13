@@ -68,6 +68,13 @@ export default defineConfig({
         //    注意：三款对战入口会产出三个各自 hash 的 bundle，内容相同但互不共享 ——
         //    这是 MPA 的固有代价（浏览器按页面缓存），接受它，不要试图合并。
         colorDuel: resolve(here, 'games/color-recall/index.html'),
+
+        // P2（2026-10-13）：三款新游戏的对战入口。第四/五/六个共用 duel-sequence.ts 的入口。
+        // 🔴 必须注册进 rollupOptions.input，否则构建**静默丢弃**、不产出页面也不报错，
+        //    线上表现为该 URL 落到 404 兜底页（内容还是全站导航，肉眼看像「页面坏了」）。
+        emojiDuel: resolve(here, 'games/emoji-ghost/index.html'),
+        chimpDuel: resolve(here, 'games/chimp-test/index.html'),
+        wordDuel: resolve(here, 'games/word-recall/index.html'),
       },
     },
   },

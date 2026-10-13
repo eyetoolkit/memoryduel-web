@@ -183,10 +183,18 @@
   }
 
   /* ─── 游戏元信息（与后端 LEVELS 对齐）────────────────────────── */
+  /* 🔴 P2（2026-10-13）补齐 emoji-ghost / chimp-test / word-recall。
+     ⚠️ 这张表目前只是**参考信息**，渲染代码走 duel-sequence.ts 的
+        inferGame()（按 URL 推断）。加新游戏时两处都要改 ——
+        这里漏了不会报错（没人读 icon/rounds），
+        inferGame() 漏了则会被当成 sequence-memory 静默玩错游戏。 */
   const GAMES = {
     'sequence-memory': { icon: '⚡', rounds: 3, grid: 3 },
     'number-recall':   { icon: '🔢', rounds: 3, grid: 0 },
     'color-recall':    { icon: '🎨', rounds: 1, grid: 0 },
+    'emoji-ghost':     { icon: '👻', rounds: 3, grid: 0 },
+    'chimp-test':      { icon: '🐒', rounds: 3, grid: 5 },
+    'word-recall':     { icon: '📝', rounds: 3, grid: 0 },
   };
 
   function normalizeCode(raw) { return String(raw || '').toUpperCase().replace(/[^A-Z2-9]/g, '').slice(0, 6); }

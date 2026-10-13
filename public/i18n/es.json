@@ -1125,7 +1125,23 @@
     "col_ready_hint": "Toca iniciar, observa los colores y rehaz cada uno lo más cerca posible.",
     "col_pick": "Color {n} de {total}: acércate lo máximo posible.",
     "col_foot_hint": "Ambos ven los mismos colores. Gana quien se acerque más.",
-    "room_not_found": "Ese código de duelo no existe. Verifica el código o crea un duelo nuevo."
+    "room_not_found": "Ese código de duelo no existe. Verifica el código o crea un duelo nuevo.",
+    "emoji_title": "Duelo Fantasma Emoji",
+    "emoji_help": "Una fila de símbolos aparece y uno desaparece. Tu rival recibe exactamente el mismo conjunto.",
+    "emoji_ready_hint": "Pulsa iniciar, observa los símbolos y elige el que estaba en el conjunto.",
+    "emoji_pick": "¿Cuál estaba en el conjunto?",
+    "emoji_foot_hint": "El mismo conjunto para ambos. Puntuado por el servidor.",
+    "chimp_title": "Duelo Prueba del Chimpancé",
+    "chimp_help": "Los números aparecen en la cuadrícula y desaparecen. Tu rival recibe la misma cuadrícula.",
+    "chimp_ready_hint": "Pulsa iniciar, observa los números y pulsa cada casilla que tenía uno.",
+    "chimp_pick": "Tu turno: pulsa las casillas numeradas",
+    "chimp_count": "Había {n} números.",
+    "chimp_foot_hint": "La misma cuadrícula para ambos. Puntuado por el servidor.",
+    "word_title": "Duelo Memoria de Palabras",
+    "word_help": "Las palabras aparecen una a una. Tu rival recibe exactamente las mismas palabras.",
+    "word_ready_hint": "Pulsa iniciar, observa las palabras y marca cada una como vista o nueva.",
+    "word_judge": "Tu turno: marca cada palabra",
+    "word_foot_hint": "Las mismas palabras para ambos. Puntuado por el servidor."
   },
   "colduel": {
     "title": "Duelo de colores · MemoryDuel",
@@ -1138,5 +1154,17 @@
   "numduel": {
     "title": "Duelo de números · MemoryDuel",
     "meta_desc": "Memoriza una cadena de dígitos y escríbela antes que tu rival. Duelo de memoria numérica 1v1, puntuación en el servidor, sin registro."
+  },
+  "emojighostduel": {
+    "title": "Duelo Fantasma Emoji · MemoryDuel",
+    "meta_desc": "Una fila de símbolos aparece y uno desaparece: elige cuál. Duelo 1v1, mismo conjunto para ambos."
+  },
+  "chimptestduel": {
+    "title": "Duelo Prueba del Chimpancé · MemoryDuel",
+    "meta_desc": "Los números aparecen y desaparecen: pulsa cada casilla. Duelo 1v1, misma cuadrícula para ambos."
+  },
+  "wordrecallduel": {
+    "title": "Duelo Memoria de Palabras · MemoryDuel",
+    "meta_desc": "Las palabras aparecen una a una: márcalas como vistas o nuevas. Duelo 1v1, mismas palabras."
   }
 }

@@ -1125,7 +1125,23 @@
     "col_ready_hint": "Tap start, watch the colours appear, then rebuild each one as closely as you can.",
     "col_pick": "Colour {n} of {total} — match it as closely as you can.",
     "col_foot_hint": "Same colours for both players. Closest match wins.",
-    "room_not_found": "That duel code does not exist. Check the code, or start a new duel."
+    "room_not_found": "That duel code does not exist. Check the code, or start a new duel.",
+    "emoji_title": "Emoji Ghost Duel",
+    "emoji_help": "A row of symbols flashes, then one is missing. Your opponent gets the exact same set — pick the ghost correctly.",
+    "emoji_ready_hint": "Tap start, watch the symbols appear, then pick the one that was in the set.",
+    "emoji_pick": "Which one was in the set?",
+    "emoji_foot_hint": "Same set for both players. Server-scored.",
+    "chimp_title": "Chimp Test Duel",
+    "chimp_help": "Numbers flash on the grid, then vanish. Your opponent gets the exact same grid — tap every cell that held a number.",
+    "chimp_ready_hint": "Tap start, watch the numbers flash, then tap every cell that held one.",
+    "chimp_pick": "Your turn — tap the numbered cells",
+    "chimp_count": "There were {n} numbers.",
+    "chimp_foot_hint": "Same grid for both players. Server-scored.",
+    "word_title": "Word Recall Duel",
+    "word_help": "Words appear one by one. Your opponent gets the exact same words — mark each as seen or new.",
+    "word_ready_hint": "Tap start, watch the words appear, then mark each as seen or new.",
+    "word_judge": "Your turn — mark each word",
+    "word_foot_hint": "Same words for both players. Server-scored."
   },
   "colduel": {
     "title": "Colour Recall Duel · MemoryDuel",
@@ -1138,5 +1154,17 @@
   "numduel": {
     "title": "Number Recall Duel · MemoryDuel",
     "meta_desc": "Memorise a string of digits and type it back before your opponent does. 1v1 number-memory duel, server-scored, no login required."
+  },
+  "emojighostduel": {
+    "title": "Emoji Ghost Duel · MemoryDuel",
+    "meta_desc": "A row of symbols flashes, then one vanishes. Pick which one was in the set. 1v1 memory duel, same set for both players, server-scored."
+  },
+  "chimptestduel": {
+    "title": "Chimp Test Duel · MemoryDuel",
+    "meta_desc": "Numbers flash on the grid, then vanish. Tap every cell that held a number. 1v1 memory duel, same grid for both players, server-scored."
+  },
+  "wordrecallduel": {
+    "title": "Word Recall Duel · MemoryDuel",
+    "meta_desc": "Words appear one by one. Then mark each as seen or new. 1v1 recognition-memory duel, same words for both players, server-scored."
   }
 }

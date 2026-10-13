@@ -1125,7 +1125,23 @@
     "col_ready_hint": "点击开始，看清颜色出现，再逐个尽量还原。",
     "col_pick": "第 {n} 个颜色，共 {total} 个 —— 尽量调得接近一些。",
     "col_foot_hint": "两位玩家看到完全相同的颜色，还原得更准的一方获胜。",
-    "room_not_found": "该对决码不存在，请检查房码或重新创建一场对决。"
+    "room_not_found": "该对决码不存在，请检查房码或重新创建一场对决。",
+    "emoji_title": "表情幽灵对决",
+    "emoji_help": "一排符号闪现，其中一个消失了。你的对手拿到的是完全相同的一组——选出刚才在里面的那个。",
+    "emoji_ready_hint": "点开始，看符号出现，然后选出刚才在集合里的那个。",
+    "emoji_pick": "哪一个刚才在集合里？",
+    "emoji_foot_hint": "双方题目完全相同，服务端判分。",
+    "chimp_title": "猩猩测试对决",
+    "chimp_help": "数字在网格上闪现后消失。你的对手拿到的是完全相同的网格——点出所有刚才有数字的格子。",
+    "chimp_ready_hint": "点开始，看数字闪现，然后点出所有刚才有数字的格子。",
+    "chimp_pick": "轮到你——点出有数字的格子",
+    "chimp_count": "一共有 {n} 个数字。",
+    "chimp_foot_hint": "双方题目完全相同，服务端判分。",
+    "word_title": "词语记忆对决",
+    "word_help": "词语逐个出现。你的对手拿到的是完全相同的词——为每个词标记「见过」或「没见过」。",
+    "word_ready_hint": "点开始，看词语出现，然后逐个标记见过或没见过。",
+    "word_judge": "轮到你——逐个标记词语",
+    "word_foot_hint": "双方题目完全相同，服务端判分。"
   },
   "colduel": {
     "title": "颜色记忆对决 · MemoryDuel",
@@ -1138,5 +1154,17 @@
   "numduel": {
     "title": "数字记忆对决 · MemoryDuel",
     "meta_desc": "记住一串数字，在对手之前把它敲回来。1v1 数字记忆对决，服务端判分，无需登录。"
+  },
+  "emojighostduel": {
+    "title": "表情幽灵对决 · MemoryDuel",
+    "meta_desc": "记住一排符号，选出消失的是哪一个。1v1 记忆对决，双方题目完全相同，服务端判分。"
+  },
+  "chimptestduel": {
+    "title": "猩猩测试对决 · MemoryDuel",
+    "meta_desc": "数字在网格上闪现后消失，点出所有有数字的格子。1v1 记忆对决，双方题目完全相同，服务端判分。"
+  },
+  "wordrecallduel": {
+    "title": "词语记忆对决 · MemoryDuel",
+    "meta_desc": "词语逐个出现，之后逐个标记见过或没见过。1v1 记忆对决，双方题目完全相同，服务端判分。"
   }
 }

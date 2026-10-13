@@ -1125,7 +1125,23 @@
     "col_ready_hint": "Lancez la manche, observez les couleurs, puis reproduisez chacune au plus près.",
     "col_pick": "Couleur {n} sur {total} — approchez-la au plus près.",
     "col_foot_hint": "Les deux joueurs voient les mêmes couleurs. Le plus proche gagne.",
-    "room_not_found": "Ce code de duel nexiste pas. Vérifiez le code ou créez un nouveau duel."
+    "room_not_found": "Ce code de duel nexiste pas. Vérifiez le code ou créez un nouveau duel.",
+    "emoji_title": "Duel Fantôme Émoji",
+    "emoji_help": "Une rangée de symboles s'affiche et l'un disparaît. Votre adversaire reçoit exactement le même ensemble.",
+    "emoji_ready_hint": "Lancez, observez les symboles, puis choisissez celui qui était dans l'ensemble.",
+    "emoji_pick": "Lequel était dans l'ensemble ?",
+    "emoji_foot_hint": "Même ensemble pour les deux. Noté par le serveur.",
+    "chimp_title": "Duel Test du Chimpanzé",
+    "chimp_help": "Des chiffres apparaissent sur la grille puis disparaissent. Votre adversaire reçoit la même grille.",
+    "chimp_ready_hint": "Lancez, observez les chiffres, puis touchez chaque case qui en portait un.",
+    "chimp_pick": "À vous : touchez les cases numérotées",
+    "chimp_count": "Il y avait {n} chiffres.",
+    "chimp_foot_hint": "Même grille pour les deux. Noté par le serveur.",
+    "word_title": "Duel Mémoire des Mots",
+    "word_help": "Les mots apparaissent un par un. Votre adversaire reçoit exactement les mêmes mots.",
+    "word_ready_hint": "Lancez, observez les mots, puis indiquez pour chacun s'il a été vu.",
+    "word_judge": "À vous : indiquez chaque mot",
+    "word_foot_hint": "Les mêmes mots pour les deux. Noté par le serveur."
   },
   "colduel": {
     "title": "Duel des couleurs · MemoryDuel",
@@ -1138,5 +1154,17 @@
   "numduel": {
     "title": "Duel de chiffres · MemoryDuel",
     "meta_desc": "Mémorisez une suite de chiffres et retappez-la avant votre adversaire. Duel de mémoire numérique 1v1, noté par le serveur, sans inscription."
+  },
+  "emojighostduel": {
+    "title": "Duel Fantôme Émoji · MemoryDuel",
+    "meta_desc": "Une rangée de symboles s'affiche, l'un disparaît : choisissez-le. Duel 1v1, même ensemble."
+  },
+  "chimptestduel": {
+    "title": "Duel Test du Chimpanzé · MemoryDuel",
+    "meta_desc": "Des chiffres apparaissent puis disparaissent : touchez chaque case. Duel 1v1, même grille."
+  },
+  "wordrecallduel": {
+    "title": "Duel Mémoire des Mots · MemoryDuel",
+    "meta_desc": "Les mots apparaissent un par un : indiquez vus ou nouveaux. Duel 1v1, mêmes mots."
   }
 }

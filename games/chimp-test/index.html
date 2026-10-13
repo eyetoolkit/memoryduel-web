@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" data-site="memory">
+<head>
+<script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:52,fallback:"en"};</script>
+<script src="/i18n/i18n.js?v=36"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#FAF6F1">
+<title data-i18n-title="chimptestduel.title">Chimp Test Duel · MemoryDuel</title>
+<meta name="description" data-i18n="chimptestduel.meta_desc" content="Numbers flash on the grid, then vanish. Tap every cell that held a number. 1v1 memory duel, same grid for both players, server-scored.">
+<link rel="canonical" href="https://memoryduel.com/games/chimp-test/" />
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MemoryDuel">
+<meta property="og:url" content="https://memoryduel.com/games/chimp-test/" />
+<meta property="og:image" content="https://memoryduel.com/og-default.jpg" />
+<meta property="og:title" content="Chimp Test Duel · MemoryDuel" />
+<meta property="og:description" content="Numbers flash on the grid, then vanish. Tap every cell that held one. Same grid for both players." />
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Chimp Test Duel · MemoryDuel" />
+<meta name="twitter:description" content="A 1v1 position-memory duel: same grid, both players, server-scored." />
+<meta name="twitter:image" content="https://memoryduel.com/og-default.jpg" />
+<link rel="alternate" hreflang="zh-CN" href="https://memoryduel.com/games/chimp-test/" />
+<link rel="alternate" hreflang="en" href="https://memoryduel.com/games/chimp-test/?lang=en" />
+<link rel="alternate" hreflang="ja" href="https://memoryduel.com/games/chimp-test/?lang=ja" />
+<link rel="alternate" hreflang="es" href="https://memoryduel.com/games/chimp-test/?lang=es" />
+<link rel="alternate" hreflang="fr" href="https://memoryduel.com/games/chimp-test/?lang=fr" />
+<link rel="alternate" hreflang="de" href="https://memoryduel.com/games/chimp-test/?lang=de" />
+<link rel="alternate" hreflang="x-default" href="https://memoryduel.com/games/chimp-test/" />
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="stylesheet" href="/src/styles/home.css">
+<link rel="stylesheet" href="/src/styles/daily-challenge.css">
+<link rel="stylesheet" href="/src/styles/duel.css">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Memory Duel">
+<script src="/js/sw-register.js" defer></script>
+</head>
+<body class="dc-page">
+
+<header class="dc-top">
+  <a class="back" href="/" data-i18n="duel.back_home">← MemoryDuel</a>
+  <h1 class="title" data-i18n="duel.chimp_title">Chimp Test Duel</h1>
+  <span class="spacer"></span>
+  <div class="duel-round" id="roundTag" hidden></div>
+</header>
+
+<main class="dc-wrap">
+  <!-- 阶段容器：由 duel-sequence.ts 整体渲染 -->
+  <div class="dc-card" id="card">
+    <div class="dc-loading" data-i18n="duel.loading">Loading…</div>
+  </div>
+</main>
+
+<footer class="duel-foot">
+  <span data-i18n="duel.chimp_foot_hint">Same grid for both players. Server-scored.</span>
+</footer>
+
+<script src="/shared/duel-room.js?v=1"></script>
+<script type="module" src="/src/pages/duel-sequence.ts"></script>
+</body>
+</html>

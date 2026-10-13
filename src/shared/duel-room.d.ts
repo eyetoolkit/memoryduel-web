@@ -28,7 +28,14 @@ declare global {
         code: string; status: string; round: number; totalRounds: number;
         mode: string; game?: string; players?: any[];
       }>;
-      /** 逐轮取题。puzzle 是要记的内容（sequence 的 seq / number 的 digits / color 的 colors） */
+      /** 逐轮取题。puzzle 是要记的内容，按 game 分：
+       *  sequence-memory: { len, seq:number[], grid }
+       *  number-recall:   { len, digits:number[] }
+       *  color-recall:    { colors:{h,s,b}[] }
+       *  emoji-ghost:     { len, grid:string[]（要记的集合）, options:string[]（四选一，含干扰项） }
+       *  chimp-test:      { len, grid:number（边长）, positions:number[]（数字所在格下标） }
+       *  word-recall:     { len, words:string[]（已按房间 lang 固化）, lang }
+       *  ⚠️ 全部**不含判分基准**；标准答案只留在服务端 room.bundle。 */
       fetchRound: (code: string, round: number, game?: string) => Promise<{
         code: string; game: string; round: number; totalRounds: number; puzzle: any;
       }>;

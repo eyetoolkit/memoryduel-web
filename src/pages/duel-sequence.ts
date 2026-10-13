@@ -52,33 +52,48 @@ function t(key: string, fallback: string): string {
   return fallback;
 }
 
-/* ─── 游戏由 URL 决定（P1-3 Number / P1-5 Color 复用同一套对战内核）──
+/* ─── 游戏由 URL 决定（P1-3 Number / P1-5 Color / P2 三款新游戏共用同一套对战内核）──
    🔴 为什么不是一个 URL + 参数，而是多个独立页面：
      每个游戏一条独立 URL 才能各自进 sitemap、各自有 OG/标题，
      SEO 上是多个落地页而不是一个。但**代码只有一份** ——
      由路径推断 game，避免复制粘贴出多份会逐渐分叉的实现。
      只有「题目长什么样 + 玩家怎么作答」两处有差异，其余（建房、
      等待、轮询、提交、比分）完全共用。 */
-const GAME: string = /\/games\/number-recall\//.test(location.pathname)
-  ? 'number-recall'
-  : /\/games\/color-recall\//.test(location.pathname)
-    ? 'color-recall'
-    : 'sequence-memory';
+function inferGame(): string {
+  const p = location.pathname;
+  if (/\/games\/number-recall\//.test(p)) return 'number-recall';
+  if (/\/games\/color-recall\//.test(p)) return 'color-recall';
+  if (/\/games\/emoji-ghost\//.test(p)) return 'emoji-ghost';
+  if (/\/games\/chimp-test\//.test(p)) return 'chimp-test';
+  if (/\/games\/word-recall\//.test(p)) return 'word-recall';
+  return 'sequence-memory';
+}
+const GAME: string = inferGame();
 const ROUNDS = 3;
 const LIT_MS = 600;
 const GAP_MS = 240;
 /** 颜色阵列的展示时长。与 daily 的 playColor 保持一致，玩家不必在两种玩法间换预期。 */
 const COLOR_SHOW_MS = 4200;
+/** 三款新游戏的展示时长。与 daily-game.ts 的同名常量逐字一致，
+    免得玩家在同一款游戏的两处体验到不同时长、以为其中一处坏了。 */
+const EMOJI_SHOW_MS = 3400;
+const CHIMP_LIT_MS = 700;
+const CHIMP_GAP_MS = 180;
+const WORD_STEP_MS = 760;
 
 /** 每个游戏的专属文案前缀，避免在多款游戏间写 if 分支 */
-const ICON = GAME === 'number-recall' ? '🔢' : GAME === 'color-recall' ? '🎨' : '⚡';
+const ICON = GAME === 'number-recall' ? '🔢'
+  : GAME === 'color-recall' ? '🎨'
+  : GAME === 'emoji-ghost' ? '👻'
+  : GAME === 'chimp-test' ? '🐒'
+  : GAME === 'word-recall' ? '📝'
+  : '⚡';
 
 /** 站内跳转必须回本页，不能硬编码 sequence-memory */
-const GAME_HOME = GAME === 'number-recall'
-  ? '/games/number-recall/'
-  : GAME === 'color-recall'
-    ? '/games/color-recall/'
-    : '/games/sequence-memory/';
+function gameHome(g: string): string {
+  return g === 'sequence-memory' ? '/games/sequence-memory/' : `/games/${g}/`;
+}
+const GAME_HOME = gameHome(GAME);
 
 /* ─── HSB → CSS（Color Recall 用，P1-5）────────────
    🔴 必须与 daily-game.ts 的 hsbToCss **逐字一致**，不要「顺手优化」。
@@ -134,6 +149,25 @@ const COPY: Record<string, { title: string; help: string; readyHint: string }> =
     title: t('duel.col_title', 'Colour Recall Duel'),
     help: t('duel.col_help', 'Memorise the colours, then rebuild them on the wheel. Your opponent gets the exact same colours — closest match wins.'),
     readyHint: t('duel.col_ready_hint', 'Tap start, watch the colours appear, then rebuild each one as closely as you can.'),
+  },
+  /* 🔴 P2（2026-10-13）三款新游戏的对战文案。
+     ⚠️ 键前缀用 duel.* 而不是 dc.*：每日挑战与对战是两套文案体系，
+        共用 dc.* 会让「每日挑战的措辞」反过来约束对战页。
+        六语字典两套都要有，缺一则该页显示英文兜底（不报错，极难发现）。 */
+  'emoji-ghost': {
+    title: t('duel.emoji_title', 'Emoji Ghost Duel'),
+    help: t('duel.emoji_help', 'A row of symbols flashes, then one is missing. Your opponent gets the exact same set — pick the ghost correctly.'),
+    readyHint: t('duel.emoji_ready_hint', 'Tap start, watch the symbols appear, then pick the one that was in the set.'),
+  },
+  'chimp-test': {
+    title: t('duel.chimp_title', 'Chimp Test Duel'),
+    help: t('duel.chimp_help', 'Numbers flash on the grid, then vanish. Your opponent gets the exact same grid — tap every cell that held a number.'),
+    readyHint: t('duel.chimp_ready_hint', 'Tap start, watch the numbers flash, then tap every cell that held one.'),
+  },
+  'word-recall': {
+    title: t('duel.word_title', 'Word Recall Duel'),
+    help: t('duel.word_help', 'Words appear one by one. Your opponent gets the exact same words — mark each as seen or new.'),
+    readyHint: t('duel.word_ready_hint', 'Tap start, watch the words appear, then mark each as seen or new.'),
   },
 };
 const cp = COPY[GAME] || COPY['sequence-memory'];
@@ -336,6 +370,9 @@ async function playRound(code: string, round: number): Promise<boolean> {
   const card = $('#card')!;
   const isNumber = GAME === 'number-recall';
   const isColor = GAME === 'color-recall';
+  const isEmoji = GAME === 'emoji-ghost';
+  const isChimp = GAME === 'chimp-test';
+  const isWord = GAME === 'word-recall';
 
   /* 🔴 取题：必须点「开始记忆」才请求 /room/round。
      服务端在返回题目时才开始计时（速度加成按各自真实耗时算），
@@ -370,8 +407,22 @@ async function playRound(code: string, round: number): Promise<boolean> {
       ? data.puzzle.colors.map((c: any) => ({ h: Number(c && c.h) || 0, s: Number(c && c.s) || 0, b: Number(c && c.b) || 0 }))
       : [];
 
+  /* 🔴 P2 三款新游戏的题目字段。publicView 已按游戏脱敏下发，
+     这里只做「拿到就解析、拿不到就报明确错」，不自行生成任何内容。 */
+  const pz = data.puzzle || {};
+  const emojiSet: string[] = (pz.grid || []).map((e: unknown) => String(e));
+  const emojiOptions: string[] = (pz.options || []).map((e: unknown) => String(e));
+  const chimpGrid: number = Number(pz.grid) || 5;
+  const chimpPositions: number[] = (pz.positions || []).map((n: unknown) => Number(n));
+  const words: string[] = (pz.words || []).map((w: unknown) => String(w));
+
   const target = isNumber ? digits : '';
-  const noPuzzle = isNumber ? !target.length : isColor ? !colors.length : !seq.length;
+  const noPuzzle = isNumber ? !target.length
+    : isColor ? !colors.length
+    : isEmoji ? (!emojiSet.length || emojiOptions.length !== 4)
+    : isChimp ? !chimpPositions.length
+    : isWord ? !words.length
+    : !seq.length;
   if (noPuzzle) {
     renderError(`[duel] 服务端未下发 ${GAME} 题目`, () => playRound(code, round));
     return false;
@@ -503,6 +554,157 @@ async function playRound(code: string, round: number): Promise<boolean> {
       answers.push({ h: +h.value, s: +s.value, b: +b.value });
     }
     answer = answers;
+  } else if (isEmoji) {
+    /* ── Emoji Ghost：集合闪现 → 四选一挑出「刚才在里面」的那个 ──
+       与每日挑战的 playEmojiGhost 同构。DOM 结构（.dc-emoji-row /
+       .dc-emoji / .dc-emoji-options / .dc-emoji-opt）刻意保持一致，
+       于是两处共用同一套 duel.css 样式，不需要再写一份。 */
+    card.innerHTML = `
+      <h2 class="dc-h2">${esc(t('duel.watch', 'Watch carefully…'))}</h2>
+      <div class="dc-emoji-row" id="row" aria-live="off"></div>`;
+
+    const row = $('#row')!;
+    row.innerHTML = emojiSet.map((e) => `<span class="dc-emoji">${esc(e)}</span>`).join('');
+    await sleep(EMOJI_SHOW_MS);
+    row.innerHTML = '';
+
+    card.innerHTML = `
+      <h2 class="dc-h2">${esc(t('duel.emoji_pick', 'Which one was in the set?'))}</h2>
+      <div class="dc-emoji-options" id="opts" role="radiogroup" aria-label="${esc(t('duel.emoji_pick', 'Which one was in the set?'))}">
+        ${emojiOptions.map((e, i) => `<button class="dc-emoji-opt" type="button" role="radio" aria-checked="false" data-i="${i}">${esc(e)}</button>`).join('')}
+      </div>`;
+
+    const opts = $('#opts')!;
+    answer = await new Promise<number>((resolve) => {
+      opts.addEventListener('click', (e) => {
+        const el = (e.target as HTMLElement).closest('.dc-emoji-opt') as HTMLElement | null;
+        if (!el) return;
+        opts.querySelectorAll('.dc-emoji-opt').forEach((n) => {
+          n.setAttribute('aria-checked', 'false');
+          n.classList.remove('picked');
+        });
+        el.setAttribute('aria-checked', 'true');
+        el.classList.add('picked');
+        const pick = Number(el.dataset.i);
+        setTimeout(() => resolve(pick), 180);
+      });
+    });
+  } else if (isChimp) {
+    /* ── Chimp Test：数字逐格闪现 → 消失 → 点出所有数字格 ── */
+    const size = chimpGrid * chimpGrid;
+    const cell = (i: number) => `<div class="dc-chimp-cell" data-i="${i}"></div>`;
+
+    card.innerHTML = `
+      <h2 class="dc-h2">${esc(t('duel.watch', 'Watch carefully…'))}</h2>
+      <div class="dc-chimp-grid" id="grid" style="grid-template-columns:repeat(${chimpGrid},1fr)">
+        ${Array.from({ length: size }, (_, i) => cell(i)).join('')}
+      </div>`;
+
+    const showGrid = $('#grid')!;
+    const nodes = Array.from(showGrid.querySelectorAll<HTMLElement>('.dc-chimp-cell'));
+    for (let k = 0; k < chimpPositions.length; k++) {
+      const pos = chimpPositions[k];
+      const n = nodes[pos];
+      if (!n) continue;
+      n.textContent = String(k + 1);
+      n.classList.add('lit');
+      await sleep(CHIMP_LIT_MS);
+      n.classList.remove('lit');
+      await sleep(CHIMP_GAP_MS);
+    }
+    await sleep(500);
+    nodes.forEach((n) => { n.textContent = ''; });
+
+    card.innerHTML = `
+      <h2 class="dc-h2">${esc(t('duel.chimp_pick', 'Tap every cell that held a number.'))}</h2>
+      <p class="dc-help">${esc(t('duel.chimp_count', 'There were {n} numbers.').replace('{n}', String(chimpPositions.length)))}</p>
+      <div class="dc-chimp-grid" id="grid" style="grid-template-columns:repeat(${chimpGrid},1fr)">
+        ${Array.from({ length: size }, (_, i) => cell(i)).join('')}
+      </div>
+      <button class="dc-btn" id="done" type="button" style="margin-top:14px">${esc(t('dc.chimp_done', 'Done'))}</button>`;
+
+    const grid2 = $('#grid')!;
+    /* 🔴 数组必须在 Promise **外部**声明：写成
+       `const picked = await new Promise(r => { ...picked.push(i) })`
+       会让回调里的 picked 处于暂时性死区，点第一格就抛 ReferenceError，
+       页面停在「轮到你」且点击无反应。 */
+    const picked: number[] = [];
+    grid2.addEventListener('click', (e) => {
+      const el = (e.target as HTMLElement).closest('.dc-chimp-cell') as HTMLElement | null;
+      if (!el || picked.length >= chimpPositions.length) return;
+      const i = Number(el.dataset.i);
+      if (picked.includes(i)) return;
+      picked.push(i);
+      /* 用 .lit（daily-challenge.css 里已定义）而不是自造 .picked ——
+         另起类名就得再补一条样式，漏补时选中态完全不可见，
+         玩家会以为点击没生效。.wrong 是每日挑战的即时反馈，
+         对战里不给（判分在提交后统一给，避免中途泄露对错）。 */
+      el.classList.add('lit');
+    });
+
+    await new Promise<void>((resolve) => {
+      document.getElementById('done')!.addEventListener('click', () => resolve(), { once: true });
+    });
+    answer = picked;
+  } else if (isWord) {
+    /* ── Word Recall：词逐个出现 → 逐词判断见过 / 没见过 ──
+       🔴 语言一致性红线（已核过服务端契约，这里**不要**多此一举传 lang）：
+         房间题的 lang 在**题目生成时已固化** —— buildRoomPuzzles(game, seed, n, lang)
+         把建房端传来的 lang 传进 buildPuzzle，publicView 再把 puzzle.lang 随题目下发，
+         服务端 judgeAgainst 直接读 room.bundle[r].words 复算。
+         即判分基准与题目来自**同一个已固化的 bundle**，与前端传什么无关。
+         若在此处再从 <html lang> 猜一个值上传，反而可能与题目语言不一致，
+         把本来正确的判分搞错。故只提交 marks。 */
+    card.innerHTML = `
+      <h2 class="dc-h2">${esc(t('duel.watch', 'Watch carefully…'))}</h2>
+      <div class="dc-word-stage" id="stage" aria-live="off"></div>`;
+
+    const stage = $('#stage')!;
+    stage.innerHTML = `<div class="dc-word-now" id="now"></div><div class="dc-word-prog" id="prog"></div>`;
+    const now = document.getElementById('now') as HTMLElement;
+    const prog = document.getElementById('prog') as HTMLElement;
+    for (let i = 0; i < words.length; i++) {
+      now.textContent = words[i];
+      prog.textContent = `${i + 1} / ${words.length}`;
+      await sleep(WORD_STEP_MS);
+    }
+    now.textContent = '';
+    prog.textContent = '';
+    await sleep(350);
+
+    card.innerHTML = `
+      <h2 class="dc-h2">${esc(t('duel.word_judge', 'Your turn — mark each word'))}</h2>
+      <div class="dc-word-list" id="list">
+        ${words.map((w, i) => `
+          <div class="dc-word-row" data-i="${i}">
+            <span class="w">${esc(w)}</span>
+            <span class="opts">
+              <button class="dc-word-btn" type="button" data-i="${i}" data-v="new">${esc(t('dc.word_new', 'New'))}</button>
+              <button class="dc-word-btn" type="button" data-i="${i}" data-v="seen">${esc(t('dc.word_seen', 'Seen'))}</button>
+            </span>
+          </div>`).join('')}
+      </div>
+      <button class="dc-btn" id="lock" type="button" style="margin-top:14px">${esc(t('dc.word_lock', 'Submit answers'))}</button>`;
+
+    const marks = new Array(words.length).fill('');
+    const list = document.getElementById('list')!;
+    list.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest('.dc-word-btn') as HTMLElement | null;
+      if (!btn) return;
+      const i = Number(btn.dataset.i);
+      marks[i] = btn.dataset.v || '';
+      const row = list.querySelector(`.dc-word-row[data-i="${i}"]`);
+      if (row) row.classList.toggle('answered', !!marks[i]);
+      list.querySelectorAll(`.dc-word-btn[data-i="${i}"]`).forEach((b) => {
+        b.classList.toggle('on', (b as HTMLElement).dataset.v === marks[i]);
+      });
+    });
+
+    await new Promise<void>((resolve) => {
+      document.getElementById('lock')!.addEventListener('click', () => resolve(), { once: true });
+    });
+    // 未判定的词按 'new' 提交：与每日挑战同一兜底，服务端按比例计分而非判零
+    answer = marks.map((v) => v || 'new');
   } else {
     /* Sequence Memory：格子依次点亮 → 按序点回 */
     const cells = Array.from({ length: grid * grid },

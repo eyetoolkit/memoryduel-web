@@ -1125,7 +1125,23 @@
     "col_ready_hint": "Starte die Runde, sieh dir die Farben an und stelle jede so genau wie möglich nach.",
     "col_pick": "Farbe {n} von {total} — so nah wie möglich annähern.",
     "col_foot_hint": "Beide sehen dieselben Farben. Wer näher dran ist, gewinnt.",
-    "room_not_found": "Dieser Duell-Code existiert nicht. Prüfe den Code oder starte ein neues Duell."
+    "room_not_found": "Dieser Duell-Code existiert nicht. Prüfe den Code oder starte ein neues Duell.",
+    "emoji_title": "Emoji-Geist-Duell",
+    "emoji_help": "Eine Reihe Symbole blinkt auf, eines verschwindet. Dein Gegner bekommt genau dieselbe Menge.",
+    "emoji_ready_hint": "Start drücken, Symbole ansehen, dann wählen, welches in der Menge war.",
+    "emoji_pick": "Welches war in der Menge?",
+    "emoji_foot_hint": "Dieselbe Menge für beide. Server-seitig gewertet.",
+    "chimp_title": "Schimpansen-Test-Duell",
+    "chimp_help": "Zahlen blinken im Raster auf und verschwinden. Dein Gegner bekommt dasselbe Raster.",
+    "chimp_ready_hint": "Start drücken, Zahlen ansehen, dann jedes Feld mit einer Zahl antippen.",
+    "chimp_pick": "Du bist dran – tippe die nummerierten Felder",
+    "chimp_count": "Es waren {n} Zahlen.",
+    "chimp_foot_hint": "Dasselbe Raster für beide. Server-seitig gewertet.",
+    "word_title": "Wörter-Gedächtnis-Duell",
+    "word_help": "Wörter erscheinen nacheinander. Dein Gegner bekommt genau dieselben Wörter.",
+    "word_ready_hint": "Start drücken, Wörter ansehen, dann jedes als gesehen oder neu markieren.",
+    "word_judge": "Du bist dran – Wörter markieren",
+    "word_foot_hint": "Dieselben Wörter für beide. Server-seitig gewertet."
   },
   "colduel": {
     "title": "Farb-Duell · MemoryDuel",
@@ -1138,5 +1154,17 @@
   "numduel": {
     "title": "Zahlen-Duell · MemoryDuel",
     "meta_desc": "Merke dir eine Ziffernfolge und tippe sie vor deinem Gegner zurück. 1v1-Zahlengedächtnisduell, serverseitig gewertet, ohne Anmeldung."
+  },
+  "emojighostduel": {
+    "title": "Emoji-Geist-Duell · MemoryDuel",
+    "meta_desc": "Eine Reihe Symbole blinkt auf, eines verschwindet: wählen. Duell 1v1, gleiche Menge."
+  },
+  "chimptestduel": {
+    "title": "Schimpansen-Test-Duell · MemoryDuel",
+    "meta_desc": "Zahlen blinken auf und verschwinden: tippe jedes Feld. Duell 1v1, gleiches Raster."
+  },
+  "wordrecallduel": {
+    "title": "Wörter-Gedächtnis-Duell · MemoryDuel",
+    "meta_desc": "Wörter erscheinen nacheinander: markiere gesehen oder neu. Duell 1v1, gleiche Wörter."
   }
 }
