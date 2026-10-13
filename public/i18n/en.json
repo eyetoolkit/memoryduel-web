@@ -1142,7 +1142,11 @@
     "word_ready_hint": "Tap start, watch the words appear, then mark each as seen or new.",
     "word_judge": "Your turn — mark each word",
     "word_foot_hint": "Same words for both players. Server-scored.",
-    "settle_failed": "Scores saved, but rewards could not be issued this time. Play again later."
+    "settle_failed": "Scores saved, but rewards could not be issued this time. Play again later.",
+    "wait_title": "All your rounds are done",
+    "wait_body": "Your opponent still has rounds to play. The duel settles as soon as they finish — stay on this page or come back later with your code.",
+    "checking": "Checking your opponent…",
+    "settled_banner": "Duel settled"
   },
   "colduel": {
     "title": "Colour Recall Duel · MemoryDuel",

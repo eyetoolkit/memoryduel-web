@@ -1142,7 +1142,11 @@
     "word_ready_hint": "Pulsa iniciar, observa las palabras y marca cada una como vista o nueva.",
     "word_judge": "Tu turno: marca cada palabra",
     "word_foot_hint": "Las mismas palabras para ambos. Puntuado por el servidor.",
-    "settle_failed": "Puntuación guardada, pero esta vez no se pudieron entregar las recompensas. Inténtalo más tarde."
+    "settle_failed": "Puntuación guardada, pero esta vez no se pudieron entregar las recompensas. Inténtalo más tarde.",
+    "wait_title": "Has completado todas tus rondas",
+    "wait_body": "A tu rival aún le quedan rondas. El duelo se resolverá en cuanto termine: quédate en esta página o vuelve más tarde con tu código.",
+    "checking": "Esperando a tu rival…",
+    "settled_banner": "Duelo resuelto"
   },
   "colduel": {
     "title": "Duelo de colores · MemoryDuel",

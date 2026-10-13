@@ -1142,7 +1142,11 @@
     "word_ready_hint": "点开始，看词语出现，然后逐个标记见过或没见过。",
     "word_judge": "轮到你——逐个标记词语",
     "word_foot_hint": "双方题目完全相同，服务端判分。",
-    "settle_failed": "比分已保存，但本次奖励未能发放，请稍后再试一局。"
+    "settle_failed": "比分已保存，但本次奖励未能发放，请稍后再试一局。",
+    "wait_title": "你的轮次已全部完成",
+    "wait_body": "对手还有轮次没打完。对方完成后本局自动结算——你可以留在此页，或稍后用房码回来查看结果。",
+    "checking": "正在等待对手完成…",
+    "settled_banner": "本局已结算"
   },
   "colduel": {
     "title": "颜色记忆对决 · MemoryDuel",

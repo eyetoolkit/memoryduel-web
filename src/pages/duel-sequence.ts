@@ -260,7 +260,14 @@ async function enterRoom(code: string) {
     if (iAmHost) sessionStorage.setItem('duel-host', '1');
   } catch (_) {}
 
-  if (st.status === 'waiting') renderWaiting(code, st);
+  /* 🔴 2026-10-13 深度审核：status 必须三分支处理。
+   原实现是 `waiting ? 等待页 : 作答页` —— 于是 finished 的房间
+   （服务端已结算）会被当成 playing 重新进入对战循环：
+   玩家刷新页面 → 又要重打全部轮次 → 提交全部 already=true 拿 0 分。
+   此前服务端 finish() 只写 finished 不改 status，所以这里根本
+   收不到 finished；status 机修复后必须同步处理，否则漏洞从后门回来。 */
+  if (st.status === 'finished') renderFinalScore(code, st, true);
+  else if (st.status === 'waiting') renderWaiting(code, st);
   else renderPlay(code, st);
 }
 
@@ -350,7 +357,18 @@ async function renderPlay(code: string, st: any) {
   if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
   const total = Number(st.totalRounds || ROUNDS);
 
-  for (let round = 0; round < total; round++) {
+  /* 🔴 2026-10-13 深度审核：刷新/重进要从**已答轮次之后**继续。
+     原实现恒从 round=0 开始，而 /answer 是幂等的（重复提交 already=true、
+     gained=0），于是玩家刷新后会被迫把全部轮次重看一遍题目、
+     再点一遍提交，最后一题还是拿 0 分 —— 表现为「打完没得分」
+     且完全看不出是刷新导致的。
+     服务端 /room/status 不返回个人作答进度（那是隐私：不能告诉对手
+     你答到第几轮），所以这里用 room.round 作**保守下界**：
+     room.round 只在「本轮全员完成」时前进，作为起点不会漏答、
+     最坏多打一轮（那一轮幂等返回 already）。 */
+  const from = Math.max(0, Math.min(Number(st.round) || 0, total));
+
+  for (let round = from; round < total; round++) {
     showRoundTag(round + 1, total);
     const played = await playRound(code, round);
     if (!played) return;   // 出错已在 playRound 内渲染
@@ -790,61 +808,37 @@ async function playRound(code: string, round: number): Promise<boolean> {
   return true;
 }
 
-/* ═══════════ 阶段 4：比分 ═══════════ */
-/* 🔴 2026-10-13 深度审核发现：这一段此前**只读比分、从不结算**。
-   showResult 原来直接 `roomStatus()` 渲染榜单就结束，全文件搜不到
-   `finishRoom`。而 /room/finish 是 memoryduel **唯一**的发币入口
-   （index.js 在那里 settlePlayerOnce 给每个 pid 发 15/5 币，
-   并落 D1 matches / match_players）。
-   后果：六款记忆游戏（sequence / number / color / emoji / chimp / word）
-   玩家打完整局 → 比分正常显示 → **金币 0 增长、战绩不落库**。
-   只有 quiz 的两条老链路（train.html 在线对战、teacher.js 课堂）
-   调了 finish，所以「对战能产币」这件事在站点上一直是半残的。
+/* ═══════════ 阶段 4：终局等待 / 比分 ═══════════ */
+/* 🔴 2026-10-13 深度审核：这一段经历了「从不结算」→「提前结算」两次修正，
+   现在的正确形态是**服务端权威终局 + 前端等待**。
 
-   为什么原来没炸：结算失败也不会有任何报错 —— 页面已经渲染完了，
-   玩家看不到任何线索，只是金币悄悄没加。 */
+   ① 最初：showResult 只读比分、从不调 finishRoom。
+      而 /room/finish 是唯一发币入口 → 六款记忆游戏打完整局，金币 0 增长。
+
+   ② 首次修复：showResult 直接调 finishRoom()。
+      但异步对战里**每位玩家跑完自己的轮次就调** —— 手快的一方会在
+      对手还没开始打时把整局按当前比分固化：winner 定错、对手后续得分
+      永久丢失、第二次 finish 被 ALREADY_FINISHED 挡死无法补救。
+      （服务端当时也不校验赛程进度，两边叠加才形成生产漏洞。）
+
+   ③ 现在：终局判定在服务端 —— 所有真人玩家答满全部轮次时，
+      由触发最后一答的那个 /answer 请求就地结算并发币。
+      前端完成个人轮次后**不再主动固化**，改为轮询 /room/status 等 finished。
+      finishRoom() 仍保留为兜底重试（响应丢失时用），
+      服务端对「赛程未完成」回 WAITING_FOR_OPPONENT，属正常形态而非错误。 */
 async function showResult(code: string) {
   showRoundTag(ROUNDS, ROUNDS);
   const card = $('#card')!;
   card.innerHTML = `<div class="dc-loading">${esc(t('duel.scoring', 'Scoring…'))}</div>`;
 
-  /* ① 先结算，再拉比分。
-     顺序很重要：finish 内部会把最终比分写进 D1 并发币，
-     若先读 status 拿到的是「结算前」的分数（异步对战下
-     对手可能还在打），榜单会显示一个中间态。 */
-  let settled = false;
-  try {
-    await C().finishRoom(code);
-    settled = true;
-  } catch (e) {
-    /* 服务端 /room/finish 对「重复结算」回 4xx ALREADY_FINISHED。
-       那不是错误 —— 说明这一局早就结过了。异步对战里对手先打完、
-       或用户刷新后重新进房走到这里，都会命中，属正常形态。
-       判据用 err.code（duel-room.js 把后端 error.code 挂在异常上），
-       不用正则去 match message 文本 —— 那是拿文案当契约，
-       一旦有人改文案或加前缀就静默失效。 */
-    const code2 = (e as any)?.code || '';
-    settled = code2 === 'BAD_PARAM' && /ALREADY_FINISHED/i.test((e as Error).message || '');
-    if (!settled) console.warn('[duel] finish failed:', (e as Error).message);
-    else console.info('[duel] already settled by opponent');
-  }
-
-  /* ② 结算失败也要把比分给玩家看。
-     金币没发不等于这一局白打了 —— 玩家该知道自己得了几分。
-     所以这里只加一条提示，不换成错误卡（那会让玩家以为整局无效）。 */
-  if (!settled) {
-    try {
-      sessionStorage.setItem('duel-settle-failed', '1');
-    } catch (_) {}
-  }
-
-  let st: any;
+  /* ① 先问一次服务端：这局是否已经结算。
+     正常情况下「自己跑完全部轮次」时，对手若也已跑完，最后一答就已结算；
+     否则这里拿到 playing → 进入等待界面。 */
+  let st: any = null;
   try {
     st = await C().roomStatus(code);
     room = { code, ...st };
   } catch (e) {
-    // 拉不到最新榜单时，用本地房间快照兜底（至少把自己的分数显示出来），
-    // 而不是把整页换成错误卡 —— 玩家刚打完三局却什么也看不到，体验最差。
     st = room && room.code === code ? room : null;
     if (!st) {
       renderError((e as Error).message, () => showResult(code));
@@ -852,6 +846,104 @@ async function showResult(code: string) {
     }
   }
 
+  if (st.status !== 'finished') {
+    await waitOpponent(code);
+    return;
+  }
+
+  renderFinalScore(code, st, true);
+}
+
+/* ─── 等待对手完成（异步对战的常态，不是错误）─── */
+function waitOpponent(code: string) {
+  const card = $('#card')!;
+  card.innerHTML = `
+    <h2 class="dc-h2">${esc(t('duel.wait_title', 'All your rounds are done'))}</h2>
+    <p class="dc-help">${esc(t('duel.wait_body', 'Your opponent still has rounds to play. The duel settles as soon as they finish — stay on this page or come back later with your code.'))}</p>
+    <div class="dc-loading" id="waitSpin">${esc(t('duel.checking', 'Checking your opponent…'))}</div>
+    <div class="dc-rank" id="waitScores"></div>
+    <div class="duel-code-box">
+      <span class="duel-code-big">${esc(code)}</span>
+      <button class="dc-btn ghost small" id="copyBtnW" type="button">${esc(t('duel.copy', 'Copy'))}</button>
+    </div>
+    <a class="dc-btn ghost" href="/" style="margin-top:10px;display:block;text-align:center;text-decoration:none">${esc(t('duel.back_home', '← MemoryDuel'))}</a>`;
+
+  const cb = document.getElementById('copyBtnW');
+  if (cb) {
+    cb.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(code); cb.textContent = t('duel.copied', 'Copied!'); }
+      catch (_) { cb.textContent = code; }
+    });
+  }
+
+  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+  let ticks = 0;
+  pollTimer = window.setInterval(async () => {
+    ticks++;
+    try {
+      const st = await C().roomStatus(code);
+      // 期间比分会变（对手在打）——顺手刷新，让玩家看到进度
+      const box = document.getElementById('waitScores');
+      if (box && st.players) {
+        box.innerHTML = st.players.slice()
+          .sort((a: any, b: any) => (b.score || 0) - (a.score || 0))
+          .map((p: any) => `
+            <div class="dc-rank-row ${p.pid === myPid ? 'me' : ''}">
+              <span class="ico">${ICON}</span>
+              <span class="nm">${esc(p.name)}${p.pid === myPid ? ' · ' + esc(t('duel.you', 'you')) : ''}</span>
+              <span class="sc">${esc(p.score || 0)}</span>
+            </div>`).join('');
+      }
+      if (st.status === 'finished') {
+        if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+        room = { code, ...st };
+        renderFinalScore(code, st, true);
+        return;
+      }
+    } catch (_) { /* 下一拍再试 */ }
+
+    /* 🔴 兜底：轮询 5 分钟仍没结束，主动调一次 finish。
+       覆盖「对手的最后一答没能触发结算」（例如请求被网关截断、
+       或 D1 唯一索引竞态导致那一答没拿到结算权）。
+       服务端此时已能判定赛程完成 → 正常结算；
+       若对手确实还没打完 → 回 WAITING_FOR_OPPONENT，继续等。 */
+    if (ticks >= 100) {   // 3s × 100 ≈ 5 分钟
+      if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+      void tryFinish(code);
+    }
+  }, 3000);
+}
+
+/** 兜底结算：只在「服务端判定赛程已完成」时才算成功 */
+async function tryFinish(code: string) {
+  let st: any = null;
+  try {
+    await C().finishRoom(code);
+    st = await C().roomStatus(code);
+  } catch (e) {
+    const err = e as any;
+    if (err.code === 'WAITING_FOR_OPPONENT') {
+      // 正常：对手还没打完，回到等待界面
+      waitOpponent(code);
+      return;
+    }
+    if (err.code === 'BAD_PARAM' && /ALREADY_FINISHED/i.test((e as Error).message || '')) {
+      st = await C().roomStatus(code).catch(() => null);
+    } else {
+      console.warn('[duel] finish failed:', (e as Error).message);
+    }
+  }
+  if (st && st.status === 'finished') {
+    room = { code, ...st };
+    renderFinalScore(code, st, false);
+  } else {
+    waitOpponent(code);
+  }
+}
+
+/** 终局比分。settledByMe=false 时不谎称「已结算」 */
+function renderFinalScore(code: string, st: any, settledByOk: boolean) {
+  const card = $('#card')!;
   const players = (st.players || []).slice().sort((a: any, b: any) => (b.score || 0) - (a.score || 0));
   const rows = players.map((p: any, i: number) => `
     <div class="dc-rank-row ${p.pid === myPid ? 'me' : ''}">
@@ -862,7 +954,7 @@ async function showResult(code: string) {
 
   card.innerHTML = `
     <h2 class="dc-h2">${esc(t('duel.result_title', 'Duel complete'))}</h2>
-    ${settled ? '' : `<p class="dc-help error">${esc(t('duel.settle_failed', 'Scores saved, but rewards could not be issued this time. Play again later.'))}</p>`}
+    ${settledByOk ? '' : `<p class="dc-help error">${esc(t('duel.settle_failed', 'Scores saved, but rewards could not be issued this time. Play again later.'))}</p>`}
     <div class="dc-rank">${rows}</div>
     <div class="duel-code-box">
       <span class="duel-code-big">${esc(code)}</span>

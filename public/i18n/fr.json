@@ -1142,7 +1142,11 @@
     "word_ready_hint": "Lancez, observez les mots, puis indiquez pour chacun s'il a été vu.",
     "word_judge": "À vous : indiquez chaque mot",
     "word_foot_hint": "Les mêmes mots pour les deux. Noté par le serveur.",
-    "settle_failed": "Score enregistré, mais les récompenses n'ont pas pu être attribuées cette fois. Réessayez plus tard."
+    "settle_failed": "Score enregistré, mais les récompenses n'ont pas pu être attribuées cette fois. Réessayez plus tard.",
+    "wait_title": "Vous avez terminé toutes vos manches",
+    "wait_body": "Votre adversaire a encore des manches à jouer. Le duel sera tranché dès qu’il aura fini : restez sur cette page ou revenez plus tard avec votre code.",
+    "checking": "En attente de votre adversaire…",
+    "settled_banner": "Duel réglé"
   },
   "colduel": {
     "title": "Duel des couleurs · MemoryDuel",

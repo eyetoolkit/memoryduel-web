@@ -1142,7 +1142,11 @@
     "word_ready_hint": "Start drücken, Wörter ansehen, dann jedes als gesehen oder neu markieren.",
     "word_judge": "Du bist dran – Wörter markieren",
     "word_foot_hint": "Dieselben Wörter für beide. Server-seitig gewertet.",
-    "settle_failed": "Punkte gespeichert, aber die Belohnung konnte diesmal nicht ausgegeben werden. Bitte später erneut versuchen."
+    "settle_failed": "Punkte gespeichert, aber die Belohnung konnte diesmal nicht ausgegeben werden. Bitte später erneut versuchen.",
+    "wait_title": "Alle deine Runden sind geschafft",
+    "wait_body": "Dein Gegner hat noch Runden vor sich. Sobald er fertig ist, wird das Duell automatisch gewertet – bleib auf dieser Seite oder komm später mit deinem Code zurück.",
+    "checking": "Warten auf deinen Gegner…",
+    "settled_banner": "Duell gewertet"
   },
   "colduel": {
     "title": "Farb-Duell · MemoryDuel",
