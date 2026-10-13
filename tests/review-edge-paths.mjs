@@ -82,6 +82,10 @@ class CDP {
         const en = e.params.entry;
         const t = en.text || '';
         if (/Failed to fetch|NetworkError|Load failed|ERR_/i.test(t)) continue;
+        // 🔴 HTTP 4xx 不是前端异常 —— 场景 1（非法房码）**预期**后端返 404，
+        //    浏览器必然在控制台记一条 "Failed to load resource"。那是正确行为，
+        //    把它算成「未捕获异常」会让这条断言永远红且毫无意义。
+        if (/status of 4\d\d/.test(t)) continue;
         out.push('资源错误: ' + t + ' ' + (en.url || ''));
       }
     }
@@ -172,12 +176,25 @@ const SHIM_BAD_SHAPE = `
 })();
 `;
 
+/* 🔴 这个 shim 必须**尊重 AbortSignal**，否则测不到超时机制：
+   fetchTimeout 内部同样是调 window.fetch，若本 shim 无视 signal 直接返回
+   一个永不 settle 的 Promise，AbortController.abort() 就完全失效 ——
+   测出来的「永久转圈」是测试自己造的，不是产品缺陷。 */
 const SHIM_HANG = `
 (function(){
   var _f = window.fetch;
   window.fetch = function(input, init){
     var u = String(input && input.url ? input.url : input);
-    if (u.indexOf('/api/') >= 0) { return new Promise(function(){ /* 永不 settle */ }); }
+    if (u.indexOf('/api/') >= 0) {
+      return new Promise(function(resolve, reject){
+        var sig = init && init.signal;
+        if (!sig) return;                       // 无 signal：真挂起
+        if (sig.aborted) { reject(new DOMException('Aborted','AbortError')); return; }
+        sig.addEventListener('abort', function(){
+          reject(new DOMException('Aborted','AbortError'));
+        });
+      });
+    }
     return _f.call(this, input, init);
   };
 })();
@@ -245,14 +262,14 @@ async function main() {
 
     // 4. 请求挂起不返回 —— 关键：不能永久转圈
     console.log(`\n─── 4. 请求永不 settle（挂起） ───`);
+    console.log('    预期：15s FETCH_TIMEOUT_MS 触发 → 降级为可读错误');
     const t0 = Date.now();
     let hungOk = false, snap4 = null;
-    // 每个场景的 shim 只能注入一次，所以这里单独导航一次
     page.reset();
     await page.send('Page.addScriptToEvaluateOnNewDocument', { source: SHIM_HANG });
     await page.send('Page.navigate', { url: `${ORIGIN}/games/daily-challenge/?lang=zh` });
-    // 给 12 秒，看是否自行给出降级
-    for (let i = 0; i < 24; i++) {
+    // 超时上限是 15s，这里给 25s 留足余量
+    for (let i = 0; i < 50; i++) {
       await sleep(500);
       try {
         snap4 = await page.eval(SNAPSHOT);
@@ -261,12 +278,13 @@ async function main() {
     }
     const waited = ((Date.now() - t0) / 1000).toFixed(1);
     ok(hungOk, `4. 请求挂起后 ${waited}s 内给出降级（未永久转圈）`);
+    ok(waited >= 12, `4. 不是立刻误报，而是等到超时才降级（用了 ${waited}s，应 ≥12s）`);
     if (snap4) {
       ok(!snap4.loading, `4. 不停留在 loading`);
       ok(snap4.txtLen > 10, `4. 有可读文案（"${(snap4.txt || '').slice(0, 60)}"）`);
+      ok(/超时|timeout|失败|重试|重试/i.test(snap4.errText + snap4.txt),
+        `4. 提示里点明是超时而非泛化失败（"${(snap4.errText || snap4.txt || '').slice(0, 70)}"）`);
     }
-    // 注意：这一项可能本来就该「继续转圈」—— 网络挂起时前端无从得知，
-    // 若失败需人工判断是产品该加超时，还是测试期望不合理。日志留证据。
 
     // 5. 后端 500
     await scenario(page, '5. 后端 500',
