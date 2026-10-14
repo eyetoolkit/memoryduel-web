@@ -2,14 +2,21 @@
    MemoryDuel · 每日挑战游戏页 + 大厅页样式
    ────────────────────────────────────────────────────────────────
    品牌色：橙家族（tokens.css 为权威，memoryduel 非靛蓝）
-     主色 #EA580C / hover #C2410C / light #FB923C / accent #FBBF24
+     主色 #C2410C / hover #9A3412 / light #FB923C / accent #FBBF24
    ⚠️ 与 boardduel 的区别：boardduel 是紫罗兰 + ink 深底，
       memoryduel 是纸感浅底 + 橙色强调。两站 CSS 不通用。
+
+   🔴 2026-10-14 无障碍修正：主色原为 #EA580C，白字压上去只有 **3.56:1**，
+      低于 WCAG AA 的 4.5:1 —— 而 .dc-btn 是「Show me / Create a duel」
+      这类**主行动按钮**，全站六款对战页 + 每日挑战都在用，等于主 CTA 读不清。
+      改为 #C2410C（5.18:1，同色系 orange-700，视觉差异最小）。
+      hover 顺延到 #9A3412（7.31:1）避免「按下时反而更亮」。
+      同色系的 #FB923C 只用于描边/图形，不承载白字。 */
    ═══════════════════════════════════════════════════════════════ */
 
 :root {
-  --dc-primary: #EA580C;
-  --dc-primary-dark: #C2410C;
+  --dc-primary: #C2410C;
+  --dc-primary-dark: #9A3412;
   --dc-primary-light: #FB923C;
   --dc-accent: #FBBF24;
   --dc-ink: #1C1917;

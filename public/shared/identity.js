@@ -271,6 +271,20 @@
       '.idt-ask.compact .idt-in{width:9rem;padding:.35rem .6rem;font-size:.85rem}',
       '.idt-ask.compact .idt-go{padding:.35rem .7rem;font-size:.85rem}',
       '.idt-ask.compact .idt-note{font-size:.75rem;white-space:nowrap}',
+      /* 🔴 2026-10-14 移动端横向溢出修复（390px 视口实测 scrollWidth=556）：
+         顶栏那一行是 brand + nav + actions + 身份条，无宽度约束时用户名一长
+         （或叠加「修改」按钮）就把整行撑破视口 → 页面出现横向滚动条，
+         正文被推出屏幕。玩法说明/会员/博客三页同时中招（共用同一个页头）。
+         三处缺一不可：
+           1) .sh-me 允许收缩（inline-flex 默认 min-width:auto = 内容宽，不肯缩）
+           2) .idt-name 限宽 + 省略号（用户名是外部输入，长度不可控）
+           3) .idt-edit 不换行且不被挤没
+         只改其中一处无效：只给 .idt-name 加 max-width，.sh-me 仍会以
+         min-width:auto 顶着内容宽度不缩。 */
+      '.sh-me{display:inline-flex;align-items:center;min-width:0;max-width:100%;flex-shrink:1;overflow:hidden}',
+      '.idt-ask.compact .idt-name{max-width:5.5rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.idt-ask.compact .idt-edit{flex:none;white-space:nowrap}',
+      '@media (max-width:820px){.sh-me .idt-name{max-width:4rem}}',
       /* iOS Safari for font-size<16px input auto-zooms the page on focus (user must
          zoom out manually). Force a 16px floor on mobile; desktop keeps .85rem. */
       '@media (max-width:820px){input.idt-in,',

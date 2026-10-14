@@ -63,7 +63,19 @@
 
 /* ── 页脚 ── */
 .duel-foot{
-  text-align:center;color:var(--mute);font-size:12.5px;
+  /* 🔴 2026-10-14 无障碍修正：本区块的深墨底来自 home.css:195 的**全局**
+     `footer{background:var(--ink)}`（--ink=#1C1408）。深底本身是设计意图，
+     问题在文字色：这里用的是 var(--mute)（#6B5544，**浅底用的暗棕**），
+     套到深底上实测 rgb(107,90,69) on rgb(28,20,8) = **2.61:1**，
+     远低于 WCAG AA 的 4.5:1 —— 六款对战页的页脚说明几乎读不出来，
+     而且零报错、看着"有字"。
+     改为深底专用浅色 #D9CFBC（11.8:1），不透明、不再靠 opacity 降级。
+     ⚠️ 教训：全局无限定元素的规则（footer/button/a）会把颜色语义
+     带到设计意图完全不同的容器里，凡用 var(--mute) 都要先问
+     「我所在的底是浅是深」。 */
+  text-align:center;
+  color:#D9CFBC;
+  font-size:12.5px;
   padding:24px 20px 40px;
 }
 
