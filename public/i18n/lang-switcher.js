@@ -6,7 +6,7 @@
      <script src="/i18n/lang-switcher.js?v=40" defer></script>
 
    模式自适应：
-     - 挂载点位于 nav/header/.topbar/.sidebar 内 → 内嵌图标按钮（38px，菜单向下）
+     - 挂载点位于 nav/header/.topbar/.sidebar 内 → 内嵌图标按钮（44px，菜单向下）
      - 其它位置（如 body 末尾）→ 右下角浮动圆球（46px，菜单向上）
    样式使用命名空间 --lsw-* 变量，不依赖站点语义变量（各站 --ink/--paper 含义相反）。
    ═══════════════════════════════════════════════════════════════ */
@@ -44,7 +44,9 @@
 
   var CSS = ''
     + '.lang-switcher{position:relative;display:inline-flex;flex:none;font-family:inherit}'
-    + '.lang-switcher .lsw-btn{width:38px;height:38px;padding:0;display:grid;place-items:center;'
+    /* 🔴 2026-10-14：38→44px（触摸目标下限，WCAG 2.5.5 / Apple HIG）。
+       浮动模式本来就是 46px，内嵌模式反而更小，是三站顶栏的语言按钮。 */
+    + '.lang-switcher .lsw-btn{width:44px;height:44px;padding:0;display:grid;place-items:center;'
     +   'background:var(--lsw-bg,#fff);border:1px solid var(--lsw-line,rgba(25,20,45,.16));'
     +   'border-radius:10px;color:var(--lsw-fg,#3b3552);cursor:pointer;'
     +   'transition:border-color .15s,color .15s,box-shadow .15s;font:inherit}'
