@@ -57,6 +57,9 @@
 
 <!-- 🔴 与 Sequence 共用同一套对战内核（duel-sequence.ts 按路径推断 game），
      不复制一份实现 —— 两份实现会随时间分叉，判分/防偷看的修复也会漏改一边。 -->
+<!-- solo mode (?mode=solo) uses the same public puzzle endpoint as the
+     daily challenge; without daily-client.js the mode cannot start. -->
+<script src="/shared/daily-client.js?v=1"></script>
 <script src="/shared/duel-room.js?v=1"></script>
 <script type="module" src="/src/pages/duel-sequence.ts"></script>
 </body>

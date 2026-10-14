@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" data-site="memory">
+<head>
+<script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:53,fallback:"en"};</script>
+<script src="/i18n/i18n.js?v=36"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#FAF6F1">
+<title data-i18n-title="dl.title">Word Recall — Choose Your Duel · MemoryDuel · MemoryDuel</title>
+<meta name="description" data-i18n="dl.meta_desc" content="Words appear one by one. Then mark each as seen or new. Asynchronous 1v1 duel: create a room, share the 6-character code, and the server scores both players on the same questions.">
+<link rel="canonical" href="https://memoryduel.com/games/word-recall/lobby/" />
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MemoryDuel">
+<meta property="og:url" content="https://memoryduel.com/games/word-recall/lobby/" />
+<meta property="og:image" content="https://memoryduel.com/og-default.jpg" />
+<meta property="og:title" content="Word Recall — Choose Your Duel · MemoryDuel · MemoryDuel" />
+<meta property="og:description" content="Words appear one by one. Then mark each as seen or new." />
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Word Recall — Choose Your Duel · MemoryDuel · MemoryDuel" />
+<meta name="twitter:description" content="Words appear one by one. Then mark each as seen or new." />
+<meta name="twitter:image" content="https://memoryduel.com/og-default.jpg" />
+<link rel="alternate" hreflang="zh-CN" href="https://memoryduel.com/games/word-recall/lobby/" />
+<link rel="alternate" hreflang="en" href="https://memoryduel.com/games/word-recall/lobby/?lang=en" />
+<link rel="alternate" hreflang="ja" href="https://memoryduel.com/games/word-recall/lobby/?lang=ja" />
+<link rel="alternate" hreflang="es" href="https://memoryduel.com/games/word-recall/lobby/?lang=es" />
+<link rel="alternate" hreflang="fr" href="https://memoryduel.com/games/word-recall/lobby/?lang=fr" />
+<link rel="alternate" hreflang="de" href="https://memoryduel.com/games/word-recall/lobby/?lang=de" />
+<link rel="alternate" hreflang="x-default" href="https://memoryduel.com/games/word-recall/lobby/" />
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="stylesheet" href="/src/styles/home.css">
+<link rel="stylesheet" href="/src/styles/daily-challenge.css">
+<link rel="stylesheet" href="/src/styles/duel.css">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Memory Duel">
+<script src="/js/sw-register.js" defer></script>
+</head>
+<body class="dc-page">
+
+<header class="dc-top">
+  <a class="back" href="/" data-i18n="duel.back_home">← MemoryDuel</a>
+  <p class="title dc-top-name" data-i18n="dl.title_word">Word Recall Duel</p>
+  <span class="spacer"></span>
+</header>
+
+<main class="dc-wrap">
+
+  <!-- ═══════════ Hero ═══════════ -->
+  <section class="dc-hero">
+    <span class="cover" aria-hidden="true">📝</span>
+    <h1 id="dlH1">Word Recall <em data-i18n="dl.h1_em">Play your way.</em></h1>
+    <p class="sub" id="dlBlurb">Words appear one by one. Then mark each as seen or new.</p>
+    <div class="dc-chips">
+      <span class="chip"><span class="dot"></span><span data-i18n="dl.chip_async">Asynchronous — play any time</span></span>
+      <span class="chip"><span class="dot"></span><span data-i18n="dl.chip_code">6-character room code</span></span>
+      <span class="chip"><span class="dot"></span><span data-i18n="dl.chip_free">No login required</span></span>
+    </div>
+  </section>
+
+  <!-- ═══════════ 未完成的对局（有 session 残留时才出现）═══════════ -->
+  <p class="dc-note" id="dlResume" hidden>
+    <span data-i18n="dl.resume_label">You have an unfinished duel:</span>
+    <b id="dlResumeCode"></b>
+    <a class="dc-btn ghost" id="dlResumeBtn" href="#">Resume</a>
+  </p>
+
+  <div class="dc-grid">
+
+    <section aria-labelledby="modesTitle">
+      <h2 class="dc-sec-h" id="modesTitle" data-i18n="dl.modes_h2">Choose your duel<small data-i18n="dl.modes_h2_small">Tap a card to jump straight in.</small></h2>
+
+      <div class="dc-modes" id="modeGrid">
+
+        <!-- 01 · 建房 —— 主推。/?mode=create 由游戏页触发建房，
+             🔴 建房放在游戏页而非本页：建房会失败（限流/房间封顶/网络），
+             失败时用户看到的必须是游戏页自己的错误态与重试按钮。 -->
+        <a class="dc-mode feat" href="/games/word-recall/?mode=create" data-mode="create">
+          <div class="mi" aria-hidden="true">🏠</div>
+          <div>
+            <div class="mt" data-i18n="dl.mt_create">Create a duel</div>
+            <div class="md" data-i18n="dl.md_create">Get a 6-character code, share it with a friend, and wait for them to finish. You can play in the meantime.</div>
+            <span class="dc-tag is-gold" data-i18n="dl.tag_main">Main event</span>
+          </div>
+        </a>
+
+        <!-- 02 · 加入 -->
+        <a class="dc-mode" href="/games/word-recall/?mode=join" data-mode="join">
+          <div class="mi" aria-hidden="true">🔑</div>
+          <div>
+            <div class="mt" data-i18n="dl.mt_join">Join with a code</div>
+            <div class="md" data-i18n="dl.md_join">Already have a code from someone else? Enter it and jump straight into their duel.</div>
+            <span class="dc-tag is-live" data-i18n="dl.tag_live">Live</span>
+          </div>
+        </a>
+
+        <!-- 03 · 单人计时练习（纯前端，不记分不排行） -->
+        <a class="dc-mode" href="/games/word-recall/?mode=solo" data-mode="solo">
+          <div class="mi" aria-hidden="true">🎯</div>
+          <div>
+            <div class="mt" data-i18n="dl.mt_solo">Practice solo</div>
+            <div class="md" data-i18n="dl.md_solo">Warm up against the clock on your own. Not scored, not ranked — just your own time.</div>
+            <span class="dc-tag is-live" data-i18n="dl.tag_practice">Practice</span>
+          </div>
+        </a>
+
+        <!-- 04 · 随机匹配 —— 灰态占位。
+             🔴 后端当前**没有匹配队列端点**（只有 create/join/start/round/
+             answer/finish/status）。等真做了 MATCH_QUEUE 再把 div 换成 a。 -->
+        <div class="dc-mode ghost" aria-disabled="true">
+          <div class="mi" aria-hidden="true">⚡</div>
+          <div>
+            <div class="mt" data-i18n="dl.mt_random">Random match</div>
+            <div class="md" data-i18n="dl.md_random">Get paired with whoever else is online. Needs a matchmaking queue on the server first.</div>
+            <span class="dc-tag is-mute" data-i18n="dl.tag_soon">Coming soon</span>
+          </div>
+        </div>
+
+        <!-- 05 · 锦标赛 —— 灰态占位，理由同上（无 rating、无赛程端点）。 -->
+        <div class="dc-mode ghost" aria-disabled="true">
+          <div class="mi" aria-hidden="true">🏆</div>
+          <div>
+            <div class="mt" data-i18n="dl.mt_tournament">Tournament</div>
+            <div class="md" data-i18n="dl.md_tournament">Round-robin brackets with a shared leaderboard. Needs ratings and a bracket service first.</div>
+            <span class="dc-tag is-mute" data-i18n="dl.tag_soon">Coming soon</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════ 侧栏：只讲真实规则，不编造个人战绩 ═══════════ -->
+    <aside>
+      <section class="dc-panel" aria-labelledby="rulesTitle">
+        <h3 id="rulesTitle" data-i18n="dl.side_rules_title">How duels are scored</h3>
+        <p class="pnote" data-i18n="dl.side_rules_note">Every fact below is enforced by the server, not by your browser.</p>
+        <div class="dc-side-list" id="dlRules"></div>
+      </section>
+
+      <section class="dc-panel" style="margin-top:14px" aria-labelledby="howTitle">
+        <h3 id="howTitle" data-i18n="dl.side_how_title">How a duel runs</h3>
+        <p class="pnote" data-i18n="dl.side_how_note">One player creates the room and shares the code. Both players answer the same rounds on your own schedule. The duel settles when both players have finished — nobody has to be online at the same time.</p>
+      </section>
+    </aside>
+
+  </div>
+</main>
+
+<footer class="duel-foot">
+  <span data-i18n="dl.foot_hint">Same questions for both players. Sharper memory wins.</span>
+</footer>
+
+<script src="/shared/duel-room.js?v=1"></script>
+<script type="module" src="/src/pages/duel-lobby.ts"></script>
+<script src="/i18n/lang-switcher.js?v=40" defer></script>
+<script type="module" src="/shared/theme.js?v=1"></script>
+</body>
+</html>

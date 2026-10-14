@@ -93,6 +93,10 @@ const ICON = GAME === 'number-recall' ? '🔢'
 function gameHome(g: string): string {
   return g === 'sequence-memory' ? '/games/sequence-memory/' : `/games/${g}/`;
 }
+
+/** 本游戏的大厅页地址（无效 mode 深链的回退目标）。
+    🔴 用 gameHome() 推导而非手写六份，否则新增游戏时必然漏一处。 */
+const LOBBY_URL = gameHome(GAME).replace(/\/$/, '') + '/lobby/';
 const GAME_HOME = gameHome(GAME);
 
 /* ─── HSB → CSS（Color Recall 用，P1-5）────────────
@@ -118,6 +122,189 @@ let myPid = '';
    等进房后再靠 p.host 判断会恒为 false —— 房主看不到「开始对决」按钮，
    房间永远停在等待中，整局打不起来。 */
 let iAmHost = false;
+
+/* ═══════════ 单人模式（?mode=solo · 2026-10-14）═══════════
+   🔴 边界必须写死，否则会变成生产事故：
+   · **不建房、不 join、不调任何房间端点**（尤其绝不调 submitAnswer ——
+     那条路径会为真实房间记账并可能触发发币）
+   · 题目走**公开取题端点** `/api/md/puzzle`（与每日挑战同一条），
+     不在本地编题 —— 本地编题一旦与题库脱节，玩家练的是不存在的内容
+   · 判分在本地做，**只用于本局展示**：不写库、不发币、不排行
+
+   🔴 判分口径与对战不同（单人部分分 / 对战服务端权威）。
+     两套口径不能混，否则同一题在两处得分不同，那种「说不清哪里怪」
+     的体感比缺功能更伤（用户记忆：判分模型要分档）。
+
+   实现方式：只替换 playRound 的**取题**与**提交**两处，
+   全部题目渲染/交互代码一行不动 —— 复制一份渲染必然与对战侧分叉。 */
+let SOLO = false;
+
+/** 单人模式的正确答案缓存。🔴 只存内存，绝不写 localStorage/sessionStorage：
+   写盘就等于刷新可偷看，对战侧明令禁止的事，单人侧也不能开先例。 */
+const soloTruth: Record<number, unknown> = {};
+
+/** 取题：走服务端公开端点，与每日挑战共用一套题目生成与词库。
+    端点返回的 puzzle 形状与对战 /room/round 一致，故渲染代码可原样复用。
+    🔴 lang 必须带：word-recall 题目按语言分裂，不传会拿到默认语言词库，
+       界面会出现「英文题配中文界面」。 */
+async function soloFetchRound(round: number): Promise<{ puzzle: any }> {
+  const W = (window as any).DailyClient;
+  if (!W || typeof W.fetchPuzzleInLang !== 'function') {
+    throw new Error('[duel] solo 模式需要 DailyClient 取题契约');
+  }
+  const data = await W.fetchPuzzleInLang(GAME, round);
+  const puzzle = data && data.puzzle;
+  if (!puzzle) throw new Error('[duel] solo 取题响应缺少 puzzle');
+
+  /* 真值按渲染层能读到的形状存档，供本地判分。
+     🔴 对战接口下发的是 publicView（已脱敏，不含答案），而公开 puzzle 端点
+        会带答案字段 —— 所以这里只取**能确定是真值**的字段，
+        取不到就判 0 分，绝不猜。 */
+  if (GAME === 'emoji-ghost' && Array.isArray(puzzle.grid)) {
+    soloTruth[round] = { kind: 'emoji', set: puzzle.grid.map(String) };
+  } else if (GAME === 'color-recall' && Array.isArray(puzzle.colors)) {
+    soloTruth[round] = {
+      kind: 'color',
+      colors: puzzle.colors.map((c: any) => ({ h: Number(c && c.h) || 0, s: Number(c && c.s) || 0, b: Number(c && c.b) || 0 })),
+    };
+  } else if (GAME === 'chimp-test' && Array.isArray(puzzle.positions)) {
+    soloTruth[round] = {
+      kind: 'chimp',
+      grid: Number(puzzle.grid) || 5,
+      positions: puzzle.positions.map(Number),
+    };
+  } else if (GAME === 'word-recall' && Array.isArray(puzzle.words)) {
+    soloTruth[round] = { kind: 'word', words: puzzle.words.map(String) };
+  } else if (GAME === 'sequence-memory' && Array.isArray(puzzle.seq)) {
+    soloTruth[round] = { kind: 'seq', seq: puzzle.seq.map(Number) };
+  } else if (GAME === 'number-recall') {
+    const digits = Array.isArray(puzzle.digits) ? puzzle.digits.join('') : String(puzzle.digits || '');
+    if (digits) soloTruth[round] = { kind: 'num', digits };
+  }
+
+  return { puzzle };
+}
+
+/* 单人本地判分：分档给分（部分正确也拿分），与对战的「服务端权威」口径不同。
+   🔴 这里的 gained 只用于本局展示，不写任何后端、不发币、不排行。
+      取不到真值的轮次一律 0 分 —— 宁可少给，不可乱给。 */
+function soloJudge(round: number, answer: unknown): any {
+  const tr = soloTruth[round] as any;
+  let score = 0;
+  let perfect = false;
+
+  if (!tr) return { correct: false, gained: 0, score: soloTotal };
+
+  if (tr.kind === 'seq' || tr.kind === 'num') {
+    const right: any[] = tr.kind === 'seq' ? tr.seq : tr.digits.split('');
+    const got: any[] = tr.kind === 'seq'
+      ? (Array.isArray(answer) ? answer.map(Number) : [])
+      : String(answer ?? '').split('');
+    const n = Math.min(right.length, got.length);
+    let hit = 0;
+    let firstMiss = -1;
+    for (let i = 0; i < n; i++) {
+      if (right[i] === got[i]) hit++;
+      else if (firstMiss < 0) firstMiss = i;
+    }
+    /* 顺序题：首个错位之后的一律不算分（记位置记忆不是记集合） */
+    score = firstMiss >= 0
+      ? Math.round((firstMiss / right.length) * 100)
+      : Math.round((hit / right.length) * 100);
+    perfect = hit === right.length && got.length === right.length;
+  } else if (tr.kind === 'color') {
+    const got = Array.isArray(answer) ? answer : [];
+    let sum = 0;
+    tr.colors.forEach((c: any, i: number) => {
+      const g = got[i] || { h: 0, s: 50, b: 50 };
+      const dh = Math.min(Math.abs(c.h - g.h), 360 - Math.abs(c.h - g.h)) / 180;
+      const ds = Math.abs(c.s - g.s) / 100;
+      const db = Math.abs(c.b - g.b) / 100;
+      sum += Math.max(0, 1 - (dh + ds + db) / 3);
+    });
+    score = Math.round((sum / Math.max(1, tr.colors.length)) * 100);
+    perfect = score >= 95;
+  } else if (tr.kind === 'emoji') {
+    /* 渲染层回传的是**被选中的 emoji 本体**；命中集合即对 */
+    const got = String(answer ?? '');
+    const ok = tr.set.indexOf(got) >= 0;
+    score = ok ? 100 : 0;
+    perfect = ok;
+  } else if (tr.kind === 'chimp') {
+    const got = (Array.isArray(answer) ? answer.map(Number) : []).slice().sort((a, b) => a - b);
+    const right = tr.positions.slice().sort((a: number, b: number) => a - b);
+    const hit = got.filter((p) => right.indexOf(p) >= 0).length;
+    /* 漏选与误选都扣：只算命中会让「全点一遍」得满分 */
+    score = Math.max(0, Math.round(((hit - (got.length - hit)) / Math.max(1, right.length)) * 100));
+    perfect = hit === right.length && got.length === right.length;
+  } else if (tr.kind === 'word') {
+    const got = Array.isArray(answer) ? answer : [];
+    let ok = 0;
+    tr.words.forEach((w: string, i: number) => { if (got[i] === w) ok++; });
+    score = Math.round((ok / Math.max(1, tr.words.length)) * 100);
+    perfect = score === 100;
+  }
+
+  /* 速度加成：纯前端计时，仅本局展示；口径与对战一致（最多 +20%） */
+  const bonus = Math.round(score * 0.2 * Math.max(0, 1 - (soloElapsed[round] || 0) / 60000));
+  const gained = Math.round((score + bonus) / 10);
+  soloTotal += gained;
+  return { correct: perfect, gained, score: soloTotal };
+}
+
+/** 每轮本地耗时（毫秒），用于速度加成 */
+const soloElapsed: Record<number, number> = {};
+let soloTotal = 0;
+
+/** 单人模式的完整赛程：复用 playRound 的全部渲染，只换判分与终局。 */
+async function runSolo() {
+  SOLO = true;
+  const card = $('#card')!;
+  soloTotal = 0;
+
+  card.innerHTML = `
+    <h2 class="dc-h2">${esc(cp.title)}</h2>
+    <p class="dc-help">${esc(t('duel.solo_help', 'Practice against the clock — nothing is scored, ranked or shared.'))}</p>
+    <button class="dc-btn" id="soloGo" type="button">${esc(t('duel.solo_start', 'Start practice'))}</button>
+    <p class="duel-note">${esc(t('duel.solo_note', 'Practice runs entirely in your browser. No room is created and no result is sent anywhere.'))}</p>`;
+
+  await new Promise<void>((resolve) => {
+    document.getElementById('soloGo')!.addEventListener('click', () => resolve(), { once: true });
+  });
+
+  for (let round = 0; round < ROUNDS; round++) {
+    showRoundTag(round + 1, ROUNDS);
+    soloElapsed[round] = 0;
+    const t0 = performance.now();
+    const played = await playRound('', round);
+    /* 🔴 计时只包住玩家真正作答的那段：上面 playRound 里的取题等待
+       已被 soloElapsed 清零，这里补上耗时即可，不用改 playRound。 */
+    soloElapsed[round] = Math.round(performance.now() - t0);
+    if (!played) return;
+  }
+
+  renderSoloResult();
+}
+
+function renderSoloResult() {
+  const card = $('#card')!;
+  const tag = document.getElementById('roundTag');
+  if (tag) tag.hidden = true;
+
+  card.innerHTML = `
+    <h2 class="dc-h2">${esc(t('duel.solo_done', 'Practice complete'))}</h2>
+    <div class="dc-result-score">${esc(soloTotal)}</div>
+    <div class="dc-result-of">${esc(t('duel.solo_total', 'practice points'))}</div>
+    <p class="duel-note">${esc(t('duel.solo_nosave', 'Practice is never recorded. Play a real duel to have your score count.'))}</p>
+    <div class="duel-or"><span>${esc(t('duel.or', 'or'))}</span></div>
+    <div class="duel-join" style="flex-direction:column;gap:10px">
+      <button class="dc-btn" id="soloAgain" type="button">${esc(t('duel.solo_again', 'Practise again'))}</button>
+      <a class="dc-btn ghost" href="${esc(LOBBY_URL)}">${esc(t('duel.back_modes', '← All modes'))}</a>
+      <a class="dc-btn ghost" href="${esc(gameHome(GAME))}">${esc(t('duel.create', 'Create a duel'))}</a>
+    </div>`;
+
+  document.getElementById('soloAgain')!.addEventListener('click', () => { void runSolo(); });
+}
 
 /* ═══════════ 错误卡（不静默留白）═══════════ */
 function renderError(msg: string, retry?: () => void) {
@@ -407,7 +594,7 @@ async function playRound(code: string, round: number): Promise<boolean> {
 
   let data: any;
   try {
-    data = await C().fetchRound(code, round, GAME);
+    data = SOLO ? await soloFetchRound(round) : await C().fetchRound(code, round, GAME);
   } catch (e) {
     renderError((e as Error).message, () => playRound(code, round));
     return false;
@@ -786,11 +973,18 @@ async function playRound(code: string, round: number): Promise<boolean> {
 
   /* ── 提交：🔴 发的是玩家真实作答，不是正确答案 ── */
   let res: any;
-  try {
-    res = await C().submitAnswer(code, round, answer, {});
-  } catch (e) {
-    renderError((e as Error).message, () => playRound(code, round));
-    return false;
+  if (SOLO) {
+    /* 单人模式在本地判分，**绝不调 submitAnswer** ——
+       服务端会为真实房间记账，误调会污染对手比分与金币账本。
+       这是「前端我做完了 ≠ 这局该结算」的另一面（RULES-FE #88）。 */
+    res = soloJudge(round, answer);
+  } else {
+    try {
+      res = await C().submitAnswer(code, round, answer, {});
+    } catch (e) {
+      renderError((e as Error).message, () => playRound(code, round));
+      return false;
+    }
   }
 
   card.innerHTML = `
@@ -984,7 +1178,34 @@ function renderFinalScore(code: string, st: any, settledByOk: boolean) {
 /* ═══════════ 主流程 ═══════════ */
 async function main() {
   const params = new URLSearchParams(location.search);
+
+  /* 🔴 深链优先级（2026-10-14）：邀请码 ?c= **必须先判**。
+     ?c=ABC234&mode=solo 同时存在时，用户意图是「进这个房」而不是「去练手」。
+     顺序颠倒会出现：点别人分享的链接却被拉进单人模式，
+     玩家看不到自己那局的比分，且 URL 里的房码被消费掉了。 */
   const invite = params.get('c') || params.get('room');
+
+  if (!invite) {
+    const mode = (params.get('mode') || '').toLowerCase();
+    if (mode) {
+      /* 无效 mode 一律回大厅，绝不停在什么都不做的页面。
+         （合法值集合就是下面三个 —— 大厅页也只有这三张真卡。） */
+      if (mode !== 'create' && mode !== 'join' && mode !== 'solo') {
+        location.replace(LOBBY_URL);
+        return;
+      }
+      if (mode === 'create') { await doCreate(); return; }
+      if (mode === 'solo')   { await runSolo(); return; }
+      /* mode=join：先渲染入口页再把焦点交给输码框。
+         🔴 不用 autofocus —— iOS Safari 无头与部分浏览器会忽略它，
+         且读完式渲染前设焦点会丢。用 JS 显式 focus + scrollIntoView。 */
+      renderEntry();
+      const codeIn = document.getElementById('codeIn') as HTMLInputElement | null;
+      if (codeIn) { codeIn.focus(); codeIn.scrollIntoView({ block: 'center' }); }
+      return;
+    }
+  }
+
   let code = invite ? C().normalizeCode(invite) : '';
 
   if (!code) {

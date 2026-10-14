@@ -75,6 +75,18 @@ export default defineConfig({
         emojiDuel: resolve(here, 'games/emoji-ghost/index.html'),
         chimpDuel: resolve(here, 'games/chimp-test/index.html'),
         wordDuel: resolve(here, 'games/word-recall/index.html'),
+
+        /* P3（2026-10-14）：六款对战游戏的大厅页（模式选择）。
+           🔴 必须逐个显式注册，否则构建**静默丢弃**、不产出页面也不报错，
+              线上表现为该 URL 落到 404 兜底（内容还是全站导航，肉眼像「页面坏了」）。
+           ⚠️ input 的 key 即产物名：duelLobbySeq → assets/duelLobbySeq-<hash>.js
+              **不是** duel-lobby-<hash>.js。验收脚本按 key 搜产物。 */
+        duelLobbySeq: resolve(here, 'games/sequence-memory/lobby/index.html'),
+        duelLobbyNum: resolve(here, 'games/number-recall/lobby/index.html'),
+        duelLobbyCol: resolve(here, 'games/color-recall/lobby/index.html'),
+        duelLobbyEmoji: resolve(here, 'games/emoji-ghost/lobby/index.html'),
+        duelLobbyChimp: resolve(here, 'games/chimp-test/lobby/index.html'),
+        duelLobbyWord: resolve(here, 'games/word-recall/lobby/index.html'),
       },
     },
   },

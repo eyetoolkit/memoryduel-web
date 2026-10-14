@@ -56,6 +56,9 @@
   <span data-i18n="duel.chimp_foot_hint">Same grid for both players. Server-scored.</span>
 </footer>
 
+<!-- solo mode (?mode=solo) uses the same public puzzle endpoint as the
+     daily challenge; without daily-client.js the mode cannot start. -->
+<script src="/shared/daily-client.js?v=1"></script>
 <script src="/shared/duel-room.js?v=1"></script>
 <script type="module" src="/src/pages/duel-sequence.ts"></script>
 </body>
