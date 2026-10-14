@@ -29,14 +29,26 @@
      · --orange         → 保持 #EA580C，但**只用于无文字元素**（logo 方块、
                           焦点环、边框、装饰渐变）；一旦要压白字就走 --orange-ink。
      · --orange-ink     → 新增，专给「实心橙底 + 白字」用，5.18:1 达标。
-     · --orange-deep    → 文字压浅底用（.badge / .gcard-tag.live / .rank-pt），
-                          4.28:1 接近阈值，配合 11px+ 粗体可读；深色下会
-                          被覆盖成亮橙（见文末暗色块），保证 6.08:1。
-   ⚠️ 不要把 #EA580C 再加回任何 color:#fff 的规则里。 */
+     · --orange-deep    → 文字压浅底用（.badge / .gcard-tag.live / .rank-pt）。
+                          🔴 2026-10-15 从 #C2410C 调到 #B03A0A：原值压
+                          .badge 的 rgba(234,88,12,.1) 底只有 **4.27:1**，
+                          低于 AA 4.5:1（12.5px 粗体**不算** WCAG 大字，
+                          不能套 3:1 那档）。新值 5.01:1，压纯 paper 5.65:1。
+                          深色下仍被覆盖成亮橙（见文末暗色块），保证 6.08:1。
+     · --orange-ink-hover → 🔴 2026-10-15 新增。原先 .btn-primary:hover 直接吃
+                          --orange-deep，而暗色下该令牌被覆盖成亮橙 #F97316，
+                          白字压上去只剩 2.80:1（远低于 4.5:1）。且亮色下
+                          --orange-ink 与 --orange-deep 同为 #C2410C，
+                          hover 根本没有任何颜色变化，只有 translateY。
+                          故独立出「实心底 hover」令牌，两主题都统一加深。
+   ⚠️ 不要把 #EA580C 再加回任何 color:#fff 的规则里。
+   ⚠️ 凡是「实心橙底 + 白字」的 hover，一律走 --orange-ink-hover。 */
 :root{
-  --orange:#EA580C; --orange-deep:#C2410C; --orange-bright:#F97316;
+  --orange:#EA580C; --orange-deep:#B03A0A; --orange-bright:#F97316;
   /* 白字压橙底的合规填充色：#FFFFFF on #C2410C = 5.18:1（WCAG AA 通过） */
   --orange-ink:#C2410C;
+  /* hover 加深一档：#FFFFFF on #9A3412 = 7.31:1，且比 base 明显更暗，有反馈 */
+  --orange-ink-hover:#9A3412;
   --paper:#FAF6F1; --card:#fff; --ink:#1C1408; --mute:#6B5A45; --line:#EAD9C7;
   --amber:#F59E0B; --green:#22C55E; --indigo-sig:#4F46E5; /* 页脚三站署名色，故意不改 */
   /* 圆角刻度（B1）：原先 --rt 定义后引用 0 次，等于没做。统一走这四档。 */
@@ -112,7 +124,9 @@ a{color:inherit;text-decoration:none}
 
 .btn{border:0;font-family:var(--ui);font-weight:700;cursor:pointer;border-radius:11px;font-size:14px;padding:10px 16px;transition:transform .12s,background .12s;display:inline-flex;align-items:center;gap:8px;justify-content:center;min-height:44px}
 .btn-primary{background:var(--orange-ink);color:#fff}
-.btn-primary:hover{background:var(--orange-deep);transform:translateY(-1px)}
+/* 🔴 hover 必须走专用令牌，不能吃 --orange-deep：
+   暗色下 --orange-deep 是亮橙 #F97316，白字压上去只有 2.80:1。 */
+.btn-primary:hover{background:var(--orange-ink-hover);transform:translateY(-1px)}
 .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
 .btn-ghost:hover{border-color:var(--orange);color:var(--orange-deep)}
 .lang{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--mute);border:1px solid var(--line);border-radius:8px;padding:5px 9px}
@@ -160,7 +174,10 @@ h1 em{font-style:normal;color:var(--orange)}
 
 /* ── 分类网格（home.mjs 契约：.cat/.ci/.cn/.cq + disabled=加载中/无题） ── */
 .cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.cat{border:1px solid var(--line);background:#fff;border-radius:13px;padding:12px 8px;cursor:pointer;text-align:center;font-family:var(--ui);transition:transform .12s,border-color .12s;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+/* 🔴 color:var(--ink) 不能省：`<button>` 默认继承 UA 的 `buttontext`（纯黑），
+   不会跟着 --ink 走 —— 暗色下就成了黑字压 #151C2B 卡面 = 1.23:1，等于看不见。
+   亮色下黑字白卡全绿，所以这条只在暗色暴露。 */
+.cat{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:13px;padding:12px 8px;cursor:pointer;text-align:center;font-family:var(--ui);transition:transform .12s,border-color .12s;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
 .cat:hover:not(:disabled){transform:translateY(-2px)}
 .cat .ci{font-size:22px;line-height:1}
 .cat .cn{font-size:12.5px;font-weight:700}
@@ -374,6 +391,9 @@ html[data-theme="dark"]{
   --orange-deep:#F97316;
   /* 暗色专属实心底：#FFFFFF on #7C2D12 = 9.37:1（比亮色下的 #C2410C 更稳） */
   --orange-ink:#7C2D12;
+  /* hover 再加深一档：#FFFFFF on #5C210D = 12.51:1。
+     🔴 不能沿用 --orange-deep —— 它在暗色下是亮橙 #F97316，白字只有 2.80:1。 */
+  --orange-ink-hover:#5C210D;
 
   body{ background-color:var(--paper); background-image:none; }
 
@@ -389,9 +409,15 @@ html[data-theme="dark"]{
   .room-in{ background:var(--card); color:var(--ink); }
   .room-in::placeholder{ color:#7C8AA0; }
 
-  /* 选中 tab 保持亮片（白底 + 亮橙字 = 6.4:1） */
-  .tab.on{ background:#fff; color:var(--orange-deep); }
-  .btn-primary{ background:var(--orange-ink); }
+  /* 选中 tab 白底亮片：🔴 暗色下**不能**用 --orange-deep ——
+     它在暗色被覆盖成亮橙 #F97316，压白底只剩 2.80:1（旧注释写的 6.4:1 是错的）。
+     改用 --orange-ink（暗色为 #7C2D12，压白底 9.37:1）。 */
+  .tab.on{ background:#fff; color:var(--orange-ink); }
+  /* 🔴 这里**不要**再写 `.btn-primary{ background:var(--orange-ink) }`。
+     令牌已在上面覆盖，写它纯属冗余，而且嵌套规则会编译成
+     `html[data-theme="dark"] :is(.btn-primary)`（权重 0,2,1），
+     反而**压过** `.btn-primary:hover`（0,2,0）→ hover 态永不生效，
+     按钮完全没有颜色反馈。实测 2026-10-15：删掉它 hover 才生效。 */
   .btn-ghost{ color:var(--ink); }
   .solo-link{ color:var(--mute); }
 

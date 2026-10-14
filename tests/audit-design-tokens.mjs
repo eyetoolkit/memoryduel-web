@@ -247,6 +247,46 @@ async function main() {
       console.log(`  达标 ${base.length - failC.length}/${base.length}，` +
         `仅达 AA 未达 AAA ${warnC.length}，最低 ${lo}:1`);
 
+      /* ── 1b. 暗色主题对比度 ──
+         🔴 2026-10-15 补：本脚本头注释宣称覆盖「暗色模式对比度」，
+            但实际上**从未切换过主题**（只在末尾读一下 data-theme 属性），
+            也就是暗色下有问题的文本一条都没量过。首页暗色 .tab.on
+            「白底 + 亮橙字 2.80:1」就是这样漏网的 —— 亮色全绿、暗色全瞎。
+            判据同样走 AA（大字 3:1 / 正文 4.5:1）。 */
+      /* 🔴 只对**真正支持暗色**的页面跑暗色扫描。
+         判定：页面加载了 /shared/theme.js，或内联脚本里出现 data-theme。
+         反例：games/sequence-memory/index.html 引了 home.css（含
+         html[data-theme=dark] 块）却**没引 theme.js** —— 用户永远到不了暗色，
+         强切 data-theme 只会把「页面本来就不支持的主题」量成一堆假失败。 */
+      /* 🔴 必须写成 `return (...)()`：page.eval 会把表达式包进
+         `(async () => { <expr> })()`，外层没有 return，
+         IIFE 的返回值会被直接丢弃 → supportsDark 恒为 undefined（假跳过）。 */
+      const supportsDark = await page.eval(`return (() => {
+        const s = [...document.querySelectorAll('script')];
+        return s.some(x => /theme\\.js/.test(x.src || ''))
+            || s.some(x => /data-theme/.test(x.textContent || ''));
+      })();`);
+      if (!supportsDark) {
+        console.log(`  ⚠ ${label} 不支持暗色（无 theme.js / 无内联主题脚本），跳过暗色扫描`);
+      } else {
+      await page.eval(`document.documentElement.setAttribute('data-theme','dark'); return 1;`);
+      await sleep(600);
+      const dk = await page.eval(MEASURE);
+      const dkBase = dk.measurable;
+      const dkFail = dkBase.filter((s) => s.ratio < (s.large ? 3 : 4.5));
+      ok(dkFail.length === 0,
+        `${label} 暗色主题无低于 AA 的文本（${dkFail.length} 处）` +
+        (dkFail.length ? '：' + dkFail.slice(0, 6)
+          .map((s) => `"${s.label}" <${s.tag}.${s.cls}> ${s.size}px/${s.weight} ${s.ratio}:1`)
+          .join('; ') : ''));
+      if (dkBase.length) {
+        console.log(`  暗色达标 ${dkBase.length - dkFail.length}/${dkBase.length}，` +
+          `最低 ${Math.min(...dkBase.map((s) => s.ratio))}:1`);
+      }
+      await page.eval(`document.documentElement.setAttribute('data-theme','light'); return 1;`);
+      await sleep(400);
+      }
+
       /* ── 2. 字号阶梯 ── */
       section(`2. 字号阶梯 — ${label}`);
       console.log(`  实测字号集：${d.sizes.join(', ')}`);

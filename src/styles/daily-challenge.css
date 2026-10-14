@@ -833,3 +833,48 @@
   .dc-emoji { animation: none; }
   .dc-emoji-opt { transition: none; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   暗色模式（2026-10-15 新增，此前完全没有）
+   ───────────────────────────────────────────────────────────────
+   🔴 为什么必须补：home.css 的暗色块只覆盖 --ink/--paper/--card/--orange-*
+      这一套令牌，**不认识**本文件的 --dc-* 命名空间。于是 daily 系列页面
+      在暗色下「卡片/页面底色变暗了，但 --dc-ink 仍是亮色主题的深色 #1C1917」
+      → 实测对比度 **1.08:1**，标题和正文等于隐形。
+      亮色全程 133/133 全绿，所以这类问题只在暗色暴露，且肉眼一扫很容易
+      被「页面整体看着挺暗挺协调」骗过去。
+
+   🔴 填充色与文字色必须分离（和 home.css 同一个坑）：
+      --dc-primary 在本文件里既当**文字色**（.dc-hero h1 em）
+      又当**.dc-btn 的填充色**（白字压上去）。暗色下若统一翻成亮橙
+      #F97316，白字压亮橙只剩 2.80:1。故拆出 --dc-fill / --dc-fill-hover
+      专供「实心底 + 白字」，--dc-primary 只管文字与点缀。
+   ═══════════════════════════════════════════════════════════════ */
+html[data-theme="dark"]{
+  --dc-paper:#0B1120;
+  --dc-surface:#151C2B;
+  --dc-ink:#ECE6DC;
+  --dc-muted:#9B8E7C;
+  --dc-line:#33313F;
+  /* 文字/点缀用亮橙：压 #0B1120 = 6.72:1 */
+  --dc-primary:#F97316;
+  --dc-primary-dark:#FDBA74;
+  --dc-primary-light:#FB923C;
+  --dc-accent:#FBBF24;
+  /* 「实心底 + 白字」专用：#FFFFFF on #7C2D12 = 9.37:1 */
+  --dc-fill:#7C2D12;
+  --dc-fill-hover:#5C210D;
+
+  /* 白字压填充色的三处，必须改走 --dc-fill。
+     🔴 必须 :not(.ghost)：.dc-btn.ghost 是「透明底 + --dc-muted 文字」，
+        而 `html[data-theme=dark] .dc-btn`（0,2,1）权重高于
+        `.dc-btn.ghost{background:transparent}`（0,2,0），
+        不加 :not 会给幽灵按钮强塞填充底 → 灰字压深棕实测 2.92:1。 */
+  .dc-btn:not(.ghost){ background:var(--dc-fill); }
+  .dc-btn:not(.ghost):hover{ background:var(--dc-fill-hover); }
+  .dc-step.on .n{ background:var(--dc-fill); }
+  .dc-chimp-cell.lit{ background:var(--dc-fill); border-color:var(--dc-primary); }
+
+  /* 硬编码浅底：暗色下会变成「亮盒 + 暗字」，一并翻掉 */
+  .dc-word-row.answered{ background:rgba(249,115,22,.14); }
+}
