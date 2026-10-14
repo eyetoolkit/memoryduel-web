@@ -201,10 +201,34 @@ body.battle-v2 {
   text-decoration: none;
   font-weight: 600;
   transition: background 0.15s;
+  /* 2026-10-14：bd-replay 改成 <button>，补浏览器默认样式复位 */
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
 }
 
 .bd-btn-prim:hover {
   background: #115e59;
+}
+
+/* 次要按钮：Return home（2026-10-14 随「Play again」一起加入） */
+.bd-btn-ghost {
+  display: inline-block;
+  padding: 12px 28px;
+  background: transparent;
+  color: inherit;
+  border: 1px solid currentColor;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  opacity: 0.75;
+  transition: opacity 0.15s;
+}
+
+.bd-btn-ghost:hover {
+  opacity: 1;
 }
 
 /* === Responsive === */

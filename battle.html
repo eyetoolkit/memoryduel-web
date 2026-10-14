@@ -7,9 +7,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <meta name="theme-color" content="#FAF6F1">
-<title>Knowledge Battle · MemoryDuel</title>
-<meta name="description" content="Teacher's classroom quiz battle · 10 questions · 15s each · Track your progress to your teacher.">
-<meta name="robots" content="noindex">
+<title>Knowledge Battle · 10 Questions, 15 Seconds Each · MemoryDuel</title>
+<meta name="description" content="Free 1v1 knowledge battle. Ten questions, 15 seconds each, first correct answer takes the point. Science, history, geography, sport, movies and more. No login, no install, no ads.">
+<!-- 2026-10-14：/battle/ 已是公开可玩入口（无房码也能直接开打），从 noindex 放行收录，
+     配合 canonical 指向无参 /battle/，教师带 ?c= 的邀请链接不会重复收录 -->
+<meta name="robots" content="index,follow">
 <link rel="icon" type="image/svg+xml" href="/favicon.ico">
 <link rel="canonical" href="https://memoryduel.com/battle/">
 <link rel="stylesheet" href="/css/shared/tokens.css">
@@ -59,7 +61,8 @@
     <p class="bd-result-score" id="bd-result-score">—</p>
     <p class="bd-result-detail" id="bd-result-detail">—</p>
     <div class="bd-result-acts">
-      <a class="bd-btn-prim" href="/">Return home</a>
+      <button class="bd-btn-prim" id="bd-replay" type="button">Play again</button>
+      <a class="bd-btn-ghost" href="/">Return home</a>
     </div>
   </section>
 
