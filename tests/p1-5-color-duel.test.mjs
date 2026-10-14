@@ -30,23 +30,26 @@ const LANGS = ['en', 'zh', 'ja', 'es', 'fr', 'de'];
    1. 路由：三款游戏各自独立 URL
    ═══════════════════════════════════════════════════════════════ */
 test('三款对战游戏各有独立 URL，且由 pathname 推断 game', () => {
-  const m = /const GAME: string =([\s\S]*?);\n/.exec(src);
-  assert.ok(m, '应能定位 GAME 定义');
+  // 🔴 2026-10-14：这组断言原锚在「GAME 三元 + 兜底写死 sequence-memory」上，
+  //    P2 扩到六款后源码抽成 inferGame() 独立函数（每款一行 return），
+  //    行为完全等价但写法变了 → 测试红了 4 条。产品代码没回归，是断言过时。
+  //    改法：锁**语义**（六款各自映射到正确 slug、靠 pathname、兜底仍是 sequence）
+  //    而不是锁某一种写法。锚写法必然被下一次重构打断，这是个教训。
+  const m = /function inferGame\(\): string \{([\s\S]*?)\n\}/.exec(src);
+  assert.ok(m, '应能定位 inferGame 定义');
   const body = m[1];
-  // 🔴 源码里路径是写在正则字面量里的，斜杠被转义成 \/：
-  //     /\/games\/number-recall\//  ← 抓出来是 \/games\/number-recall\//
-  //    直接查 '/games/number-recall/' 必然落空，且报错信息完全指不到点上。
-  assert.ok(body.includes('games\\/number-recall\\/'), 'number-recall 必须由路径推断');
-  assert.ok(body.includes('games\\/color-recall\\/'), 'color-recall 必须由路径推断');
   assert.ok(body.includes('location.pathname'), '必须按 pathname 判断而非 query（保证 SEO 落地页各自独立）');
-  const iNum = body.indexOf("'number-recall'");
-  const iCol = body.indexOf("'color-recall'");
-  assert.ok(iNum > -1 && iCol > -1, '两个显式分支都要在');
-  assert.ok(iNum < iCol, 'number 分支必须在 color 之前（顺序影响可读性）');
-  // 🔴 兜底判断不能锚行尾：缩进换行是 prettier 常规排版，
-  //    一旦格式化就锚失败，测试变成「排版即失败」的无意义红灯。
-  assert.ok(/:\s*'sequence-memory'\s*$/.test(body.trim()),
-    '兜底必须是 sequence-memory');
+  // 源码里路径是写在正则字面量里的，斜杠被转义成 \/：
+  //    直接查 '/games/number-recall/' 必然落空，且报错信息完全指不到点上。
+  const SLUGS = ['number-recall', 'color-recall', 'emoji-ghost', 'chimp-test', 'word-recall'];
+  for (const g of SLUGS) {
+    assert.ok(body.includes(`games\\/${g}\\/`), `${g} 必须由路径推断`);
+  }
+  // 🔴 兜底不能锚行尾：缩进换行是 prettier 常规排版，锚失败会变成「排版即失败」。
+  assert.ok(/return\s+'sequence-memory';?\s*$/.test(body.trim()),
+    '兜底必须是 sequence-memory（未命中路径时归到它）');
+  assert.ok(/const GAME: string = inferGame\(\);/.test(src),
+    'GAME 必须由 inferGame() 得出，不得再写死常量');
 });
 
 test('每个游戏页都存在且引同一份内核（不复制粘贴出分叉实现）', () => {
@@ -61,9 +64,20 @@ test('每个游戏页都存在且引同一份内核（不复制粘贴出分叉�
 });
 
 test('内部跳转不许硬编码 sequence-memory（否则从 color 点「再来」会跳到别的游戏）', () => {
-  assert.ok(/const GAME_HOME = GAME === 'number-recall'/.test(src), '应定义 GAME_HOME');
-  assert.ok(src.includes("'/games/color-recall/'"), 'GAME_HOME 必须含 color-recall 分支');
-  // 三处跳转（结果页再来 / 断线重连 / 顶层兜底）都要用 GAME_HOME
+  // 🔴 2026-10-14：原来锚 `const GAME_HOME = GAME === 'number-recall'`，
+  //    P2 重构成 gameHome(g) 函数后失效。改为锁语义：gameHome 对每款都
+  //    返回自己那款（sequence 单独判，其余拼 slug），且跳转都用 GAME_HOME。
+  assert.ok(/function gameHome\(g: string\): string \{/.test(src), '应定义 gameHome');
+  const gm = /function gameHome\(g: string\): string \{([\s\S]*?)\n\}/.exec(src);
+  assert.ok(gm, '应能定位 gameHome 函数体');
+  assert.ok(/g === 'sequence-memory' \? '\/games\/sequence-memory\/' : `\/games\/\$\{g\}\//.test(gm[1]),
+    'gameHome 必须按游戏返回自己的落地页（sequence 显式判，其余拼 slug）');
+  assert.ok(/const GAME_HOME = gameHome\(GAME\);/.test(src), 'GAME_HOME 必须由 gameHome(GAME) 得出');
+  // 🔴 通用防回归：每款都必须有 slug 能拼出 URL，否则「再来」跳 404
+  for (const g of ['sequence-memory', 'number-recall', 'color-recall', 'emoji-ghost', 'chimp-test', 'word-recall']) {
+    assert.ok(fs.existsSync(path.join(ROOT, 'games', g, 'index.html')), `${g} 落地页应存在`);
+  }
+  // 不得出现指向不存在的 slug 的跳转
   const hrefs = [...src.matchAll(/location\.href = ([^;]+);/g)].map((m) => m[1]);
   assert.ok(hrefs.length >= 3, `应有多处跳转，实际 ${hrefs.length}`);
   for (const h of hrefs) {
@@ -86,8 +100,15 @@ test('颜色答案以 HSB 对象数组提交（不是颜色名字符串）', () 
 });
 
 test('服务端没下发颜色时报错，而不是拿空数组往下走', () => {
-  assert.ok(/const noPuzzle = isNumber \? !target\.length : isColor \? !colors\.length : !seq\.length;/.test(src),
+  // 🔴 2026-10-14：原来锚一行三元 `isNumber ? !target.length : isColor ? !colors.length : !seq.length`，
+  //    P2 加到六款后拆成多行、emoji 分支还新增「选项数≠4」的第二重校验。
+  //    锁语义：color 的空数组必须仍被算作「未下发」，报错文案仍在。
+  const seg = src.slice(src.indexOf('const noPuzzle'), src.indexOf('if (noPuzzle)'));
+  assert.ok(/isColor \? !colors\.length/.test(seg),
     '颜色关的空数组必须被当成「未下发题目」');
+  assert.ok(/isNumber \? !target\.length/.test(seg), 'number 关同理');
+  assert.ok(/!seq\.length/.test(seg), 'sequence 关同理');
+  assert.ok(/if \(noPuzzle\)/.test(src), 'noPuzzle 必须真正被消费');
   assert.ok(/服务端未下发 \$\{GAME\} 题目/.test(src), '应有明确报错文案');
 });
 
@@ -294,11 +315,31 @@ test('sequence 与 number 的文案与判定仍走原有分支', () => {
 });
 
 test('配色图标三款各不相同', () => {
-  const m = /const ICON = GAME === 'number-recall' \? '([^']+)' : GAME === 'color-recall' \? '([^']+)' : '([^']+)'/.exec(src);
-  assert.ok(m, 'ICON 应是三路分支');
-  assert.equal(m[2], '🎨', 'color 图标应为调色板');
-  const uniq = new Set([m[1], m[2], m[3]]);
-  assert.equal(uniq.size, 3, '三款图标必须互不相同（否则比分页分不清谁是谁）');
+  // 🔴 2026-10-14：原来锚三路三元 `number ? 🔢 : color ? 🎨 : ⚡`，
+  //    P2 扩到六款变五路分支。改为逐 slug 校验图标互不相同 ——
+  //    契约是「六款图标可区分」，不是「某一行恰好这么写」。
+  const seg = src.slice(src.indexOf('const ICON'), src.indexOf('function gameHome'));
+  // 🔴 兜底锚点必须锚**语句结束**：seg 尾部还跟着 JSDoc 注释，
+  //    直接 seg.trim() 再锚 $ 会落在注释行上而永远匹配不到。
+  const stmt = seg.slice(0, seg.indexOf(';') + 1);
+  // 🔴 用 [^']+ 而不是 (.): emoji 是双码元代理对，(.) 只吃一个码元，
+  //    后面紧跟的 ' 匹配不上 → 整条正则静默 0 命中，报"分支数不足"，
+  //    看着像源码问题，其实是判据自己的 bug。
+  const pairs = [...stmt.matchAll(/GAME === '([a-z-]+)' \?\s*'([^']+)'/g)].map((m) => [m[1], m[2]]);
+  assert.ok(pairs.length >= 5, `应覆盖各款图标分支，实际 ${pairs.length}`);
+  const slugs = pairs.map((p) => p[0]);
+  const glyphs = pairs.map((p) => p[1]);
+  assert.equal(new Set(slugs).size, slugs.length, `同一 slug 不应出现两次：${slugs}`);
+  assert.equal(new Set(glyphs).size, glyphs.length,
+    `各款图标必须互不相同（否则比分页分不清谁是谁）：${glyphs}`);
+  // 每款都必须真的被映射到（漏一款 = 该款无图标）
+  for (const g of ['number-recall', 'color-recall', 'emoji-ghost', 'chimp-test', 'word-recall']) {
+    assert.ok(slugs.includes(g), `${g} 应有图标分支`);
+  }
+  // 兜底分支（sequence）也要有独立图标
+  const tail = /:\s*'([^']+)'\s*;\s*$/.exec(stmt.trim());
+  assert.ok(tail, `应有兜底图标（sequence 等未命中分支），实际片段：${JSON.stringify(stmt)}`);
+  assert.ok(!glyphs.includes(tail[1]), '兜底图标不得与任何一款重复');
 });
 /* ═══════════════════════════════════════════════════════════════
    7. 异常路径回归（2026-10-13 全面复查第四批新增）

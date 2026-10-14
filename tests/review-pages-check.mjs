@@ -1,16 +1,14 @@
 /**
  * 新上线游戏页面全量核查（线上真站点，CDP 无头）
  * ────────────────────────────────────────────────────────────────
- * 覆盖 4 个游戏页 + 1 个 lobby 页，共 5 页：
- *   /games/daily-challenge/          ?mode=daily|number|sequence|color
+ * 覆盖每日挑战页 + 大厅页 + **games/ 下全部对战页**（目录派生，加游戏自动纳入）：
+ *   /games/daily-challenge/          ?mode=daily|number|sequence|color|emoji|chimp|word
  *   /games/daily-challenge/lobby/    模式选择大厅
- *   /games/sequence-memory/          双人对战
- *   /games/number-recall/            双人对战
- *   /games/color-recall/             双人对战
+ *   /games/<slug>/                   sequence / number / color / emoji / chimp / word
  *
  * 每项都绑定外部可观测事实，不看「没报错」：
- *   A. lobby：4 张模式卡片存在、href 精确、有可访问名、真实点击能跳到对应 ?mode=
- *   B. 深链：四个 mode 均能入局（出现游戏主体 DOM 且 URL 未被弹回大厅）
+ *   A. lobby：模式卡片存在、href 精确、有可访问名、真实点击能跳到对应 ?mode=
+ *   B. 深链：各mode 均能入局（出现游戏主体 DOM 且 URL 未被弹回大厅）
  *   C. 兜底：无效 mode 必须 replace 回大厅且大厅正常渲染（不得白屏/半死）
  *   D. 邀请码优先：?c= 必须带到大厅（?c= 优先于 ?mode=）
  *   E. 对战页：入口 UI 出现（建房/房码/加入），无 c= 时不静默失败
@@ -164,8 +162,17 @@ async function checkLobby(page) {
 
   const s = await page.eval(SNAP_LOBBY);
   ok(s.bodyLen > 100, `大厅有实质内容（正文 ${s.bodyLen} 字符）`);
-  ok(s.cards.length === 4, `4 张模式卡片都在（实测 ${s.cards.length}）`);
-  const want = ['?mode=daily', '?mode=number', '?mode=sequence', '?mode=color'];
+  // 🔴 2026-10-14：原来写死 4 张 / 4 个 mode。P2 加了 emoji|chimp|word 后
+  //    大厅实为 7 张，页面是对的、断言过时。改为**从大厅源码派生**期望集合 ——
+  //    既能防"卡片少了"，也不会在下次加游戏时误报。
+  const lobbyHtml = fs.readFileSync(
+    path.join(process.cwd(), 'games/daily-challenge/lobby/index.html'), 'utf8');
+  const wantModes = [...lobbyHtml.matchAll(/href="\/games\/daily-challenge\/\?mode=([a-z]+)"/g)]
+    .map((m) => `?mode=${m[1]}`);
+  ok(wantModes.length >= 7, `大厅源码应含 7 个mode 入口（P2 三款新游戏），实际 ${wantModes.length}`);
+  ok(s.cards.length === wantModes.length,
+    `大厅卡片数与源码一致（实测 ${s.cards.length}，源码 ${wantModes.length}）`);
+  const want = wantModes;
   for (const w of want) {
     const c = s.cards.find((x) => x.href.includes(w));
     ok(!!c, `卡片存在 ${w}`);
@@ -243,7 +250,14 @@ async function checkBadMode(page) {
   ok(s1.path.endsWith('/lobby/'), `无效 mode=bogus 被 replace 回大厅（实际 ${s1.path}${s1.search}）`);
   ok(s1.bodyLen > 100, `回大厅后有实质内容（${s1.bodyLen} 字符，非白屏）`);
   const cards = await page.eval(`return document.querySelectorAll('a[href*="?mode="]').length;`);
-  ok(cards === 4, `大厅 4 张卡片正常渲染（实测 ${cards}）`);
+  // 🔴 2026-10-14：原来写死 === 4。P2 上线 emoji/chimp/word 后大厅实为 7 张卡，
+  //    页面是对的、断言过时。改成与源码 HTML 里的 data-mode 卡片数对齐 ——
+  //    数量写死必被下一次加游戏打断，从源码派生才既能防"卡片少了"又不误报。
+  const expectCards = (await fs.promises.readFile(
+    path.join(process.cwd(), 'games/daily-challenge/lobby/index.html'), 'utf8'))
+    .match(/data-mode="/g).length;
+  ok(cards === expectCards,
+    `大厅模式卡片数与源码一致（实测 ${cards}，源码 ${expectCards}）`);
 
   // D1b 回大厅后进度条不残留：大厅页本身没有 .dc-step，若出现说明串页
   const stray = await page.eval(`return document.querySelectorAll('.dc-step').length;`);
@@ -265,6 +279,16 @@ async function checkBadMode(page) {
   const s3 = await page.eval(SNAP_DC);
   ok(s3.path.endsWith('/lobby/') && /c=TESTCODE1/.test(s3.search),
     `?c= 优先于 ?mode=，被带到大厅（实际 ${s3.path}${s3.search}）`);
+}
+
+/* 派生出的对战页清单必须与源码 games/ 里真正引用 duel 内核的目录一致。
+   🔴 与单测p1-5 里「每个 games/<slug>/index.html 都注册进 vite input」互为犄角：
+      那条防「页面存在但没构建」，这条防「页面存在但没验收」。 */
+function assertDuelCoverage(dirs) {
+  ok(dirs.length >= 6, `对战页覆盖数 ${dirs.length}（含 P2 三款新游戏则应为 6）`);
+  for (const g of ['emoji-ghost', 'chimp-test', 'word-recall']) {
+    ok(dirs.includes(g), `P2 新游戏 ${g} 的对战页必须纳入巡检（否则新增游戏零覆盖）`);
+  }
 }
 
 async function checkDuelPage(page, slug, label) {
@@ -369,12 +393,35 @@ async function main() {
     await checkDeepLink(page, 'number', 'number-recall');
     await checkDeepLink(page, 'sequence', 'sequence-memory');
     await checkDeepLink(page, 'color', 'color-recall');
+    // 🔴 2026-10-14：P2 三款新游戏原先零深链覆盖（深链解析失败会静默弹回大厅，
+    //    正好是最容易漏的一类）。补齐，单关模式要出现且不被弹回。
+    await checkDeepLink(page, 'emoji', 'emoji-ghost');
+    await checkDeepLink(page, 'chimp', 'chimp-test');
+    await checkDeepLink(page, 'word', 'word-recall');
     await checkBadMode(page);
     await checkGoButton(page);
 
-    await checkDuelPage(page, '/games/sequence-memory/', '序列对战');
-    await checkDuelPage(page, '/games/number-recall/', '数字对战');
-    await checkDuelPage(page, '/games/color-recall/', '颜色对战');
+    // 🔴 2026-10-14：原来逐条写死三款 → P2 上线 emoji/chimp/word 后这三条对战页
+    //    处于**零覆盖**状态（页面 404、脚本都不会红）。改为遍历 games/ 目录派生，
+    //    下次加游戏自动纳入，不用记得回来改脚本。
+    const DUEL_LABEL = {
+      'sequence-memory': '序列对战', 'number-recall': '数字对战', 'color-recall': '颜色对战',
+      'emoji-ghost': '表情幽灵对战', 'chimp-test': '猩猩测试对战', 'word-recall': '词语记忆对战',
+    };
+    const duelDirs = fs.readdirSync(path.join(process.cwd(), 'games'), { withFileTypes: true })
+      .filter((d) => d.isDirectory() && fs.existsSync(path.join(process.cwd(), 'games', d.name, 'index.html')))
+      // 🔴 只认**引用对战内核**的目录：daily-challenge 也有 games/<slug>/index.html，
+      //    但它走 daily-game.ts（每日挑战），没有建房/房码/加入入口，
+      //    按目录无差别纳入会凭空多出 3 条必然失败的断言（2026-10-14 实测踩到）。
+      //    判据用源码事实（引 duel-sequence.ts），不靠 slug 白名单。
+      .filter((d) => fs.readFileSync(
+        path.join(process.cwd(), 'games', d.name, 'index.html'), 'utf8')
+        .includes('/src/pages/duel-sequence.ts'))
+      .map((d) => d.name);
+    assertDuelCoverage(duelDirs);
+    for (const g of duelDirs) {
+      await checkDuelPage(page, `/games/${g}/`, DUEL_LABEL[g] || g);
+    }
 
     await checkLangConsistency(page, '/games/daily-challenge/lobby/', '大厅');
     await checkLangConsistency(page, '/games/color-recall/', '颜色对战');
