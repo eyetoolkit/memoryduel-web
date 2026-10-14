@@ -100,13 +100,15 @@ function renderCategories() {
 
   const { CATEGORIES, QUESTIONS, byCategory, loading } = window.MemoryDuelQuiz;
   const lang = (window.i18n && window.i18n.getLang) ? window.i18n.getLang() : 'en';
+  // 🔴 2026-10-14：原 labels.loading 六语文案（「加载中…」）已随「加载中不再禁用卡片」下线。
+  //    加载期题量位留空（不渲染数字），避免闪一个假数字给用户。
   const labels = {
-    zh: { loading: '加载中…', empty: '暂无题目', select: '选择' },
-    en: { loading: 'Loading…', empty: 'No questions yet', select: 'Select' },
-    ja: { loading: '読み込み中…', empty: '問題なし', select: '選択' },
-    es: { loading: 'Cargando…', empty: 'Sin preguntas', select: 'Seleccionar' },
-    fr: { loading: 'Chargement…', empty: 'Pas de questions', select: 'Choisir' },
-    de: { loading: 'Lädt…', empty: 'Keine Fragen', select: 'Auswählen' },
+    zh: { empty: '暂无题目', select: '选择' },
+    en: { empty: 'No questions yet', select: 'Select' },
+    ja: { empty: '問題なし', select: '選択' },
+    es: { empty: 'Sin preguntas', select: 'Seleccionar' },
+    fr: { empty: 'Pas de questions', select: 'Choisir' },
+    de: { empty: 'Keine Fragen', select: 'Auswählen' },
   };
   const t = labels[lang] || labels.en;
 
@@ -123,14 +125,19 @@ function renderCategories() {
   grid.innerHTML = CATEGORIES.map((c) => {
     const count = (byCategory(c.id) || []).length;
     const name = c[lang] || c.en || c.id;
-    // 还在加载中：禁用按钮，显示 loading 文字
-    // 加载完成但该分类无题：禁用按钮，显示 empty 文字
-    // 加载完成且有题：可点击
-    const disabled = stillLoading || count === 0;
-    const countText = stillLoading ? t.loading : (count > 0 ? count : t.empty);
+    // 🔴 2026-10-14 修复「分类卡最长 15 秒不可用」：
+    //   旧逻辑在题库未加载完时把整张卡 disabled（实测 t+9s 渲染、t+24s 才可点，
+    //   首页唯一核心转化入口被卡死 15 秒，且无任何提示）。
+    //   改为：**只有确认该分类真的 0 题才禁用**，加载中照常可点。
+    //   题库本身是按需加载的 —— 点「Start Duel」走 /train.html?cat=xx，
+    //   那边会自行取题，首页不必等全量题库到位。
+    //   兼容：卡片仍带 locked/disabled 的老视觉契约（无题分类），其余走可点态。
+    const noQuestions = !stillLoading && count === 0;
+    const disabled = noQuestions;
+    const countText = stillLoading ? '' : (count > 0 ? count : t.empty);
     // 两套 class 同时给：.cat/.ci/.cn/.cq 是设计稿皮肤，.cat-card/.selected 是旧 JS 契约
     return `
-      <button class="cat cat-card${disabled ? ' locked' : ''}" data-cat="${c.id}" ${disabled ? 'disabled' : ''}>
+      <button class="cat cat-card${disabled ? ' locked' : ''}" data-cat="${c.id}"${disabled ? ' disabled' : ''}>
         <span class="ci cat-icon">${c.icon || '🧩'}</span>
         <span class="cn cat-name">${name}</span>
         <span class="cq cat-count">${countText}</span>

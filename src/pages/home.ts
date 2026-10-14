@@ -27,19 +27,31 @@ if (!SHOW_BETA) {
 
 /* ── 2. 抽屉 / 收窄导航 ─────────────────────────────────────────────── */
 function bindNav(): void {
-  const burger = $<HTMLButtonElement>('burger');
+  const burger = $<HTMLButtonElement>('navBurger') ?? $<HTMLButtonElement>('burger');
+  const drawer = $('navDrawer');
   const overlay = $('overlay');
   const collapse = $<HTMLButtonElement>('collapse');
 
   const close = () => {
     document.body.classList.remove('nav-open');
     burger?.setAttribute('aria-expanded', 'false');
+    drawer?.setAttribute('hidden', '');
   };
 
+  const open = () => {
+    document.body.classList.add('nav-open');
+    burger?.setAttribute('aria-expanded', 'true');
+    // hidden 属性切换会同步 display，抽屉才真正出现
+    drawer?.removeAttribute('hidden');
+  };
+
+  // 🔴 2026-10-14 C1：旧抽屉找 #burger/#overlay/.sidebar（重设计首页已无这些元素 → 死代码），
+  //    现改为同时驱动新的 #navBurger + #navDrawer，并在移动断点外保证抽屉关闭。
   burger?.addEventListener('click', () => {
-    const open = document.body.classList.toggle('nav-open');
-    burger.setAttribute('aria-expanded', String(open));
+    if (document.body.classList.contains('nav-open')) close();
+    else open();
   });
+
   overlay?.addEventListener('click', close);
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') close();
@@ -47,11 +59,19 @@ function bindNav(): void {
   collapse?.addEventListener('click', () => document.body.classList.toggle('rail'));
 
   // 抽屉里点任何导航项都收起来，否则在手机上会挡住锚点目标
-  document.querySelectorAll<HTMLAnchorElement>('.sidebar .nav-item').forEach((a) => {
+  // （旧 .sidebar 与新 .nav-drawer 两套都要挂）
+  document.querySelectorAll<HTMLAnchorElement>('.sidebar .nav-item, .nav-drawer-in a').forEach((a) => {
     a.addEventListener('click', () => {
       if (window.matchMedia('(max-width: 1119px)').matches) close();
     });
   });
+
+  // 从移动断点放大到桌面时，抽屉必须收起 —— 否则桌面端会留一块遮罩挡住整页
+  const mq = window.matchMedia('(min-width: 640px)');
+  mq.addEventListener('change', (e) => { if (e.matches) close(); });
+
+  // 页面加载时若已是桌面宽度，直接确保抽屉关闭（防 SSR/缓存 HTML 带 nav-open）
+  if (mq.matches) close();
 }
 
 /* ── 3. 真实排行榜 ──────────────────────────────────────────────────── */

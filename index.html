@@ -40,6 +40,13 @@
 </script>
 <!-- 重设计皮肤真源：src/styles/home.css（原 home-papergames.css 保留作回滚） -->
 <link rel="stylesheet" href="/src/styles/home.css">
+<!-- 🔴 2026-10-14 E1：首屏关键字体预加载，避免 FOUT 与文字跳动。
+     只预加载首屏真实用到的 3 个（h1 用 Space Grotesk 700，正文用 Inter 400/700）；
+     JetBrains Mono 只用于计时器/排名数字，非首屏关键路径，不预加载。
+     ⚠️ crossorigin 必须带 —— woff2 是跨域字体请求，缺了会二次下载反而更慢。 -->
+<link rel="preload" href="/fonts/space-grotesk-latin-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/inter-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/inter-latin-700.woff2" as="font" type="font/woff2" crossorigin>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Memory Duel">
@@ -51,15 +58,37 @@
 <script src="/js/sw-register.js" defer></script>
 </head>
 
+<!-- 🔴 2026-10-14 无障碍整改 A2：skip-link 必须是 body 下第一个可聚焦元素 -->
+<a class="skip-link" href="#main">Skip to main content</a>
+
 <!-- ═══════════ 顶栏导航（重设计：顶栏替代旧侧栏 chrome） ═══════════ -->
-<nav class="nav"><div class="nav-in">
+<nav class="nav" aria-label="Main"><div class="nav-in">
   <a class="logo" href="/"><span class="mk"></span>MemoryDuel</a>
   <div class="nav-links">
     <a href="#lobby" data-i18n="home_v2.nav_play">Play</a><a href="#how" data-i18n="home_v2.nav_how">How to play</a><a href="#features" data-i18n="home_v2.features_nav">Features</a><a href="#globalTop" data-i18n="home_v2.nav_leaderboard">Leaderboard</a>
   </div>
   <span class="spacer"></span><div id="lang-switcher"></div>
   <a class="btn btn-ghost" href="/membership/" data-i18n="home_v2.sign_in">Sign in</a>
+  <!-- 🔴 2026-10-14 C1 修复：639px 以下 .nav-links 隐藏，此前 4 个导航锚点完全失联。
+       桌面端 display:none，只有移动断点才显示。aria-expanded 由 src/pages/home.ts 的 bindNav() 维护。 -->
+  <button class="nav-burger" id="navBurger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navDrawer">
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+  </button>
 </div></nav>
+
+<!-- 🔴 2026-10-14 C1：移动端导航抽屉。挂 body.nav-open，桌面端不渲染。 -->
+<div class="nav-drawer" id="navDrawer" hidden>
+  <div class="nav-drawer-in">
+    <a href="#lobby" data-i18n="home_v2.nav_play">Play</a>
+    <a href="#how" data-i18n="home_v2.nav_how">How to play</a>
+    <a href="#features" data-i18n="home_v2.features_nav">Features</a>
+    <a href="#globalTop" data-i18n="home_v2.nav_leaderboard">Leaderboard</a>
+    <a href="/membership/" data-i18n="home_v2.sign_in">Sign in</a>
+  </div>
+</div>
+
+<!-- 🔴 2026-10-14 A2：正文包裹进 <main> 地标 -->
+<main id="main">
 
 <!-- ═══════════ Hero：左文案 + 右实战预览卡（首屏即产品） ═══════════ -->
 <section class="hero wrap">
@@ -196,16 +225,18 @@
 <section class="duo wrap" id="lobby" aria-label="Battle modes and leaderboard">
   <div>
     <div class="panel">
-      <div class="sec-ttl" data-i18n="home_v2.sec_battle_title">Choose your battle</div>
+      <!-- 🔴 2026-10-14 A3：div.sec-ttl → h2（区块标题改语义标签，修大纲跳级） -->
+      <h2 class="sec-ttl" data-i18n="home_v2.sec_battle_title">Choose your battle</h2>
       <div class="sec-sub" data-i18n="home_v2.sec_battle_sub">AI sparring is always ready. Online match looks for a real opponent.</div>
 
+      <!-- 🔴 2026-10-14 A5：补 tab 的 id / aria-controls，与下方 tabpanel 形成完整关联 -->
       <div class="tabs" id="modeToggle" role="tablist" aria-label="Battle mode">
-        <button class="tab on" data-m="ai" role="tab" aria-selected="true" type="button" data-i18n="home_v2.tab_ai">🤖 vs AI</button>
-        <button class="tab" data-m="online" role="tab" aria-selected="false" type="button" data-i18n="home_v2.tab_online">🌐 Online</button>
+        <button class="tab on" id="tabAi" data-m="ai" role="tab" aria-selected="true" aria-controls="aiPanel" type="button" data-i18n="home_v2.tab_ai">🤖 vs AI</button>
+        <button class="tab" id="tabOnline" data-m="online" role="tab" aria-selected="false" aria-controls="onlinePanel" tabindex="-1" type="button" data-i18n="home_v2.tab_online">🌐 Online</button>
       </div>
 
-      <!-- AI 面板：分类由 home.mjs 按 /api/md/quiz/bundle 真实题量注入 -->
-      <div id="aiPanel" role="tabpanel">
+      <!-- 🔴 2026-10-14 A4：匹配状态改 role=status，读屏可播报「匹配中/已取消」 -->
+      <div id="aiPanel" role="tabpanel" aria-labelledby="tabAi">
         <div class="cat-grid" id="catGrid"></div>
         <!-- 已选分类小字：home.mjs 写入「<分类名> · 10 questions · 15s each」 -->
         <div class="sel-note" id="catSel">Pick one to start</div>
@@ -213,36 +244,39 @@
         <a class="solo-link" href="/train.html" data-i18n="home_v2.practice_solo">Practice solo first →</a>
       </div>
 
-      <!-- Online 面板：匹配/房间逻辑全在 home.mjs，状态文字由 JS 写入，HTML 保持为空 -->
-      <div id="onlinePanel" role="tabpanel" hidden style="display:none">
+      <!-- 🔴 2026-10-14 A4/A5：面板加 aria-labelledby；状态区加 role=status / aria-live -->
+      <div id="onlinePanel" role="tabpanel" aria-labelledby="tabOnline" hidden style="display:none">
         <div class="field" id="online">
           <label data-i18n="home_v2.quick_match">Quick match</label>
           <button class="btn btn-primary" id="startMatchBtn" type="button" style="width:100%" data-i18n="home_v2.start_matching">⚡ Start Matching</button>
-          <div class="match-status" id="matchStatus"></div>
+          <div class="match-status" id="matchStatus" role="status" aria-live="polite"></div>
           <button class="btn btn-ghost" id="cancelMatchBtn" type="button" style="width:100%;display:none" data-i18n="home_v2.cancel">Cancel</button>
         </div>
         <div class="divider" data-i18n="home_v2.or_friend">or play a friend</div>
         <div class="field">
           <label for="roomInput" data-i18n="home_v2.room_code_label">Enter room code</label>
           <input class="room-in" id="roomInput" maxlength="6" inputmode="latin" autocomplete="off" spellcheck="false" aria-label="Room code" data-i18n-aria-label="home_v2.room_code_label" placeholder="ABC123">
-          <div class="room-err" id="roomErr" data-i18n="home_v2.room_err">Room codes are 6 letters or digits.</div>
+          <!-- 🔴 A4：房间码校验错误用 role=alert，读屏立即播报 -->
+          <div class="room-err" id="roomErr" role="alert" data-i18n="home_v2.room_err">Room codes are 6 letters or digits.</div>
         </div>
         <div class="row2">
           <button class="btn btn-ghost" id="joinBtn" type="button" data-i18n="home_v2.join_room">Join Room</button>
           <button class="btn btn-ghost" id="createRoomBtn" type="button">➕ Create</button>
         </div>
-        <div class="match-status" id="onlineRooms"></div>
+        <div class="match-status" id="onlineRooms" role="status" aria-live="polite"></div>
       </div>
     </div>
 
     <div class="panel" id="features">
-      <div class="sec-ttl" data-i18n="home_v2.features_title">Why MemoryDuel</div>
+      <!-- 🔴 2026-10-14 A3：同改 h2 -->
+      <h2 class="sec-ttl" data-i18n="home_v2.features_title">Why MemoryDuel</h2>
       <div class="sec-sub" data-i18n="home_v2.features_sub">Built for fast, fair, private knowledge duels.</div>
       <div class="feats">
-        <div class="feat"><div class="fi">⏱</div><h4 data-i18n="home_v2.feat1_t">Timed quizzes</h4><p data-i18n="home_v2.feat1_d">15s pressure makes every round sharp.</p></div>
-        <div class="feat"><div class="fi">🌍</div><h4 data-i18n="home_v2.feat2_t">6 languages</h4><p data-i18n="home_v2.feat2_d">Play in your language, anywhere.</p></div>
-        <div class="feat"><div class="fi">🤖</div><h4 data-i18n="home_v2.feat3_t">AI sparring</h4><p data-i18n="home_v2.feat3_d">Always-ready opponent, any time.</p></div>
-        <div class="feat"><div class="fi">🏆</div><h4 data-i18n="home_v2.feat4_t">Leaderboards</h4><p data-i18n="home_v2.feat4_d">Weekly reset, badges for top 10%.</p></div>
+        <!-- 🔴 A3：feat h4 → h3（原先 H2 后直接跳 H4，属跳级） -->
+        <div class="feat"><div class="fi" aria-hidden="true">⏱</div><h3 data-i18n="home_v2.feat1_t">Timed quizzes</h3><p data-i18n="home_v2.feat1_d">15s pressure makes every round sharp.</p></div>
+        <div class="feat"><div class="fi" aria-hidden="true">🌍</div><h3 data-i18n="home_v2.feat2_t">6 languages</h3><p data-i18n="home_v2.feat2_d">Play in your language, anywhere.</p></div>
+        <div class="feat"><div class="fi" aria-hidden="true">🤖</div><h3 data-i18n="home_v2.feat3_t">AI sparring</h3><p data-i18n="home_v2.feat3_d">Always-ready opponent, any time.</p></div>
+        <div class="feat"><div class="fi" aria-hidden="true">🏆</div><h3 data-i18n="home_v2.feat4_t">Leaderboards</h3><p data-i18n="home_v2.feat4_d">Weekly reset, badges for top 10%.</p></div>
       </div>
     </div>
   </div>
@@ -250,9 +284,11 @@
   <!-- 右：真实排行榜（home.ts 拉 /api/md/rank） -->
   <div id="globalTop">
     <div class="panel">
-      <div class="sec-ttl" data-i18n="home_v2.top_title">🏆 Top players</div>
+      <!-- 🔴 2026-10-14 A3：同改 h2 -->
+      <h2 class="sec-ttl" data-i18n="home_v2.top_title">🏆 Top players</h2>
       <div class="sec-sub" data-i18n="home_v2.top_sub">The best minds dueling right now.</div>
-      <div class="rank-list" id="topRankList"></div>
+      <!-- 🔴 D1：异步榜单加载骨架，避免空白观感与 CLS（JS 到位后被替换） -->
+      <div class="rank-list" id="topRankList" aria-busy="true" aria-live="polite" aria-label="Top players"></div>
       <div class="rank-foot">
         <a href="/membership/" data-i18n="home_v2.scoring">How scoring works →</a>
       </div>
@@ -266,13 +302,15 @@
 
 <!-- ═══════════ 三步上手 ═══════════ -->
 <section class="block wrap" id="how" aria-label="How to play">
-  <div class="how-ttl" data-i18n="home_v2.how_title">New here? Three steps.</div>
+  <!-- 🔴 2026-10-14 A3：div.how-ttl → h2 -->
+  <h2 class="how-ttl" data-i18n="home_v2.how_title">New here? Three steps.</h2>
   <div class="steps" style="margin-top:20px">
     <div class="step"><div class="n" data-i18n="home_v2.step1_n">Step 1</div><h3 data-i18n="home_v2.step1_t">Pick a category</h3><p data-i18n="home_v2.step1_d">Science, history, movies — choose what you know best.</p></div>
     <div class="step"><div class="n" data-i18n="home_v2.step2_n">Step 2</div><h3 data-i18n="home_v2.step2_t">Start a duel</h3><p data-i18n="home_v2.step2_d">Face the AI, match a random player, or share a room code with a friend.</p></div>
     <div class="step"><div class="n" data-i18n="home_v2.step3_n">Step 3</div><h3 data-i18n="home_v2.step3_t">Answer first to win</h3><p data-i18n="home_v2.step3_d">Beat the clock and your rival. Climb the ladder, earn badges.</p></div>
   </div>
 </section>
+</main><!-- 🔴 2026-10-14 A2：正文地标闭合，页脚保持在 main 之外 -->
 
 <!-- ═══════════ 页脚（深墨；三站 pip 各站品牌色，MemoryDuel 保持 #4F46E5） ═══════════ -->
 <footer>

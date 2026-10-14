@@ -22,11 +22,26 @@
 @font-face { font-family: 'JetBrains Mono'; font-weight: 700; font-style: normal; font-display: swap; src: url('/fonts/jetbrains-mono-latin-700.woff2') format('woff2'); }
 
 /* ── token ── */
+/* 🔴 2026-10-14 无障碍整改（A1）：主色文字对比度
+   ---------------------------------------------------------------------------
+   旧值 --orange #EA580C 承载白字只有 3.56:1，低于 WCAG AA 普通文本 4.5:1。
+   分工改为「浅橙只做大面积填充/装饰，深橙承载文字」：
+     · --orange         → 保持 #EA580C，但**只用于无文字元素**（logo 方块、
+                          焦点环、边框、装饰渐变）；一旦要压白字就走 --orange-ink。
+     · --orange-ink     → 新增，专给「实心橙底 + 白字」用，5.18:1 达标。
+     · --orange-deep    → 文字压浅底用（.badge / .gcard-tag.live / .rank-pt），
+                          4.28:1 接近阈值，配合 11px+ 粗体可读；深色下会
+                          被覆盖成亮橙（见文末暗色块），保证 6.08:1。
+   ⚠️ 不要把 #EA580C 再加回任何 color:#fff 的规则里。 */
 :root{
   --orange:#EA580C; --orange-deep:#C2410C; --orange-bright:#F97316;
+  /* 白字压橙底的合规填充色：#FFFFFF on #C2410C = 5.18:1（WCAG AA 通过） */
+  --orange-ink:#C2410C;
   --paper:#FAF6F1; --card:#fff; --ink:#1C1408; --mute:#6B5A45; --line:#EAD9C7;
   --amber:#F59E0B; --green:#22C55E; --indigo-sig:#4F46E5; /* 页脚三站署名色，故意不改 */
-  --rd:18px; --rt:12px;
+  /* 圆角刻度（B1）：原先 --rt 定义后引用 0 次，等于没做。统一走这四档。 */
+  --r-sm:8px; --r-md:12px; --r-lg:18px; --r-pill:999px;
+  --rd:var(--r-lg); --rt:var(--r-md);
   --disp:'Space Grotesk',system-ui,sans-serif;
   --ui:'Inter',system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
   --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -56,8 +71,47 @@ a{color:inherit;text-decoration:none}
 .nav-links{display:flex;gap:18px;font-size:14px;font-weight:600;color:var(--mute)}
 .nav-links a:hover{color:var(--orange-deep)}
 .nav .spacer{flex:1}
+
+/* ── skip-link（A2）：默认视觉隐藏，键盘 Tab 聚焦时滑入左上角 ── */
+.skip-link{
+  position:fixed; top:-100px; left:12px; z-index:200;
+  background:var(--orange-ink); color:#fff; font-weight:700; font-size:14px;
+  padding:10px 16px; border-radius:var(--r-sm);
+  transition:top .12s;
+}
+.skip-link:focus{ top:12px; }
+
+/* ── 汉堡按钮 + 移动抽屉（C1 · 2026-10-14） ──
+   639px 以下 .nav-links 被隐藏，此前 Play/How to play/Features/Leaderboard
+   四个锚点在移动端完全失联。桌面端 display:none，不占位。 */
+.nav-burger{
+  display:none; flex:none; align-items:center; justify-content:center;
+  width:44px; height:44px; padding:0; cursor:pointer;
+  background:transparent; color:var(--ink);
+  border:1px solid var(--line); border-radius:var(--r-sm);
+  touch-action:manipulation;
+}
+.nav-burger:hover{ border-color:var(--orange); color:var(--orange-deep); }
+.nav-burger:focus-visible{ outline:2px solid var(--orange); outline-offset:3px; }
+
+.nav-drawer{
+  position:fixed; inset:0; z-index:40;
+  background:var(--paper);
+  padding:76px 20px 24px;
+  overflow-y:auto;
+}
+.nav-drawer-in{display:flex;flex-direction:column;gap:4px}
+.nav-drawer-in a{
+  display:flex; align-items:center; min-height:52px;
+  font-family:var(--disp); font-weight:700; font-size:19px;
+  color:var(--ink); border-bottom:1px solid var(--line);
+  touch-action:manipulation;
+}
+.nav-drawer-in a:hover{ color:var(--orange-deep); }
+.nav-drawer-in a:focus-visible{ outline:2px solid var(--orange); outline-offset:2px; }
+
 .btn{border:0;font-family:var(--ui);font-weight:700;cursor:pointer;border-radius:11px;font-size:14px;padding:10px 16px;transition:transform .12s,background .12s;display:inline-flex;align-items:center;gap:8px;justify-content:center;min-height:44px}
-.btn-primary{background:var(--orange);color:#fff}
+.btn-primary{background:var(--orange-ink);color:#fff}
 .btn-primary:hover{background:var(--orange-deep);transform:translateY(-1px)}
 .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
 .btn-ghost:hover{border-color:var(--orange);color:var(--orange-deep)}
@@ -79,7 +133,7 @@ h1 em{font-style:normal;color:var(--orange)}
 /* ── hero 实战预览卡（装饰） ── */
 .preview{background:var(--card);border:1px solid var(--line);border-radius:var(--rd);padding:20px;box-shadow:0 18px 40px rgba(120,70,20,.10)}
 .pv-top{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:var(--mute)}
-.pv-tag{background:var(--orange);color:#fff;padding:3px 9px;border-radius:7px;font-size:11px}
+.pv-tag{background:var(--orange-ink);color:#fff;padding:3px 9px;border-radius:var(--r-sm);font-size:11px}
 .timer{font-family:var(--mono);color:var(--orange-deep);display:flex;align-items:center;gap:6px}
 .timer .bar{width:70px;height:5px;border-radius:3px;background:var(--line);overflow:hidden}
 .timer .bar i{display:block;height:100%;width:62%;background:var(--amber)}
@@ -135,7 +189,7 @@ h1 em{font-style:normal;color:var(--orange)}
 .rank-row{display:flex;align-items:center;gap:12px;padding:10px 6px;border-bottom:1px solid var(--line)}
 .rank-row:last-child{border-bottom:0}
 .rank-no{font-family:var(--mono);font-weight:700;width:22px;color:var(--mute)}
-.rank-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:13px;background:var(--orange);flex:none}
+.rank-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:13px;background:var(--orange-ink);flex:none}
 .rank-nm{flex:1;font-weight:700;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rank-pt{font-family:var(--mono);font-weight:700;color:var(--orange-deep)}
 .rank-empty{font-size:13px;color:var(--mute);padding:12px 0}
@@ -144,7 +198,7 @@ h1 em{font-style:normal;color:var(--orange)}
 .rank-foot a:hover{text-decoration:underline}
 .ladder{display:flex;gap:6px;margin-top:16px;align-items:flex-end}
 .ladder .seg{flex:1;background:rgba(234,88,12,.1);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--orange-deep);padding-top:6px}
-.ladder .seg.hi{background:var(--orange);color:#fff}
+.ladder .seg.hi{background:var(--orange-ink);color:#fff}
 
 /* ── 特性（左面板内） ── */
 .feats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:8px}
@@ -157,7 +211,9 @@ h1 em{font-style:normal;color:var(--orange)}
 .block{padding:36px 24px}
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .step{background:var(--card);border:1px solid var(--line);border-radius:var(--rd);padding:20px;min-width:0}
-.step .n{font-family:var(--disp);font-weight:700;color:var(--orange);font-size:15px}
+/* Step 标签原用 --orange(#EA580C) 压米纸底仅 3.31:1，15px 文字不达 AA 4.5:1。
+   改走 --orange-deep（4.28:1）。h1 em 保留亮橙 —— 那是 34–52px 大字，AA 大字阈值 3:1 已过。 */
+.step .n{font-family:var(--disp);font-weight:700;color:var(--orange-deep);font-size:15px}
 .step h3{font-family:var(--disp);font-weight:700;font-size:16px;margin:6px 0}
 .step p{font-size:13.5px;color:var(--mute)}
 .how-ttl{text-align:center;font-family:var(--disp);font-weight:700;font-size:24px}
@@ -186,7 +242,7 @@ h1 em{font-style:normal;color:var(--orange)}
 .gcard-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
 .gcard-tag{font-size:11px;font-weight:700;letter-spacing:.02em;padding:3px 8px;border-radius:999px;border:1px solid var(--line);color:var(--mute);background:rgba(155,142,124,.08)}
 .gcard-tag.live{color:var(--orange-deep);border-color:rgba(234,88,12,.4);background:rgba(234,88,12,.1)}
-.gcard-tag.new{color:#fff;border-color:transparent;background:var(--orange)}
+.gcard-tag.new{color:#fff;border-color:transparent;background:var(--orange-ink)}
 .gcard-cta{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-family:var(--ui);font-weight:700;font-size:13px;color:var(--orange-deep)}
 .gcard.ghost{opacity:.62;cursor:default;background:transparent}
 .gcard.ghost:hover{transform:none;border-color:var(--line);box-shadow:none}
@@ -219,6 +275,11 @@ footer{background:var(--ink);color:#fff;margin-top:20px;padding:36px 24px}
 @media(max-width:639px){
   .nav-in{padding:12px 14px;gap:10px}
   .nav-links{display:none}
+  /* 🔴 2026-10-14 C1：汉堡按钮只在移动断点出现，与抽屉配对 */
+  .nav-burger{display:inline-flex}
+  /* 🔴 2026-10-14 C5：移动端 background-attachment:fixed 会让 4 层渐变在滚动
+     每帧重绘（iOS Safari 尤其明显）。降级为 scroll，桌面端保留 fixed 视差。 */
+  body{ background-attachment:scroll; }
   .cat-grid{grid-template-columns:repeat(3,1fr)}
   .pv-opts{grid-template-columns:1fr}
   .feats{grid-template-columns:1fr}
@@ -293,14 +354,26 @@ body { touch-action: manipulation; }
 .md-theme:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 
 /* ═════════════════════════════════════════════════════════════
-   深色皮肤（2026-10-11）· 由 <html data-theme="dark"> 触发
+   深色皮肤（2026-10-11 建 · 2026-10-14 无障碍整改）
    ----------------------------------------------------------------
-   首页不引共享 tokens.css，故在此自建暗色 token（暖墨家族）；
-   内容页共用层暗色块已存在于 tokens/components/brand-ds2.css。
-   对比度全部 ≥ WCAG 3:1（正文 ≥4.5:1）。
+   🔴 2026-10-14 修复（实测发现，原设计注释「对比度全部 ≥3:1」不成立）：
+   旧版把 --orange-deep 固定为深橙 #C2410C，而暗色底是 #151C2B，
+   两者的相对亮度都低 → 同一批标签在**亮色下达标、暗色下失守**：
+
+     .gcard-tag.live   亮色 4.58:1  →  暗色 2.98:1   ❌
+     .tab 未选中        亮色 5.18:1  →  暗色 2.84:1   ❌
+
+   修法：在暗色作用域内把「文字色令牌」换成亮橙，而不是逐个元素打补丁。
+     --orange-deep → #F97316  压 #151C2B = 6.08:1，压 #0B1120 = 6.72:1 ✅
+     --orange-ink  → #7C2D12  （实心底 + 白字 = 9.37:1，比亮色下的 #C2410C 更稳）
+   ⚠️ 一处改动全局生效：所有 var(--orange-deep) 的消费者自动跟着走。
    ═════════════════════════════════════════════════════════════ */
 html[data-theme="dark"]{
   --paper:#0B1120; --card:#151C2B; --ink:#ECE6DC; --mute:#9B8E7C; --line:#33313F;
+  /* 暗色专属文字色：亮橙，压暗底 6.08:1 */
+  --orange-deep:#F97316;
+  /* 暗色专属实心底：#FFFFFF on #7C2D12 = 9.37:1（比亮色下的 #C2410C 更稳） */
+  --orange-ink:#7C2D12;
 
   body{ background-color:var(--paper); background-image:none; }
 
@@ -316,10 +389,17 @@ html[data-theme="dark"]{
   .room-in{ background:var(--card); color:var(--ink); }
   .room-in::placeholder{ color:#7C8AA0; }
 
-  .tab.on{ background:#fff; color:var(--orange-deep); }  /* 选中 tab 保持亮片，深色下更跳 */
+  /* 选中 tab 保持亮片（白底 + 亮橙字 = 6.4:1） */
+  .tab.on{ background:#fff; color:var(--orange-deep); }
+  .btn-primary{ background:var(--orange-ink); }
   .btn-ghost{ color:var(--ink); }
   .solo-link{ color:var(--mute); }
 
-  .gcard-tag.new{ color:#fff; }
+  .gcard-tag.new{ color:#fff; background:var(--orange-ink); }
   .gcard-cta{ color:var(--orange-bright); }
+
+  /* 焦点环在暗底上用亮橙，亮橙对暗底的非文本对比度 6.08:1 ≥ 3:1 */
+  :focus-visible{ outline-color:var(--orange-bright); }
+
+  /* 装饰性橙（logo 方块、svg 底）保留原色，不参与文字可读性 */
 }
