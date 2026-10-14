@@ -6,6 +6,11 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
+/** i18n 字典版本号（唯一真相源是 public/i18n/VERSION） */
+const DICT_VERSION = fs.readFileSync(
+  path.join(__dirname, '..', 'public', 'i18n', 'VERSION'),
+  'utf8').trim();
+
 const DIST = 'D:/GAME/memoryduel-web/dist';
 const GAMES = ['sequence-memory', 'number-recall', 'color-recall', 'emoji-ghost', 'chimp-test', 'word-recall'];
 
@@ -58,7 +63,9 @@ for (const g of GAMES) {
 
   // i18n 键：六语字典必须有 dl.*
   ok(h.includes('data-i18n="dl.mt_create"'), '模式卡挂 i18n 键');
-  ok(/dictVersion:53/.test(h), 'dictVersion 已同步到 53');
+  // 🔴 版本号必须从 VERSION 文件读，不能写死字面量：
+  // 写死会让「bump 了 VERSION 但漏改某个页面」永远测不出来（真的漏过一轮）。
+  ok(h.includes(`dictVersion:${DICT_VERSION}`), `dictVersion 已同步到 VERSION（${DICT_VERSION}）`);
 
   // script 引入（🔴 构建后 .ts 会被 Vite 换成带 hash 的 assets/*.js，
   // 断言源码路径必然失败 —— 必须匹配产物路径）
@@ -78,6 +85,35 @@ const duelJs = fs.readFileSync(path.join(DIST, 'assets', seqJs[0]), 'utf8');
 ok(duelJs.includes('/lobby/'), '对战内核含 lobby 回退字面量');
 ok(duelJs.includes('mode=solo') || duelJs.includes('solo'), '对战内核含 solo 分支');
 ok(duelJs.includes('fetchPuzzleInLang'), '单人模式走服务端公开取题端点');
+
+/* 🔴🔴 轮次基准回归防线（真的在线上挂过一次）：
+   对战内核 round 是 0-based，而 /api/md/daily/puzzle 是 1-based。
+   漏掉 +1 时第 1 轮直接 HTTP 400 BAD_PARAM bad_round，单人模式全盘卡死，
+   而「能进单人页」的验收完全测不到 —— 必须静态钉住这个 +1。 */
+const srcTs = fs.readFileSync(path.join(__dirname, '..', 'src', 'pages', 'duel-sequence.ts'), 'utf8');
+const fetchCall = srcTs.match(/fetchPuzzleInLang\([^)]*\)/);
+ok(!!fetchCall, '取题调用可定位');
+ok(/fetchPuzzleInLang\(GAME,\s*round\s*\+\s*1\b/.test(srcTs),
+  '取题 round 已做 0-based → 1-based 转换（round + 1）',
+  fetchCall ? fetchCall[0] : '未找到调用');
+ok(/fetchAnswerLang\(\)/.test(srcTs),
+  '取题带语言（word-recall 题目按语言分裂）');
+
+/* 🔴 emoji-ghost 判分必须按 options 下标反查本体：
+   渲染层 resolve 的是下标，直接当字符串比对会恒 0 分且零报错。 */
+const emojiTruth = srcTs.match(/kind:\s*'emoji'[\s\S]{0,220}?\};/);
+ok(!!emojiTruth && /options:/.test(emojiTruth[0]),
+  'emoji 真值已存档 options（判分需反查本体）',
+  emojiTruth ? emojiTruth[0].slice(0, 120) : '未找到');
+ok(/tr\.options\s*\|\|\s*\[\]/.test(srcTs) && /\(tr\.options\s*\|\|\s*\[\]\)\[pick\]/.test(srcTs),
+  'emoji 判分按下标反查 options（不能直接 String(answer) 比对）');
+
+/* 🔴 速度加成计时起点必须在 playRound 内部（题面就绪时），
+   且 soloJudge 必须实时取差值 —— 放循环头会永远读到上一轮旧值。 */
+ok(/if \(SOLO\) soloT0 = performance\.now\(\)/.test(srcTs),
+  '计时起点在题面就绪处（playRound 内），非循环头');
+ok(/const elapsed = soloT0 \? Math\.round\(performance\.now\(\) - soloT0\) : 0/.test(srcTs),
+  '速度加成实时取差值（不读上一轮残留）');
 
 const lobbyJsCode = fs.readFileSync(path.join(DIST, 'assets', lobbyJs[0]), 'utf8');
 ok(lobbyJsCode.includes('/lobby/'), '大厅脚本含回退字面量');

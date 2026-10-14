@@ -1205,7 +1205,7 @@
     "mt_random": "Partida aleatoria",
     "md_random": "Empareja con quien esté conectado. Necesita una cola de emparejamiento en el servidor.",
     "mt_tournament": "Torneo",
-    "md_tournament": "Cuadriga con clasificación compartida. Necesita valoraciones y servicio deLlave.",
+    "md_tournament": "Round-robin con clasificación compartida. Necesita valoraciones y un servicio de cuadro primero.",
     "tag_main": "Evento principal",
     "tag_live": "Disponible",
     "tag_practice": "Práctica",

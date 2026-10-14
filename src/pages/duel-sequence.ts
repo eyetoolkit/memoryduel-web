@@ -146,13 +146,19 @@ const soloTruth: Record<number, unknown> = {};
 /** 取题：走服务端公开端点，与每日挑战共用一套题目生成与词库。
     端点返回的 puzzle 形状与对战 /room/round 一致，故渲染代码可原样复用。
     🔴 lang 必须带：word-recall 题目按语言分裂，不传会拿到默认语言词库，
-       界面会出现「英文题配中文界面」。 */
+       界面会出现「英文题配中文界面」。
+    🔴🔴 round 基准不一致，这是线上真事故：
+       对战内核的 round 是 **0-based**（0..ROUNDS-1），
+       而 /api/md/daily/puzzle 的 round 是 **1-based**（1..meta.rounds）。
+       直接把对战 round 透传过去，第一轮会拿到 HTTP 400 BAD_PARAM bad_round，
+       整个单人模式在第 1 轮就卡死报错 —— 而只测「进得去」的验收完全测不到。
+       所以这里必须 +1 转成 1-based。 */
 async function soloFetchRound(round: number): Promise<{ puzzle: any }> {
   const W = (window as any).DailyClient;
   if (!W || typeof W.fetchPuzzleInLang !== 'function') {
     throw new Error('[duel] solo 模式需要 DailyClient 取题契约');
   }
-  const data = await W.fetchPuzzleInLang(GAME, round);
+  const data = await W.fetchPuzzleInLang(GAME, round + 1, W.fetchAnswerLang());
   const puzzle = data && data.puzzle;
   if (!puzzle) throw new Error('[duel] solo 取题响应缺少 puzzle');
 
@@ -161,7 +167,13 @@ async function soloFetchRound(round: number): Promise<{ puzzle: any }> {
         会带答案字段 —— 所以这里只取**能确定是真值**的字段，
         取不到就判 0 分，绝不猜。 */
   if (GAME === 'emoji-ghost' && Array.isArray(puzzle.grid)) {
-    soloTruth[round] = { kind: 'emoji', set: puzzle.grid.map(String) };
+    /* 🔴 必须同时存 options：判分拿到的是 options 下标，得反查 emoji 本体
+       才能与 grid（闪现集合）比对 —— 只存 grid 会让判分永远对不上。 */
+    soloTruth[round] = {
+      kind: 'emoji',
+      set: puzzle.grid.map(String),
+      options: Array.isArray(puzzle.options) ? puzzle.options.map(String) : [],
+    };
   } else if (GAME === 'color-recall' && Array.isArray(puzzle.colors)) {
     soloTruth[round] = {
       kind: 'color',
@@ -225,9 +237,13 @@ function soloJudge(round: number, answer: unknown): any {
     score = Math.round((sum / Math.max(1, tr.colors.length)) * 100);
     perfect = score >= 95;
   } else if (tr.kind === 'emoji') {
-    /* 渲染层回传的是**被选中的 emoji 本体**；命中集合即对 */
-    const got = String(answer ?? '');
-    const ok = tr.set.indexOf(got) >= 0;
+    /* 🔴 渲染层回传的是 options 里的**下标**（与每日挑战同构，playEmojiGhost
+       也 resolve(pick) 下标），不是 emoji 本体。
+       这里若直接 String(answer) 去 set 里找，下标 "0" 永远不在 emoji 集合里，
+       emoji-ghost 的单人模式会恒为 0 分 —— 且不报任何错。 */
+    const pick = Number(answer);
+    const got = (tr.options || [])[pick];
+    const ok = typeof got === 'string' && tr.set.indexOf(got) >= 0;
     score = ok ? 100 : 0;
     perfect = ok;
   } else if (tr.kind === 'chimp') {
@@ -245,14 +261,19 @@ function soloJudge(round: number, answer: unknown): any {
     perfect = score === 100;
   }
 
-  /* 速度加成：纯前端计时，仅本局展示；口径与对战一致（最多 +20%） */
-  const bonus = Math.round(score * 0.2 * Math.max(0, 1 - (soloElapsed[round] || 0) / 60000));
+  /* 速度加成：纯前端计时，仅本局展示；口径与对战一致（最多 +20%）。
+     口径 = 玩家从「题面出现」到「提交」的耗时，60 秒线性衰减到 0。 */
+  const elapsed = soloT0 ? Math.round(performance.now() - soloT0) : 0;
+  soloElapsed[round] = elapsed;
+  const bonus = Math.round(score * 0.2 * Math.max(0, 1 - elapsed / 60000));
   const gained = Math.round((score + bonus) / 10);
   soloTotal += gained;
   return { correct: perfect, gained, score: soloTotal };
 }
 
-/** 每轮本地耗时（毫秒），用于速度加成 */
+/** 单人模式计时器：每轮由 playRound 在「题面就绪」时重置 */
+let soloT0 = 0;
+/** 每轮本地耗时（毫秒），由 soloJudge 在提交瞬间写入 */
 const soloElapsed: Record<number, number> = {};
 let soloTotal = 0;
 
@@ -274,12 +295,9 @@ async function runSolo() {
 
   for (let round = 0; round < ROUNDS; round++) {
     showRoundTag(round + 1, ROUNDS);
-    soloElapsed[round] = 0;
-    const t0 = performance.now();
+    /* 计时不在这里管：由 playRound 在题面就绪时置 soloT0，
+       soloJudge 在提交瞬间写 soloElapsed[round]。 */
     const played = await playRound('', round);
-    /* 🔴 计时只包住玩家真正作答的那段：上面 playRound 里的取题等待
-       已被 soloElapsed 清零，这里补上耗时即可，不用改 playRound。 */
-    soloElapsed[round] = Math.round(performance.now() - t0);
     if (!played) return;
   }
 
@@ -599,6 +617,12 @@ async function playRound(code: string, round: number): Promise<boolean> {
     renderError((e as Error).message, () => playRound(code, round));
     return false;
   }
+
+  /* 🔴 速度加成的计时起点：题目刚到手、玩家即将开始作答这一刻。
+     不能放在 runSolo 的循环头 —— 那样会把取题等待也算进耗时，
+     而且 soloJudge 是在 playRound 内部同步调用的，
+     那时循环头写的值还是上一轮的旧值（第一轮恒为 0）。 */
+  if (SOLO) soloT0 = performance.now();
 
   /* ── 按游戏解析题目（三款游戏唯一的差异点之一）── */
   /* 🔴 `puzzle.grid` 是**按游戏多态**的字段，不是统一的「网格」：
