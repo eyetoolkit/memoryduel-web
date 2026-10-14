@@ -86,16 +86,20 @@ ok(duelJs.includes('/lobby/'), '对战内核含 lobby 回退字面量');
 ok(duelJs.includes('mode=solo') || duelJs.includes('solo'), '对战内核含 solo 分支');
 ok(duelJs.includes('fetchPuzzleInLang'), '单人模式走服务端公开取题端点');
 
-/* 🔴🔴 轮次基准回归防线（真的在线上挂过一次）：
+/* 🔴🔴 轮次基准回归防线（真的在线上挂过两次）：
    对战内核 round 是 0-based，而 /api/md/daily/puzzle 是 1-based。
-   漏掉 +1 时第 1 轮直接 HTTP 400 BAD_PARAM bad_round，单人模式全盘卡死，
-   而「能进单人页」的验收完全测不到 —— 必须静态钉住这个 +1。 */
+   漏掉转换时第 1 轮直接 HTTP 400 BAD_PARAM bad_round，单人模式全盘卡死，
+   而「能进单人页」的验收完全测不到 —— 必须静态钉住。
+   🔴 另外各游戏题库轮次数不同（color-recall 只有 1 轮），
+      所以不能断言「第 N 轮一定取第 N 题」，只能钉住「有做 1-based 转换」。 */
 const srcTs = fs.readFileSync(path.join(__dirname, '..', 'src', 'pages', 'duel-sequence.ts'), 'utf8');
 const fetchCall = srcTs.match(/fetchPuzzleInLang\([^)]*\)/);
 ok(!!fetchCall, '取题调用可定位');
-ok(/fetchPuzzleInLang\(GAME,\s*round\s*\+\s*1\b/.test(srcTs),
+ok(/const puzzleRound = isSinglePuzzle \? 1 : round \+ 1;/.test(srcTs),
   '取题 round 已做 0-based → 1-based 转换（round + 1）',
   fetchCall ? fetchCall[0] : '未找到调用');
+ok(/isSinglePuzzle = GAME === 'color-recall'/.test(srcTs),
+  'color-recall 固定复用第 1 轮题库（实测该端点只有 1 轮）');
 ok(/fetchAnswerLang\(\)/.test(srcTs),
   '取题带语言（word-recall 题目按语言分裂）');
 

@@ -158,7 +158,16 @@ async function soloFetchRound(round: number): Promise<{ puzzle: any }> {
   if (!W || typeof W.fetchPuzzleInLang !== 'function') {
     throw new Error('[duel] solo 模式需要 DailyClient 取题契约');
   }
-  const data = await W.fetchPuzzleInLang(GAME, round + 1, W.fetchAnswerLang());
+  /* 🔴🔴 各游戏在共享题库里的轮次数**不一样**，实测（2026-10-14）：
+       sequence-memory / number-recall / emoji-ghost / chimp-test / word-recall → 3 轮
+       color-recall                                  → **只有 1 轮**（1 轮 = 5 色，满分 50）
+     直接用 round+1 去取，第 2 轮起就吃 HTTP 400 BAD_PARAM bad_round，
+     表现为「color-recall 单人模式第一轮后直接报错」。
+     这里对 color-recall 固定复用第 1 轮那组颜色 —— 它本身就是 5 色一整套，
+     重复三轮只是把同一组颜色再练两遍，不影响判分口径，也不伪造题目。 */
+  const isSinglePuzzle = GAME === 'color-recall';
+  const puzzleRound = isSinglePuzzle ? 1 : round + 1;
+  const data = await W.fetchPuzzleInLang(GAME, puzzleRound, W.fetchAnswerLang());
   const puzzle = data && data.puzzle;
   if (!puzzle) throw new Error('[duel] solo 取题响应缺少 puzzle');
 

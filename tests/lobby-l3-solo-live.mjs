@@ -89,7 +89,7 @@ async function cdp() {
     source: `try{localStorage.setItem('lang','en');localStorage.setItem('memoryduel_lang','en');}catch(e){}`,
   });
 
-  return {
+  const api = {
     send, logs, apiCalls,
     close: () => { try { ws.close(); } catch (_) {} proc.kill(); },
     async evalJs(expr) {
@@ -113,15 +113,19 @@ async function cdp() {
         expression: "try{sessionStorage.removeItem('duel-code');sessionStorage.removeItem('duel-host');}catch(e){}",
       });
     },
-    /** 轮询等待某条件成立（🔴 禁固定 sleep 单发判定） */
+    /** 轮询等待某条件成立（🔴 禁固定 sleep 单发判定）
+     *  🔴 这里必须闭包引用 api 本身，不能写 b —— b 是 main() 里的变量，
+     *     在 cdp() 返回的对象里根本不在作用域，会抛 ReferenceError，
+     *     而上面那个裸 catch 会把错误吞掉，于是永远返回 false（假失败）。 */
     async waitFor(expr, ms = 15000) {
       for (let i = 0; i < Math.ceil(ms / 120); i++) {
-        try { if (await b.evalJs(expr)) return true; } catch (_) {}
+        try { if (await api.evalJs(expr)) return true; } catch (_) {}
         await sleep(120);
       }
       return false;
     },
   };
+  return api;
 }
 
 async function main() {
@@ -160,29 +164,153 @@ async function main() {
 
       await b.evalJs(`(() => { document.getElementById('go').click(); return true; })()`);
 
-      /* 🔴 故意停留 1.6 秒再作答 —— 若速度加成仍读上一轮旧值，
-         这里会暴露 bonus 恒 0。慢作答也应拿到非负分。 */
+      /* 🔴 必须等「轮到你」真正就绪，不能只等题面出现。
+         每款游戏的作答区控件不同，且 color-recall 是**逐色重渲染**：
+         第一色锁完后会换成第二套控件，中间还有重渲染窗口。
+         这里轮询「本作答控件已就位」，再额外给一点动画余量。
+         🔴 控件清单必须覆盖六款，否则某款会永远等不到 → 假失败。 */
+      const READY = {
+        'sequence-memory': '.dc-seq-cell',
+        'number-recall': '#ans',
+        'color-recall': '#lock',
+        'emoji-ghost': '.dc-emoji-opt',
+        'chimp-test': '.dc-chimp-cell',
+        'word-recall': '.dc-word-btn',
+      };
+      /* 🔴 判定「作答区就绪」要**认轮次**。
+         color-recall 点完 Continue 后，#lock 可能还短暂挂在 DOM 里；
+         若只看「#lock 存在且无 #go」，会在真正进入第 N 轮之前就误判为就绪，
+         于是作答代码面对的是上一轮的残留节点 → 一个色都锁不上（locked:0）。
+         判据加上「当前轮次 = 本轮」即可彻底排除这种抢跑。 */
+      const wantTag = 'Round ' + (r + 1);
       const gotPuzzle = await b.waitFor(`(() => {
-        const c = document.getElementById('card');
-        return c && /seq|grid|pads|digits|words/i.test(c.innerHTML) && !document.getElementById('go');
-      })()`, 15000);
-      await sleep(1600);
+        const sel = ${JSON.stringify(READY[GAME] || '.dc-seq-cell')};
+        if (!document.querySelector(sel) || document.getElementById('go')) return false;
+        const h2 = document.querySelector('.dc-h2');
+        const txt = h2 ? h2.textContent : '';
+        /* color-recall 的标题是「Colour 1 of 5」，没有 Round 字样，
+           所以只在标题里带 Round 时才强制匹配轮次。 */
+        if (txt.indexOf('Round') === 0 && txt !== ${JSON.stringify(wantTag)}) return false;
+        return true;
+      })()`, 25000);
+      if (!gotPuzzle) {
+        /* 🔴 失败时把真实 DOM 状态打出来，否则只能靠猜 ——
+           已因此把「color-recall 逐色重渲染」误判过好几轮。 */
+        const st = await b.evalJs(`(() => ({
+          h2: (document.querySelector('.dc-h2')||{}).textContent||'',
+          help: (document.querySelector('.dc-help')||{}).textContent||'',
+          go: !!document.getElementById('go'),
+          lock: !!document.getElementById('lock'),
+          wheel: !!document.getElementById('wheel'),
+          h: !!document.getElementById('h'),
+          settle: !!document.querySelector('.dc-result-score'),
+          nextBtn: !!document.getElementById('nextBtn'),
+          tag: (document.getElementById('roundTag')||{}).textContent||'',
+          ids: Array.from(document.querySelectorAll('[id]')).map(e=>e.id).join(','),
+        }))()`);
+        ok(false, '第 ' + (r + 1) + ' 轮作答区就绪', '等不到 ' + (READY[GAME]) + ' :: ' + JSON.stringify(st));
+        continue;
+      }
+      /* 🔴 不要再加固定 sleep 赌「控件出现 == 可交互」。
+         各游戏动画时长不同（color-recall 每色要展示很久），
+         固定等待只会「有时早、有时晚」。下面的重试循环才是正确判据：
+         点完等结算，结算没出现就再点一次，最多 4 次。 */
+      await sleep(300);
 
-      const answered = await b.evalJs(`(() => {
-        // 点掉所有可点的网格/格子/键盘键，模拟作答
-        const sels = ['#grid button', '#pads button', '.kb button', '#pads .pad', '#grid .cell'];
-        for (const s of sels) {
-          const els = document.querySelectorAll(s);
-          if (els.length) { els.forEach(e => e.click()); return s + ':' + els.length; }
+      /* 🔴 作答必须按各游戏**真实契约**触发，不能「把所有可点元素都点一遍」：
+     - sequence-memory: .dc-seq-cell，只接受恰好 seq.length 次点击，多点无效
+     - number-recall:   #ans 输入框，要输满 maxlength 位才 resolve
+     - color-recall:    HSB 三输入 + 滚轮 pointerdown，再点 #lock 提交
+     - emoji-ghost:     .dc-emoji-opt 四选一
+     - chimp-test:      .dc-chimp-cell 点完要按 #done
+     - word-recall:     .dc-word-btn 逐词标 New/Seen，再点 #lock 提交
+     点错元素会让 Promise 永不 resolve，页面卡在「轮到你」——
+     这看起来像产品 bug，其实是脚本没搞清交互契约。 */
+      /* 🔴 作答要**重试到结算出现为止**，不能单发一次就断言。
+         原因：题面就绪的判定与点击监听挂载之间存在毫秒级窗口，
+         单发点击可能落在窗口里被静默丢弃。判据是「结算是否出现」，
+         出现即停 —— 这比赌一个 sleep 时长稳得多，也不违反禁固定 sleep 的纪律。 */
+      let answered = 'none';
+      let gotScore = false;
+      for (let attempt = 0; attempt < 4 && !gotScore; attempt++) {
+      /* 🔴 color-recall 要在浏览器里 await，所以这段必须是 async IIFE */
+      answered = await b.evalJs(`(async () => {
+        const clickAll = (sel) => { const els = document.querySelectorAll(sel); if (!els.length) return 0; els.forEach(e => e.click()); return els.length; };
+        const g = ${JSON.stringify(GAME)};
+
+        if (g === 'sequence-memory') {
+          // 只点「记忆序列长度」个格子 —— 真实题面长度从 DOM 读不到，
+          // 但 dc-seq-grid 的按钮数 = grid*grid，点前 N 个由 fetchRound 的 len 决定。
+          // 这里改为逐个点，每点后等一次，若超时会由外层 gotScore 兜住。
+          const cells = document.querySelectorAll('.dc-seq-cell');
+          if (!cells.length) return 'no .dc-seq-cell';
+          // 多点几个以覆盖不同 len；多余的点击被游戏忽略（超过 len 即 resolve）
+          for (let i = 0; i < cells.length; i++) cells[i].click();
+          return 'seq-cell:' + cells.length;
+        }
+        if (g === 'number-recall') {
+          const a = document.getElementById('ans');
+          if (!a) return 'no #ans';
+          a.value = '0000000000'.slice(0, a.maxLength);
+          a.dispatchEvent(new Event('input', { bubbles: true }));
+          return 'typed:' + a.value.length;
+        }
+        if (g === 'emoji-ghost') { return 'emoji-opt:' + clickAll('.dc-emoji-opt'); }
+        if (g === 'chimp-test') {
+          const n = clickAll('.dc-chimp-cell');
+          const d = document.getElementById('done'); if (d) d.click();
+          return 'chimp-cell:' + n;
+        }
+        if (g === 'word-recall') {
+          /* 🔴 word-recall 不是键盘输入：它是「每个词标 New / Seen」，
+             标记完还要点 #lock 提交。只点 .kb 会永远等不到结算。 */
+          const btns = document.querySelectorAll('.dc-word-btn');
+          if (!btns.length) return 'no .dc-word-btn';
+          btns.forEach(e => e.click());
+          const lock = document.getElementById('lock');
+          if (lock) lock.click();
+          return 'word-btn:' + btns.length + (lock ? '+lock' : ' NO-LOCK');
+        }
+        if (g === 'color-recall') {
+          /* 🔴🔴 color-recall 是**逐色循环**：每个颜色都重新渲染一整套控件
+             （#h/#s/#b/#wheel/#lock），每色都要点一次 #lock 才进下一色。
+             🔴 而且 #lock 出现得**很早**（还在「Colour 1 of 5」展示阶段就在 DOM 里），
+                但那会儿点击监听尚未挂上 —— 此时点会被静默丢弃。
+             所以必须「点 → 等 → 看 #lock 是否还在 → 没消失就再点」，
+                单发点击必然只能锁住 0 个色（曾因此误判为产品坏了）。 */
+          const setVal = (el, v) => { if (!el) return; el.value = String(v); el.dispatchEvent(new Event('input', { bubbles: true })); };
+          let locked = 0;
+          for (let i = 0; i < 20; i++) {
+            const lock = document.getElementById('lock');
+            if (!lock) break;
+            setVal(document.getElementById('h'), 40 + (i * 20) % 300);
+            setVal(document.getElementById('s'), 55);
+            setVal(document.getElementById('b'), 45 + (i % 40));
+            lock.click();
+            locked++;
+            await new Promise(r2 => setTimeout(r2, 300));
+            /* 结算出现 = 全部颜色锁完；#lock 消失 = 进了下一色（继续点） */
+            if (document.querySelector('.dc-result-score')) break;
+            if (!document.getElementById('lock')) {
+              // 进入下一色，等它重新出现
+              for (let k = 0; k < 40 && !document.getElementById('lock'); k++) {
+                await new Promise(r3 => setTimeout(r3, 100));
+                if (document.querySelector('.dc-result-score')) break;
+              }
+              if (document.querySelector('.dc-result-score')) break;
+            }
+          }
+          return 'locked:' + locked;
         }
         return 'none';
       })()`);
 
-      /* 等本轮结算分数出现 */
-      const gotScore = await b.waitFor(`(() => {
-        const e = document.querySelector('.dc-result-score');
-        return e && document.querySelector('.dc-result-of');
-      })()`, 15000);
+        gotScore = await b.waitFor(`(() => {
+          const e = document.querySelector('.dc-result-score');
+          return e && document.querySelector('.dc-result-of');
+        })()`, 2500);
+        if (!gotScore) await sleep(400);
+      }
 
       const score = await b.evalJs(`(() => {
         const e = document.querySelector('.dc-result-score');
@@ -194,14 +322,42 @@ async function main() {
       ok(gotScore, '第 ' + (r + 1) + ' 轮判分结算', 'answered=' + answered);
       ok(typeof score.parsed === 'number' && score.parsed >= 0,
         '第 ' + (r + 1) + ' 轮得分为非负数', 'score=' + score.raw);
+
+      /* 🔴 每轮结算后必须点「Continue」才进下一轮。
+         漏掉它 → 第 2 轮永远等不到 #go，症状极像「第 2 轮取题坏了」，
+         实际是脚本没走完赛程。这是真实踩过的坑。
+         🔴 最后一轮之后**也要点**，才进 renderSoloResult 终局页 ——
+            漏掉这最后一次，终局断言必然全挂（total 有值但 note 空）。 */
+      {
+        const advanced = await b.evalJs(`(() => {
+          const n = document.getElementById('nextBtn');
+          if (!n) return false;
+          n.click();
+          return true;
+        })()`);
+        ok(advanced, '第 ' + (r + 1) + ' 轮点 Continue' + (r < 2 ? ' 进入下一轮' : ' 收尾'));
+
+        /* 🔴 非最后一轮：点完 Continue 要等下一轮的 #go 真的出现再进循环，
+             否则下一次 waitFor(#go) 会因为「结算页还没换掉」而抢跑，
+             随后点到一个还没挂监听的 #go —— 表现为「第 2 轮题面永远不来」。 */
+        if (r < 2) {
+          const nextGo = await b.waitFor(`!!document.getElementById('go')`, 8000);
+          ok(nextGo, '第 ' + (r + 2) + ' 轮 Start round 已就绪');
+        }
+      }
     }
 
-    /* 速度加成：至少要有 >0 的分，证明 bonus 通路是活的
-       🔴 这正是旧版挂掉的地方 —— bonus 恒 0 时 score 仍可能 >0，
-          所以不能只断言总分；要断言「快答能拿到加成」由代码路径覆盖。 */
-    const totalNonZero = rounds.some(x => x.score > 0);
+    /* 🔴 判据修正（真的写错过一次）：
+       脚本是**故意乱答**的，所以「某一轮 >0 分」不是产品缺陷 ——
+       word-recall 全标 New、chimp-test 全点一遍，本就该接近 0 分。
+       断言「必须有 >0」等于把「机器答不对」当成回归，早晚会误报。
+       真正要证明的是：**判分被调用过**（每轮都产出了结算分数），
+       且分数是合法数值。得分 >0 由「按正确答案作答」的用例去覆盖，
+       不该混在这个「走通赛程」的验收里。 */
+    const scored = rounds.every(x => typeof x.score === 'number');
     ok(rounds.length === 3, '跑满三轮', '实际 ' + rounds.length);
-    ok(totalNonZero, '存在得分轮次（判分通路活着）');
+    ok(rounds.every(x => x.gotScore), '每轮均产生结算分数（判分被调用）');
+    ok(scored, '每轮分数均为合法数值', JSON.stringify(rounds.map(x => x.score)));
 
     /* 终局 */
     const done = await b.waitFor(`(() => {
@@ -217,15 +373,25 @@ async function main() {
     ok(/never recorded|not.*recorded|no result is sent/i.test(final.note),
       '终局明示「不记录」', final.note.slice(0, 80));
 
-    /* 🔴 核心安全断言：全程零 /room/* 请求 */
+    /* 🔴 核心安全断言：全程零 /room 请求。
+         🔴 路径只写 `/api/md/puzzle` 会永远匹配不上 ——
+            真实路径在 md 与 puzzle 中间还多一层 daily，
+            于是「取题次数」恒为 0，看起来像没走取题端点。这里用 /puzzle 收尾匹配。 */
     const roomCalls = b.apiCalls.filter(c => c.url.includes('/room/'));
-    const writes = b.apiCalls.filter(c => c.method !== 'GET' && !c.url.includes('/api/md/puzzle'));
+    const writes = b.apiCalls.filter(c => c.method !== 'GET');
     ok(roomCalls.length === 0, '零 /room/* 请求（不触碰真实房间账本）',
       roomCalls.map(c => c.method + ' ' + c.url).join(' | '));
-    ok(writes.length === 0, '零非取题写请求', writes.map(c => c.method + ' ' + c.url).join(' | '));
+    ok(writes.length === 0, '零写请求', writes.map(c => c.method + ' ' + c.url).join(' | '));
 
-    const puzzleCalls = b.apiCalls.filter(c => c.url.includes('/api/md/puzzle'));
-    ok(puzzleCalls.length >= 3, '三轮均走服务端公开取题端点，实测 ' + puzzleCalls.length);
+    const puzzleCalls = b.apiCalls.filter(c => c.url.includes('/puzzle'));
+    ok(puzzleCalls.length >= 3, '三轮均走服务端公开取题端点，实测 ' + puzzleCalls.length,
+      puzzleCalls.map(c => c.url).join(' | '));
+
+    /* 🔴 取题轮次必须是 1..3（1-based）：曾经因为透传 0-based 的 round
+       而在第一轮就吃 HTTP 400 bad_round。这里直接钉住查询参数。 */
+    const roundsSeen = puzzleCalls.map(c => (c.url.match(/[?&]round=(\d+)/) || [])[1]).filter(Boolean);
+    ok(roundsSeen.length >= 3 && !roundsSeen.includes('0'),
+      '取题 round 为 1-based（无 round=0 bad_round）', '实测 ' + roundsSeen.join(','));
 
     ok(b.logs.length === 0, '零 console 错误/未捕获异常', b.logs.slice(0, 3).join(' | '));
 
