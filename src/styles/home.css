@@ -277,10 +277,13 @@ html { overscroll-behavior-y: none; }
 body { touch-action: manipulation; }
 
 /* ── 主题切换按钮（深色皮肤专项 · 2026-10-11） ──
-   用首页自身 token 回退链；内容页复用同一类名，样式在 tokens.css 内（共享 --border/--surface/--text）。 */
+   用首页自身 token 回退链；内容页复用同一类名，样式在 tokens.css 内（共享 --border/--surface/--text）。
+   🔴 2026-10-14：这里是全站第二份 .md-theme 定义（另一份在 public/css/shared/tokens.css），
+   两者原本都是 38px。只改 tokens.css 不够 —— 凡是加载了 home.css 的页面（首页、
+   daily-challenge 等）会以本文件为准，尺寸必须同步改，否则改了一处另一处照旧。 */
 .md-theme{
   display:inline-flex;align-items:center;justify-content:center;
-  width:38px;height:38px;flex:none;border-radius:50%;padding:0;
+  width:44px;height:44px;flex:none;border-radius:50%;padding:0;
   border:1px solid var(--line, #EAD9C7);
   background:var(--card, #fff);
   color:var(--ink, #1C1408);
