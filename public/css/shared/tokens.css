@@ -343,10 +343,12 @@ html { overscroll-behavior-y: none; }
 body { touch-action: manipulation; }
 
 /* ── 主题切换按钮（深色皮肤专项 · 2026-10-11） ──
-   内容页按钮由 /shared/theme.js 注入 .sh-actions；token 随 html[data-theme="dark"] 自动翻暗。 */
+   内容页按钮由 /shared/theme.js 注入 .sh-actions；token 随 html[data-theme="dark"] 自动翻暗。
+   🔴 2026-10-14：原为 38×38，低于触摸目标 44px（WCAG 2.5.5 / Apple HIG）。
+   这是顶栏唯一的常驻圆形按钮，误触成本低但命中率也低，直接放大到 44。 */
 .md-theme{
   display:inline-flex;align-items:center;justify-content:center;
-  width:38px;height:38px;flex:none;border-radius:50%;padding:0;
+  width:44px;height:44px;flex:none;border-radius:50%;padding:0;
   border:1px solid var(--border, #E4E8EE);
   background:var(--surface, #fff);
   color:var(--text, #0F172A);

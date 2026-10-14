@@ -223,7 +223,10 @@
 
 .dc-tag.is-live { background: #DCFCE7; color: #15803D; }
 .dc-tag.is-gold { background: #FEF3C7; color: #B45309; }
-.dc-tag.is-mute { background: #F1F5F9; color: #64748B; }
+/* 🔴 2026-10-14：#64748B 压 #F1F5F9 只有 4.34:1，差 AA 的 4.5:1 一线。
+   "Coming soon" 这类标签是唯一的对外状态提示，读不清就等于没提示。
+   同色系再深一档 #5B6675 → 5.32:1，色相不变，视觉差异几乎不可见。 */
+.dc-tag.is-mute { background: #F1F5F9; color: #5B6675; }
 
 /* ─── 侧栏 ─── */
 .dc-panel {
