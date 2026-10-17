@@ -257,6 +257,7 @@
     "feat_ai_desc": "随时练习，AI 难度自适应。",
     "feat_ranks": "段位系统",
     "feat_ranks_desc": "冲排行榜，赢徽章。",
+    "rank_empty": "暂无玩家上榜",
     "section_how": "玩法",
     "step1": "选择类别",
     "step2": "开始对决或邀请好友",

@@ -260,6 +260,7 @@
     "feat_ai_desc": "Entraînez-vous à tout moment. La difficulté de l'IA s'adapte à vous.",
     "feat_ranks": "Système de Rang",
     "feat_ranks_desc": "Grimpez le classement. Gagnez des badges.",
+    "rank_empty": "Aucun joueur dans le classement pour le moment",
     "section_how": "Comment Jouer",
     "step1": "Choisissez une catégorie",
     "step2": "Lancez un duel ou invitez un ami",

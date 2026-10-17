@@ -7,7 +7,11 @@
 
   function t(key, fallback) {
     if (window.i18n && typeof window.i18n.t === 'function') {
-      return window.i18n.t(key);
+      // 🔴 2026-10-17：旧实现是 return window.i18n.t(key) —— fallback 被完全丢弃，
+      // 字典缺键时用户看到裸 key（如 'auth.msg_fill_all'）。i18n.js 的 t() 第四参
+      // 才是兜底文案，这里必须显式传进去；返回空串时也要落到 fallback。
+      var v = window.i18n.t(key, null, null, fallback);
+      return (v && v !== key) ? v : (fallback || key);
     }
     return fallback || key;
   }

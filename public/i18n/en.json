@@ -257,6 +257,7 @@
     "feat_ai_desc": "Practice anytime. AI difficulty adapts to you.",
     "feat_ranks": "Ranked System",
     "feat_ranks_desc": "Climb the leaderboard. Earn badges.",
+    "rank_empty": "No players ranked yet",
     "section_how": "How to Play",
     "step1": "Pick a category",
     "step2": "Start a duel or invite a friend",

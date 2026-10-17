@@ -260,6 +260,7 @@
     "feat_ai_desc": "Jederzeit üben. KI-Schwierigkeit passt sich dir an.",
     "feat_ranks": "Rangsystem",
     "feat_ranks_desc": "In der Rangliste aufsteigen. Abzeichen verdienen.",
+    "rank_empty": "Noch keine Spieler in der Rangliste",
     "section_how": "Spielanleitung",
     "step1": "Kategorie wählen",
     "step2": "Duell starten oder Freund einladen",

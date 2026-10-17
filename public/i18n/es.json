@@ -260,6 +260,7 @@
     "feat_ai_desc": "Practica en cualquier momento. La dificultad de IA se adapta a ti.",
     "feat_ranks": "Sistema de Rangos",
     "feat_ranks_desc": "Sube en la tabla de clasificación. Gana insignias.",
+    "rank_empty": "Aún no hay jugadores en la clasificación",
     "section_how": "Cómo Jugar",
     "step1": "Elige una categoría",
     "step2": "Inicia un duelo o invita a un amigo",

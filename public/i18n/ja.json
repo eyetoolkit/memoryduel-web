@@ -260,6 +260,7 @@
     "feat_ai_desc": "Practice anytime. AI 難易度 adapts to you.",
     "feat_ranks": "ランクシステム",
     "feat_ranks_desc": "Climb the リーダーボード. Earn badges.",
+    "rank_empty": "まだランクインしたプレイヤーはいません",
     "section_how": "遊び方",
     "step1": "カテゴリを選ぶ",
     "step2": "開始 a デュエル or 招待 a friend",
