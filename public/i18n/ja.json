@@ -1173,10 +1173,6 @@
     "meta_desc": "単語が1つずつ表示され、「見た／初めて」を判定。1v1 記憶対戦、両者同じ設問。"
   },
   "dl": {
-    "title": {
-      "lobby": "対戦",
-      "meta_desc": "遊び方を選んでください。"
-    },
     "title_sequence": "シーケンス記憶 対戦",
     "title_number": "数字記憶 対戦",
     "title_color": "色記憶 対戦",
@@ -1217,6 +1213,13 @@
     "rule_async": "非同期——いつでも遊べる",
     "side_how_title": "対戦の流れ",
     "side_how_note": "片方がルームを作ってコードを共有。両者が自分のペースで同じ問題に答えます。両者終了時点で決着します。同時プレイは不要です。",
-    "foot_hint": "両者同じ問題。記憶力的差が勝敗を決めます。"
+    "foot_hint": "両者同じ問題。記憶力的差が勝敗を決めます。",
+    "meta_desc_roster": "部屋を作成してコードを共有し、同じ問題で友人と対戦。サーバー採点の非同期1対1メモリデュエル。",
+    "seo_title_sequence_memory": "シーケンスメモリ — 対戦を選択",
+    "seo_title_number_recall": "数字リコール — 対戦を選択",
+    "seo_title_color_recall": "カラーリコール — 対戦を選択",
+    "seo_title_emoji_ghost": "絵文字ゴースト — 対戦を選択",
+    "seo_title_chimp_test": "チンパテスト — 対戦を選択",
+    "seo_title_word_recall": "ワードリコール — 対戦を選択"
   }
 }

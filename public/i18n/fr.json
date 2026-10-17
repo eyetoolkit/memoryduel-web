@@ -1173,10 +1173,6 @@
     "meta_desc": "Les mots apparaissent un par un : indiquez vus ou nouveaux. Duel 1v1, mêmes mots."
   },
   "dl": {
-    "title": {
-      "lobby": "Duels",
-      "meta_desc": "Choisissez votre mode de jeu."
-    },
     "title_sequence": "Duel de séquence",
     "title_number": "Duel de chiffres",
     "title_color": "Duel de couleurs",
@@ -1217,6 +1213,13 @@
     "rule_async": "Asynchrone — jouez quand vous voulez",
     "side_how_title": "Comment se déroule un duel",
     "side_how_note": "Un joueur crée le salon et partage le code. Les deux répondent aux mêmes manches à leur rythme. Le duel se conclut quand les deux ont fini : nul besoin d'être connecté en même temps.",
-    "foot_hint": "Mêmes questions pour les deux. La meilleure mémoire gagne."
+    "foot_hint": "Mêmes questions pour les deux. La meilleure mémoire gagne.",
+    "meta_desc_roster": "Créez une salle, partagez le code et affrontez vos amis sur les mêmes questions. Duel de mémoire 1v1 asynchrone, noté par le serveur.",
+    "seo_title_sequence_memory": "Mémoire Séquentielle — Choisissez votre duel",
+    "seo_title_number_recall": "Mémoire des Nombres — Choisissez votre duel",
+    "seo_title_color_recall": "Mémoire des Couleurs — Choisissez votre duel",
+    "seo_title_emoji_ghost": "Fantôme Emoji — Choisissez votre duel",
+    "seo_title_chimp_test": "Test du Chimpanzé — Choisissez votre duel",
+    "seo_title_word_recall": "Mémoire des Mots — Choisissez votre duel"
   }
 }

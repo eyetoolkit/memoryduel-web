@@ -16,8 +16,13 @@ if (process.env.VITE_SHOW_BETA === '1') {
 }
 
 const html = await readFile(resolve(root, 'index.html'), 'utf8');
+// 首页的游戏入口一律指向 `/games/<id>/lobby/`，所以这里必须同时接受
+// 根目录型与 lobby 型 href，否则 live 集合恒为空、已上线游戏被误判为未上线
+// 而从 sitemap 中移除（2026-10-17 修复，与 boardduel 同源逻辑对齐）。
 const live = new Set(
-  [...html.matchAll(/href="\/games\/([a-z0-9-]+)\/"\s+data-stage="live"/g)].map((m) => m[1]),
+  [...html.matchAll(/href="\/games\/([a-z0-9-]+)\/(?:lobby\/)?"\s+data-stage="live"/g)].map(
+    (m) => m[1],
+  ),
 );
 
 const sitemapPath = resolve(root, 'dist', 'sitemap.xml');

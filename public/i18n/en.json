@@ -1173,10 +1173,6 @@
     "meta_desc": "Words appear one by one. Then mark each as seen or new. 1v1 recognition-memory duel, same words for both players, server-scored."
   },
   "dl": {
-    "title": {
-      "lobby": "Duels",
-      "meta_desc": "Choose how to play."
-    },
     "title_sequence": "Sequence Memory Duel",
     "title_number": "Number Recall Duel",
     "title_color": "Colour Recall Duel",
@@ -1217,6 +1213,13 @@
     "rule_async": "Asynchronous — play any time",
     "side_how_title": "How a duel runs",
     "side_how_note": "One player creates the room and shares the code. Both players answer the same rounds on your own schedule. The duel settles when both players have finished — nobody has to be online at the same time.",
-    "foot_hint": "Same questions for both players. Sharper memory wins."
+    "foot_hint": "Same questions for both players. Sharper memory wins.",
+    "meta_desc_roster": "Create a room, share the code, and duel friends on the same questions. Asynchronous 1v1 memory duel scored by the server.",
+    "seo_title_sequence_memory": "Sequence Memory — Choose Your Duel",
+    "seo_title_number_recall": "Number Recall — Choose Your Duel",
+    "seo_title_color_recall": "Colour Recall — Choose Your Duel",
+    "seo_title_emoji_ghost": "Emoji Ghost — Choose Your Duel",
+    "seo_title_chimp_test": "Chimp Test — Choose Your Duel",
+    "seo_title_word_recall": "Word Recall — Choose Your Duel"
   }
 }

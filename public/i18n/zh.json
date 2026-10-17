@@ -1173,10 +1173,6 @@
     "meta_desc": "词语逐个出现，之后逐个标记见过或没见过。1v1 记忆对决，双方题目完全相同，服务端判分。"
   },
   "dl": {
-    "title": {
-      "lobby": "对战",
-      "meta_desc": "选择你的对战方式。"
-    },
     "title_sequence": "序列记忆对战",
     "title_number": "数字广度对战",
     "title_color": "颜色还原对战",
@@ -1217,6 +1213,13 @@
     "rule_async": "异步对战——随时都能玩",
     "side_how_title": "一局对战怎么跑",
     "side_how_note": "一方建房并分享房间码，双方按自己的节奏答同一批题目。双方都答完即结算——不需要同时在线。",
-    "foot_hint": "双方题目相同。记忆更好的人赢。"
+    "foot_hint": "双方题目相同。记忆更好的人赢。",
+    "meta_desc_roster": "创建房间、分享房码，与好友就同一套题目对战。由服务端判定的异步 1v1 记忆对决。",
+    "seo_title_sequence_memory": "序列记忆 — 选择你的对战",
+    "seo_title_number_recall": "数字回忆 — 选择你的对战",
+    "seo_title_color_recall": "颜色回忆 — 选择你的对战",
+    "seo_title_emoji_ghost": "表情幽灵 — 选择你的对战",
+    "seo_title_chimp_test": "猩猩测试 — 选择你的对战",
+    "seo_title_word_recall": "单词回忆 — 选择你的对战"
   }
 }

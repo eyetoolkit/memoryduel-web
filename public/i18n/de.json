@@ -1173,10 +1173,6 @@
     "meta_desc": "Wörter erscheinen nacheinander: markiere gesehen oder neu. Duell 1v1, gleiche Wörter."
   },
   "dl": {
-    "title": {
-      "lobby": "Duelle",
-      "meta_desc": "Wähle deine Spielweise."
-    },
     "title_sequence": "Sequenz-Duell",
     "title_number": "Zahlen-Duell",
     "title_color": "Farb-Duell",
@@ -1217,6 +1213,13 @@
     "rule_async": "Asynchron — spiele jederzeit",
     "side_how_title": "Wie ein Duell abläuft",
     "side_how_note": "Ein Spieler erstellt den Raum und teilt den Code. Beide beantworten dieselben Runden in ihrem eigenen Tempo. Das Duell endet, wenn beide fertig sind — niemand muss gleichzeitig online sein.",
-    "foot_hint": "Gleiche Fragen für beide. Das bessere Gedächtnis gewinnt."
+    "foot_hint": "Gleiche Fragen für beide. Das bessere Gedächtnis gewinnt.",
+    "meta_desc_roster": "Raum erstellen, Code teilen und gegen Freunde dieselben Fragen spielen. Asynchrones 1v1-Memory-Duell, serverseitig gewertet.",
+    "seo_title_sequence_memory": "Sequenzgedächtnis — Wähle dein Duell",
+    "seo_title_number_recall": "Zahlen Erinnern — Wähle dein Duell",
+    "seo_title_color_recall": "Farben Erinnern — Wähle dein Duell",
+    "seo_title_emoji_ghost": "Emoji-Geist — Wähle dein Duell",
+    "seo_title_chimp_test": "Schimpansen-Test — Wähle dein Duell",
+    "seo_title_word_recall": "Wörter Erinnern — Wähle dein Duell"
   }
 }

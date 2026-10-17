@@ -1173,10 +1173,6 @@
     "meta_desc": "Las palabras aparecen una a una: márcalas como vistas o nuevas. Duelo 1v1, mismas palabras."
   },
   "dl": {
-    "title": {
-      "lobby": "Duelos",
-      "meta_desc": "Elige cómo jugar."
-    },
     "title_sequence": "Duelo de secuencia",
     "title_number": "Duelo de números",
     "title_color": "Duelo de colores",
@@ -1217,6 +1213,13 @@
     "rule_async": "Asíncrono: juega cuando quieras",
     "side_how_title": "Cómo transcurre un duelo",
     "side_how_note": "Un jugador crea la sala y comparte el código. Ambos responden las mismas rondas a su ritmo. El duelo se cierra cuando ambos terminan: no hace falta estar conectados a la vez.",
-    "foot_hint": "Mismas preguntas para ambos. Gana quien recuerde mejor."
+    "foot_hint": "Mismas preguntas para ambos. Gana quien recuerde mejor.",
+    "meta_desc_roster": "Crea una sala, comparte el código y enfréntate con amigos en las mismas preguntas. Duelo de memoria 1v1 asíncrono, puntuado por el servidor.",
+    "seo_title_sequence_memory": "Memoria Secuencial — Elige tu duelo",
+    "seo_title_number_recall": "Recuerdo de Números — Elige tu duelo",
+    "seo_title_color_recall": "Recuerdo de Colores — Elige tu duelo",
+    "seo_title_emoji_ghost": "Fantasma Emoji — Elige tu duelo",
+    "seo_title_chimp_test": "Prueba del Chimpancé — Elige tu duelo",
+    "seo_title_word_recall": "Recuerdo de Palabras — Elige tu duelo"
   }
 }
