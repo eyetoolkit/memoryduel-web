@@ -274,7 +274,7 @@ html[data-theme="dark"] #site-header { border-color: color-mix(in srgb, var(--bo
 
 
 /* ========== 19. 首页布局统一层 (三站对齐 DS2 范式) ==========
-   背景: boardduel / mathduel 首页沿用 components.css 的站点级私有类
+   背景: boardduel / numeriduel 首页沿用 components.css 的站点级私有类
    (.home-hero / .home-section / .featured-card / .value-card / .stat-item);
    memoryduel 首页已用 DS2 原生类 (.gradient-hero / .duel-section /
    .duel-card / .stat-pill)。两套类名产出两套视觉 = 三站首页不统一。
@@ -480,7 +480,7 @@ html[data-theme="dark"] .home-hero { background:
   border-color: color-mix(in srgb, var(--brand) 35%, transparent);
 }
 
-/* ---- 19.1b gradient-hero 内遗留私有类兜底 (boardduel/mathduel hero) ---- */
+/* ---- 19.1b gradient-hero 内遗留私有类兜底 (boardduel/numeriduel hero) ---- */
 .gradient-hero .hero-emoji { display: none; }
 .gradient-hero .hero-tag {
   background: color-mix(in srgb, var(--surface) 70%, transparent);

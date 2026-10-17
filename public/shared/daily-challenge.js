@@ -50,7 +50,7 @@ const SITE = detectSite();
 /* memoryduel 走 /api/md/daily/*，其余仍走 /api/daily/* */
 const API_PREFIX = SITE === 'memory' ? '/api/md/daily' : '/api/daily';
 
-const WS_BASE = (typeof window !== 'undefined' && window.MATHDUEL_WS_BASE)
+const WS_BASE = (typeof window !== 'undefined' && window.NUMERIDUEL_WS_BASE)
   || (typeof location !== 'undefined' ? location.protocol + '//' + location.host : 'https://numeriduel.com');
 const HTTP_BASE = WS_BASE.replace(/^wss?:/, '');
 

@@ -271,7 +271,7 @@
         if (d && d.uuid) {
           currentUser = d;
           document.querySelectorAll('[data-open-auth]').forEach(btn => {
-            /* P1: 优先用共享模块渲染「[段位] 头像 昵称」（与 mathduel 一致）；未加载时降级为 👤+昵称 */
+            /* P1: 优先用共享模块渲染「[段位] 头像 昵称」（与 numeriduel 一致）；未加载时降级为 👤+昵称 */
             let handled = false;
             if (typeof window !== 'undefined' && window.MDAuthExtras && window.MDAuthExtras.decorateUserButton) {
               handled = window.MDAuthExtras.decorateUserButton(btn, currentUser);

@@ -1,6 +1,6 @@
 # MemoryDuel 分支与发布规范
 
-> 与 `mathduel-web`、`boardduel-web` 完全一致的架构，便于三站统一管理。
+> 与 `numeriduel-web`、`boardduel-web` 完全一致的架构，便于三站统一管理。
 
 ## 一、架构总览
 

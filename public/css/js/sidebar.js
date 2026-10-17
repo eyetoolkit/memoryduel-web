@@ -23,7 +23,7 @@
       ]
     },
     math: {
-      name: 'Math Duel',
+      name: 'Numeri Duel',
       nameZh: '数学对决',
       emoji: '🔢',
       host: 'numeriduel.com',
@@ -51,7 +51,7 @@
   // ---------- 品牌矩阵 ----------
   var BRAND_MATRIX = [
     { key: 'board',  emoji: '⚔️', name: 'Board Duel',  zh: '棋盘对决',  desc: '实时棋类对战' },
-    { key: 'math',   emoji: '🔢', name: 'Math Duel',   zh: '数学对决',  desc: '数学益智游戏' },
+    { key: 'math',   emoji: '🔢', name: 'Numeri Duel',   zh: '数学对决',  desc: '数学益智游戏' },
     { key: 'memory', emoji: '🧠', name: 'Memory Duel', zh: '记忆对决',  desc: '知识答题对战' }
   ];
 
