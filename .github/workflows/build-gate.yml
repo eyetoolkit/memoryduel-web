@@ -73,3 +73,8 @@ jobs:
       # tsc --noEmit + vite build + 产物后处理，一步到位
       - name: Type check + build
         run: pnpm build
+
+      # 5 个可跑单测（纯 fs/node:assert 型，不含 live 探针 b-m3-battle-page —— 它要 fetch 线上，
+      # 会因网络抖动假红，故留在本地手动跑；红线 RULES-FE-G「假失败比真 bug 费时间」）
+      - name: Unit tests
+        run: pnpm test
