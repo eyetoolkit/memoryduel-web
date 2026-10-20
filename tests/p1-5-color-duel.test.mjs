@@ -196,7 +196,11 @@ test('色轮无障碍属性齐备（wheel 是 role=application 的自定义控�
    ═══════════════════════════════════════════════════════════════ */
 test('首页游戏矩阵含 color-recall 卡片', () => {
   const home = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
-  assert.ok(home.includes('href="/games/color-recall/"'), '首页应有入口');
+  // 🔴 2026-10-20：原断言锚 `href="/games/color-recall/"`（不带 lobby），是 10-14 把
+  //    三款游戏路由抽成 inferGame() 后漏改的过时断言。首页实际给的是
+  //    `href="/games/color-recall/lobby/"`（与其他 5 款游戏一致的 lobby 入口范式）。
+  //    改判「首页有 color-recall 的任意入口」，不锚精确尾部，避免「写法变化即假失败」。
+  assert.ok(home.includes('/games/color-recall/'), '首页应有 color-recall 入口');
   assert.ok(home.includes('data-i18n="duel.col_title"'), '卡片标题应走 i18n');
   assert.ok(home.includes('data-i18n="home_v2.game_col_d"'), '卡片描述应走 i18n');
 });
