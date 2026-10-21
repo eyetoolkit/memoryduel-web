@@ -198,6 +198,102 @@
   };
 
   function normalizeCode(raw) { return String(raw || '').toUpperCase().replace(/[^A-Z2-9]/g, '').slice(0, 6); }
+  /* ─── 离线感知层（纯前端，2026-10-20）───────────────────────
+     🔴 为什么单独一层而不是改 call()/fetchRound()：
+       本模块的对战是**异步模型**（逐轮 /room/round 拉题），
+       不存在实时连接要"重连"。真正要兜的是三类断线场景：
+       ① 玩家侧物理断网（WiFi 掉了 / 电梯 / 进地库），但页面没刷新，
+          后续 fetchRound 会 15s 超时才报错 —— 玩家要干等 15s 才知道。
+       ② 弱网：onLine 仍为 true 但请求持续失败（navigator.onLine
+          在 iOS/Android 上并不可靠，这是它最大的坑）。
+       ③ 页面切后台：mobile 应用挂起 fetch 定时器，回来时房间状态
+          可能已变（对手已打完/房间过期），需要主动重拉一次。
+       三个场景都是**"网络变了"**而不是"逻辑错了"，所以把感知
+       集中在一个模块，duel-sequence.ts 只订阅状态 + 在 fetchRound
+       失败时通知一次，不侵入对战主循环。
+
+     🔴 红线：这里**只读、只报状态，绝不调 /room/** —— 重拉题目的
+       动作仍归 duel-sequence.ts 自己决定（它才知道当前 code/round）。
+       netwatch 是传感器不是执行器，保持职责单一。 */
+
+  var NETWATCH_STATE = {
+    online: (typeof navigator !== 'undefined' && navigator.onLine !== false) || true,
+    lastFailAt: 0,          // 最近一次被 duel-sequence 上报的 fetch 失败时间戳
+    lastSuccessAt: 0,       // 最近一次成功的 fetch（含 session/create/status/round/answer）
+    failStreak: 0,          // 连续失败次数；成功即清零
+    wasVisible: (typeof document !== 'undefined' && document.visibilityState === 'visible'),
+    handlers: []
+  };
+
+  function _netSnapshot() {
+    // "弱网"判定：onLine 为 true 但最近一次是失败且连续失败 ≥2 次。
+    // 只信一次失败可能是偶发抖动（单次超时不代表断网），
+    // 连失两次才升级为可见的"网络不佳"横幅，避免无谓惊吓。
+    var weak = !NETWATCH_STATE.online || (NETWATCH_STATE.failStreak >= 2 && NETWATCH_STATE.lastFailAt > 0);
+    return { online: NETWATCH_STATE.online, weak: weak, failStreak: NETWATCH_STATE.failStreak };
+  }
+
+  function _netNotify() {
+    var snap = _netSnapshot();
+    for (var i = 0; i < NETWATCH_STATE.handlers.length; i++) {
+      try { NETWATCH_STATE.handlers[i](snap); } catch (_) { /* 订阅者崩掉不影响其它订阅者 */ }
+    }
+  }
+
+  var netwatch = {
+    /** duel-sequence.ts 在启动对战时调一次；重复调用安全（幂等）。 */
+    watch: function () {
+      if (typeof window === 'undefined') return;
+      var onOnline = function () {
+        NETWATCH_STATE.online = true;
+        NETWATCH_STATE.failStreak = 0;   // 网络恢复 → 视为"清零"，不再算弱网
+        _netNotify();
+      };
+      var onOffline = function () {
+        NETWATCH_STATE.online = false;
+        _netNotify();
+      };
+      window.addEventListener('online', onOnline);
+      window.addEventListener('offline', onOffline);
+    },
+    /** duel-sequence.ts 在 fetchRound / submitAnswer 等 call() 成功 resolve 后调。 */
+    noteSuccess: function () {
+      NETWATCH_STATE.lastSuccessAt = Date.now();
+      NETWATCH_STATE.failStreak = 0;
+      _netNotify();
+    },
+    /** duel-sequence.ts 在 call() 抛网络类错误（非业务 4xx）的 catch 里调。
+        🔴 只上报"网络层"失败：HTTP 4xx/5xx 是服务端明确回话，不算断网，
+           传 true 表示是网络层（超时/TypeError/AbortError）失败，
+           业务错误传 false（或省略）则不计入弱网判定。 */
+    noteFailure: function (isNetworkLayer) {
+      NETWATCH_STATE.lastFailAt = Date.now();
+      if (isNetworkLayer === true) NETWATCH_STATE.failStreak++;
+      _netNotify();
+    },
+    isOffline: function () { return !NETWATCH_STATE.online; },
+    snapshot: function () { return _netSnapshot(); },
+    /** 订阅状态变化，返回取消订阅函数。duel-sequence.ts 用它驱动横幅。 */
+    onChange: function (cb) {
+      if (typeof cb !== 'function') return function () {};
+      NETWATCH_STATE.handlers.push(cb);
+      return function () {
+        var idx = NETWATCH_STATE.handlers.indexOf(cb);
+        if (idx >= 0) NETWATCH_STATE.handlers.splice(idx, 1);
+      };
+    }
+  };
+
+  /* 🔴 visibilitychange 也归 netwatch：切后台后 fetch 的 15s 超时计时器
+       在 mobile 上会被浏览器挂起/不准，恢复前台那一刻"上次失败时间戳"
+       可能已经陈旧。duel-sequence.ts 在 visibilitychange 里读
+       netwatch.snapshot().lastFailAt 判断"是否要在回来时主动重拉一轮"。 */
+  if (typeof document !== 'undefined' && document.addEventListener) {
+    document.addEventListener('visibilitychange', function () {
+      NETWATCH_STATE.wasVisible = (document.visibilityState === 'visible');
+    });
+  }
+
 
   const api = {
     API,
@@ -213,6 +309,7 @@
     fetchRound,
     submitAnswer,
     finishRoom,
+    netwatch,
   };
 
   if (typeof window !== 'undefined') window.DuelRoom = api;

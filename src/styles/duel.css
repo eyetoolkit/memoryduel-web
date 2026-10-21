@@ -99,3 +99,15 @@ html[data-theme="dark"]{
 @media(prefers-reduced-motion:reduce){
   .duel-code-box,.duel-or{transition:none}
 }
+
+/* ── 网络状态横幅（2026-10-20 · 离线韧性）──
+   sticky 顶栏，离线=红/弱网=黄，恢复正常即隐藏。
+   用品牌 CSS 变量保持与卡片骨架一致，不另起设计语言。 */
+.duel-net{
+  position:sticky;top:0;z-index:20;
+  padding:8px 16px;font-size:13px;font-weight:600;text-align:center;
+  font-family:var(--ui);
+}
+.duel-net[hidden]{display:none}
+.duel-net-offline{background:#fdecec;color:#a02020;border-bottom:1px solid #f5c2c2}
+.duel-net-weak{background:#fff8e0;color:#8a6d00;border-bottom:1px solid #f0dfa0}

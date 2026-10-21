@@ -623,8 +623,38 @@ async function playRound(code: string, round: number): Promise<boolean> {
   try {
     data = SOLO ? await soloFetchRound(round) : await C().fetchRound(code, round, GAME);
   } catch (e) {
-    renderError((e as Error).message, () => playRound(code, round));
+    const nw2 = C().netwatch;
+    // 🔴 区分"网络层失败"（fetch 超时/TypeError，msg 含"网络失败"/"请求超时"）
+    // 与"业务层失败"（HTTP 4xx/5xx，服务端明确回了错）：前者才计入弱网判定。
+    const msg = String((e as Error).message || '');
+    const isNet = /网络失败|请求超时|AbortError|TypeError/.test(msg);
+    if (nw2 && typeof nw2.noteFailure === 'function') nw2.noteFailure(isNet);
+    // 网络层失败 → 明确文案 + 常驻内联重试按钮（只重拉当前轮，不整卡换 error 页）；
+    // 业务层失败 → 走既有 renderError（含具体原因），语义不变。
+    if (isNet) {
+      const card = $('#card')!;
+      card.innerHTML = `
+        <h2 class="dc-h2">${esc(t('duel.net_int', 'Network interrupted'))}</h2>
+        <p class="dc-help error">${esc(t('duel.net_int_hint', 'You are in round ' + (round + 1) + '. Retry re-fetches this round only — earlier rounds are safe.'))}</p>
+        <button class="dc-btn" id="netRetryBtn" type="button">${esc(t('duel.net_retry', 'Retry this round'))}</button>
+        <p class="duel-note" id="netRetryNote"></p>`;
+      const btn = document.getElementById('netRetryBtn')!;
+      const note = document.getElementById('netRetryNote')!;
+      let clicks = 0;
+      btn.addEventListener('click', () => {
+        clicks++;
+        note.textContent = t('duel.net_retrying', 'Retrying…') + (clicks > 1 ? ' (' + clicks + ')' : '');
+        void playRound(code, round);  // 只重拉当前轮，幂等
+      });
+      return false;
+    }
+    renderError(msg, () => playRound(code, round));
     return false;
+  }
+  // 成功 → 清零弱网计数（仅真实对战，solo 走本地判定不经过 /room/）
+  if (!SOLO) {
+    const nw3 = C().netwatch;
+    if (nw3 && typeof nw3.noteSuccess === 'function') nw3.noteSuccess();
   }
 
   /* 🔴 速度加成的计时起点：题目刚到手、玩家即将开始作答这一刻。
@@ -1210,7 +1240,67 @@ function renderFinalScore(code: string, st: any, settledByOk: boolean) {
 
 /* ═══════════ 主流程 ═══════════ */
 async function main() {
+  /* ─── 离线韧性（2026-10-20）：netwatch 驱动横幅 + 切后台快路径 ───
+     🔴 设计红线：
+       · 横幅**只读状态、不改对战循环**，网络恢复前所有 fetch 仍会失败，
+         横幅不会"假装好了"，恢复后 failStreak 自动清零。
+       · 重试按钮**只重拉当前轮**（playRound(code, round)），不会从头打。
+       · visibilitychange 快路径**只在 waiting 态生效**，playing 态不插队。 */
+  const nw = C().netwatch;
+  if (nw && typeof nw.watch === 'function') {
+    nw.watch();
+    const banner = document.getElementById('netBanner') as HTMLElement | null;
+    const unsub = nw.onChange((snap: { online: boolean; weak: boolean }) => {
+      if (!banner) return;
+      if (!snap.online) {
+        banner.className = 'duel-net-offline';
+        banner.textContent = t('duel.net_offline', 'Offline — rounds unavailable until connection restored.');
+        banner.hidden = false;
+      } else if (snap.weak) {
+        banner.className = 'duel-net-weak';
+        banner.textContent = t('duel.net_weak', 'Weak connection — retrying…');
+        banner.hidden = false;
+      } else {
+        banner.hidden = true;
+      }
+    });
+    // 首帧也刷一次（页面已离线时直接亮横幅）
+    const s0 = nw.snapshot();
+    if (banner && (!s0.online || s0.weak)) {
+      banner.className = !s0.online ? 'duel-net-offline' : 'duel-net-weak';
+      banner.textContent = !s0.online
+        ? t('duel.net_offline', 'Offline — rounds unavailable until connection restored.')
+        : t('duel.net_weak', 'Weak connection — retrying…');
+      banner.hidden = false;
+    }
+    // 页面卸载前取消订阅，避免跨 SPA 路由残留
+    window.addEventListener('pagehide', unsub, { once: true });
+
+    /* 🔴 切后台快路径（2026-10-20）：
+         只在 waiting 态（pollTimer 运行中）生效。
+         从后台回来且"切走期间出过网络失败"（lastFailAt 在 30s 内）
+         → 立即再拉一次 roomStatus，不必等下一拍 3s 轮询。
+         playing 态不插队（题目 lit/gap 计时不能被打断）。 */
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState !== 'visible') return;
+      if (!pollTimer) return;
+      const snap = nw.snapshot();
+      if (snap.lastFailAt > 0 && Date.now() - snap.lastFailAt < 30000 && room && room.code) {
+        const codeNow = room.code;
+        C().roomStatus(codeNow)
+          .then((st: any) => {
+            if (st.status === 'playing' && pollTimer) {
+              clearInterval(pollTimer); pollTimer = null;
+              renderPlay(codeNow, st);
+            }
+          })
+          .catch(() => { /* 仍失败 → 下一拍 3s 轮询会再试，不插队 */ });
+      }
+    });
+  }
+
   const params = new URLSearchParams(location.search);
+
 
   /* 🔴 深链优先级（2026-10-14）：邀请码 ?c= **必须先判**。
      ?c=ABC234&mode=solo 同时存在时，用户意图是「进这个房」而不是「去练手」。
