@@ -35,7 +35,13 @@
   <meta property="og:image" content="https://memoryduel.com/og-default.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="632">
-  <link rel="stylesheet" href="/css/shared/brand-ds2.css?v=ds2-23">
+<link rel="stylesheet" href="/css/shared/brand-ds2.css?v=ds2-23">
+<style>
+  /* chrome-mem 侧栏适配：terms 无 :root，补全套品牌变量（贴 md 橙）+ 隐藏旧顶栏 */
+  :root{--ink:#1e1b4b;--mute:#6b7280;--card:#fff;--line:rgba(23,24,40,.08);--orange:#ea580c;--orange-ink:#c2410c}
+  html[data-theme="dark"]{--ink:#f5f1ea;--mute:#a89b88;--card:#2a2118;--line:rgba(255,255,255,.12);--orange:#ff8a3d;--orange-ink:#ffb27a}
+  body.mc-on #site-header, body.mc-on .nav, body.mc-on #navDrawer, body.mc-on .md-theme{display:none!important}
+</style>
 <script src="/i18n/i18n.js?v=59"></script>
   <link rel="manifest" href="/manifest.zh.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -156,6 +162,7 @@
 
   <!-- Tri-Sites Shared JS -->
   <script defer src="/js/sidebar.js"></script>
+  <script src="/js/chrome-mem.js?v=1" defer></script>
   <script src="/shared/site-header.js?v=ds2-13"></script>
   <script src="/shared/sso-bridge.js?v=1" defer></script>
 <script src="/i18n/lang-switcher.js?v=40" defer></script>
