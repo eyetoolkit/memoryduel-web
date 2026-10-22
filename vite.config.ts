@@ -87,6 +87,14 @@ export default defineConfig({
         duelLobbyEmoji: resolve(here, 'games/emoji-ghost/lobby/index.html'),
         duelLobbyChimp: resolve(here, 'games/chimp-test/lobby/index.html'),
         duelLobbyWord: resolve(here, 'games/word-recall/lobby/index.html'),
+
+        // 知识对决大厅（2026-10-23）：Knowledge Battle 的独立大厅页（选分类 + 四模式）。
+        // 🔴 与上面六款不同源：那六款走 duel-lobby.ts（异步房码，服务端无匹配队列/无 AI），
+        //    知识对决走 train.html 内联引擎（自带 AI）+ /api/md/match/join 真实匹配端点，
+        //    故**四个模式全部真实可用**，不需要灰态占位。
+        // 🔴 必须注册，否则构建**静默丢弃**、不产出页面也不报错，线上落 404 兜底。
+        // ⚠️ key 即产物名：knowledgeLobby → assets/knowledgeLobby-<hash>.js
+        knowledgeLobby: resolve(here, 'games/knowledge-duel/lobby/index.html'),
       },
     },
   },

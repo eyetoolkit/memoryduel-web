@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" data-site="memory">
+<head>
+<script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:59,fallback:"en"};</script>
+<script src="/i18n/i18n.js?v=59"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#FAF6F1">
+<title>Knowledge Battle — Choose Your Duel · MemoryDuel</title>
+<meta name="description" content="1v1 knowledge duel across 12 categories — science, history, geography and more. Ten questions, 15 seconds each. Face the AI, match a real player, or share a room code with a friend. No login required.">
+<link rel="canonical" href="https://memoryduel.com/games/knowledge-duel/lobby/" />
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MemoryDuel">
+<meta property="og:url" content="https://memoryduel.com/games/knowledge-duel/lobby/" />
+<meta property="og:image" content="https://memoryduel.com/og-default.jpg" />
+<meta property="og:title" content="Knowledge Battle — Choose Your Duel · MemoryDuel" />
+<meta property="og:description" content="Ten questions, 15 seconds each. Face the AI, match a real player, or duel a friend with a room code." />
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Knowledge Battle — Choose Your Duel · MemoryDuel" />
+<meta name="twitter:description" content="Ten questions, 15 seconds each. Face the AI, match a real player, or duel a friend with a room code." />
+<meta name="twitter:image" content="https://memoryduel.com/og-default.jpg" />
+<!-- hreflang：与其余六款大厅页同构（?lang= 为本页唯一语言入参来源） -->
+<link rel="alternate" hreflang="zh-CN" href="https://memoryduel.com/games/knowledge-duel/lobby/" />
+<link rel="alternate" hreflang="en" href="https://memoryduel.com/games/knowledge-duel/lobby/?lang=en" />
+<link rel="alternate" hreflang="ja" href="https://memoryduel.com/games/knowledge-duel/lobby/?lang=ja" />
+<link rel="alternate" hreflang="es" href="https://memoryduel.com/games/knowledge-duel/lobby/?lang=es" />
+<link rel="alternate" hreflang="fr" href="https://memoryduel.com/games/knowledge-duel/lobby/?lang=fr" />
+<link rel="alternate" hreflang="de" href="https://memoryduel.com/games/knowledge-duel/lobby/?lang=de" />
+<link rel="alternate" hreflang="x-default" href="https://memoryduel.com/games/knowledge-duel/lobby/" />
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="stylesheet" href="/src/styles/home.css">
+<link rel="stylesheet" href="/src/styles/duel.css">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Memory Duel">
+<script src="/js/sw-register.js" defer></script>
+</head>
+<body class="dc-page">
+
+<header class="dc-top">
+  <a class="back" href="/" data-i18n="duel.back_home">← MemoryDuel</a>
+  <p class="title dc-top-name" id="kbTitle">Knowledge Battle</p>
+  <span class="spacer"></span>
+</header>
+
+<main class="dc-wrap">
+
+  <!-- ═══════════ Hero ═══════════ -->
+  <section class="dc-hero">
+    <span class="cover" aria-hidden="true">🧠</span>
+    <h1 id="kbH1">Knowledge Battle <em data-i18n="dl.h1_em">Play your way.</em></h1>
+    <p class="sub" id="kbBlurb">Ten questions, 15 seconds each. Answer first to take the point — against the AI, a matched player, or a friend on a room code.</p>
+    <div class="dc-chips">
+      <span class="chip"><span class="dot"></span><span>🧠 12 categories</span></span>
+      <span class="chip"><span class="dot"></span><span>⏱ 15s per question</span></span>
+      <span class="chip"><span class="dot"></span><span data-i18n="dl.chip_free">No login required</span></span>
+    </div>
+  </section>
+
+  <!-- ═══════════ 分类选择 ═══════════
+       与首页同源：CATEGORIES 是静态数组（id/icon/六语言名），分类名立即可用，
+       不必等题库加载。题量随题库到位后回填（加载期留空，不闪假数字）。 -->
+  <section class="dc-panel" aria-labelledby="catTitle">
+    <h2 class="dc-sec-h" id="catTitle" data-i18n="home_v2.step1_t">Pick a category<small id="kbSelNote">Pick a category to start</small></h2>
+    <div class="cat-grid" id="catGrid" role="radiogroup" aria-label="Category"></div>
+  </section>
+
+  <div class="dc-grid">
+
+    <!-- ═══════════ 模式 ═══════════
+         🔴 诚信铁律：以下四个模式**全部真实可用**（端点逐条核实）：
+            vs AI      → /train.html?mode=ai&cat=X      （train.html 内联引擎）
+            在线匹配    → POST /api/md/match/join        （home.mjs:startMatch 同源）
+            创建房间    → POST /api/md/room/create       （home.mjs:364）
+            加入房间    → /train.html?room=CODE          （train.html:startOnlineRoom 校验 6 位码）
+         不存在的能力一律不列 —— 宁可少一个按钮，也不放点了就报错的入口。 -->
+    <section aria-labelledby="modesTitle">
+      <h2 class="dc-sec-h" id="modesTitle" data-i18n="dl.modes_h2">Choose your duel<small data-i18n="dl.modes_h2_small">Tap a card to jump straight in.</small></h2>
+
+      <div class="dc-modes" id="modeGrid">
+
+        <!-- 01 · vs AI —— 主推。href 由 JS 按当前选中分类回填，
+             无 JS 时也能落到默认分类（general）开打。 -->
+        <a class="dc-mode feat" id="kbAiBtn" href="/train.html?mode=ai&cat=general" data-mode="ai">
+          <div class="mi" aria-hidden="true">🤖</div>
+          <div>
+            <div class="mt" data-i18n="home_v2.tab_ai">vs AI</div>
+            <div class="md">The AI answers in 2–9 seconds and gets about 62% right. Always ready — no waiting for anyone.</div>
+            <span class="dc-tag is-gold" data-i18n="dl.tag_main">Main event</span>
+          </div>
+        </a>
+
+        <!-- 02 · 在线匹配 -->
+        <button class="dc-mode" id="kbMatchBtn" type="button" data-mode="online" style="text-align:left;width:100%;font:inherit;color:inherit;background:none;border:0">
+          <div class="mi" aria-hidden="true">🌐</div>
+          <div>
+            <div class="mt" data-i18n="home_v2.tab_online">Online</div>
+            <div class="md">Get matched with a real player in your chosen category. We'll drop you straight into the room.</div>
+            <span class="dc-tag is-live" data-i18n="dl.tag_live">Live</span>
+          </div>
+        </button>
+
+        <!-- 03 · 建房邀友 -->
+        <button class="dc-mode" id="kbCreateBtn" type="button" data-mode="create" style="text-align:left;width:100%;font:inherit;color:inherit;background:none;border:0">
+          <div class="mi" aria-hidden="true">🏠</div>
+          <div>
+            <div class="mt" data-i18n="dl.mt_create">Create a duel</div>
+            <div class="md" data-i18n="dl.md_create">Get a 6-character code, share it with a friend, and wait for them to finish. You can play in the meantime.</div>
+            <span class="dc-tag is-live" data-i18n="dl.tag_live">Live</span>
+          </div>
+        </button>
+
+        <!-- 04 · 输码加入 -->
+        <div class="dc-mode" data-mode="join">
+          <div class="mi" aria-hidden="true">🔑</div>
+          <div>
+            <div class="mt" data-i18n="dl.mt_join">Join with a code</div>
+            <div class="md" data-i18n="dl.md_join">Already have a code from someone else? Enter it and jump straight into their duel.</div>
+            <div class="kb-join">
+              <label class="sr-only" for="kbRoomInput" data-i18n="home_v2.room_code_label">Enter room code</label>
+              <input class="room-in kb-room-in" id="kbRoomInput" maxlength="6" inputmode="latin"
+                     autocomplete="off" spellcheck="false" placeholder="ABC123"
+                     aria-label="Room code" data-i18n-aria-label="home_v2.room_code_label">
+              <button class="dc-btn" id="kbJoinBtn" type="button" data-i18n="home_v2.join_room">Join Room</button>
+            </div>
+            <p class="kb-err" id="kbRoomErr" role="alert" hidden data-i18n="home_v2.room_err">Room codes are 6 letters or digits.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 动作反馈区：匹配中 / 建房中 / 失败，一律在这里播报 -->
+      <p class="dc-note" id="kbStatus" role="status" aria-live="polite" hidden></p>
+    </section>
+
+    <!-- ═══════════ 侧栏：只讲真实规则 ═══════════ -->
+    <aside>
+      <section class="dc-panel" aria-labelledby="rulesTitle">
+        <h3 id="rulesTitle" data-i18n="dl.side_rules_title">How duels are scored</h3>
+        <p class="pnote" data-i18n="dl.side_rules_note">Every fact below is enforced by the server, not by your browser.</p>
+        <!-- 🔴 不写「速度奖励」：那是六款异步对战（duel-sequence.ts）的计分口径，
+             知识对决（train.html）**答对即 +1 分，没有速度加成**。
+             写了就是虚假宣传 —— 玩家会发现快答也没多给分。 -->
+        <div class="dc-side-list" id="kbRules"></div>
+      </section>
+
+      <section class="dc-panel" style="margin-top:14px" aria-labelledby="howTitle">
+        <h3 id="howTitle" data-i18n="dl.side_how_title">How a duel runs</h3>
+        <p class="pnote">Ten questions, 15 seconds on the clock for each. Both sides see the same questions. In an AI duel the bot answers on its own timer; in an online duel you each answer on your own and the server scores both. Ten rounds later, highest score wins.</p>
+      </section>
+    </aside>
+
+  </div>
+</main>
+
+<footer class="duel-foot">
+  <span>Same questions for both sides. Sharper knowledge wins.</span>
+</footer>
+
+<!-- 题库（分类名 + 题量）；qd8 与 train.html 同源 -->
+<script src="/assets/quiz-data.js?v=qd8" defer></script>
+<script type="module" src="/src/pages/knowledge-lobby.ts"></script>
+<script src="/i18n/lang-switcher.js?v=40" defer></script>
+<script type="module" src="/shared/theme.js?v=1"></script>
+<script src="/js/chrome-mem.js?v=1" defer></script>
+</body>
+</html>

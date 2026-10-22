@@ -215,15 +215,28 @@ test('vite.config 必须注册 color 入口（否则构建静默丢弃，线上 
     'color 入口未注册进 rollupOptions.input —— 构建会静默丢弃、线上 404');
 });
 
-test('每个 games/<slug>/index.html 都已注册进 vite input', () => {
+test('games/ 下每个页面都已注册进 vite input', () => {
   // 通用防回归：不针对 color 写死，任何新页面漏注册都会被抓到
+  //
+  // 🔴 2026-10-23 修正：原实现假设「每个 games/<slug>/ 目录都有 index.html」，
+  //    于是 knowledge-duel（**只有 lobby/**，它的游戏页是根下的 train.html ——
+  //    一个 public 静态页，本来就不经过 vite input）被误判成
+  //    「games/knowledge-duel/index.html 未注册」。
+  //    改为**递归枚举真实存在的 html**，误报消失，顺带把大厅页也纳入守卫：
+  //    旧逻辑只查 games/<slug>/index.html，**lobby 漏注册是抓不到的**
+  //    （六个 duelLobby* 此前全靠人工注释提醒，没有机器保障）。
   const cfg = fs.readFileSync(path.join(ROOT, 'vite.config.ts'), 'utf8');
-  const dirs = fs.readdirSync(path.join(ROOT, 'games'), { withFileTypes: true })
-    .filter((d) => d.isDirectory())
-    .map((d) => d.name);
-  assert.ok(dirs.length > 0, '应有游戏目录');
-  for (const d of dirs) {
-    const rel = `games/${d}/index.html`;
+  const found = [];
+  const walk = (dir) => {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const p = path.join(dir, e.name);
+      if (e.isDirectory()) walk(p);
+      else if (e.name.endsWith('.html')) found.push(path.relative(ROOT, p).split(path.sep).join('/'));
+    }
+  };
+  walk(path.join(ROOT, 'games'));
+  assert.ok(found.length > 0, '应有游戏页面');
+  for (const rel of found) {
     assert.ok(cfg.includes(rel), `${rel} 未注册进 vite input —— 构建静默丢弃、线上 404`);
   }
 });
