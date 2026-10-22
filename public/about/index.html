@@ -3,7 +3,7 @@
 <head>
 <!-- md-theme:early -->
 <script>(function(){try{var t=localStorage.getItem('md-theme2');if(t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();</script>
-  <script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:57,fallback:"en"};</script>
+  <script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:58,fallback:"en"};</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <!-- standalone 下 iOS 状态栏取 theme-color，缺失会落回成系统默认色。与 manifest 的 background_color 一致：#fff7ed -->
@@ -11,8 +11,14 @@
   <title data-i18n-title="about.title">About · MemoryDuel Knowledge Battle</title>
   <meta name="description" data-i18n="about.meta_desc" content="MemoryDuel - A knowledge battle platform with multi-category question banks. 1v1 and multiplayer online knowledge duels.">
   <link rel="canonical" href="https://memoryduel.com/about/">
-  
-  
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MemoryDuel">
+  <meta property="og:url" content="https://memoryduel.com/about/">
+  <meta property="og:title" content="About · MemoryDuel Knowledge Battle">
+  <meta property="og:description" content="MemoryDuel - A knowledge battle platform with multi-category question banks. 1v1 and multiplayer online knowledge duels.">
+  <meta property="og:image" content="https://memoryduel.com/og-default.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="632">
   <link rel="alternate" hreflang="zh-CN" href="https://memoryduel.com/about/" />
   <link rel="alternate" hreflang="en" href="https://memoryduel.com/about/?lang=en" />
   <link rel="alternate" hreflang="ja" href="https://memoryduel.com/about/?lang=ja" />
@@ -80,8 +86,8 @@
         </div>
         <div class="feature-item">
           <div class="icon">⚡</div>
-          <div class="title" data-i18n="about.feature_realtime_title">Real-time Battle</div>
-          <div class="desc" data-i18n="about.feature_realtime_desc">Real-time matching, instant start, no waiting.</div>
+          <div class="title" data-i18n="about.feature_realtime_title">Online 1v1 Duels</div>
+          <div class="desc" data-i18n="about.feature_realtime_desc">Create a room, share the code, and play — progress syncs automatically.</div>
         </div>
         <div class="feature-item">
           <div class="icon">📊</div>
@@ -115,7 +121,7 @@
       </ul>
 
       <h2 data-i18n="about.tech_title">Tech Stack</h2>
-      <p data-i18n="about.tech_desc">Pure frontend HTML5 + CSS3 + JavaScript. Data stored in browser localStorage. Real-time duel sync provided by Cloudflare Worker WebSocket service. No login required, open and play.</p>
+      <p data-i18n="about.tech_desc">Pure frontend HTML5 + CSS3 + JavaScript. Game data stays in your browser (localStorage); duel progress syncs through a lightweight Cloudflare Worker API. No login required, open and play.</p>
 
       <h2 data-i18n="about.feedback_title">Feedback</h2>
       <p data-i18n-html="about.feedback_desc">For game suggestions, feature feedback, or suspected issues, contact <a href="mailto:mathduel@foxmail.com">mathduel@foxmail.com</a>. We take every piece of feedback seriously.</p>

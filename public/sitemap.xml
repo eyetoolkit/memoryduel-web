@@ -2,9 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://memoryduel.com/</loc><changefreq>daily</changefreq><priority>1.0</priority><lastmod>2026-09-11</lastmod></url>
   <url><loc>https://memoryduel.com/train</loc><changefreq>weekly</changefreq><priority>0.9</priority><lastmod>2026-09-11</lastmod></url>
+  <url><loc>https://memoryduel.com/battle/</loc><changefreq>weekly</changefreq><priority>0.9</priority><lastmod>2026-10-22</lastmod></url>
   <url><loc>https://memoryduel.com/games/daily-challenge/</loc><changefreq>daily</changefreq><priority>0.9</priority><lastmod>2026-10-12</lastmod></url>
   <url><loc>https://memoryduel.com/games/daily-challenge/lobby/</loc><changefreq>daily</changefreq><priority>0.8</priority><lastmod>2026-10-12</lastmod></url>
   <url><loc>https://memoryduel.com/games/sequence-memory/</loc><changefreq>weekly</changefreq><priority>0.8</priority><lastmod>2026-10-12</lastmod></url>
+  <url><loc>https://memoryduel.com/games/sequence-memory/lobby/</loc><changefreq>weekly</changefreq><priority>0.8</priority><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://memoryduel.com/games/number-recall/lobby/</loc><changefreq>weekly</changefreq><priority>0.8</priority><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://memoryduel.com/games/color-recall/lobby/</loc><changefreq>weekly</changefreq><priority>0.8</priority><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://memoryduel.com/games/emoji-ghost/lobby/</loc><changefreq>weekly</changefreq><priority>0.8</priority><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://memoryduel.com/games/chimp-test/lobby/</loc><changefreq>weekly</changefreq><priority>0.8</priority><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://memoryduel.com/games/word-recall/lobby/</loc><changefreq>weekly</changefreq><priority>0.8</priority><lastmod>2026-10-22</lastmod></url>
   <url><loc>https://memoryduel.com/games/number-recall/</loc><changefreq>weekly</changefreq><priority>0.8</priority><lastmod>2026-10-12</lastmod></url>
   <url><loc>https://memoryduel.com/games/color-recall/</loc><changefreq>weekly</changefreq><priority>0.8</priority><lastmod>2026-10-13</lastmod></url>
   <url><loc>https://memoryduel.com/games/emoji-ghost/</loc><changefreq>weekly</changefreq><priority>0.8</priority><lastmod>2026-10-13</lastmod></url>
@@ -16,5 +23,6 @@
   <url><loc>https://memoryduel.com/privacy/</loc><changefreq>monthly</changefreq><priority>0.3</priority><lastmod>2026-09-11</lastmod></url>
   <url><loc>https://memoryduel.com/terms/</loc><changefreq>monthly</changefreq><priority>0.3</priority><lastmod>2026-09-11</lastmod></url>
   <url><loc>https://memoryduel.com/how-to-play/memory-match/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-09-11</lastmod></url>
+  <url><loc>https://memoryduel.com/teacher/</loc><changefreq>monthly</changefreq><priority>0.5</priority><lastmod>2026-10-22</lastmod></url>
   <url><loc>https://memoryduel.com/blog/memory-training-games/</loc><changefreq>monthly</changefreq><priority>0.6</priority><lastmod>2026-09-11</lastmod></url>
 </urlset>
