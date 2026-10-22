@@ -447,6 +447,7 @@
     "adfree_expires": "到期: {date}",
     "adfree_inactive": "未激活",
     "adfree_exchange": "用积分兑换",
+    "adfree_none": "本站暂未投放广告",
     "invite_title": "邀请好友 赢免广告",
     "invite_desc": "每邀请1位有效新人获得 <b>500 积分</b>，3/5/10人额外送免广告",
     "copy_btn": "复制",

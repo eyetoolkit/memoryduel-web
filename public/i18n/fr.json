@@ -447,6 +447,7 @@
     "adfree_expires": "Expire : {date}",
     "adfree_inactive": "Non actif",
     "adfree_exchange": "Échanger avec des pièces",
+    "adfree_none": "Ce site n'affiche pas encore de publicités",
     "invite_title": "Invitez des Amis, Gagnez Sans Pub",
     "invite_desc": "Obtenez <b>500 pièces</b> pour chaque nouvel utilisateur valide invité. 3/5/10 personnes obtiennent aussi un bonus sans pub.",
     "copy_btn": "Copier",

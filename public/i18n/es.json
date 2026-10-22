@@ -447,6 +447,7 @@
     "adfree_expires": "Expira: {date}",
     "adfree_inactive": "No activo",
     "adfree_exchange": "Canjear con monedas",
+    "adfree_none": "Este sitio aún no muestra anuncios",
     "invite_title": "Invita Amigos, Gana sin Anuncios",
     "invite_desc": "Obtén <b>500 monedas</b> por cada nuevo usuario válido invitado. 3/5/10 personas también reciben bonificación sin anuncios.",
     "copy_btn": "Copiar",

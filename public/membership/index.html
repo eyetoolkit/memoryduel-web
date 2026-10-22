@@ -292,7 +292,7 @@
             document.getElementById('m-adfree-meta').textContent = tr('membership.adfree_expires', {date: new Date(af.expires_at).toLocaleDateString()});
           } else {
             document.getElementById('m-adfree-status').textContent = tr('membership.adfree_inactive');
-            document.getElementById('m-adfree-meta').innerHTML = '<a href="#" data-exchange>' + tr('membership.adfree_exchange') + ' →</a>';
+            document.getElementById('m-adfree-meta').textContent = tr('membership.adfree_none');
           }
         });
 

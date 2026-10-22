@@ -447,6 +447,7 @@
     "adfree_expires": "Expires: {date}",
     "adfree_inactive": "未有効",
     "adfree_exchange": "コインで交換",
+    "adfree_none": "現在このサイトに広告はありません",
     "invite_title": "友人を招待して広告なしに",
     "invite_desc": "Get <b>500 コイン</b> for each valid 新規 user invited. 3/5/10 people also get ad-無料 bonus.",
     "copy_btn": "コピー",

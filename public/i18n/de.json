@@ -447,6 +447,7 @@
     "adfree_expires": "Läuft ab: {date}",
     "adfree_inactive": "Nicht aktiv",
     "adfree_exchange": "Mit Münzen einlösen",
+    "adfree_none": "Diese Seite zeigt noch keine Werbung",
     "invite_title": "Freunde Einladen, Werbefrei Gewinnen",
     "invite_desc": "Erhalte <b>500 Münzen</b> für jeden gültigen neu eingeladenen Benutzer. 3/5/10 Personen erhalten auch werbefreien Bonus.",
     "copy_btn": "Kopieren",

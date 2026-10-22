@@ -447,6 +447,7 @@
     "adfree_expires": "Expires: {date}",
     "adfree_inactive": "Not active",
     "adfree_exchange": "Exchange with coins",
+    "adfree_none": "No ads on this site yet",
     "invite_title": "Invite Friends, Win Ad-free",
     "invite_desc": "Get <b>500 coins</b> for each valid new user invited. 3/5/10 people also get ad-free bonus.",
     "copy_btn": "Copy",
