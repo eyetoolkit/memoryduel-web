@@ -26,6 +26,9 @@
   <link rel="alternate" hreflang="x-default" href="https://memoryduel.com/" />
 <style>
     :root { --p: #ea580c; --bg: #fff7ed; --t: #1e1b4b; --m: #6b7280; --p-h: #c2410c; }
+    /* chrome-mem 侧栏适配变量（贴品牌：深靛墨 + 橙色强调，与 404 theme-color 一致） */
+    :root { --ink:#1e1b4b; --mute:#6b7280; --card:#fff; --line:rgba(23,24,40,.08); --orange:#ea580c; --orange-ink:#c2410c; }
+    html[data-theme="dark"] { --bg:#1a1410; --card:#2a2118; --t:#f5f1ea; --m:#a89b88; --line:rgba(255,255,255,.12); --orange:#ff8a3d; --orange-ink:#ffb27a; }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -69,6 +72,11 @@
       border: 1.5px solid var(--p);
     }
     .nf-btn.secondary:hover { background: var(--p); color: #fff; }
+    /* chrome-mem.js 自带 body.mc-on 让位规则（padding-left:var(--mc-w)），
+       此处只补品牌变量 + 隐藏旧顶栏/页脚，避免与注入器叠加成双倍偏移 */
+    /* chrome-mem 激活后隐藏旧顶栏（site-header.js 注入）与页脚（与侧栏导航重复） */
+    body.mc-on #site-header,
+    body.mc-on .sites-footer{ display:none!important; }
   </style>
   <link rel="stylesheet" href="/css/shared/tokens.css?v=p4fix2">
   <link rel="stylesheet" href="/css/shared/brand-ds2.css?v=ds2-23">
@@ -98,6 +106,7 @@
     <a href="/" class="nf-btn" data-i18n="404.btn_home">← Back to Home</a>
     <a href="javascript:history.back()" class="nf-btn secondary" data-i18n="404.btn_back">Go Back</a>
   </div>
+  <script src="/js/chrome-mem.js?v=1" defer></script>
   <script src="/shared/site-header.js?v=ds2-13"></script>
   <script src="/shared/sso-bridge.js?v=1" defer></script>
 <footer class="sites-footer">
