@@ -255,11 +255,14 @@
       'font-size:1rem;font-weight:700;color:inherit}',
       '.idt-row{display:flex;gap:.5rem;margin:.6rem 0 .4rem}',
       '.idt-in{flex:1;min-width:0;padding:.5rem .7rem;border:1px solid var(--border,rgba(0,0,0,.18));',
-      'border-radius:.5rem;font:inherit;font-family:var(--font-sans,inherit);background:var(--bg,#fff);color:inherit}',
+      'border-radius:.5rem;font:inherit;font-family:var(--font-sans,inherit);background:var(--bg,#fff);color:inherit;',
+      /* 🔴 触摸目标 ≥44px（2026-10-15 生产 CDP 实测 34.2px 高）；
+         只补 min-height，字号与配色不动。本文件是 numeriduel 私有副本。 */
+      'min-height:44px}',
       '.idt-in:focus-visible{outline:2px solid var(--brand-600,#0066CC);outline-offset:1px;',
       'border-color:var(--brand-600,#0066CC)}',
       '.idt-go{flex:none;padding:.5rem .9rem;border:0;border-radius:.5rem;cursor:pointer;',
-      'background:var(--brand-600,#0066CC);color:#fff;font:inherit;font-weight:600}',
+      'background:var(--brand-600,#0066CC);color:#fff;font:inherit;font-weight:600;min-height:44px}',
       '.idt-go:disabled{opacity:.45;cursor:default}',
       '.idt-go:focus-visible{outline:2px solid var(--brand-600,#0066CC);outline-offset:2px}',
       '.idt-note{margin:0;font-size:.8rem;line-height:1.45;color:var(--muted,rgba(0,0,0,.55))}',
@@ -272,9 +275,9 @@
       '.idt-ask.compact .idt-go{padding:.35rem .7rem;font-size:.85rem}',
       '.idt-ask.compact .idt-note{font-size:.75rem;white-space:nowrap}',
       /* 🔴 2026-10-14 移动端横向溢出修复（390px 视口实测 scrollWidth=556）：
-         顶栏那一行是 brand + nav + actions + 身份条，无宽度约束时用户名一长
+         顶栅那一行是 brand + nav + actions + 身份条，无宽度约束时用户名一长
          （或叠加「修改」按钮）就把整行撑破视口 → 页面出现横向滚动条，
-         正文被推出屏幕。玩法说明/会员/博客三页同时中招（共用同一个页头）。
+         正文被推出屏幕。共用页头的页面同时中招。
          三处缺一不可：
            1) .sh-me 允许收缩（inline-flex 默认 min-width:auto = 内容宽，不肯缩）
            2) .idt-name 限宽 + 省略号（用户名是外部输入，长度不可控）
