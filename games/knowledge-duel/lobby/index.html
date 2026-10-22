@@ -29,8 +29,23 @@
 <link rel="alternate" hreflang="de" href="https://memoryduel.com/games/knowledge-duel/lobby/?lang=de" />
 <link rel="alternate" hreflang="x-default" href="https://memoryduel.com/games/knowledge-duel/lobby/" />
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="stylesheet" href="/src/styles/home.css">
+<link rel="stylesheet" href="/src/styles/daily-challenge.css">
 <link rel="stylesheet" href="/src/styles/duel.css">
+<link rel="stylesheet" href="/src/styles/home.css">
+<style>
+/* ── 本页精修（页面级，勿上移共享 CSS）── */
+/* 🔴 home.css:222 的 .feat 是首页「特性小卡」（text-align:center;padding:6px），
+   与 daily-challenge.css 的 .dc-mode.feat（主推模式卡）类名相撞：
+   home.css 后加载，其居中与小内边距会污染主推卡 —— 在此显式夺回。 */
+.dc-mode.feat{text-align:left;padding:16px;min-width:0}
+/* 等高网格：内容贴顶 + tag 随内容浮动 → 同行两卡下半空荡、tag 高低不齐。
+   改为内容列 flex，tag 钉在卡底，视觉重心一致。 */
+.dc-mode>div:last-child{display:flex;flex-direction:column}
+.dc-mode .dc-tag{margin-top:auto;align-self:flex-start}
+.dc-mode .md{margin-bottom:10px}
+/* button 复位：UA 按钮默认 text-align:center / 小字体，与 <a> 卡统一为左对齐 */
+.dc-modes button.dc-mode{font:inherit;width:100%;text-align:left}
+</style>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Memory Duel">
@@ -92,7 +107,7 @@
         </a>
 
         <!-- 02 · 在线匹配 -->
-        <button class="dc-mode" id="kbMatchBtn" type="button" data-mode="online" style="text-align:left;width:100%;font:inherit;color:inherit;background:none;border:0">
+        <button class="dc-mode" id="kbMatchBtn" type="button" data-mode="online">
           <div class="mi" aria-hidden="true">🌐</div>
           <div>
             <div class="mt" data-i18n="home_v2.tab_online">Online</div>
@@ -102,7 +117,7 @@
         </button>
 
         <!-- 03 · 建房邀友 -->
-        <button class="dc-mode" id="kbCreateBtn" type="button" data-mode="create" style="text-align:left;width:100%;font:inherit;color:inherit;background:none;border:0">
+        <button class="dc-mode" id="kbCreateBtn" type="button" data-mode="create">
           <div class="mi" aria-hidden="true">🏠</div>
           <div>
             <div class="mt" data-i18n="dl.mt_create">Create a duel</div>
