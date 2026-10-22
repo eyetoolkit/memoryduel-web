@@ -181,6 +181,14 @@
         </div>
       </div>
 
+      <!-- Booster 卡片（A3：2026-10-22 接线，倍率作用于对局金币结算，日闸兜底不变） -->
+      <div class="card" id="m-booster-card" style="margin-bottom:16px">
+        <div class="card-title">⚡ Boosters</div>
+        <div class="card-meta" style="margin-bottom:10px">Activate to multiply your duel coin rewards for 30 minutes.</div>
+        <div id="m-booster-list" style="display:flex;flex-wrap:wrap;gap:10px"></div>
+        <div id="m-booster-timer" style="display:none;margin-top:10px;font-weight:800;color:#b45309;font-size:.95rem;font-variant-numeric:tabular-nums"></div>
+      </div>
+
       <div class="tabs">
         <button class="tab active" data-tab="quests" data-i18n="membership.tab_quests">Daily Quests</button>
         <button class="tab" data-tab="history" data-i18n="membership.tab_history">Coin History</button>
@@ -278,6 +286,7 @@
       loadMe();
       loadQuests();
       loadInvite();
+      loadBoosters();
     }
 
     function loadMe(){
@@ -422,6 +431,12 @@
       if (t.dataset.claim) {
         claimQuests([t.dataset.claim]);
       }
+      if (t.dataset.boosterBuy) {
+        boosterAction('/api/md/boosters/purchase', t.dataset.boosterBuy, 'Booster purchased!');
+      }
+      if (t.dataset.boosterActivate) {
+        boosterAction('/api/md/boosters/activate', t.dataset.boosterActivate, 'Booster activated!');
+      }
       if (t.id === 'claim-all-btn') {
         try {
           var ids = JSON.parse(t.dataset.ids || '[]');
@@ -452,6 +467,92 @@
       .catch(function(){
         if (typeof Toast !== 'undefined') Toast.show(tr('membership.network_error'), 'error');
       });
+    }
+
+    /* ─── Booster（A3 2026-10-22）：金币唯一账本 = member.coins；库存走本站 site session。
+       membership 页用 auth cookie，而 /api/md/* 只认 X-Player-ID/Token ——
+       登录用户走 /api/md/session 会拿到 pid=账号 uuid 的 site session，两者同源。 ─── */
+    var MD_SESS_KEYS = ['md_session', 'memoryduel_session_v1'];
+    function mdSession(){
+      for (var i = 0; i < MD_SESS_KEYS.length; i++){
+        try {
+          var s0 = JSON.parse(localStorage.getItem(MD_SESS_KEYS[i]) || 'null');
+          if (s0 && s0.pid && s0.token) return Promise.resolve(s0);
+        } catch(e){}
+      }
+      return fetch((window.API_BASE || '') + '/api/md/session', {
+        method: 'POST', credentials: 'same-origin',
+        headers: {'Content-Type':'application/json'}, body: '{}'
+      }).then(function(r){ return r.json(); }).then(function(j){
+        if (!j || !j.ok || !j.data || !j.data.pid) throw new Error('session_failed');
+        var s = { pid: j.data.pid, token: j.data.token };
+        try { localStorage.setItem('md_session', JSON.stringify(s)); } catch(e){}
+        return s;
+      });
+    }
+    function mdBoostApi(method, path, body){
+      return mdSession().then(function(s){
+        var opt = { method: method, credentials: 'same-origin', headers: {'X-Player-ID': s.pid, 'X-Player-Token': s.token} };
+        if (body !== undefined){ opt.headers['Content-Type'] = 'application/json'; opt.body = JSON.stringify(body); }
+        return fetch((window.API_BASE || '') + path, opt).then(function(r){ return r.json(); });
+      });
+    }
+    var boosterTimerHandle = null;
+    function renderBoosters(d){
+      var list = document.getElementById('m-booster-list');
+      var timerEl = document.getElementById('m-booster-timer');
+      if (boosterTimerHandle){ clearInterval(boosterTimerHandle); boosterTimerHandle = null; }
+      if (!d || !d.boosters){ list.innerHTML = ''; timerEl.style.display = 'none'; return; }
+      var inv = d.inventory || [];
+      var html = '';
+      d.boosters.forEach(function(b){
+        var owned = inv.some(function(x){ return x.id === b.id; });
+        var isActive = d.active && d.active.id === b.id;
+        html += '<div style="display:flex;align-items:center;gap:8px;background:var(--bg2,#f7f8fc);border:1px solid rgba(0,0,0,.08);border-radius:12px;padding:10px 12px">'
+          + '<span style="font-size:1.4rem">' + b.icon + '</span>'
+          + '<div><div style="font-weight:700;font-size:.85rem">' + b.mult + '× Coins</div>'
+          + '<div style="font-size:.75rem;opacity:.75">' + b.cost + ' coins · 30 min</div></div>'
+          + (isActive ? '' : (owned
+              ? '<button class="btn btn-secondary btn-sm" data-booster-activate="' + b.id + '">Activate</button>'
+              : '<button class="btn btn-sm" data-booster-buy="' + b.id + '">Buy</button>'))
+          + '</div>';
+      });
+      if (d.active) {
+        html += '<div style="align-self:center;font-weight:800;color:#b45309">' + d.active.mult + '× active</div>';
+        timerEl.style.display = 'block';
+        var tick = function(){
+          var left = Math.max(0, Math.floor((d.active.expiresAt - Date.now()) / 1000));
+          if (left <= 0){ timerEl.style.display = 'none'; clearInterval(boosterTimerHandle); boosterTimerHandle = null; loadBoosters(); return; }
+          var mm = ('0' + Math.floor(left / 60)).slice(-2), ss = ('0' + (left % 60)).slice(-2);
+          timerEl.textContent = d.active.mult + '× active · ' + mm + ':' + ss;
+        };
+        tick();
+        boosterTimerHandle = setInterval(tick, 1000);
+      } else {
+        timerEl.style.display = 'none';
+      }
+      list.innerHTML = html;
+    }
+    function loadBoosters(){
+      mdBoostApi('GET', '/api/md/boosters/me')
+        .then(renderBoosters)
+        .catch(function(){ document.getElementById('m-booster-list').innerHTML = ''; });
+    }
+    function boosterAction(path, item, okMsg){
+      mdBoostApi('POST', path, { item: item })
+        .then(function(d){
+          if (d && d.ok){
+            renderBoosters(d);
+            loadMe();
+            if (typeof Toast !== 'undefined') Toast.show(okMsg, 'success');
+          } else {
+            var msg = (d && d.msg === 'insufficient_coins') ? 'Not enough coins' : (d && d.msg) || 'Failed';
+            if (typeof Toast !== 'undefined') Toast.show(String(msg), 'error');
+          }
+        })
+        .catch(function(){
+          if (typeof Toast !== 'undefined') Toast.show(tr('membership.network_error'), 'error');
+        });
     }
 
     document.getElementById('m-copy-link').addEventListener('click', function(){
