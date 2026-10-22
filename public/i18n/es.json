@@ -901,7 +901,16 @@
     "game_seq_d": "Memoriza la secuencia de casillas y repítela. Misma secuencia para ambos, puntuada en el servidor: envía un código y compara.",
     "tag_async": "Asíncrono",
     "game_num_d": "Los dígitos aparecen uno a uno: escribe la cadena completa de memoria. El mismo número para ambos, puntuación en servidor, sin registro.",
-    "game_col_d": "Aparecen cinco colores y desaparecen: rehaz cada uno en la rueda. Los mismos colores para ambos; gana quien se acerque más."
+    "game_col_d": "Aparecen cinco colores y desaparecen: rehaz cada uno en la rueda. Los mismos colores para ambos; gana quien se acerque más.",
+    "eco_title": "Tus monedas",
+    "eco_checkin": "Entrar +10",
+    "eco_signedin": "Entrado ✓",
+    "eco_btn_disabled": "Entrar",
+    "eco_sub_earn": "Gana monedas en cada partida. Inicia sesión para ver tu saldo.",
+    "eco_sub_daily": "Inicia sesión a diario: +10; 7 días seguidos: +50.",
+    "eco_sub_ok": "Sesión iniciada — +10 monedas.",
+    "eco_sub_streak": "¡{n} días seguidos — ¡bono de +50!",
+    "eco_sub_anon": "Inicia sesión para ver tus monedas."
   },
   "mm_bv": {
     "mm_bv_p1": "Mejores juegos de entrenamiento cerebral para todas las edades",

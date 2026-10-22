@@ -901,7 +901,16 @@
     "game_seq_d": "Mémorise la séquence de tuiles, puis reproduis-la. Même séquence pour les deux, notée côté serveur : envoie un code et compare.",
     "tag_async": "Asynchrone",
     "game_num_d": "Les chiffres défilent un par un — retapez la série complète de mémoire. Même nombre pour les deux, score calculé côté serveur, sans inscription.",
-    "game_col_d": "Cinq couleurs apparaissent puis disparaissent : reproduisez-les sur la roue. Même palette pour les deux, le plus proche gagne."
+    "game_col_d": "Cinq couleurs apparaissent puis disparaissent : reproduisez-les sur la roue. Même palette pour les deux, le plus proche gagne.",
+    "eco_title": "Vos pièces",
+    "eco_checkin": "Connexion +10",
+    "eco_signedin": "Connecté ✓",
+    "eco_btn_disabled": "Connexion",
+    "eco_sub_earn": "Gagnez des pièces à chaque partie. Connectez-vous pour voir votre solde.",
+    "eco_sub_daily": "Chaque jour +10, 7 jours d'affilée +50.",
+    "eco_sub_ok": "Connecté — +10 pièces.",
+    "eco_sub_streak": "{n} jours d'affilée — bonus +50 !",
+    "eco_sub_anon": "Connectez-vous pour voir vos pièces."
   },
   "mm_bv": {
     "mm_bv_p1": "Meilleurs jeux d'entraînement cérébral pour tous les âges",

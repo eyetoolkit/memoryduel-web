@@ -244,6 +244,20 @@ body.home-v2 {
 .home-v2 .room-err { font-size: .78rem; color: var(--red); margin-top: 7px; display: none; }
 
 /* Top Players 侧列 */
+/* #5 经济卡：排行榜面板内的余额 + 每日签到（PvP 发币可见 + 留存钩子） */
+.home-v2 .eco-card { margin: 0 0 16px; padding: 12px 14px; border-radius: 12px; background: var(--paper-2); border: 1px solid var(--line); }
+.home-v2 .eco-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.home-v2 .eco-balance { display: inline-flex; align-items: center; gap: 6px; font-family: var(--disp); font-weight: 700; font-size: 1.05rem; color: var(--ember-d); }
+.home-v2 .eco-coin { font-size: 1rem; }
+.home-v2 .eco-num { min-width: 2ch; }
+.home-v2 .eco-checkin {
+  border: 1.5px solid var(--amber); background: #fff; color: var(--ember-d);
+  border-radius: 9px; padding: 7px 12px; font-weight: 700; font-size: .8rem; min-height: 38px; cursor: pointer; white-space: nowrap;
+}
+.home-v2 .eco-checkin:hover:not(:disabled) { background: #FFF6F0; }
+.home-v2 .eco-checkin:disabled { opacity: .55; cursor: default; }
+.home-v2 .eco-sub { margin-top: 8px; font-size: .78rem; color: var(--mute); line-height: 1.35; }
+
 .home-v2 .rank-list { display: flex; flex-direction: column; margin-top: 16px; }
 .home-v2 .rank-row { display: flex; align-items: center; gap: 11px; padding: 10px 0; border-bottom: 1px dashed var(--line); }
 .home-v2 .rank-row:last-child { border-bottom: 0; }

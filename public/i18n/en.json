@@ -901,7 +901,16 @@
     "game_seq_d": "Memorise the tile sequence, then tap it back. Same sequence for both players, server-scored — send a room code and compare.",
     "tag_async": "Async",
     "game_num_d": "Digits flash one by one — type the whole string back. Same number for both players, server-scored, no login.",
-    "game_col_d": "Five colours appear, then vanish — rebuild each one on the wheel. Same colours for both players, closest match wins."
+    "game_col_d": "Five colours appear, then vanish — rebuild each one on the wheel. Same colours for both players, closest match wins.",
+    "eco_title": "Your coins",
+    "eco_checkin": "Sign in +10",
+    "eco_signedin": "Signed in ✓",
+    "eco_btn_disabled": "Sign in",
+    "eco_sub_earn": "Earn coins every match. Sign in to see your balance.",
+    "eco_sub_daily": "Sign in daily for +10, 7-day streak for +50.",
+    "eco_sub_ok": "Signed in — +10 coins.",
+    "eco_sub_streak": "{n}-day streak — +50 bonus!",
+    "eco_sub_anon": "Sign in to see your coins."
   },
   "mm_bv": {
     "mm_bv_p1": "Best Brain Training Games for All Ages",
