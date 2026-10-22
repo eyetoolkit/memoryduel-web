@@ -12,9 +12,27 @@
    脚本会注入吸顶玻璃头部; 自动把已有 #lang-switcher 移入头部;
    自带主题切换(复用 localStorage 'bd-theme', 并移除旧的固定按钮)。
    链接全部来自页面属性, 不硬编码路径, 不触发构建校验坏链门禁。
+
+   2026-10-22 shared 收敛阶段3：Games 下拉的导航数据外置到
+   site-header.nav.js（每站一份，天然按站不同），本文件只留逻辑，
+   三站逐字节一致（漂移契约 STRICT）。加载失败时降级为空菜单并
+   console.warn，不阻塞页面。
    ============================================================ */
 (function () {
   "use strict";
+  /* 先确保本站导航数据就绪（动态加载 site-header.nav.js），再跑主逻辑。
+     nav 文件设置 window.__SH_NAV__ = { games: [...] }。 */
+  function ensureNav(cb) {
+    if (window.__SH_NAV__) { cb(); return; }
+    var s = document.createElement("script");
+    s.src = "/shared/site-header.nav.js";
+    s.onload = function () {
+      if (!window.__SH_NAV__) { console.warn("[site-header] nav.js loaded but __SH_NAV__ missing"); window.__SH_NAV__ = { games: [] }; }
+      cb();
+    };
+    s.onerror = function () { console.warn("[site-header] nav.js load failed, Games menu empty"); window.__SH_NAV__ = { games: [] }; cb(); };
+    document.head.appendChild(s);
+  }
   function ready(fn) {
     if (document.readyState !== "loading") {
       fn();
@@ -30,6 +48,7 @@
       var t = setTimeout(run, 100);
     }
   }
+  ensureNav(function () {
   ready(function () {
     var mount = document.getElementById("site-header");
     if (!mount || mount.dataset.built) return;
@@ -55,29 +74,8 @@
     try { nav = JSON.parse(mount.dataset.nav || "[]"); } catch (e) { nav = []; }
 
     var SITE_ID = (document.documentElement.dataset.site || "board");
-    var GAMES = {
-      board: [
-        { key: "nav.ttt", label: "Tic-Tac-Toe", href: "/games/tictactoe/" },
-        { key: "nav.gomoku", label: "Gomoku", href: "/games/gomoku/" },
-        { key: "nav.connect4", label: "Connect 4", href: "/games/connect4/" },
-        { key: "nav.othello", label: "Othello", href: "/games/othello/" },
-        { key: "nav.chess", label: "Chess", href: "/games/chess/" },
-        { key: "nav.checkers", label: "Checkers", href: "/games/checkers/" }
-      ],
-      math: [
-        { key: "nav.game_24", label: "24 Game", href: "/games/24-game/" },
-        { key: "nav.game_24_easy", label: "24 Game (easy)", href: "/games/24-game-easy/" },
-        { key: "nav.game_sudoku", label: "Sudoku", href: "/games/sudoku/" },
-        { key: "nav.game_sudoku_6x6", label: "6x6 Sudoku", href: "/games/sudoku-6x6/" },
-        { key: "nav.game_killer_sudoku", label: "Killer Sudoku", href: "/games/killer-sudoku/" },
-        { key: "nav.game_equation_pyramid", label: "Equation Pyramid", href: "/games/equation-pyramid/" }
-      ],
-      memory: [
-        { key: "nav.play", label: "Lobby", href: "/#lobby" },
-        { key: "nav.train", label: "Solo train", href: "/train.html" },
-        { key: "nav.how_to_play", label: "How to play", href: "/how-to-play/memory-match/" }
-      ]
-    };
+    /* 导航数据来自 site-header.nav.js（每站一份站点定制文件） */
+    var games = (window.__SH_NAV__ && window.__SH_NAV__.games) || [];
     var SISTER_SITES = [
       { id: "board", name: "Board Duel", href: "https://boardduel.com/" },
       { id: "math", name: "Numeri Duel", href: "https://numeriduel.com/" },
@@ -119,7 +117,7 @@
     }
 
     function buildGamesMenu(navEl) {
-      var list = GAMES[SITE_ID] || GAMES.board;
+      var list = games;
       if (!list.length) return;
       var w = document.createElement("div");
       w.className = "sh-menu-wrap sh-games";
@@ -250,10 +248,11 @@
       if (window.Identity) bootIdt();
       else {
         var idtScript = document.createElement("script");
-        idtScript.src = "/shared/identity.js?v=2";
+        idtScript.src = "/shared/identity.js?v=3";
         idtScript.onload = bootIdt;
         document.head.appendChild(idtScript);
       }
     }
+  });
   });
 })();
