@@ -15,7 +15,9 @@
     "build": "tsc --noEmit && node scripts/check-css-comments.mjs && vite build && node scripts/copy-legacy.mjs && node scripts/filter-sitemap.mjs",
     "build:beta": "VITE_SHOW_BETA=1 tsc --noEmit && node scripts/check-css-comments.mjs && VITE_SHOW_BETA=1 vite build && VITE_SHOW_BETA=1 node scripts/copy-legacy.mjs && VITE_SHOW_BETA=1 node scripts/filter-sitemap.mjs",
     "preview": "vite preview",
-    "test": "node --test tests/battle-sw-quiz-lang.test.mjs tests/p1-4-share-card.test.mjs tests/p1-5-color-duel.test.mjs tests/p2-new-games.test.mjs tests/quiz-lang-detect.test.mjs"
+    "test": "node --test tests/battle-sw-quiz-lang.test.mjs tests/p1-4-share-card.test.mjs tests/p1-5-color-duel.test.mjs tests/p2-new-games.test.mjs tests/quiz-lang-detect.test.mjs",
+    "sync:shared": "node scripts/sync-shared.mjs memoryduel",
+    "sync:shared:check": "node scripts/sync-shared.mjs memoryduel --check"
   },
   "devDependencies": {
     "typescript": "^5.6.3",
