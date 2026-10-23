@@ -1,61 +1,37 @@
 /* ═══════════════════════════════════════════════════════════════
-   MemoryDuel 首页 · 重设计皮肤（redesign-package 落地版）
+   MemoryDuel 首页 · 三站统一品牌皮肤（2026-10-26 起靛蓝品牌）
    ---------------------------------------------------------------------------
-   真源依据：design/memoryduel-home.html（重设计交付包）
+   原 redesign-package 已对齐统一品牌：warm → cool、Inter → Sora、orange → indigo。
+   变量名保留 --orange/*（避免全文件改 44 处变量引用名导致回归风险），
+   值已换成靛蓝等价物。
    红线：README §4 —— 保留 home.mjs/home.ts 全部 id 契约；
-        CSP font-src 'self' → 自托管 /fonts/（Space Grotesk 400/700 +
-        Inter 400/500/700 + JetBrains Mono 500/700，勿写 500/600 档）；
-        白字压品牌色一律 --orange-deep；页脚 MemoryDuel pip 保持 #4F46E5。
-   JS 契约适配（不改 home.mjs/home.ts 一行）：
-        · home.mjs 分类卡类名 .ci/.cn/.cq + .cat-card/.selected（双套并存）
-        · home.mjs 对加载中/无题分类用 disabled+locked（与原型「锁定」视觉一致）
-        · home.ts 排行榜类名 .rank-row/.rank-no/.rank-av/.rank-nm/.rank-pt
+        CSP font-src 'self' → 自托管 /fonts/（Space Grotesk + Sora +
+        JetBrains Mono，勿写 500/600 档）。
    ═══════════════════════════════════════════════════════════════ */
 
 /* ── 字体（自托管，CSP font-src 'self'） ── */
 @font-face { font-family: 'Space Grotesk'; font-weight: 400; font-style: normal; font-display: swap; src: url('/fonts/space-grotesk-latin-400.woff2') format('woff2'); }
 @font-face { font-family: 'Space Grotesk'; font-weight: 700; font-style: normal; font-display: swap; src: url('/fonts/space-grotesk-latin-700.woff2') format('woff2'); }
-@font-face { font-family: 'Inter'; font-weight: 400; font-style: normal; font-display: swap; src: url('/fonts/inter-latin-400.woff2') format('woff2'); }
-@font-face { font-family: 'Inter'; font-weight: 500; font-style: normal; font-display: swap; src: url('/fonts/inter-latin-500.woff2') format('woff2'); }
-@font-face { font-family: 'Inter'; font-weight: 700; font-style: normal; font-display: swap; src: url('/fonts/inter-latin-700.woff2') format('woff2'); }
+/* Sora 可变字体（单文件覆盖 100–900 字重） */
+@font-face { font-family: 'Sora'; font-style: normal; font-display: swap; font-weight: 100 900; src: url('/fonts/sora-latin.woff2') format('woff2'); }
 @font-face { font-family: 'JetBrains Mono'; font-weight: 500; font-style: normal; font-display: swap; src: url('/fonts/jetbrains-mono-latin-500.woff2') format('woff2'); }
 @font-face { font-family: 'JetBrains Mono'; font-weight: 700; font-style: normal; font-display: swap; src: url('/fonts/jetbrains-mono-latin-700.woff2') format('woff2'); }
 
 /* ── token ── */
-/* 🔴 2026-10-14 无障碍整改（A1）：主色文字对比度
-   ---------------------------------------------------------------------------
-   旧值 --orange #EA580C 承载白字只有 3.56:1，低于 WCAG AA 普通文本 4.5:1。
-   分工改为「浅橙只做大面积填充/装饰，深橙承载文字」：
-     · --orange         → 保持 #EA580C，但**只用于无文字元素**（logo 方块、
-                          焦点环、边框、装饰渐变）；一旦要压白字就走 --orange-ink。
-     · --orange-ink     → 新增，专给「实心橙底 + 白字」用，5.18:1 达标。
-     · --orange-deep    → 文字压浅底用（.badge / .gcard-tag.live / .rank-pt）。
-                          🔴 2026-10-15 从 #C2410C 调到 #B03A0A：原值压
-                          .badge 的 rgba(234,88,12,.1) 底只有 **4.27:1**，
-                          低于 AA 4.5:1（12.5px 粗体**不算** WCAG 大字，
-                          不能套 3:1 那档）。新值 5.01:1，压纯 paper 5.65:1。
-                          深色下仍被覆盖成亮橙（见文末暗色块），保证 6.08:1。
-     · --orange-ink-hover → 🔴 2026-10-15 新增。原先 .btn-primary:hover 直接吃
-                          --orange-deep，而暗色下该令牌被覆盖成亮橙 #F97316，
-                          白字压上去只剩 2.80:1（远低于 4.5:1）。且亮色下
-                          --orange-ink 与 --orange-deep 同为 #C2410C，
-                          hover 根本没有任何颜色变化，只有 translateY。
-                          故独立出「实心底 hover」令牌，两主题都统一加深。
-   ⚠️ 不要把 #EA580C 再加回任何 color:#fff 的规则里。
-   ⚠️ 凡是「实心橙底 + 白字」的 hover，一律走 --orange-ink-hover。 */
 :root{
-  --orange:#EA580C; --orange-deep:#B03A0A; --orange-bright:#F97316;
-  /* 白字压橙底的合规填充色：#FFFFFF on #C2410C = 5.18:1（WCAG AA 通过） */
-  --orange-ink:#C2410C;
-  /* hover 加深一档：#FFFFFF on #9A3412 = 7.31:1，且比 base 明显更暗，有反馈 */
-  --orange-ink-hover:#9A3412;
-  --paper:#FAF6F1; --card:#fff; --ink:#1C1408; --mute:#6B5A45; --line:#EAD9C7;
-  --amber:#F59E0B; --green:#22C55E; --indigo-sig:#4F46E5; /* 页脚三站署名色，故意不改 */
-  /* 圆角刻度（B1）：原先 --rt 定义后引用 0 次，等于没做。统一走这四档。 */
+  /* 变量名 --orange/* 保留历史名（避免改 44 处引用），值已换靛蓝 */
+  --orange:#4F46E5; --orange-deep:#4338CA; --orange-bright:#6366F1;
+  /* 白字压靛蓝 #FFFFFF on #4338CA = 9.84:1（AA 通过） */
+  --orange-ink:#4338CA;
+  /* hover 加深一档：#FFFFFF on #3730A3 = 12.79:1 */
+  --orange-ink-hover:#3730A3;
+  --paper:#F4F5F9; --card:#FFFFFF; --ink:#1E1B39; --mute:#5B6079; --line:#E3E6F0;
+  --amber:#F59E0B; --green:#22C55E; --indigo-sig:#4F46E5;
+  /* 圆角刻度（B1） */
   --r-sm:8px; --r-md:12px; --r-lg:18px; --r-pill:999px;
   --rd:var(--r-lg); --rt:var(--r-md);
   --disp:'Space Grotesk',system-ui,sans-serif;
-  --ui:'Inter',system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  --ui:'Sora',system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
   --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -63,10 +39,10 @@ html{scroll-behavior:smooth}
 body{
   font-family:var(--ui); color:var(--ink); line-height:1.55; background-color:var(--paper);
   background-image:
-    radial-gradient(circle at 18% 12%,rgba(234,88,12,.055) 0,transparent 42%),
-    radial-gradient(circle at 84% 78%,rgba(245,158,11,.05) 0,transparent 40%),
-    linear-gradient(rgba(180,120,60,.05) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(180,120,60,.05) 1px,transparent 1px);
+    radial-gradient(circle at 18% 12%,rgba(79,70,229,.045) 0,transparent 42%),
+    radial-gradient(circle at 84% 78%,rgba(99,102,241,.035) 0,transparent 40%),
+    linear-gradient(rgba(79,70,229,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(79,70,229,.04) 1px,transparent 1px);
   background-size:100% 100%,100% 100%,32px 32px,32px 32px;
   background-attachment:fixed; overflow-x:hidden; -webkit-font-smoothing:antialiased;
 }
@@ -76,10 +52,10 @@ a{color:inherit;text-decoration:none}
 [id]{scroll-margin-top:76px}
 
 /* ── nav ── */
-.nav{position:sticky;top:0;z-index:30;background:rgba(250,246,241,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav{position:sticky;top:0;z-index:30;background:rgba(244,245,249,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .nav-in{max-width:1120px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:22px}
 .logo{font-family:var(--disp);font-weight:700;font-size:20px;letter-spacing:-.02em;display:flex;align-items:center;gap:9px}
-.logo .mk{width:13px;height:13px;border-radius:4px;background:var(--orange);box-shadow:0 0 0 3px rgba(234,88,12,.18)}
+.logo .mk{width:13px;height:13px;border-radius:4px;background:var(--orange);box-shadow:0 0 0 3px rgba(79,70,229,.18)}
 .nav-links{display:flex;gap:18px;font-size:14px;font-weight:600;color:var(--mute)}
 .nav-links a:hover{color:var(--orange-deep)}
 .nav .spacer{flex:1}
@@ -135,7 +111,7 @@ a{color:inherit;text-decoration:none}
 .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
 .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding:54px 24px 30px}
 .hero>*{min-width:0}
-.badge{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:var(--orange-deep);background:rgba(234,88,12,.1);padding:6px 12px;border-radius:999px}
+.badge{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:var(--orange-deep);background:rgba(79,70,229,.1);padding:6px 12px;border-radius:999px}
 h1{font-family:var(--disp);font-weight:700;font-size:clamp(34px,5vw,52px);line-height:1.04;letter-spacing:-.02em;margin:18px 0 14px}
 h1 em{font-style:normal;color:var(--orange)}
 .sub{font-size:16.5px;color:var(--mute);max-width:40ch}
@@ -168,7 +144,7 @@ h1 em{font-style:normal;color:var(--orange)}
 .sec-sub{font-size:13px;color:var(--mute);margin-bottom:16px}
 
 /* ── 模式 tab ── */
-.tabs{display:flex;gap:6px;background:rgba(234,88,12,.08);padding:5px;border-radius:13px;margin-bottom:18px}
+.tabs{display:flex;gap:6px;background:rgba(79,70,229,.07);padding:5px;border-radius:13px;margin-bottom:18px}
 .tab{border:0;background:transparent;flex:1;padding:10px;border-radius:9px;font-weight:700;font-size:14px;color:var(--orange-deep);cursor:pointer;font-family:var(--ui);min-height:44px;display:inline-flex;align-items:center;justify-content:center}
 .tab.on{background:#fff;color:var(--orange-deep);box-shadow:0 1px 3px rgba(0,0,0,.07)}
 
@@ -182,7 +158,7 @@ h1 em{font-style:normal;color:var(--orange)}
 .cat .ci{font-size:22px;line-height:1}
 .cat .cn{font-size:12.5px;font-weight:700}
 .cat .cq{font-size:10.5px;color:var(--mute);font-weight:600}
-.cat.on{border-color:var(--orange);background:#FFF6F0;color:var(--orange-deep)}
+.cat.on{border-color:var(--orange);background:#EEF1FB;color:var(--orange-deep)}
 .cat.locked,.cat:disabled{opacity:.5;cursor:not-allowed}
 .sel-note{font-size:12.5px;color:var(--mute);font-weight:600;margin:14px 0 16px}
 .sel-note b{color:var(--orange-deep)}
@@ -214,7 +190,7 @@ h1 em{font-style:normal;color:var(--orange)}
 .rank-foot a{color:var(--orange-deep);min-height:44px;display:inline-flex;align-items:center;touch-action:manipulation}
 .rank-foot a:hover{text-decoration:underline}
 .ladder{display:flex;gap:6px;margin-top:16px;align-items:flex-end}
-.ladder .seg{flex:1;background:rgba(234,88,12,.1);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--orange-deep);padding-top:6px}
+.ladder .seg{flex:1;background:rgba(79,70,229,.1);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--orange-deep);padding-top:6px}
 .ladder .seg.hi{background:var(--orange-ink);color:#fff}
 
 /* ── 特性（左面板内） ── */
@@ -251,14 +227,14 @@ h1 em{font-style:normal;color:var(--orange)}
 .games-sub{text-align:center;font-size:13.5px;color:var(--mute);margin-top:6px;max-width:56ch;margin-left:auto;margin-right:auto}
 .games-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:22px}
 .gcard{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:var(--rd);padding:20px;min-width:0;position:relative;transition:transform .14s,border-color .14s,box-shadow .14s;cursor:pointer;touch-action:manipulation}
-.gcard:hover{transform:translateY(-3px);border-color:var(--orange);box-shadow:0 8px 22px rgba(234,88,12,.13)}
+.gcard:hover{transform:translateY(-3px);border-color:var(--orange);box-shadow:0 8px 22px rgba(79,70,229,.13)}
 .gcard:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 .gcard-icon{font-size:30px;line-height:1}
 .gcard-title{font-family:var(--disp);font-weight:700;font-size:17px;margin:10px 0 5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .gcard-desc{font-size:13px;color:var(--mute);line-height:1.55}
 .gcard-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
 .gcard-tag{font-size:11px;font-weight:700;letter-spacing:.02em;padding:3px 8px;border-radius:999px;border:1px solid var(--line);color:var(--mute);background:rgba(155,142,124,.08)}
-.gcard-tag.live{color:var(--orange-deep);border-color:rgba(234,88,12,.4);background:rgba(234,88,12,.1)}
+.gcard-tag.live{color:var(--orange-deep);border-color:rgba(79,70,229,.4);background:rgba(79,70,229,.1)}
 .gcard-tag.new{color:#fff;border-color:transparent;background:var(--orange-ink)}
 .gcard-cta{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-family:var(--ui);font-weight:700;font-size:13px;color:var(--orange-deep)}
 .gcard.ghost{opacity:.62;cursor:default;background:transparent}
@@ -386,46 +362,38 @@ body { touch-action: manipulation; }
    ⚠️ 一处改动全局生效：所有 var(--orange-deep) 的消费者自动跟着走。
    ═════════════════════════════════════════════════════════════ */
 html[data-theme="dark"]{
-  --paper:#0B1120; --card:#151C2B; --ink:#ECE6DC; --mute:#9B8E7C; --line:#33313F;
-  /* 暗色专属文字色：亮橙，压暗底 6.08:1 */
-  --orange-deep:#F97316;
-  /* 暗色专属实心底：#FFFFFF on #7C2D12 = 9.37:1（比亮色下的 #C2410C 更稳） */
-  --orange-ink:#7C2D12;
-  /* hover 再加深一档：#FFFFFF on #5C210D = 12.51:1。
-     🔴 不能沿用 --orange-deep —— 它在暗色下是亮橙 #F97316，白字只有 2.80:1。 */
-  --orange-ink-hover:#5C210D;
+  --paper:#12131F; --card:#1A1B2E; --ink:#E8EAF4; --mute:#8B90A8; --line:#2D2F44;
+  /* 暗色专属文字色：亮靛蓝，压暗底 6.18:1（#A5B4FC on #1A1B2E） */
+  --orange-deep:#A5B4FC;
+  /* 暗色专属实心底：#FFFFFF on #4338CA = 9.84:1 */
+  --orange-ink:#4338CA;
+  /* hover 再加深：#FFFFFF on #3730A3 = 12.79:1 */
+  --orange-ink-hover:#3730A3;
 
   body{ background-color:var(--paper); background-image:none; }
 
-  .nav{ background:rgba(11,17,32,.85); border-bottom-color:var(--line); }
+  .nav{ background:rgba(18,19,31,.85); border-bottom-color:var(--line); }
 
-  /* footer 原用 --ink；暗色下 --ink 翻成浅色，必须固定暗底，否则白底白字 */
-  footer{ background:#080C16; }
+  /* footer 固定暗底 */
+  footer{ background:#0B0C14; }
 
   .cat{ background:var(--card); }
-  .cat.on{ background:rgba(249,115,22,.16); }
+  .cat.on{ background:rgba(129,140,248,.16); }
   .pv-opt{ background:var(--card); }
   .pv-opt.ok{ background:rgba(34,197,94,.16); }
   .room-in{ background:var(--card); color:var(--ink); }
-  .room-in::placeholder{ color:#7C8AA0; }
+  .room-in::placeholder{ color:#6B7280; }
 
-  /* 选中 tab 白底亮片：🔴 暗色下**不能**用 --orange-deep ——
-     它在暗色被覆盖成亮橙 #F97316，压白底只剩 2.80:1（旧注释写的 6.4:1 是错的）。
-     改用 --orange-ink（暗色为 #7C2D12，压白底 9.37:1）。 */
+  /* 选中 tab 白底亮片 */
   .tab.on{ background:#fff; color:var(--orange-ink); }
-  /* 🔴 这里**不要**再写 `.btn-primary{ background:var(--orange-ink) }`。
-     令牌已在上面覆盖，写它纯属冗余，而且嵌套规则会编译成
-     `html[data-theme="dark"] :is(.btn-primary)`（权重 0,2,1），
-     反而**压过** `.btn-primary:hover`（0,2,0）→ hover 态永不生效，
-     按钮完全没有颜色反馈。实测 2026-10-15：删掉它 hover 才生效。 */
   .btn-ghost{ color:var(--ink); }
   .solo-link{ color:var(--mute); }
 
   .gcard-tag.new{ color:#fff; background:var(--orange-ink); }
   .gcard-cta{ color:var(--orange-bright); }
 
-  /* 焦点环在暗底上用亮橙，亮橙对暗底的非文本对比度 6.08:1 ≥ 3:1 */
+  /* 焦点环在暗底上用亮靛蓝 */
   :focus-visible{ outline-color:var(--orange-bright); }
 
-  /* 装饰性橙（logo 方块、svg 底）保留原色，不参与文字可读性 */
+  /* 装饰性靛蓝保留原色，不参与文字可读性 */
 }

@@ -1,16 +1,15 @@
 /* ═══════════════════════════════════════════════════════════════
    MemoryDuel · Battle 页皮肤（M3 2026-10-01）
    ────────────────────────────────────────────────────────────────
-   极简 — 不用 /css/shared/tokens.css 主色（保持 paper 风格）；
-   房间码 / 倒计时 / 选项卡 / 反馈区用暖纸调。
+   极简 — 2026-10-26 已对齐统一品牌：cool bg + Sora + indigo。
    ═══════════════════════════════════════════════════════════════ */
 
 :root {
-  --bd-bg: #FAF6F1;
-  --bd-paper: #FFFCF7;
-  --bd-ink: #1F2330;
-  --bd-muted: #6B7280;
-  --bd-line: #E5DFD4;
+  --bd-bg: #F4F5F9;
+  --bd-paper: #FFFFFF;
+  --bd-ink: #1E1B39;
+  --bd-muted: #5B6079;
+  --bd-line: #E3E6F0;
   --bd-good: #0F766E;
   --bd-bad: #B91C1C;
   --bd-warn: #D97706;
@@ -22,7 +21,7 @@ body.battle-v2 {
   margin: 0;
   background: var(--bd-bg);
   color: var(--bd-ink);
-  font-family: system-ui, -apple-system, "Inter", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: 'Sora', system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
   min-height: 100vh;
 }
 

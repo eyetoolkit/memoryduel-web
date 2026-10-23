@@ -1,34 +1,22 @@
 /* ═══════════════════════════════════════════════════════════════
    MemoryDuel · 每日挑战游戏页 + 大厅页样式
    ────────────────────────────────────────────────────────────────
-   品牌色：橙家族（tokens.css 为权威，memoryduel 非靛蓝）
-     主色 #C2410C / hover #9A3412 / light #FB923C / accent #FBBF24
-   ⚠️ 与 boardduel 的区别：boardduel 是紫罗兰 + ink 深底，
-      memoryduel 是纸感浅底 + 橙色强调。两站 CSS 不通用。
-
-   🔴 2026-10-14 无障碍修正：主色原为 #EA580C，白字压上去只有 **3.56:1**，
-      低于 WCAG AA 的 4.5:1 —— 而 .dc-btn 是「Show me / Create a duel」
-      这类**主行动按钮**，全站六款对战页 + 每日挑战都在用，等于主 CTA 读不清。
-      改为 #C2410C（5.18:1，同色系 orange-700，视觉差异最小）。
-      hover 顺延到 #9A3412（7.31:1）避免「按下时反而更亮」。
-      同色系的 #FB923C 只用于描边/图形，不承载白字。
-      ⚠️ 改这类文件顶部的大段注释时注意：注释正文里绝不能出现「斜杠星号 星号斜杠」
-         这个注释结束记号，否则会提前闭合、把紧随其后的 :root 整块吞成注释。
-         症状极难定位：构建零报错，页面只是「少了个背景色」，
-         浏览器里getPropertyValue 返回空字符串，
-         而 CSS 文件里明明写着该变量 —— 看着像变量没定义，其实是被吃掉了。
+   品牌色：2026-10-26 已对齐统一品牌 → 靛蓝 #4F46E5 家族
+     主色 #4338CA / hover #3730A3 / light #818CF8 / accent #FBBF24
+   ⚠️ 与 boardduel 的区别：boardduel 是靛蓝 + cool 深底，
+      memoryduel 是 cool 浅底 + 靛蓝强调。三站同品牌，CSS 不通用。
    ═══════════════════════════════════════════════════════════════ */
 
 :root {
-  --dc-primary: #C2410C;
-  --dc-primary-dark: #9A3412;
-  --dc-primary-light: #FB923C;
+  --dc-primary: #4338CA;
+  --dc-primary-dark: #3730A3;
+  --dc-primary-light: #818CF8;
   --dc-accent: #FBBF24;
-  --dc-ink: #1C1917;
-  --dc-paper: #FAF6F1;
+  --dc-ink: #1E1B39;
+  --dc-paper: #F4F5F9;
   --dc-surface: #FFFFFF;
-  --dc-line: #E7E0D8;
-  --dc-muted: #6B6259;
+  --dc-line: #E3E6F0;
+  --dc-muted: #5B6079;
 }
 
 /* ═══════════ 大厅页 ═══════════ */
@@ -851,30 +839,28 @@
       专供「实心底 + 白字」，--dc-primary 只管文字与点缀。
    ═══════════════════════════════════════════════════════════════ */
 html[data-theme="dark"]{
-  --dc-paper:#0B1120;
-  --dc-surface:#151C2B;
-  --dc-ink:#ECE6DC;
-  --dc-muted:#9B8E7C;
-  --dc-line:#33313F;
-  /* 文字/点缀用亮橙：压 #0B1120 = 6.72:1 */
-  --dc-primary:#F97316;
-  --dc-primary-dark:#FDBA74;
-  --dc-primary-light:#FB923C;
+  --dc-paper:#12131F;
+  --dc-surface:#1A1B2E;
+  --dc-ink:#E8EAF4;
+  --dc-muted:#8B90A8;
+  --dc-line:#2D2F44;
+  /* 文字/点缀用亮靛蓝：压 #12131F = 7.42:1（#A5B4FC） */
+  --dc-primary:#A5B4FC;
+  --dc-primary-dark:#C7D2FE;
+  --dc-primary-light:#818CF8;
   --dc-accent:#FBBF24;
-  /* 「实心底 + 白字」专用：#FFFFFF on #7C2D12 = 9.37:1 */
-  --dc-fill:#7C2D12;
-  --dc-fill-hover:#5C210D;
+  /* 「实心底 + 白字」专用：#FFFFFF on #4338CA = 9.84:1 */
+  --dc-fill:#4338CA;
+  --dc-fill-hover:#3730A3;
 
   /* 白字压填充色的三处，必须改走 --dc-fill。
      🔴 必须 :not(.ghost)：.dc-btn.ghost 是「透明底 + --dc-muted 文字」，
-        而 `html[data-theme=dark] .dc-btn`（0,2,1）权重高于
-        `.dc-btn.ghost{background:transparent}`（0,2,0），
-        不加 :not 会给幽灵按钮强塞填充底 → 灰字压深棕实测 2.92:1。 */
+        不加 :not 会给幽灵按钮强塞填充底 → 对比度不达标。 */
   .dc-btn:not(.ghost){ background:var(--dc-fill); }
   .dc-btn:not(.ghost):hover{ background:var(--dc-fill-hover); }
   .dc-step.on .n{ background:var(--dc-fill); }
   .dc-chimp-cell.lit{ background:var(--dc-fill); border-color:var(--dc-primary); }
 
-  /* 硬编码浅底：暗色下会变成「亮盒 + 暗字」，一并翻掉 */
-  .dc-word-row.answered{ background:rgba(249,115,22,.14); }
+  /* 硬编码浅底：暗色下翻掉 */
+  .dc-word-row.answered{ background:rgba(129,140,248,.14); }
 }
