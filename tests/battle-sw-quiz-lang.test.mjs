@@ -23,23 +23,22 @@ assert.match(sw, /req\.mode === 'navigate'/);
 assert.match(sw, /caches\.match\('\/'\)/);
 // /api/、/ws 绝不拦截（榜单/会话/教师端数据永远走网络）
 assert.match(sw, /url\.pathname\.startsWith\('\/api\/'\)/);
-// quiz-data.js 不得进 cache-first（它不带内容 hash，靠 ?v= query 失效，
-// 只能在 /assets|fonts/ 之外的 SWR 分支——sw.js 全文不应出现 quiz-data 字面量）
+// quiz-data.js 不得进 cache-first（它不带内容 hash —— sw.js 全文不应出现 quiz-data 字面量）
 assert.doesNotMatch(sw, /quiz-data/);
 console.log('✓ sw.js（线上注册版）V=mdusw-v1；导航 network-first；/api 不拦截；quiz-data 非 cache-first');
 
-// 修订（2026-10-13）：原断言三页都锁 quiz-data.js?v=qd6，但 train.html 已随
-// 「wrap 用 fetchLang 避免模块级 LANG 竞态」修复升到 qd8（commit 4c74e92），
-// battle.html/index.html 仍是 qd6。缓存版本号本就允许各页独立，
-// 真正的契约是「三页都必须带 ?v= query（否则 SW 拿到旧题库）」，故改为断言有版本号而非等于某个值。
-for (const f of ['battle.html', 'index.html', 'public/train.html']) {
+/* 修订（2026-10-23）：cache-bust 从「?v= query」升级为「文件名版本化」。
+   原断言要求 quiz-data.js?v=<版本>，理由见下：
+     - SW 侧：Cache.match 默认 ignoreSearch=false，换 ?v= 会生成新缓存条目 ✅
+     - 但 **CF 边缘缓存键忽略 query**，?v= 对边缘无效 ❌
+   故改为文件名版本化（quiz-data.v9.js）：新 URL 边缘必然回源，
+   同时 SW 也必然是新条目。此断言改为要求「文件名带版本段」。
+   顺带把新大厅页纳入同一契约（它同样依赖题库）。 */
+for (const f of ['battle.html', 'index.html', 'public/train.html', 'games/knowledge-duel/lobby/index.html']) {
   const html = fs.readFileSync(path.join(root, f), 'utf8');
-  assert.match(html, /quiz-data\.js\?v=[A-Za-z0-9]+/, `${f} 必须 cache-bust quiz-data.js?v=<版本>`);
+  assert.match(html, /quiz-data\.v\d+\.js/, `${f} 必须引用带版本号的文件名 quiz-data.vN.js（?v= query 对 CF 边缘无效）`);
 }
-console.log('✓ 三页 HTML 均 cache-bust quiz-data.js?v=');
-
-const trainHtml = fs.readFileSync(path.join(root, 'public/train.html'), 'utf8');
-assert.match(trainHtml, /quiz-data\.js\?v=qd8/, 'train.html 应锁 qd8（fetchLang 竞态修复版本）');
+console.log('✓ 四页 HTML 均以文件名版本化 cache-bust quiz-data');
 
 const train = fs.readFileSync(path.join(root, 'public/train.html'), 'utf8');
 assert.match(train, /Prefer URL \?lang=/);

@@ -107,6 +107,12 @@
   };
 
   var QUESTIONS = [];
+  /* 每分类的**真实**题量（2026-10-23 新增）。
+     🔴 为什么需要它：/quiz/bundle 的 count 上限是 100（worker BAK-07），
+     所以 QUESTIONS 里每个分类最多只有 100 条 —— byCategory().length 恒为 100，
+     那是「拉取上限」不是「题库总量」。真实总数由服务端 bundle.total 下发。
+     服务端旧版不下发 total 时，退回切片长度（与旧行为一致，不更差）。 */
+  var COUNTS = {};
   var loaded = null;
   var loading = false;
 
@@ -120,6 +126,7 @@
     LANG = next;
     if (LANG !== old) {
       QUESTIONS.length = 0;
+      Object.keys(COUNTS).forEach(function (k) { delete COUNTS[k]; });
       loaded = null;
       loading = false;
       loadGen++; // invalidate in-flight ensureLoaded from previous lang
@@ -184,7 +191,10 @@
         })
         .then(function (j) {
           if (!j || !j.ok || !j.data) throw new Error('bad response');
-          return (j.data.questions || []).map(function (q) { return wrap(q, catId, fetchLang); });
+          var qs = j.data.questions || [];
+          var tot = Number(j.data.total);
+          if (tot > 0) COUNTS[catId] = tot;
+          return qs.map(function (q) { return wrap(q, catId, fetchLang); });
         })
         .catch(function (err) {
           if (n < retries) {
@@ -264,6 +274,8 @@
           }
           all = all.concat(arr || []);
           if (arr && arr.length > 0) successes++;
+          // 服务端未下发 total 时退回切片长度（旧 worker 兼容）
+          if (typeof COUNTS[c.id] !== 'number') COUNTS[c.id] = (arr && arr.length) || 0;
         } catch (e) {
           failedIds.push(c.id);
           console.error('[MD] ensureLoaded category crash', c.id, e && e.message);
@@ -316,6 +328,8 @@
     AI_NAMES: AI_NAMES,
     QUESTIONS: QUESTIONS,
     byCategory: byCategory,
+    counts: COUNTS,
+    categoryCount: function (id) { return COUNTS[id] || 0; },
     getLang: getLang,
     setLang: setLang,
     detectLang: detectQuizLang,

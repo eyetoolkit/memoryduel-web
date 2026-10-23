@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const src = fs.readFileSync(path.join(root, 'public/assets/quiz-data.js'), 'utf8');
+const src = fs.readFileSync(path.join(root, 'public/assets/quiz-data.v9.js'), 'utf8');
 
 function loadQuiz(env) {
   const listeners = {};
@@ -138,7 +138,7 @@ function loadQuiz(env) {
   // 现在是 qn[L]，L = rawLang || LANG。真正的契约是「只写一个语言槽位，绝不写死 en」：
   //   ① 必须仍以 qn[...]=apiQ.q 形式写入
   //   ② 绝不能再出现把任意语言塞进 en 的旧写法
-  const srcText = fs.readFileSync(path.join(root, 'public/assets/quiz-data.js'), 'utf8');
+  const srcText = fs.readFileSync(path.join(root, 'public/assets/quiz-data.v9.js'), 'utf8');
   assert.ok(!/o = \{ en: apiQ\.q \}/.test(srcText), 'old wrap that stamps en with any lang must be gone');
   assert.ok(
     /qn\[\w+\] = apiQ\.q/.test(srcText),

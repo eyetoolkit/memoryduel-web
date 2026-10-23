@@ -37,6 +37,7 @@ interface QuizCat { id: string; icon?: string; en?: string; [k: string]: unknown
 interface QuizApi {
   CATEGORIES?: readonly QuizCat[];
   byCategory?: (cat: string) => unknown[];
+  categoryCount?: (cat: string) => number;
   loading?: () => boolean;
   ready?: boolean;
   ensureLoaded?: () => Promise<unknown>;
@@ -130,6 +131,14 @@ function mdName(): string {
 
 let selectedCat = '';
 
+/** 题量显示：千分位。
+    🔴 不能用 byCategory().length —— bundle 的 count 上限是 100，
+    那得到的是「本次拉了多少题」，不是「题库有多少题」，恒显示 100。
+    真实总数来自服务端 bundle.total（quiz-data.js 收进 COUNTS）。 */
+function fmtCount(n: number): string {
+  return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
 function renderCategories(): void {
   const grid = el<HTMLDivElement>('catGrid');
   const Q = W.MemoryDuelQuiz;
@@ -142,11 +151,14 @@ function renderCategories(): void {
   const loading = !!(Q.loading && Q.loading());
 
   grid.innerHTML = cats.map((c) => {
-    const count = (Q.byCategory ? Q.byCategory(c.id) || [] : []).length;
+    const local = (Q.byCategory ? Q.byCategory(c.id) || [] : []).length;
+    // 真实总数优先；服务端未下发 total（旧 worker）时退回本地切片长度
+    const total = Q.categoryCount ? Q.categoryCount(c.id) : 0;
+    const count = total || local;
     const raw = c[lang];
     const name = typeof raw === 'string' && raw ? raw : (c.en || c.id);
     const noQ = !loading && count === 0;
-    const countText = loading ? '' : (count > 0 ? String(count) : 'No questions yet');
+    const countText = loading ? '' : (count > 0 ? fmtCount(count) : 'No questions yet');
     return `<button class="cat cat-card${noQ ? ' locked' : ''}" data-cat="${esc(c.id)}"${
       noQ ? ' disabled' : ''} role="radio" aria-checked="false">
         <span class="ci cat-icon">${esc(c.icon || '🧩')}</span>
