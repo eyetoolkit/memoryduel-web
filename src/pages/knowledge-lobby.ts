@@ -131,12 +131,29 @@ function mdName(): string {
 
 let selectedCat = '';
 
+// 实时题量：服务端 /quiz/counts 返回的全分类真实总数。
+// null = 尚未拉取（首渲用静态 COUNTS 兜底）；{} = 拉过但无/失败（同样退回静态）。
+let liveCounts: Record<string, number> | null = null;
+
 /** 题量显示：千分位。
     🔴 不能用 byCategory().length —— bundle 的 count 上限是 100，
     那得到的是「本次拉了多少题」，不是「题库有多少题」，恒显示 100。
     真实总数来自服务端 bundle.total（quiz-data.js 收进 COUNTS）。 */
 function fmtCount(n: number): string {
   return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+/** 拉取实时题量（服务端 /quiz/counts，一次返回全部分类真实总数，读 KV/R2 缓存零 D1）。
+   成功则覆盖静态 COUNTS 快照；失败/无数据则 liveCounts={} 标记已尝试，
+   renderCategories 退回静态兜底——绝不因接口抖动而误锁或闪「No questions yet」。 */
+function loadLiveCounts(lang: string): void {
+  fetch((W.API_BASE || '') + '/api/md/quiz/counts?lang=' + encodeURIComponent(lang))
+    .then((r) => r.json() as Promise<{ ok?: boolean; counts?: Record<string, number> }>)
+    .then((j) => {
+      if (j && j.ok && j.counts) { liveCounts = j.counts; renderCategories(); }
+      else { liveCounts = {}; }
+    })
+    .catch(() => { liveCounts = {}; });
 }
 
 function renderCategories(): void {
@@ -146,19 +163,23 @@ function renderCategories(): void {
 
   const cats = Q.CATEGORIES;
   const lang = curLang();
-  // 加载期不渲染题量（避免闪一个假数字），但卡片照常可点 —— 题库是按需加载的，
-  // 点「vs AI」走 /train.html?cat=xx，那边自行取题，大厅不必等全量题库到位。
-  const loading = !!(Q.loading && Q.loading());
+  // 🔴 实时 count 优先于静态快照：liveCounts 到位后覆盖 COUNTS（daily-topup 每日增量，
+  // 静态会漂移）；未取到（pending）时退回静态 COUNTS（仍是真实数，只是可能略旧）；
+  // 两者皆无才留空——绝不在数据未到时误锁或闪「No questions yet」。
+  const resolved = liveCounts !== null;
+  const countFor = (c: QuizCat): number => {
+    if (liveCounts && liveCounts[c.id] != null) return liveCounts[c.id];
+    const total = Q.categoryCount ? Q.categoryCount(c.id) : 0;
+    if (total) return total;
+    return Q.byCategory ? (Q.byCategory(c.id) || []).length : 0;
+  };
 
   grid.innerHTML = cats.map((c) => {
-    const local = (Q.byCategory ? Q.byCategory(c.id) || [] : []).length;
-    // 真实总数优先；服务端未下发 total（旧 worker）时退回本地切片长度
-    const total = Q.categoryCount ? Q.categoryCount(c.id) : 0;
-    const count = total || local;
+    const count = countFor(c);
     const raw = c[lang];
     const name = typeof raw === 'string' && raw ? raw : (c.en || c.id);
-    const noQ = !loading && count === 0;
-    const countText = loading ? '' : (count > 0 ? fmtCount(count) : 'No questions yet');
+    const countText = count > 0 ? fmtCount(count) : (resolved ? 'No questions yet' : '');
+    const noQ = resolved && count === 0;
     return `<button class="cat cat-card${noQ ? ' locked' : ''}" data-cat="${esc(c.id)}"${
       noQ ? ' disabled' : ''} role="radio" aria-checked="false">
         <span class="ci cat-icon">${esc(c.icon || '🧩')}</span>
@@ -339,6 +360,15 @@ function main(): void {
   if (Q && !Q.ready && Q.ensureLoaded) {
     Q.ensureLoaded().then(() => renderCategories()).catch(() => { /* 题量留空即可 */ });
   }
+
+  // 实时题量：首渲后异步拉 /quiz/counts 覆盖静态快照（daily-topup 每日增量，静态会漂移）
+  loadLiveCounts(curLang());
+  // 语言切换（site-header/sidebar 派发 langchange）：题量 + 分类名一起刷新
+  window.addEventListener('langchange', (e: Event) => {
+    const d = (e as CustomEvent<{ lang?: string }>).detail;
+    loadLiveCounts(d && d.lang ? String(d.lang).split('-')[0].toLowerCase() : curLang());
+    renderCategories();
+  });
 
   const grid = el<HTMLDivElement>('catGrid');
   if (grid) {
