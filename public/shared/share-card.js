@@ -23,12 +23,17 @@
 
 /* ─── 站点品牌配置 ───
    🔴 primary 必须与各站 tokens.css 的 --brand-600 保持一致：
-     memory : tokens.css:214 html[data-site="memory"] --brand-600 #EA580C
-     board  : tokens.css:194 html[data-site="board"]  --brand-600 #7F77DD
+     math  : public/shared/tokens.css  --brand-600 #4F46E5
+     board : public/shared/tokens.css  --brand-600 #7F77DD
+     memory: src/styles/home.css --orange #4F46E5（三站统一靛蓝，2026-10-26 定稿）
    改这里前先核对 tokens.css，不要凭印象填色。
 
+   🔴 2026-10-26 memory 主色由旧橙 #EA580C 改为靛蓝 #4F46E5 ——
+     站点主色早已统一为靛蓝（home.css 的 --orange 变量名保留、值已换靛蓝），
+     只有这张分享卡还停在旧橙，导出的 PNG 发到站外一眼就是两个品牌。
+
    🔴 2026-10-26 name 一律用**英文品牌名**（NumeriDuel / BoardDuel /
-   MemoryDuel），不再用「数学对决 / 棋盘对决 / 记忆对决」中文名：
+     MemoryDuel），不再用「数学对决 / 棋盘对决 / 记忆对决」中文名：
      · 与各站 header 的 logo 文案一致（BoardDuel / MemoryDuel / NumeriDuel）
      · 卡片是要分享到站外的，英文品牌名对 6 种语言的用户都成立；
        中文名会让德语/日语用户看到一张写着「棋盘对决」却署名 boardduel.com 的卡
@@ -56,12 +61,24 @@ const SITES = {
     name: 'MemoryDuel',
     host: 'memoryduel.com',
     url: 'https://memoryduel.com',
-    primary: '#EA580C',
-    primaryDark: '#C2410C',
-    primaryLight: '#FB923C',
+    primary: '#4F46E5',
+    primaryDark: '#4338CA',
+    primaryLight: '#6366F1',
     accent: '#FBBF24',
   },
 };
+
+/* ─── 字体栈 ───────────────────────────────────────────────────
+   🔴 2026-10-26：原先只有 "PingFang SC", "Microsoft YaHei" 两个**中文**
+     字体，而且排在最前面。Canvas 的字体回退是**逐字符**的 ——
+     拉丁字符（含英文撇号 '、连字符）在中文优先的栈里拿不到合适字形，
+     会落到系统兜底字体，结果是同一张卡里英文和中文不是一个字重/风格。
+     修法（与站点 --ui 变量同款）：**拉丁字体在前、中文字体在后**——
+     拉丁字符由 Sora 接管，CJK 字符仍由 PingFang SC / 微软雅黑接管。
+     字体都是站点自托管的（/fonts/sora-latin.woff2 等），不外载。 */
+const FONT_UI = '"Sora", "Space Grotesk", Inter, system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif';
+/* emoji 单独一套（系统彩色 emoji 字体），不要混进正文栈 */
+const FONT_EMOJI = '"Apple Color Emoji", "Segoe UI Emoji", sans-serif';
 
 /* 解析站点：显式参数 > <html data-site> > 默认 math */
 function resolveSite(site) {
@@ -114,7 +131,40 @@ const W = 1200, H = 630;
       都塞进来只会让这张表变成谁都不敢改的共享状态。引擎只管排版，
       「显示什么」由调用方决定。 */
 const GAME_ICONS = { '24-game': '🃏', pyramid: '🔺', sudoku: '🔢' };
-const GAME_NAMES = { '24-game': '24 点', pyramid: '金字塔', sudoku: '数独' };
+/* 🔴 2026-10-26：游戏名兜底由中文改英文 ——
+   引擎名义上三站共用、站点支持 6 种语言，写死「24 点 / 金字塔 / 数独」
+   会让非中文用户看到一张写着中文游戏名的卡。品牌/游戏名用英文是三站通例。 */
+const GAME_NAMES = { '24-game': '24 Game', pyramid: 'Pyramid', sudoku: 'Sudoku' };
+
+/* ─── 引擎内置文案（可被 card.labels 覆盖）─────────────────────
+   🔴 2026-10-26：原先这套 meta 字段的标签是**写死中文**的
+      （💡 x 解 / 🔥 x 连 / ⭐ x 分 / 🎯 x 次），时长也是「x分y秒」。
+      但本引擎名义上三站共用、6 种语言，写死中文 = 切到英/德/法/日时
+      这几行直接露中文。
+      现在默认值改成**英文中性兜底**，并允许调用方用 card.labels 传本地化文案。
+      注：生产上没人走这条路径（memoryduel 传的是 metaLines），
+      但留着一份中文写死的分支迟早会被用上。 */
+const DEFAULT_LABELS = {
+  sec: 's',
+  min: 'm',
+  solved: 'solved',
+  streak: 'streak',
+  score: 'score',
+  attempts: 'attempts',
+};
+
+/** 合并调用方传入的文案覆盖。 */
+function labelsOf(card) {
+  return Object.assign({}, DEFAULT_LABELS, (card && card.labels) || {});
+}
+
+/**
+ * 大数字千分位。
+ * 各语言分隔符不同（de 用点、fr 用窄空格），交给运行时最省事。
+ */
+function fmtNum(n) {
+  try { return Number(n).toLocaleString(); } catch { return String(n); }
+}
 
 /* ─── 工具:文字自动换行(支持中文按字拆,英文按词拆)─── */
 function wrapText(ctx, text, maxWidth) {
@@ -206,7 +256,7 @@ function drawBadge(ctx, x, y, badge, opts) {
   const icon = b.icon, text = b.text;
   const padX = 18, padY = 10;
   const h = 56;
-  ctx.font = '700 24px "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif';
+  ctx.font = `700 24px ${FONT_UI}`;
   const textW = text ? ctx.measureText(text).width : 0;
   // 🔴 42 而不是 36：emoji 在 28px 字号下的实际推进宽度接近 28px，
   //    按 36 排会让文字紧贴图标（实测「💯PERFECT」连在一起）。
@@ -218,13 +268,13 @@ function drawBadge(ctx, x, y, badge, opts) {
   roundRect(ctx, bx, y, w, h, 28);
   ctx.fill();
   if (icon) {
-    ctx.font = '28px "Apple Color Emoji", "Segoe UI Emoji", sans-serif';
+    ctx.font = `28px ${FONT_EMOJI}`;
     ctx.textBaseline = 'middle';
     ctx.fillStyle = COLORS.text;
     ctx.fillText(icon, bx + padX, y + h/2 + 2);
   }
   if (text) {
-    ctx.font = '700 24px "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif';
+    ctx.font = `700 24px ${FONT_UI}`;
     ctx.fillStyle = COLORS.text;
     ctx.textBaseline = 'middle';
     ctx.fillText(text, bx + padX + iconW, y + h/2 + 2);
@@ -243,7 +293,7 @@ function drawGameIcon(ctx, x, y, game, iconOverride) {
   ctx.fillStyle = grad;
   roundRect(ctx, x, y, size, size, 18);
   ctx.fill();
-  ctx.font = '900 44px "Apple Color Emoji", "Segoe UI Emoji", sans-serif';
+  ctx.font = `900 44px ${FONT_EMOJI}`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = COLORS.white;
@@ -264,12 +314,13 @@ function metaLinesOf(card) {
     return card.metaLines.filter((s) => typeof s === 'string' && s.length).slice(0, 4);
   }
   const m = (card && card.meta) || {};
+  const L = labelsOf(card);
   const items = [];
-  if (typeof m.duration === 'number') items.push(`⏱ ${formatDuration(m.duration)}`);
-  if (typeof m.solutions_count === 'number') items.push(`💡 ${m.solutions_count} 解`);
-  if (typeof m.streak === 'number') items.push(`🔥 ${m.streak} 连`);
-  if (typeof m.score === 'number') items.push(`⭐ ${m.score} 分`);
-  if (typeof m.attempts === 'number') items.push(`🎯 ${m.attempts} 次`);
+  if (typeof m.duration === 'number') items.push(`⏱ ${formatDuration(m.duration, L)}`);
+  if (typeof m.solutions_count === 'number') items.push(`💡 ${fmtNum(m.solutions_count)} ${L.solved}`);
+  if (typeof m.streak === 'number') items.push(`🔥 ${fmtNum(m.streak)} ${L.streak}`);
+  if (typeof m.score === 'number') items.push(`⭐ ${fmtNum(m.score)} ${L.score}`);
+  if (typeof m.attempts === 'number') items.push(`🎯 ${fmtNum(m.attempts)} ${L.attempts}`);
   return items;
 }
 
@@ -278,7 +329,7 @@ function metaLinesOf(card) {
    结果 meta 以 x=920 为中心排版 —— 视觉上偏右，与居中的标题/按钮对不齐。 */
 function drawMeta(ctx, x, y, lines, align) {
   if (!Array.isArray(lines) || lines.length === 0) return;
-  ctx.font = '500 24px "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif';
+  ctx.font = `500 24px ${FONT_UI}`;
   ctx.fillStyle = COLORS.textLight;
   ctx.textBaseline = 'top';
   ctx.textAlign = align === 'center' ? 'center' : 'left';
@@ -290,11 +341,12 @@ function drawMeta(ctx, x, y, lines, align) {
   ctx.textAlign = 'left';
 }
 
-function formatDuration(s) {
-  if (s < 60) return `${s}秒`;
+function formatDuration(s, labels) {
+  const L = labels || DEFAULT_LABELS;
+  if (s < 60) return `${fmtNum(s)}${L.sec}`;
   const m = Math.floor(s / 60);
   const sec = s % 60;
-  return sec > 0 ? `${m}分${sec}秒` : `${m}分`;
+  return sec > 0 ? `${fmtNum(m)}${L.min}${fmtNum(sec)}${L.sec}` : `${fmtNum(m)}${L.min}`;
 }
 
 /* ─── 主函数: 在 canvas 上渲染卡 ─── */
@@ -339,14 +391,14 @@ function renderCard(canvas, card, site) {
   /* ─── 左上:游戏图标 + 站名 ─── */
   drawGameIcon(ctx, cardX + 40, cardY + 40, card.game, card.icon);
   ctx.fillStyle = C.text;
-  ctx.font = '800 28px "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif';
+  ctx.font = `800 28px ${FONT_UI}`;
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
   ctx.fillText(`${S.name} · ${S.host}`, cardX + 140, cardY + 56);
 
   // 游戏名(右上小标签)
   const gameName = card.gameName || GAME_NAMES[card.game] || card.game;
-  ctx.font = '600 22px "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif';
+  ctx.font = `600 22px ${FONT_UI}`;
   ctx.fillStyle = COLORS.primary;
   ctx.textAlign = 'right';
   ctx.fillText(gameName, cardX + cardW - 40, cardY + 48);
@@ -362,7 +414,7 @@ function renderCard(canvas, card, site) {
   /* ─── 主标题(中上,大字)─── */
   const titleSize = 64;
   ctx.fillStyle = COLORS.text;
-  ctx.font = `900 ${titleSize}px "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif`;
+  ctx.font = `900 ${titleSize}px ${FONT_UI}`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
@@ -385,7 +437,7 @@ function renderCard(canvas, card, site) {
   /* ─── 副文案(标题下方) ─── */
   const subY = titleStartY + (titleLines.length === 1 ? 62 : titleLines.length * 50 + 30);
   if (card.subtitle) {
-    ctx.font = '500 30px "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif';
+    ctx.font = `500 30px ${FONT_UI}`;
     ctx.fillStyle = COLORS.textLight;
     ctx.textBaseline = 'middle';
     const subLines = wrapText(ctx, card.subtitle, cardW - 120);
@@ -396,7 +448,7 @@ function renderCard(canvas, card, site) {
   const ctaTop = cardY + cardH - 108;
   if (card.cta) {
     const ctaText = card.cta;
-    ctx.font = '700 28px "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif';
+    ctx.font = `700 28px ${FONT_UI}`;
     const tw = ctx.measureText(ctaText).width;
     const btnW = tw + 80, btnH = 60;
     const btnX = (W - btnW) / 2;
@@ -429,7 +481,7 @@ function renderCard(canvas, card, site) {
 
   /* ─── 网址(白卡底部内) ───
      🔴 原先画在 H-32=598，落在白卡底边(560)之外，视觉上像「溢出」。 */
-  ctx.font = '500 20px -apple-system, "PingFang SC", sans-serif';
+  ctx.font = `500 20px ${FONT_UI}`;
   ctx.fillStyle = COLORS.textLight;
   ctx.textBaseline = 'bottom';
   ctx.textAlign = 'center';
@@ -508,6 +560,8 @@ if (typeof window !== 'undefined') {
     renderCard, downloadCard, toDataURL, copyToClipboard, buildCardDataURL, toSVG,
     /* 调试/测试用：查看当前生效的站点配置与配色 */
     SITES, resolveSite, colorsFor,
+    /* 调试/测试用：数值格式化与文案标签覆盖（Node 侧走 module.exports） */
+    fmtNum, labelsOf, DEFAULT_LABELS, FONT_UI,
   };
 }
 
@@ -516,6 +570,7 @@ if (typeof module !== 'undefined' && module.exports) {
     renderCard, downloadCard, toDataURL, copyToClipboard, buildCardDataURL, toSVG,
     // 暴露给 Node 测试用的纯函数
     wrapText, formatDuration, drawBadge, normalizeBadge, drawGameIcon, drawMeta, roundRect,
+    labelsOf, fmtNum, DEFAULT_LABELS, FONT_UI,
     SITES, resolveSite, colorsFor, applyColors,
     COLORS, W, H,
   };
@@ -534,7 +589,7 @@ function toSVG(card, site) {
 
   const metaText = metaLinesOf(card).join('  ·  ');
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="315" viewBox="0 0 1200 630" font-family="-apple-system, PingFang SC, Microsoft YaHei, sans-serif">
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="315" viewBox="0 0 1200 630" font-family="Sora, Space Grotesk, Inter, system-ui, -apple-system, PingFang SC, Microsoft YaHei, sans-serif">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="${COLORS.primary}"/>

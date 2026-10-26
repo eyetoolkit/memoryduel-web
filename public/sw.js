@@ -11,10 +11,16 @@
    4. 其余同源静态（/css/、/js/、/shared/、图标等）：stale-while-revalidate
    换版本：V 常量升级即弃旧缓存。
 
+   🔴 2026-10-26：V 从 mdusw-v1 升到 mdusw-v2 ——
+      分享卡主色改靛蓝 + 字体栈换拉丁字体，/shared/share-card.js 内容变了。
+      /shared/ 是 stale-while-revalidate：首次访问会先吐旧缓存（用户看到的
+      还是旧橙卡片），要等第二次访问才更新。分享卡是**分享出去**的东西，
+      旧橙卡发出去就是品牌事故，所以直接升 V 把旧缓存整个清掉。
+
    ⚠️ 记录与成绩走 localStorage（无后端账号），离线可用性与 SW 无关；
       本 SW 只解决「断网时页面还能打开 + 静态资源秒开」。
    ═══════════════════════════════════════════════════════════════ */
-const V = 'mdusw-v1';
+const V = 'mdusw-v2';
 const ASSET_RE = /^\/(assets|fonts)\//;
 const ICON_RE = /^\/(favicon\.ico|apple-touch-icon\.png|icon-192\.png|icon-512\.png|icon-maskable-512\.png|manifest(\.[a-z]{2})?\.webmanifest)$/;
 

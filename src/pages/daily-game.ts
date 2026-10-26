@@ -62,6 +62,18 @@ function announce(msg: string) {
   if (live) live.textContent = msg;
 }
 
+/**
+ * 大数字千分位（2026-10-26 卡片第 2 批）。
+ * ----------------------------------------------------------------
+ * 分享卡上的分数/连胜现在还不大（每日挑战满分 74），但千分位是**口径**
+ * 问题：一旦接入总榜/累计分，"1280" 挤成一坨，读者要数位数才知道量级。
+ * 用 toLocaleString 而不是手写正则：各语言分隔符不同（de 用点、
+ * fr 用窄空格），交给运行时最省事。
+ */
+function fmtNum(n: number): string {
+  try { return n.toLocaleString(); } catch { return String(n); }
+}
+
 function sleep(ms: number) {
   return new Promise<void>((r) => setTimeout(r, ms));
 }
@@ -608,13 +620,13 @@ function buildShareCard(): ShareCardInput {
   // numeri 字段集（解/连/分/次）完全不同，硬塞进去只会互相踩。
   const lines: string[] = [];
   if (state.streak > 0) {
-    lines.push(`🔥 ${state.streak} ${t('dc.streak_days', 'Day streak')}`);
+    lines.push(`🔥 ${fmtNum(state.streak)} ${t('dc.streak_days', 'Day streak')}`);
   }
   const perfectLevels = games.filter((g) => (state.totals[g] || 0) >= c.LEVELS[g].maxScore);
   if (perfectLevels.length) {
-    lines.push(`💯 ${perfectLevels.length}/${games.length} ${t('dc.perfect_all', 'all levels maxed')}`);
+    lines.push(`💯 ${fmtNum(perfectLevels.length)}/${fmtNum(games.length)} ${t('dc.perfect_all', 'all levels maxed')}`);
   }
-  lines.push(`⭐ ${sum} / ${max}`);
+  lines.push(`⭐ ${fmtNum(sum)} / ${fmtNum(max)}`);
   // 服务端日期串优先；拿不到就不显示日期行，绝不用本地时区拼一个（会和服务端差一天）
   if (state.date) lines.push(`📅 ${state.date}`);
 
@@ -626,7 +638,7 @@ function buildShareCard(): ShareCardInput {
       return { icon: '💯', text: t('dc.badge_perfect', 'PERFECT') };
     }
     if (state.streak > 0) {
-      return { icon: '🔥', text: `${state.streak} ${t('dc.badge_streak', 'DAY STREAK')}` };
+      return { icon: '🔥', text: `${fmtNum(state.streak)} ${t('dc.badge_streak', 'DAY STREAK')}` };
     }
     return null;
   })();
@@ -634,7 +646,7 @@ function buildShareCard(): ShareCardInput {
     game: 'daily-challenge',
     icon: '🧠',
     gameName: t('dc.game_title', 'Daily Challenge'),
-    title: `${sum} / ${max}`,
+    title: `${fmtNum(sum)} / ${fmtNum(max)}`,
     subtitle: state.perfect ? t('dc.perfect_all', 'all levels maxed') : t('dc.final_title', "Today's challenge complete"),
     cta: t('dc.share_cta', 'Same puzzles for everyone — can you beat it?'),
     url: `${location.origin}${c.LOBBY_URL}?from=s${sid}`,

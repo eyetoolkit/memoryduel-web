@@ -53,6 +53,21 @@ declare global {
     };
     /** 🔴 直接给定展示行（最多 4 行），优先于 meta。 */
     metaLines?: string[];
+    /** 🔴 2026-10-26：覆盖引擎内置 meta 字段的标签文案。
+     *
+     *    引擎内置那套 meta 字段（duration/solutions_count/streak/score/attempts）
+     *    是 numeri 的口味，标签原先写死中文（解/连/分/次）与「x分y秒」。
+     *    引擎三站共用 + 6 语言，写死中文必然露馅 —— 现在默认是**英文中性兜底**，
+     *    需要本地化时由调用方通过本字段传入（键名见引擎 DEFAULT_LABELS）。
+     */
+    labels?: {
+      sec?: string;
+      min?: string;
+      solved?: string;
+      streak?: string;
+      score?: string;
+      attempts?: string;
+    };
   }
 
   interface Window {

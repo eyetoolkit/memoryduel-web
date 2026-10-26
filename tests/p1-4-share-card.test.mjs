@@ -61,33 +61,62 @@ test('card.icon / gameName 覆盖内置表（memoryduel 每日挑战用法）', 
   assert.ok(svg.includes('🔥 3 连') && svg.includes('⭐ 32 分'), '应显示 metaLines');
 });
 
-test('numeri 存量路径逐字不变（24 点 / 金字塔 / 数独）', () => {
+test('numeri 存量路径的游戏名改用英文（24 Game / Pyramid / Sudoku）', () => {
+  // 🔴 2026-10-26 卡片第 2 批：内置游戏名由中文（「24 点 / 金字塔 / 数独」）
+  //   改为英文。引擎名义上三站共用、站点支持 6 种语言，写死中文 = 非中文
+  //   用户看到一张写着中文游戏名的卡。中文名改由调用方 gameName 传入
+  //   （memoryduel 每日挑战传的就是本地化的「每日挑战」）。
   const SC = loadAsBrowser();
   const cases = [
-    ['24-game', '🃏', '24 点'],
-    ['pyramid', '🔺', '金字塔'],
-    ['sudoku', '🔢', '数独'],
+    ['24-game', '🃏', '24 Game'],
+    ['pyramid', '🔺', 'Pyramid'],
+    ['sudoku', '🔢', 'Sudoku'],
   ];
   for (const [game, icon, name] of cases) {
     const svg = SC.toSVG({ game, title: 'A', subtitle: 'B' }, 'math');
     assert.ok(svg.includes(icon), `${game} 图标应为 ${icon}`);
     assert.ok(svg.includes(name), `${game} 名称应为 ${name}`);
   }
+  // 不得再出现中文游戏名
+  const svg = SC.toSVG({ game: '24-game', title: 'A' }, 'math');
+  for (const cn of ['24 点', '金字塔', '数独']) {
+    assert.ok(!svg.includes(cn), `不应再出现中文游戏名 ${cn}`);
+  }
 });
 
-test('numeri meta 字段集自动成行，顺序与旧实现一致', () => {
+test('numeri meta 字段集自动成行，顺序与旧实现一致（标签改为英文中性兜底）', () => {
+  // 🔴 2026-10-26：meta 字段的标签原先写死中文（💡 x 解 / 🔥 x 连 /
+  //   ⭐ x 分 / 🎯 x 次），引擎三站共用 + 6 语言，写死中文必然露馅。
+  //   现在默认英文中性兜底，调用方可用 card.labels 覆盖。
   const SC = loadAsBrowser();
   const svg = SC.toSVG({
     game: '24-game', title: 'A',
     meta: { duration: 95, solutions_count: 1, streak: 3, score: 120, attempts: 2 },
   }, 'math');
   // 🔴 顺序即旧实现的 push 顺序：⏱ → 💡 → 🔥 → ⭐ → 🎯
+  for (const s of ['💡 1 solved', '🔥 3 streak', '⭐ 120 score', '🎯 2 attempts']) {
+    assert.ok(svg.includes(s), `应包含 ${s}`);
+  }
+  const i3 = svg.indexOf('🔥 3 streak');
+  const i4 = svg.indexOf('⭐ 120 score');
+  assert.ok(i3 < i4, '🔥 应排在 ⭐ 之前');
+  // 时长也应是英文单位，不再是「1分35秒」
+  assert.ok(svg.includes('1m35s'), '时长应使用英文单位（1m35s）');
+  for (const cn of ['解', '连', '分', '次', '秒']) {
+    assert.ok(!svg.includes(cn), `不应再出现中文标签 ${cn}`);
+  }
+});
+
+test('card.labels 可覆盖引擎内置标签（调用方本地化入口）', () => {
+  const SC = loadAsBrowser();
+  const svg = SC.toSVG({
+    game: '24-game', title: 'A',
+    meta: { solutions_count: 1, streak: 3, score: 120, attempts: 2 },
+    labels: { solved: '解', streak: '连', score: '分', attempts: '次' },
+  }, 'math');
   for (const s of ['💡 1 解', '🔥 3 连', '⭐ 120 分', '🎯 2 次']) {
     assert.ok(svg.includes(s), `应包含 ${s}`);
   }
-  const i3 = svg.indexOf('🔥 3 连');
-  const i4 = svg.indexOf('⭐ 120 分');
-  assert.ok(i3 < i4, '🔥 应排在 ⭐ 之前');
 });
 
 test('metaLines 优先于 meta，且最多 4 行', () => {
@@ -138,7 +167,12 @@ test('三站品牌各自正确', () => {
   // 品牌色与 tokens.css --brand-600 对齐
   assert.ok(SC.toSVG({ game: 'x', title: 'A' }, 'math').includes('#4F46E5'));
   assert.ok(SC.toSVG({ game: 'x', title: 'A' }, 'board').includes('#7F77DD'));
-  assert.ok(SC.toSVG({ game: 'x', title: 'A' }, 'memory').includes('#EA580C'));
+  // 🔴 2026-10-26 卡片第 2 批：memory 分享卡主色由旧橙 #EA580C 改为靛蓝
+  //   #4F46E5（三站统一品牌定稿）。站点主色早已是靛蓝，只有这张卡还是旧橙，
+  //   导出的 PNG 发到站外一眼就是两个品牌。
+  assert.ok(SC.toSVG({ game: 'x', title: 'A' }, 'memory').includes('#4F46E5'));
+  assert.ok(!SC.toSVG({ game: 'x', title: 'A' }, 'memory').includes('#EA580C'),
+    'memory 分享卡不得再出现旧橙 #EA580C');
 });
 
 /* ═══════════════════════════════════════════════════════════════
@@ -227,7 +261,7 @@ test('toSVG 与 renderCard 读同一套映射表，不各自漂移', () => {
   assert.equal(iconTables.length, 1,
     `GAME_ICONS 字面量表应恰好存在 1 份，实得 ${iconTables.length} 份（多份即两条渲染路径各自内联）`);
 
-  const dupName = /\{[^{}]*['"]?24-game['"]?\s*:\s*['"][^'"]*24\s*点[^'"]*['"][^{}]*\}/g;
+  const dupName = /\{[^{}]*['"]?24-game['"]?\s*:\s*['"][^'"]*24\s*Game[^'"]*['"][^{}]*\}/g;
   const nameTables = src.match(dupName) || [];
   assert.equal(nameTables.length, 1,
     `GAME_NAMES 字面量表应恰好存在 1 份，实得 ${nameTables.length} 份`);
@@ -238,8 +272,75 @@ test('toSVG 与 renderCard 读同一套映射表，不各自漂移', () => {
   const svgBody = src.slice(src.indexOf('function toSVG'));
   assert.ok(!renderBody.includes('🃏'), 'renderCard 内不应再内联游戏图标字面量');
   assert.ok(!svgBody.includes('🃏'), 'toSVG 内不应再内联游戏图标字面量');
-  assert.ok(!renderBody.includes('24 点'), 'renderCard 内不应再内联游戏名字面量');
-  assert.ok(!svgBody.includes('24 点'), 'toSVG 内不应再内联游戏名字面量');
+  assert.ok(!renderBody.includes('24 Game'), 'renderCard 内不应再内联游戏名字面量');
+  assert.ok(!svgBody.includes('24 Game'), 'toSVG 内不应再内联游戏名字面量');
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   1c. 卡片第 2 批（2026-10-26）：字体栈 / 靛蓝主色 / 千分位
+   ═══════════════════════════════════════════════════════════════ */
+
+test('字体栈必须拉丁字体在前、中文字体在后', () => {
+  // 🔴 背景：原先栈里只有 "PingFang SC", "Microsoft YaHei" 两个**中文**
+  //   字体且排在最前。Canvas 的字体回退是逐字符的 —— 拉丁字符（含英文
+  //   撇号）在中文优先的栈里拿不到合适字形，英文跟中文不是一个字重/风格。
+  //   修法与站点 --ui 变量同款：拉丁在前、中文在后兜底 CJK。
+  const src = fs.readFileSync(SHARE_CARD, 'utf8');
+  const m = src.match(/const FONT_UI\s*=\s*'([^']+)'/);
+  assert.ok(m, '必须抽出 FONT_UI 常量（避免 10 处各写一份、彼此漂移）');
+  const stack = m[1];
+  const iLatin = stack.search(/Sora|Space Grotesk|Inter/);
+  const iCjk = stack.search(/PingFang|YaHei/);
+  assert.ok(iLatin > -1, '字体栈必须含拉丁字体');
+  assert.ok(iCjk > -1, '字体栈必须保留中文字体（CJK 字符要有兜底）');
+  assert.ok(iLatin < iCjk, '拉丁字体必须排在中文字体之前');
+  // 所有正文绘制都必须用这个常量，不能再有内联的 PingFang 栈
+  const inline = src.match(/ctx\.font\s*=\s*[`'][^`']*PingFang/g) || [];
+  assert.equal(inline.length, 0,
+    `ctx.font 不得再内联 PingFang 栈（实得 ${inline.length} 处），应统一用 FONT_UI`);
+});
+
+test('memory 分享卡主色是靛蓝，与站点 --orange 变量一致', () => {
+  const SC = loadAsBrowser();
+  assert.equal(SC.SITES.memory.primary, '#4F46E5');
+  assert.equal(SC.SITES.memory.primaryDark, '#4338CA');
+  assert.equal(SC.SITES.memory.primaryLight, '#6366F1');
+  // 与站点主色令牌对齐（home.css 的 --orange 变量名保留、值已换靛蓝）
+  const home = fs.readFileSync(path.join(ROOT, 'src/styles/home.css'), 'utf8');
+  const om = home.match(/--orange:\s*(#[0-9A-Fa-f]{6})/);
+  assert.ok(om, 'home.css 必须定义 --orange 主色');
+  assert.equal(SC.SITES.memory.primary, om[1],
+    '分享卡主色必须与站点主色令牌一致');
+});
+
+test('大数字走千分位格式化', () => {
+  const SC = loadAsBrowser();
+  assert.ok(typeof SC.fmtNum === 'function', '引擎必须导出 fmtNum');
+  assert.ok(SC.fmtNum(12345).includes(','), '12345 应格式化为 12,345');
+  // 引擎内置 meta 路径的数值也要走千分位
+  const svg = SC.toSVG({
+    game: '24-game', title: 'A',
+    meta: { solutions_count: 12345, score: 12000 },
+  }, 'math');
+  assert.ok(svg.includes('12,345'), 'meta 数值应带千分位');
+  // 每日挑战侧也必须走千分位
+  assert.ok(/function fmtNum/.test(dailySrc), 'daily-game.ts 必须有 fmtNum');
+  assert.ok(/fmtNum\(sum\)/.test(dailySrc), '分数必须走 fmtNum');
+  assert.ok(/fmtNum\(state\.streak\)/.test(dailySrc), '连胜必须走 fmtNum');
+});
+
+test('share-card.js 的缓存版本已升（内容变了必须让用户拿到新文件）', () => {
+  // 🔴 /shared/ 是 stale-while-revalidate：首次访问会先吐旧缓存。
+  //   分享卡是**分享出去**的东西，旧橙卡发出去就是品牌事故，
+  //   所以 SW 版本号 + script 查询串都要一起升。
+  const html = fs.readFileSync(path.join(ROOT, 'games/daily-challenge/index.html'), 'utf8');
+  const m = html.match(/\/shared\/share-card\.js\?v=(\d+)/);
+  assert.ok(m, 'script 必须带 ?v= 查询串做 cache-buster');
+  assert.ok(Number(m[1]) >= 2, `script 版本号应 ≥2（内容已改），实际 ${m[1]}`);
+  const sw = fs.readFileSync(path.join(ROOT, 'public/sw.js'), 'utf8');
+  const v = sw.match(/const V = '([^']+)'/);
+  assert.ok(v, 'sw.js 必须定义缓存版本 V');
+  assert.ok(!/mdusw-v1/.test(v[1]), `SW 缓存版本应已升级（当前 ${v[1]}）`);
 });
 
 /* ═══════════════════════════════════════════════════════════════

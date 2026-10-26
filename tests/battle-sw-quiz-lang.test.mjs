@@ -16,7 +16,11 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const sw = fs.readFileSync(path.join(root, 'public/sw.js'), 'utf8');
-assert.match(sw, /const V = 'mdusw-v1'/);
+// 🔴 2026-10-26：原先硬断言 V === 'mdusw-v1'，结果每次因为内容变更升
+//   缓存版本（分享卡换主色等）都要回来改这个测试 —— 而它锁的是**缓存策略**
+//   （导航 network-first / api 不拦截 / quiz-data 非 cache-first），
+//   版本号本身不是被测对象。改成版本无关的匹配，避免"改版本号就得改测试"。
+assert.match(sw, /const V = 'mdusw-v\d+'/);
 // 页面导航 network-first：所有 HTML 导航（含 /battle、/train.html、/index.html）
 // 永远优先网络，断网才回落缓存——比旧实现的逐页清单更通用
 assert.match(sw, /req\.mode === 'navigate'/);
@@ -25,7 +29,7 @@ assert.match(sw, /caches\.match\('\/'\)/);
 assert.match(sw, /url\.pathname\.startsWith\('\/api\/'\)/);
 // quiz-data.js 不得进 cache-first（它不带内容 hash —— sw.js 全文不应出现 quiz-data 字面量）
 assert.doesNotMatch(sw, /quiz-data/);
-console.log('✓ sw.js（线上注册版）V=mdusw-v1；导航 network-first；/api 不拦截；quiz-data 非 cache-first');
+console.log('✓ sw.js（线上注册版）V=mdusw-v*；导航 network-first；/api 不拦截；quiz-data 非 cache-first');
 
 /* 修订（2026-10-23）：cache-bust 从「?v= query」升级为「文件名版本化」。
    原断言要求 quiz-data.js?v=<版本>，理由见下：
