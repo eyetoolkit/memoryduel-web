@@ -32,8 +32,17 @@ declare global {
     cta?: string;
     /** 卡面底部展示的 URL，默认取站点 host。 */
     url?: string;
-    /** 右上角徽章。 */
-    badge?: { icon: string; text: string };
+    /** 右上角徽章。
+     *
+     * 🔴 2026-10-26：类型须与引擎 `normalizeBadge()` 的实际能力对齐。
+     *    引擎接受三种形态并统一归一化：字符串（当纯文字）、{icon,text} 对象、
+     *    以及 null / undefined / 空内容（→ 不绘制徽章，不留空药丸）。
+     *    此前此处只声明 `badge?: {icon,text}`，导致调用方无法把
+     *    `normalizeBadge()` 的 null 结果或字符串形态传进来 —— 类型比实现窄，
+     *    tsc 直接报错 TS2322。**声明必须 ≥ 实现的接受范围**，否则引擎加固反而
+     *    让调用方编译不过。
+     */
+    badge?: { icon: string; text: string } | string | null;
     /** numeri 口味的结构化 meta（duration/solutions_count/streak/score/attempts）。 */
     meta?: {
       duration?: number;
