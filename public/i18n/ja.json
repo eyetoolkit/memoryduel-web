@@ -989,6 +989,8 @@
     "cross_board": "チェス · 五目並べ · Connect 4 · オセロ · 三目並べ"
   },
   "dc": {
+    "badge_perfect": "全問正解",
+    "badge_streak": "連続日数",
     "game_title": "デイリーチャレンジ",
     "game_back": "← モード選択へ",
     "loading": "今日のパズルを読み込み中…",

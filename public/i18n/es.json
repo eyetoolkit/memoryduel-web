@@ -989,6 +989,8 @@
     "cross_board": "Ajedrez · Gomoku · Connect 4 · Othello · Tres en raya"
   },
   "dc": {
+    "badge_perfect": "PERFECTO",
+    "badge_streak": "DÍAS SEGUIDOS",
     "game_title": "Desafío diario",
     "game_back": "← Todos los modos",
     "loading": "Cargando el reto de hoy…",

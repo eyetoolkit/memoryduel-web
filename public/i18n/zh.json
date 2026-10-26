@@ -989,6 +989,8 @@
     "cross_board": "国际象棋 · 五子棋 · 四子棋 · 黑白棋 · 井字棋"
   },
   "dc": {
+    "badge_perfect": "全满",
+    "badge_streak": "连胜",
     "game_title": "每日挑战",
     "game_back": "← 返回模式选择",
     "loading": "正在加载今日题目…",

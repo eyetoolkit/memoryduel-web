@@ -989,6 +989,8 @@
     "cross_board": "Chess · Gomoku · Connect 4 · Othello · Tic-Tac-Toe"
   },
   "dc": {
+    "badge_perfect": "PERFECT",
+    "badge_streak": "DAY STREAK",
     "game_title": "Daily Challenge",
     "game_back": "← All modes",
     "loading": "Loading today's puzzle…",

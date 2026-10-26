@@ -619,6 +619,17 @@ function buildShareCard(): ShareCardInput {
   if (state.date) lines.push(`📅 ${state.date}`);
 
   const sid = 'd' + Math.random().toString(36).slice(2, 10);
+  // 徽章：只在真有亮点时才给（全部关卡满分 > 连胜），没有就不传 ——
+  // 引擎会跳过绘制，而不是留下一个空药丸。
+  const badge = (() => {
+    if (games.length > 0 && perfectLevels.length === games.length) {
+      return { icon: '💯', text: t('dc.badge_perfect', 'PERFECT') };
+    }
+    if (state.streak > 0) {
+      return { icon: '🔥', text: `${state.streak} ${t('dc.badge_streak', 'DAY STREAK')}` };
+    }
+    return null;
+  })();
   return {
     game: 'daily-challenge',
     icon: '🧠',
@@ -628,6 +639,7 @@ function buildShareCard(): ShareCardInput {
     cta: t('dc.share_cta', 'Same puzzles for everyone — can you beat it?'),
     url: `${location.origin}${c.LOBBY_URL}?from=s${sid}`,
     metaLines: lines,
+    badge,
   };
 }
 

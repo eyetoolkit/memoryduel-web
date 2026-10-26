@@ -25,10 +25,17 @@
    🔴 primary 必须与各站 tokens.css 的 --brand-600 保持一致：
      memory : tokens.css:214 html[data-site="memory"] --brand-600 #EA580C
      board  : tokens.css:194 html[data-site="board"]  --brand-600 #7F77DD
-   改这里前先核对 tokens.css，不要凭印象填色。 */
+   改这里前先核对 tokens.css，不要凭印象填色。
+
+   🔴 2026-10-26 name 一律用**英文品牌名**（NumeriDuel / BoardDuel /
+   MemoryDuel），不再用「数学对决 / 棋盘对决 / 记忆对决」中文名：
+     · 与各站 header 的 logo 文案一致（BoardDuel / MemoryDuel / NumeriDuel）
+     · 卡片是要分享到站外的，英文品牌名对 6 种语言的用户都成立；
+       中文名会让德语/日语用户看到一张写着「棋盘对决」却署名 boardduel.com 的卡
+     · 中文站点的品牌名本来就是英文——三站 logo 都没用中文名。 */
 const SITES = {
   math: {
-    name: '数学对决',
+    name: 'NumeriDuel',
     host: 'numeriduel.com',
     url: 'https://numeriduel.com',
     primary: '#4F46E5',
@@ -37,7 +44,7 @@ const SITES = {
     accent: '#FBBF24',
   },
   board: {
-    name: '棋盘对决',
+    name: 'BoardDuel',
     host: 'boardduel.com',
     url: 'https://boardduel.com',
     primary: '#7F77DD',
@@ -46,7 +53,7 @@ const SITES = {
     accent: '#F59E0B',
   },
   memory: {
-    name: '记忆对决',
+    name: 'MemoryDuel',
     host: 'memoryduel.com',
     url: 'https://memoryduel.com',
     primary: '#EA580C',
@@ -169,29 +176,59 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
-/* ─── 工具:绘制带文字徽章 ─── */
-function drawBadge(ctx, x, y, badge) {
-  if (!badge) return;
-  const icon = badge.icon || '';
-  const text = badge.text || '';
-  ctx.font = '700 28px "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif';
-  const textW = ctx.measureText(text).width;
+/* ─── 工具:归一化徽章输入 ───────────────────────────────
+   🔴 2026-10-26：原实现对 badge 的结构零防御，踩过两个坑：
+      ① 传字符串（'NEW RECORD'）时 badge.icon / badge.text 都是 undefined
+         → textW=0 → 只画出一个 36px 宽的空药丸，文字完全不见
+         （「有药丸没字」的观感就是从这来的，不是绘制顺序问题）
+      ② 无 icon 且无文字时仍会画出空药丸，白白占一块视觉
+   现在统一归一化：字符串当纯文字、对象取 icon/text，两者都空 → 不画。 */
+function normalizeBadge(badge) {
+  if (!badge) return null;
+  if (typeof badge === 'string') {
+    const text = badge.trim();
+    return text ? { icon: '', text } : null;
+  }
+  if (typeof badge !== 'object') return null;
+  const icon = typeof badge.icon === 'string' ? badge.icon.trim() : '';
+  const text = typeof badge.text === 'string' ? badge.text.trim() : '';
+  if (!icon && !text) return null;
+  return { icon, text };
+}
+
+/* ─── 工具:绘制带文字徽章 ───────────────────────────────
+   🔴 opts.right：给定右边界则**先量宽再右对齐**。原先调用处写死
+      「右边 - 220px」的偏移量，徽章实际宽度随文字长短变化，窄徽章会
+      离右边缘留下空档，宽徽章则会越出卡片内边距。现在按实际宽度定位。 */
+function drawBadge(ctx, x, y, badge, opts) {
+  const b = normalizeBadge(badge);
+  if (!b) return 0;
+  const icon = b.icon, text = b.text;
   const padX = 18, padY = 10;
-  const w = textW + (icon ? 36 : 0) + padX * 2;
   const h = 56;
+  ctx.font = '700 24px "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif';
+  const textW = text ? ctx.measureText(text).width : 0;
+  // 🔴 42 而不是 36：emoji 在 28px 字号下的实际推进宽度接近 28px，
+  //    按 36 排会让文字紧贴图标（实测「💯PERFECT」连在一起）。
+  const iconW = icon ? 42 : 0;
+  const w = textW + iconW + padX * 2;
+  let bx = x;
+  if (opts && typeof opts.right === 'number') bx = Math.max(0, opts.right - w);
   ctx.fillStyle = COLORS.accent;
-  roundRect(ctx, x, y, w, h, 28);
+  roundRect(ctx, bx, y, w, h, 28);
   ctx.fill();
   if (icon) {
     ctx.font = '28px "Apple Color Emoji", "Segoe UI Emoji", sans-serif';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = COLORS.text;
-    ctx.fillText(icon, x + padX, y + h/2 + 2);
+    ctx.fillText(icon, bx + padX, y + h/2 + 2);
   }
-  ctx.font = '700 24px "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif';
-  ctx.fillStyle = COLORS.text;
-  ctx.textBaseline = 'middle';
-  ctx.fillText(text, x + padX + (icon ? 36 : 0), y + h/2 + 2);
+  if (text) {
+    ctx.font = '700 24px "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif';
+    ctx.fillStyle = COLORS.text;
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, bx + padX + iconW, y + h/2 + 2);
+  }
   return w;
 }
 
@@ -236,17 +273,21 @@ function metaLinesOf(card) {
   return items;
 }
 
-/* ─── 工具:绘制 meta 信息(右下角)─── */
-function drawMeta(ctx, x, y, lines) {
+/* ─── 工具:绘制 meta 信息 ───
+   🔴 align 显式参数：原先依赖调用处残留的 ctx.textAlign（恰好是 center），
+   结果 meta 以 x=920 为中心排版 —— 视觉上偏右，与居中的标题/按钮对不齐。 */
+function drawMeta(ctx, x, y, lines, align) {
   if (!Array.isArray(lines) || lines.length === 0) return;
   ctx.font = '500 24px "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif';
   ctx.fillStyle = COLORS.textLight;
   ctx.textBaseline = 'top';
+  ctx.textAlign = align === 'center' ? 'center' : 'left';
 
   const lineHeight = 32;
   for (let i = 0; i < lines.length; i++) {
     ctx.fillText(lines[i], x, y + i * lineHeight);
   }
+  ctx.textAlign = 'left';
 }
 
 function formatDuration(s) {
@@ -313,9 +354,9 @@ function renderCard(canvas, card, site) {
 
   /* ─── 徽章(右上,游戏名下方)─── */
   if (card.badge) {
-    const badgeW = drawBadge(ctx, cardX + cardW - 40 - 220, cardY + 80, card.badge);
-    // 居右对齐
-    // (此处简化:固定位置;实测不影响)
+    // 🔴 右对齐到内容右边界：宽度随文字长短变化，写死偏移会窄的贴不住边、
+    //    宽的越出内边距。drawBadge 内部先量宽再定位。
+    drawBadge(ctx, cardX + 40, cardY + 80, card.badge, { right: cardX + cardW - 40 });
   }
 
   /* ─── 主标题(中上,大字)─── */
@@ -326,7 +367,9 @@ function renderCard(canvas, card, site) {
   ctx.textBaseline = 'middle';
 
   const titleLines = wrapText(ctx, card.title || '', cardW - 120);
-  const titleStartY = cardY + cardH * 0.36;
+  // 🔴 2026-10-26：0.36 → 0.33。原位置把标题压到 246，副标题/meta/CTA/URL
+  //    四段全挤在下面 220px 里，导致 meta 压在 CTA 按钮上、URL 溢出白卡底边。
+  const titleStartY = cardY + cardH * 0.33;
   if (titleLines.length === 1) {
     ctx.fillText(titleLines[0], W/2, titleStartY);
   } else if (titleLines.length === 2) {
@@ -339,24 +382,25 @@ function renderCard(canvas, card, site) {
     ctx.fillText(titleLines[2], W/2, titleStartY + 72);
   }
 
-  /* ─── 副文案(中部)─── */
+  /* ─── 副文案(标题下方) ─── */
+  const subY = titleStartY + (titleLines.length === 1 ? 62 : titleLines.length * 50 + 30);
   if (card.subtitle) {
     ctx.font = '500 30px "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif';
     ctx.fillStyle = COLORS.textLight;
     ctx.textBaseline = 'middle';
     const subLines = wrapText(ctx, card.subtitle, cardW - 120);
-    const subY = titleStartY + (titleLines.length === 1 ? 60 : titleLines.length * 50 + 30);
     ctx.fillText(subLines[0], W/2, subY);
   }
 
-  /* ─── CTA 按钮(中下)─── */
+  /* ─── CTA 按钮(下部) ─── */
+  const ctaTop = cardY + cardH - 108;
   if (card.cta) {
     const ctaText = card.cta;
     ctx.font = '700 28px "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif';
     const tw = ctx.measureText(ctaText).width;
     const btnW = tw + 80, btnH = 60;
     const btnX = (W - btnW) / 2;
-    const btnY = cardY + cardH - 140;
+    const btnY = ctaTop;
     const grad = ctx.createLinearGradient(btnX, btnY, btnX + btnW, btnY + btnH);
     grad.addColorStop(0, COLORS.primary);
     grad.addColorStop(1, COLORS.primaryLight);
@@ -368,20 +412,29 @@ function renderCard(canvas, card, site) {
     ctx.fillText(ctaText, W/2, btnY + btnH/2 + 2);
   }
 
-  /* ─── meta 信息(右下角)─── */
+  /* ─── meta 信息(副标题与 CTA 之间,居中) ──────────────────
+     🔴 2026-10-26 重排。原实现把 meta 放在「右下角」(x=920 中心, y=450 起)，
+        而 CTA 按钮在 420~480 —— 两行以上 meta 必然压在按钮上（实测 4 行时
+        第 1 行正好落在按钮内部），最后一行还会溢出白卡底边。
+        现在 meta 移到副标题正下方、CTA 之上，并改为整卡居中对齐
+        （原先偏右，与标题/按钮对不齐）。行数按可用空间自动收敛，
+        标题多行时也不会重叠。 */
   if (card.meta || card.metaLines) {
-    const metaX = cardX + cardW - 200;
-    const metaY = cardY + cardH - 110;
-    drawMeta(ctx, metaX, metaY, metaLinesOf(card));
+    const all = metaLinesOf(card);
+    const metaY = subY + 26;
+    let n = Math.min(all.length, 4);
+    while (n > 1 && metaY + ((n - 1) * 32 + 24) > ctaTop - 12) n--;
+    drawMeta(ctx, W / 2, metaY, all.slice(0, n), 'center');
   }
 
-  /* ─── 网址(底部)─── */
+  /* ─── 网址(白卡底部内) ───
+     🔴 原先画在 H-32=598，落在白卡底边(560)之外，视觉上像「溢出」。 */
   ctx.font = '500 20px -apple-system, "PingFang SC", sans-serif';
   ctx.fillStyle = COLORS.textLight;
   ctx.textBaseline = 'bottom';
   ctx.textAlign = 'center';
   const urlText = card.url || S.host;
-  ctx.fillText(urlText, W/2, H - 32);
+  ctx.fillText(urlText, W/2, cardY + cardH - 20);
 
   return canvas;
 }
@@ -462,7 +515,7 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     renderCard, downloadCard, toDataURL, copyToClipboard, buildCardDataURL, toSVG,
     // 暴露给 Node 测试用的纯函数
-    wrapText, formatDuration, drawBadge, drawGameIcon, drawMeta, roundRect,
+    wrapText, formatDuration, drawBadge, normalizeBadge, drawGameIcon, drawMeta, roundRect,
     SITES, resolveSite, colorsFor, applyColors,
     COLORS, W, H,
   };
@@ -506,21 +559,25 @@ function toSVG(card, site) {
     const cjk = (card.cta.match(/[\u4e00-\u9fa5]/g) || []).length;
     const ascii = card.cta.length - cjk;
     const tw = cjk * 32 + ascii * 18 + 80;
-    return `<rect x="${(1200 - tw) / 2}" y="430" width="${tw}" height="64" rx="32" fill="${COLORS.primary}"/>
-    <text x="600" y="471" font-size="30" font-weight="700" fill="white" text-anchor="middle">${escapeXml(card.cta)}</text>`;
+    return `<rect x="${(1200 - tw) / 2}" y="452" width="${tw}" height="60" rx="30" fill="${COLORS.primary}"/>
+    <text x="600" y="491" font-size="30" font-weight="700" fill="white" text-anchor="middle">${escapeXml(card.cta)}</text>`;
   })() : ''}
-  ${card.badge ? (() => {
-    const cjk = ((card.badge.text || '').match(/[\u4e00-\u9fa5]/g) || []).length;
-    const ascii = (card.badge.text || '').length - cjk;
-    const tw = (card.badge.icon ? 36 : 0) + cjk * 28 + ascii * 16 + 36;
+  ${(() => {
+    // 🔴 与 canvas 路径共用同一个归一化：字符串/对象都吃，
+    //    空徽章不画空药丸（原先这里只认 {icon,text} 对象）。
+    const b = normalizeBadge(card.badge);
+    if (!b) return '';
+    const cjk = (b.text.match(/[\u4e00-\u9fa5]/g) || []).length;
+    const ascii = b.text.length - cjk;
+    const tw = (b.icon ? 42 : 0) + cjk * 28 + ascii * 16 + 36;
     return `<rect x="${1080 - tw}" y="190" width="${tw}" height="56" rx="28" fill="${COLORS.accent}"/>
-    ${card.badge.icon ? `<text x="${1080 - tw + 18}" y="226" font-size="28">${card.badge.icon}</text>` : ''}
-    <text x="${1080 - tw + 18 + (card.badge.icon ? 36 : 0)}" y="226" font-size="24" font-weight="700" fill="${COLORS.text}">${escapeXml(card.badge.text || '')}</text>`;
-  })() : ''}
-  <text x="600" y="335" font-size="56" font-weight="900" fill="${COLORS.text}" text-anchor="middle">${escapeXml(card.title || '')}</text>
-  <text x="600" y="400" font-size="28" font-weight="500" fill="${COLORS.textLight}" text-anchor="middle">${escapeXml(card.subtitle || '')}</text>
-  <text x="960" y="520" font-size="24" font-weight="500" fill="${COLORS.textLight}">${escapeXml(metaText)}</text>
-  <text x="600" y="595" font-size="20" font-weight="500" fill="${COLORS.textLight}" text-anchor="middle">${escapeXml(card.url || S.host)}</text>
+    ${b.icon ? `<text x="${1080 - tw + 18}" y="226" font-size="28">${b.icon}</text>` : ''}
+    ${b.text ? `<text x="${1080 - tw + 18 + (b.icon ? 42 : 0)}" y="226" font-size="24" font-weight="700" fill="${COLORS.text}">${escapeXml(b.text)}</text>` : ''}`;
+  })()}
+  <text x="600" y="300" font-size="56" font-weight="900" fill="${COLORS.text}" text-anchor="middle">${escapeXml(card.title || '')}</text>
+  <text x="600" y="352" font-size="28" font-weight="500" fill="${COLORS.textLight}" text-anchor="middle">${escapeXml(card.subtitle || '')}</text>
+  <text x="600" y="420" font-size="24" font-weight="500" fill="${COLORS.textLight}" text-anchor="middle">${escapeXml(metaText)}</text>
+  <text x="600" y="540" font-size="20" font-weight="500" fill="${COLORS.textLight}" text-anchor="middle">${escapeXml(card.url || S.host)}</text>
 </svg>`;
 }
 

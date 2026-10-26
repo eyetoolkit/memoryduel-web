@@ -989,6 +989,8 @@
     "cross_board": "Échecs · Gomoku · Puissance 4 · Othello · Morpion"
   },
   "dc": {
+    "badge_perfect": "PARFAIT",
+    "badge_streak": "JOURS D'AFFILÉE",
     "game_title": "Défi du jour",
     "game_back": "← Tous les modes",
     "loading": "Chargement du puzzle du jour…",

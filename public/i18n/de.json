@@ -989,6 +989,8 @@
     "cross_board": "Schach · Gomoku · Vier gewinnt · Othello · Tic-Tac-Toe"
   },
   "dc": {
+    "badge_perfect": "PERFEKT",
+    "badge_streak": "TAGE SERIE",
     "game_title": "Tägliche Herausforderung",
     "game_back": "← Alle Modi",
     "loading": "Heutiges Rätsel wird geladen…",

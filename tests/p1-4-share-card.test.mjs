@@ -142,6 +142,66 @@ test('三站品牌各自正确', () => {
 });
 
 /* ═══════════════════════════════════════════════════════════════
+   1b. 卡片品牌名与徽章（2026-10-26 修复后的回归防护）
+   ═══════════════════════════════════════════════════════════════ */
+
+test('站名用英文品牌名，与各站 header logo 一致', () => {
+  // 🔴 背景：原先 SITES.*.name 写死中文（数学对决/棋盘对决/记忆对决），
+  //   卡片分享到站外后，德语/日语用户会看到一张写着「棋盘对决」却署名
+  //   boardduel.com 的卡；中文用户的品牌名也和 logo（MemoryDuel）对不上。
+  const SC = loadAsBrowser();
+  assert.ok(SC.toSVG({ game: 'x', title: 'A' }, 'math').includes('NumeriDuel'));
+  assert.ok(SC.toSVG({ game: 'x', title: 'A' }, 'board').includes('BoardDuel'));
+  assert.ok(SC.toSVG({ game: 'x', title: 'A' }, 'memory').includes('MemoryDuel'));
+  // 中文站名不得再出现
+  for (const cn of ['数学对决', '棋盘对决', '记忆对决']) {
+    assert.ok(!SC.toSVG({ game: 'x', title: 'A' }, 'memory').includes(cn),
+      `不应再出现中文站名 ${cn}`);
+  }
+});
+
+test('徽章传字符串也能画出文字（不再只剩空药丸）', () => {
+  // 🔴 背景：drawBadge 原先只认 {icon,text} 对象。传字符串时
+  //   badge.text / badge.icon 均为 undefined → textW=0 → 只画一个
+  //   36px 宽的空药丸，文字完全消失。
+  const SC = loadAsBrowser();
+  const svg = SC.toSVG({ game: 'x', title: 'A', badge: 'NEW RECORD' }, 'memory');
+  assert.ok(svg.includes('NEW RECORD'), '字符串徽章应显示文字');
+  assert.ok(svg.includes('y="190"'), '应画出徽章底板');
+});
+
+test('空徽章不画空药丸', () => {
+  const SC = loadAsBrowser();
+  const svg = SC.toSVG({ game: 'x', title: 'A', badge: { icon: '', text: '' } }, 'memory');
+  assert.ok(!svg.includes('y="190"'), '空徽章不应留下药丸底板');
+});
+
+test('徽章右对齐到内容右边界（宽度随文字变化也不越界）', () => {
+  const SC = loadAsBrowser();
+  const src = fs.readFileSync(SHARE_CARD, 'utf8');
+  assert.ok(/drawBadge\(ctx,[^)]*\{\s*right:/.test(src),
+    'renderCard 必须用 right 选项右对齐徽章，而不是写死像素偏移');
+  assert.ok(!/cardW - 40 - 220/.test(src), '不得再写死「右边 -220px」的徽章偏移');
+});
+
+test('每日挑战在有亮点时给分享卡挂徽章', () => {
+  const shareFn = dailySrc.slice(dailySrc.indexOf('function buildShareCard'));
+  assert.ok(/badge_perfect/.test(shareFn), '满分时应给 PERFECT 徽章');
+  assert.ok(/badge_streak/.test(shareFn), '连胜时应给连胜徽章');
+  assert.ok(/\n\s*badge,/.test(shareFn), 'buildShareCard 必须把 badge 放进返回值');
+});
+
+test('六语字典都有徽章文案', () => {
+  for (const lg of LANGS) {
+    const d = JSON.parse(fs.readFileSync(path.join(ROOT, `public/i18n/${lg}.json`), 'utf8'));
+    for (const k of ['badge_perfect', 'badge_streak']) {
+      assert.ok(typeof d.dc?.[k] === 'string' && d.dc[k].trim(),
+        `${lg}.dc.${k} 缺失或为空`);
+    }
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════
    2. 双渲染路径一致性（本次改造的核心动机）
    ═══════════════════════════════════════════════════════════════ */
 
