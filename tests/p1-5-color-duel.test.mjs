@@ -326,8 +326,13 @@ test('sequence 与 number 的文案与判定仍走原有分支', () => {
   for (const k of ['seq_title', 'seq_ready_hint', 'num_title', 'num_ready_hint', 'col_title']) {
     assert.ok(entry.includes(k), `COPY 表缺 ${k}`);
   }
-  // number 仍是「位数满即提交」，不能被颜色分支污染
-  assert.ok(/ans\.value\.length === target\.length/.test(src), 'number 的自动提交判定应保留');
+  // 🔴 2026-10-29 P0-2：number 契约已改「显式提交」——输满自动提交会把
+  //    整串答案明文回显 1100ms（靠剧透堆分），删除后由 #numSubmit 按钮 + Enter 提交。
+  //    sequence 同批加了 #seqSubmit + 进度提示，但 `picked.length >= seq.length`
+  //    仍保留为 done() 的收尾判定（点满即可提前交卷）。
+  assert.ok(/numSubmit/.test(src), 'number 应有显式提交按钮 #numSubmit');
+  assert.ok(!/ans\.value\.length === target\.length/.test(src), 'number 不得保留「位数满即自动提交」');
+  assert.ok(/seqSubmit/.test(src), 'sequence 应有提交按钮 #seqSubmit');
   assert.ok(/if \(picked\.length >= seq\.length\)/.test(src), 'sequence 的点满判定应保留');
 });
 
