@@ -30,6 +30,9 @@
   /* 圆角刻度（B1） */
   --r-sm:8px; --r-md:12px; --r-lg:18px; --r-pill:999px;
   --rd:var(--r-lg); --rt:var(--r-md);
+  /* 游戏图标 sprite 内部色（2026-10-29）：跟随主题，暗色作用域内覆写 */
+  --i-ink:#1E1B39; --i-card:#FFFFFF; --i-mut:#9AA0B5; --i-line:#C9CEDD;
+  --chip-bg:rgba(79,70,229,.07); --chip-line:rgba(79,70,229,.18);
   --disp:'Space Grotesk',system-ui,sans-serif;
   --ui:'Sora',system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
   --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -229,7 +232,10 @@ h1 em{font-style:normal;color:var(--orange)}
 .gcard{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:var(--rd);padding:20px;min-width:0;position:relative;transition:transform .14s,border-color .14s,box-shadow .14s;cursor:pointer;touch-action:manipulation}
 .gcard:hover{transform:translateY(-3px);border-color:var(--orange);box-shadow:0 8px 22px rgba(79,70,229,.13)}
 .gcard:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
-.gcard-icon{font-size:30px;line-height:1}
+/* 游戏图标 chip（2026-10-29）：56px 容器 + 40px SVG（sprite use）。
+   旧版是裸 emoji font-size:30px；SVG 内部颜色走 --i-* 变量，随主题切换。 */
+.gcard-icon{width:56px;height:56px;border-radius:16px;background:var(--chip-bg);border:1px solid var(--chip-line);display:flex;align-items:center;justify-content:center}
+.gcard-icon svg{width:40px;height:40px;display:block}
 .gcard-title{font-family:var(--disp);font-weight:700;font-size:17px;margin:10px 0 5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .gcard-desc{font-size:13px;color:var(--mute);line-height:1.55}
 .gcard-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
@@ -363,6 +369,9 @@ body { touch-action: manipulation; }
    ═════════════════════════════════════════════════════════════ */
 html[data-theme="dark"]{
   --paper:#12131F; --card:#1A1B2E; --ink:#E8EAF4; --mute:#8B90A8; --line:#2D2F44;
+  /* 图标 sprite 内部色（暗色） */
+  --i-ink:#E8EAF4; --i-card:#1A1B2E; --i-mut:#6B7188; --i-line:#3A3D58;
+  --chip-bg:rgba(129,140,248,.12); --chip-line:rgba(129,140,248,.28);
   /* 暗色专属文字色：亮靛蓝，压暗底 6.18:1（#A5B4FC on #1A1B2E） */
   --orange-deep:#A5B4FC;
   /* 暗色专属实心底：#FFFFFF on #4338CA = 9.84:1 */

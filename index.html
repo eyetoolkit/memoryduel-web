@@ -91,6 +91,137 @@
   </div>
 </div>
 
+<!-- ═══════════ 游戏图标 sprite（2026-10-29）：8 枚手绘 SVG · viewBox 48×48 ═══════════
+     设计语言：tile 盘面母题 · 实心=闪现过的内容 · 虚线=消失待回忆（呼应数独语法）。
+     内部颜色走 --i-* 变量（定义见 home.css :root / html[data-theme=dark]），跟随亮暗主题。
+     内联 sprite = 零额外请求，8 枚共约 4KB。 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <!-- 知识对决：两张答题卡对峙，前卡亮绿勾 -->
+    <symbol id="ig-knowledge" viewBox="0 0 48 48">
+      <rect x="7" y="9" width="21" height="28" rx="4" style="fill:var(--i-card);stroke:var(--i-mut);stroke-width:2"/>
+      <g style="stroke:var(--i-line);stroke-width:2.6;stroke-linecap:round">
+        <path d="M12.5 18h9M12.5 24h6M12.5 30h8"/>
+      </g>
+      <rect x="20" y="13" width="21" height="28" rx="4" style="fill:var(--i-card);stroke:var(--i-ink);stroke-width:2"/>
+      <circle cx="30.5" cy="21.5" r="4.6" style="fill:#22C55E"/>
+      <path d="M28.4 21.6l1.5 1.5 2.7-3.1" fill="none" style="stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"/>
+      <rect x="25" y="29.5" width="11" height="3.2" rx="1.6" style="fill:#4F46E5"/>
+      <rect x="25" y="35" width="7.5" height="3.2" rx="1.6" style="fill:var(--i-line)"/>
+    </symbol>
+    <!-- 每日挑战：日历 · 3 实格 2 虚格（3 of 5） -->
+    <symbol id="ig-daily" viewBox="0 0 48 48">
+      <rect x="9" y="11" width="30" height="28" rx="4" style="fill:var(--i-card);stroke:var(--i-ink);stroke-width:2"/>
+      <g style="stroke:var(--i-ink);stroke-width:2.4;stroke-linecap:round">
+        <path d="M17 7.5v6M31 7.5v6"/>
+      </g>
+      <path d="M9.8 19h28.4" style="stroke:var(--i-line);stroke-width:1.8"/>
+      <g style="fill:#4F46E5">
+        <rect x="14.2" y="23" width="6.4" height="6.4" rx="1.8"/>
+        <rect x="22.3" y="23" width="6.4" height="6.4" rx="1.8"/>
+        <rect x="30.4" y="23" width="6.4" height="6.4" rx="1.8"/>
+      </g>
+      <g style="fill:none;stroke:var(--i-mut);stroke-width:1.7;stroke-dasharray:2.6 2.4" stroke-linecap="round">
+        <rect x="14.2" y="31.2" width="6.4" height="6.4" rx="1.8"/>
+        <rect x="22.3" y="31.2" width="6.4" height="6.4" rx="1.8"/>
+      </g>
+    </symbol>
+    <!-- 序列记忆：3×3 盘面 · 一条 1→2→3 递亮路径 -->
+    <symbol id="ig-sequence" viewBox="0 0 48 48">
+      <g style="fill:none;stroke:var(--i-line);stroke-width:1.8">
+        <rect x="10" y="10" width="9" height="9" rx="2.5"/>
+        <rect x="31" y="10" width="9" height="9" rx="2.5"/>
+        <rect x="10" y="20.5" width="9" height="9" rx="2.5"/>
+        <rect x="31" y="20.5" width="9" height="9" rx="2.5"/>
+        <rect x="10" y="31" width="9" height="9" rx="2.5"/>
+        <rect x="20.5" y="31" width="9" height="9" rx="2.5"/>
+        <rect x="31" y="31" width="9" height="9" rx="2.5"/>
+      </g>
+      <g style="fill:#4F46E5">
+        <rect x="10" y="10" width="9" height="9" rx="2.5"/>
+        <rect x="20.5" y="10" width="9" height="9" rx="2.5"/>
+        <rect x="20.5" y="20.5" width="9" height="9" rx="2.5"/>
+      </g>
+      <g font-size="6.6" font-weight="700" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central" font-family="var(--mono)">
+        <text x="14.5" y="14.8">1</text>
+        <text x="25" y="14.8">2</text>
+        <text x="25" y="25.3">3</text>
+      </g>
+    </symbol>
+    <!-- 数字回忆：7 · 4 · ▢（第三位虚线待回忆） -->
+    <symbol id="ig-number" viewBox="0 0 48 48">
+      <rect x="6.5" y="15" width="12" height="18" rx="3.5" style="fill:#4F46E5"/>
+      <rect x="18.5" y="15" width="12" height="18" rx="3.5" style="fill:#4F46E5"/>
+      <rect x="30.5" y="15" width="12" height="18" rx="3.5" style="fill:none;stroke:var(--i-mut);stroke-width:2;stroke-dasharray:3.2 2.8" stroke-linecap="round"/>
+      <g font-size="11" font-weight="700" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central" font-family="var(--mono)">
+        <text x="12.5" y="24.4">7</text>
+        <text x="24.5" y="24.4">4</text>
+      </g>
+      <g style="fill:var(--i-line)">
+        <circle cx="14" cy="39" r="1.8"/><circle cx="24" cy="39" r="1.8"/>
+      </g>
+      <circle cx="34" cy="39" r="1.8" style="fill:none;stroke:var(--i-mut);stroke-width:1.5"/>
+    </symbol>
+    <!-- 颜色回忆：色盘 · 三实一虚 -->
+    <symbol id="ig-colour" viewBox="0 0 48 48">
+      <circle cx="9.5" cy="24" r="4.6" style="fill:#4F46E5"/>
+      <circle cx="19" cy="24" r="4.6" style="fill:#22C55E"/>
+      <circle cx="28.5" cy="24" r="4.6" style="fill:#F59E0B"/>
+      <circle cx="38" cy="24" r="4.6" style="fill:none;stroke:var(--i-mut);stroke-width:1.9;stroke-dasharray:2.8 2.6"/>
+    </symbol>
+    <!-- 幽灵符号：四格中一格幽灵缺失 -->
+    <symbol id="ig-ghost" viewBox="0 0 48 48">
+      <rect x="6.5" y="19.5" width="9" height="9" rx="2.5" style="fill:var(--i-card);stroke:var(--i-ink);stroke-width:1.8"/>
+      <circle cx="11" cy="24" r="2" style="fill:#4F46E5"/>
+      <rect x="16.5" y="19.5" width="9" height="9" rx="2.5" style="fill:var(--i-card);stroke:var(--i-ink);stroke-width:1.8"/>
+      <rect x="20.9" y="21.9" width="4.2" height="4.2" rx="1" style="fill:#F59E0B"/>
+      <rect x="26.5" y="19.5" width="9" height="9" rx="2.5" style="fill:none;stroke:var(--i-mut);stroke-width:1.8;stroke-dasharray:2.8 2.4"/>
+      <path d="M29.2 27.1c0-2.1 1.4-3.4 3-3.4s3 1.3 3 3.4v1.3c-.7-.5-1.2-.5-1.6 0-.4.5-.9.5-1.4 0-.5-.5-1-.5-1.4 0-.4.5-.9.5-1.6 0z" style="fill:var(--i-mut)"/>
+      <rect x="36.5" y="19.5" width="9" height="9" rx="2.5" style="fill:var(--i-card);stroke:var(--i-ink);stroke-width:1.8"/>
+      <path d="M38.9 24.9l4.2-1.6-1.6 4.2" fill="none" style="stroke:#22C55E;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"/>
+    </symbol>
+    <!-- 黑猩猩测试：4×4 盘面 · 散落 1/2/3 -->
+    <symbol id="ig-chimp" viewBox="0 0 48 48">
+      <g style="fill:none;stroke:var(--i-line);stroke-width:1.5">
+        <rect x="8.5" y="8.5" width="7" height="7" rx="2"/>
+        <rect x="24.5" y="8.5" width="7" height="7" rx="2"/>
+        <rect x="32.5" y="8.5" width="7" height="7" rx="2"/>
+        <rect x="8.5" y="16.5" width="7" height="7" rx="2"/>
+        <rect x="16.5" y="16.5" width="7" height="7" rx="2"/>
+        <rect x="32.5" y="16.5" width="7" height="7" rx="2"/>
+        <rect x="8.5" y="24.5" width="7" height="7" rx="2"/>
+        <rect x="16.5" y="24.5" width="7" height="7" rx="2"/>
+        <rect x="24.5" y="24.5" width="7" height="7" rx="2"/>
+        <rect x="8.5" y="32.5" width="7" height="7" rx="2"/>
+        <rect x="16.5" y="32.5" width="7" height="7" rx="2"/>
+        <rect x="24.5" y="32.5" width="7" height="7" rx="2"/>
+        <rect x="32.5" y="32.5" width="7" height="7" rx="2"/>
+      </g>
+      <g style="fill:#4F46E5">
+        <rect x="16.5" y="8.5" width="7" height="7" rx="2"/>
+        <rect x="24.5" y="16.5" width="7" height="7" rx="2"/>
+        <rect x="32.5" y="24.5" width="7" height="7" rx="2"/>
+      </g>
+      <g font-size="5.6" font-weight="700" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central" font-family="var(--mono)">
+        <text x="20" y="12.3">1</text>
+        <text x="28" y="20.3">2</text>
+        <text x="36" y="28.3">3</text>
+      </g>
+    </symbol>
+    <!-- 单词回忆：词条行 · seen 勾 / new 问号 -->
+    <symbol id="ig-word" viewBox="0 0 48 48">
+      <rect x="8" y="13.5" width="22" height="9.5" rx="4.7" style="fill:var(--i-card);stroke:var(--i-ink);stroke-width:2"/>
+      <path d="M12.5 18.2h9" style="stroke:var(--i-line);stroke-width:2.6;stroke-linecap:round"/>
+      <circle cx="37" cy="18.2" r="4.6" style="fill:#22C55E"/>
+      <path d="M35 18.3l1.5 1.5 2.6-3" fill="none" style="stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"/>
+      <rect x="8" y="27.5" width="22" height="9.5" rx="4.7" style="fill:var(--i-card);stroke:var(--i-ink);stroke-width:2"/>
+      <path d="M12.5 32.2h6.5" style="stroke:var(--i-line);stroke-width:2.6;stroke-linecap:round"/>
+      <circle cx="37" cy="32.2" r="4.6" style="fill:none;stroke:#F59E0B;stroke-width:2"/>
+      <text x="37" y="33.4" font-size="7.2" font-weight="700" fill="#F59E0B" text-anchor="middle" dominant-baseline="central" font-family="var(--mono)">?</text>
+    </symbol>
+  </defs>
+</svg>
+
 <!-- 🔴 2026-10-14 A2：正文包裹进 <main> 地标 -->
 <main id="main">
 
@@ -129,7 +260,7 @@
     <!-- 2026-10-23：知识对决改走独立大厅页（选分类 + 四模式），不再直达 /battle/。
          /battle/ 仍是公开自由局与广告投放落地页，保留原样，只是不再作为首页主入口。 -->
     <a class="gcard" href="/games/knowledge-duel/lobby/" data-stage="live">
-      <div class="gcard-icon" aria-hidden="true">⚔️</div>
+      <div class="gcard-icon" aria-hidden="true"><svg focusable="false"><use href="#ig-knowledge"/></svg></div>
       <div class="gcard-title" data-i18n="home_v2.game_knowledge">Knowledge Duel</div>
       <p class="gcard-desc" data-i18n="home_v2.game_knowledge_d">Head-to-head quizzes across science, history and geography. Race a friend or an AI opponent, 15 seconds per question.</p>
       <div class="gcard-tags">
@@ -141,7 +272,7 @@
     </a>
 
     <a class="gcard" href="/games/daily-challenge/" data-stage="live">
-      <div class="gcard-icon" aria-hidden="true">🧠</div>
+      <div class="gcard-icon" aria-hidden="true"><svg focusable="false"><use href="#ig-daily"/></svg></div>
       <div class="gcard-title" data-i18n="dc.game_title">Daily Memory Challenge</div>
       <p class="gcard-desc" data-i18n="home_v2.game_daily_d">Three of five memory games, rotated every day. Same puzzles for everyone, streak builds daily.</p>
       <div class="gcard-tags">
@@ -153,7 +284,7 @@
     </a>
 
     <a class="gcard" href="/games/sequence-memory/lobby/" data-stage="live">
-      <div class="gcard-icon" aria-hidden="true">⚡</div>
+      <div class="gcard-icon" aria-hidden="true"><svg focusable="false"><use href="#ig-sequence"/></svg></div>
       <div class="gcard-title" data-i18n="duel.seq_title">Sequence Memory Duel</div>
       <p class="gcard-desc" data-i18n="home_v2.game_seq_d">Memorise the tile sequence, then tap it back. Same sequence for both players, server-scored — send a room code and compare.</p>
       <div class="gcard-tags">
@@ -165,7 +296,7 @@
     </a>
 
     <a class="gcard" href="/games/number-recall/lobby/" data-stage="live">
-      <div class="gcard-icon" aria-hidden="true">🔢</div>
+      <div class="gcard-icon" aria-hidden="true"><svg focusable="false"><use href="#ig-number"/></svg></div>
       <div class="gcard-title" data-i18n="duel.num_title">Number Recall Duel</div>
       <p class="gcard-desc" data-i18n="home_v2.game_num_d">Digits flash one by one — type the whole string back. Same number for both players, server-scored, no login.</p>
       <div class="gcard-tags">
@@ -177,7 +308,7 @@
     </a>
 
     <a class="gcard" href="/games/color-recall/lobby/" data-stage="live">
-      <div class="gcard-icon" aria-hidden="true">🎨</div>
+      <div class="gcard-icon" aria-hidden="true"><svg focusable="false"><use href="#ig-colour"/></svg></div>
       <div class="gcard-title" data-i18n="duel.col_title">Colour Recall Duel</div>
       <p class="gcard-desc" data-i18n="home_v2.game_col_d">Five colours appear, then vanish — rebuild each one on the wheel. Same colours for both players, closest match wins.</p>
       <div class="gcard-tags">
@@ -189,7 +320,7 @@
     </a>
 
     <a class="gcard" href="/games/emoji-ghost/lobby/" data-stage="live">
-      <div class="gcard-icon" aria-hidden="true">👻</div>
+      <div class="gcard-icon" aria-hidden="true"><svg focusable="false"><use href="#ig-ghost"/></svg></div>
       <div class="gcard-title" data-i18n="duel.emoji_title">Emoji Ghost Duel</div>
       <p class="gcard-desc" data-i18n="duel.emoji_help">A row of symbols flashes, then one is missing. Your opponent gets the exact same set — pick the ghost correctly.</p>
       <div class="gcard-tags">
@@ -201,7 +332,7 @@
     </a>
 
     <a class="gcard" href="/games/chimp-test/lobby/" data-stage="live">
-      <div class="gcard-icon" aria-hidden="true">🐒</div>
+      <div class="gcard-icon" aria-hidden="true"><svg focusable="false"><use href="#ig-chimp"/></svg></div>
       <div class="gcard-title" data-i18n="duel.chimp_title">Chimp Test Duel</div>
       <p class="gcard-desc" data-i18n="duel.chimp_help">Numbers flash on the grid, then vanish. Your opponent gets the exact same grid — tap every cell that held a number.</p>
       <div class="gcard-tags">
@@ -213,7 +344,7 @@
     </a>
 
     <a class="gcard" href="/games/word-recall/lobby/" data-stage="live">
-      <div class="gcard-icon" aria-hidden="true">📝</div>
+      <div class="gcard-icon" aria-hidden="true"><svg focusable="false"><use href="#ig-word"/></svg></div>
       <div class="gcard-title" data-i18n="duel.word_title">Word Recall Duel</div>
       <p class="gcard-desc" data-i18n="duel.word_help">Words appear one by one. Your opponent gets the exact same words — mark each as seen or new.</p>
       <div class="gcard-tags">
