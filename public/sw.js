@@ -17,10 +17,15 @@
       还是旧橙卡片），要等第二次访问才更新。分享卡是**分享出去**的东西，
       旧橙卡发出去就是品牌事故，所以直接升 V 把旧缓存整个清掉。
 
+   🔴 2026-10-29：V 从 mdusw-v2 升到 mdusw-v3 ——
+      首页游戏卡 emoji → 手绘 SVG 图标改版上线，但 / HTML max-age=600
+      让部分已打开过的用户拿到旧 HTML + 旧 SW 缓存。升 V 强制弃掉全部
+      客户端旧缓存；同日 / 的 max-age 600→60（见 _headers）。
+
    ⚠️ 记录与成绩走 localStorage（无后端账号），离线可用性与 SW 无关；
       本 SW 只解决「断网时页面还能打开 + 静态资源秒开」。
    ═══════════════════════════════════════════════════════════════ */
-const V = 'mdusw-v2';
+const V = 'mdusw-v3';
 const ASSET_RE = /^\/(assets|fonts)\//;
 const ICON_RE = /^\/(favicon\.ico|apple-touch-icon\.png|icon-192\.png|icon-512\.png|icon-maskable-512\.png|manifest(\.[a-z]{2})?\.webmanifest)$/;
 

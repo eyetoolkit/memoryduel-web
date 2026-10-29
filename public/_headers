@@ -10,9 +10,10 @@
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.google-analytics.com; font-src 'self' data:; connect-src 'self' https://cloudflareinsights.com https://*.google-analytics.com https://www.googletagmanager.com; worker-src 'self'; manifest-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
   Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=()
 
-# HTML 短缓存 10 分钟（单页游戏，SW 对页面走缓存优先但仍预留更新）
+# HTML 短缓存 1 分钟（2026-10-29：600→60。600 会让发版后已打开过的
+# 用户最多 10 分钟看不到新版——图标改版当天实测撞上；60s 与 /battle 对齐）
 /
-  Cache-Control: public, max-age=600, must-revalidate
+  Cache-Control: public, max-age=60, must-revalidate
 
 # PWA manifest 短期缓存
 /manifest*.webmanifest
