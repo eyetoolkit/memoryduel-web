@@ -806,10 +806,17 @@
           '<h3 style="margin-bottom:16px">' + T('room.room_ready','Room Ready') + '</h3>' +
           '<div class="battle-scores">' + namesHtml + '</div>' +
           '<div id="olWaitBox" style="margin-top:18px">' + startBox + '</div>' +
-          '<div class="battle-actions" style="margin-top:16px"><button class="btn ghost" onclick="location.href=\'/\'">← ' + T('battle.back_lobby','Back to Lobby') + '</button></div>' +
+          '<div class="battle-actions" style="margin-top:16px">' +
+            (OL.isHost ? '<button class="btn ghost" id="olInvite">✉ ' + T('md.share_invite_title','Invite a friend') + '</button>' : '') +
+            '<button class="btn ghost" onclick="location.href=\'/\'">← ' + T('battle.back_lobby','Back to Lobby') + '</button></div>' +
         '</div>';
       var sb = document.getElementById('olStart');
       if (sb) sb.addEventListener('click', hostStart);
+      var ib = document.getElementById('olInvite');
+      if (ib) ib.addEventListener('click', function () { openKnowledgeInvite(OL.code); });
+      /* 对齐 boardduel/序列对决：host 进等待页自动弹一次邀请卡
+         （Canvas 600×760 + 二维码 + 6 位房码 + 链接 + 复制/保存/分享）。guest 不弹。 */
+      if (OL.isHost) openKnowledgeInvite(OL.code);
       // 轮询:开局后自动进入对局
       if (OL.statusTimer) clearInterval(OL.statusTimer);
       OL.statusTimer = setInterval(function () {
@@ -820,6 +827,54 @@
           }
         }).catch(function () {});
       }, 2000);
+    }
+
+    /* ── 邀请卡（2026-10-29 对齐 boardduel）──
+       引擎与序列页 shareInvite 同源：/shared/invite-card.mjs（fe-shared 统一版）。
+       quiz 链接形态与序列 lobby 不同：/train.html?room=<CODE>；
+       二维码走 /api/md/qr?game=quiz（worker 白名单已含 quiz）。 */
+    function kbGameName() {
+      return getLang() === 'zh' ? '知识对决' : 'Knowledge Battle';
+    }
+    function kbInviteCfg(code) {
+      var codeU = String(code || '').toUpperCase();
+      return {
+        title: T('md.share_invite_title', 'Invite a friend'),
+        subtitle: kbGameName() + ' · ' + codeU,
+        big: codeU,
+        bigLabel: T('md.share_room_code', 'Room code'),
+        stats: [
+          [T('md.share_stat_game', 'Game'), kbGameName()],
+          [T('md.share_stat_status', 'Status'), T('md.share_stat_waiting', 'Waiting')],
+          [T('md.share_stat_mode', 'Mode'), T('md.share_stat_1v1', '1 v 1')],
+        ],
+        url: location.origin + '/train.html?room=' + codeU,
+        qrSrc: '/api/md/qr?game=quiz&code=' + encodeURIComponent(codeU) + '&size=220&cb=' + Date.now(),
+        tone: 'indigo',
+        brand: 'MemoryDuel',
+        domain: 'memoryduel.com',
+        scanText: T('md.share_scan', 'Scan to join the same duel'),
+        ctaText: T('md.share_cta', 'Play a free game'),
+        noQrText: T('md.share_free', 'Free to play — no sign-up'),
+        fileBase: 'memoryduel',
+        texts: {
+          copy: T('md.share_copy', 'Copy'),
+          copied: T('md.share_copied', 'Link copied'),
+          copyFailed: T('md.share_copy_failed', 'Copy failed'),
+          save: T('md.share_save', 'Save Image'),
+          saved: T('md.share_saved', 'Image saved'),
+          share: T('md.share_sys', 'Share'),
+          close: T('md.share_close', 'Close'),
+          linkAria: T('md.share_link_aria', 'Share link'),
+          qrMain: T('md.share_scan_tap', 'Scan or tap the link'),
+          qrSub: T('md.share_scan_sub', 'Invite a friend to your duel'),
+        },
+      };
+    }
+    function openKnowledgeInvite(code) {
+      import('/shared/invite-card.mjs').then(function (m) {
+        return m.openInviteCard(kbInviteCfg(code));
+      }).catch(function () { /* 引擎加载失败静默——房码仍在页面上可见 */ });
     }
 
     function hostStart() {
