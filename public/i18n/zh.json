@@ -1172,7 +1172,8 @@
     "diff_easy": "简单",
     "diff_normal": "普通",
     "diff_hard": "困难",
-    "diff_hint": "难度越高轮次越多，且每轮的内容更长。"
+    "diff_hint": "难度越高轮次越多，且每轮的内容更长。",
+    "invite": "邀请"
   },
   "colduel": {
     "title": "颜色记忆对决 · MemoryDuel",
@@ -1247,5 +1248,36 @@
     "seo_title_emoji_ghost": "表情幽灵 — 选择你的对战",
     "seo_title_chimp_test": "猩猩测试 — 选择你的对战",
     "seo_title_word_recall": "单词回忆 — 选择你的对战"
+  },
+  "md": {
+    "share_invite_title": "邀请好友",
+    "share_room_code": "房间码",
+    "share_scan": "扫码加入同一场对决",
+    "share_free": "免费游玩 · 无需注册",
+    "share_cta": "来玩一局免费对决",
+    "share_copied": "链接已复制",
+    "share_copy_failed": "复制失败",
+    "share_saved": "图片已保存",
+    "share_stat_game": "游戏",
+    "share_stat_status": "状态",
+    "share_stat_waiting": "等待对手",
+    "share_stat_mode": "模式",
+    "share_stat_1v1": "1 对 1",
+    "share_stat_site": "站点",
+    "share_stat_time": "时间",
+    "share_stat_moves": "轮数",
+    "share_result_win": "胜利",
+    "share_result_good": "打得不错",
+    "share_big_win": "胜",
+    "share_big_loss": "负",
+    "share_win_sub": "你保持了领先",
+    "share_loss_sub": "下次再战",
+    "share_close": "关闭",
+    "share_scan_tap": "扫码或点链接",
+    "share_scan_sub": "邀请好友来你的对决",
+    "share_link_aria": "分享链接",
+    "share_copy": "复制",
+    "share_save": "保存图片",
+    "share_sys": "分享"
   }
 }

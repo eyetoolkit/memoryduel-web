@@ -1172,7 +1172,8 @@
     "diff_easy": "Easy",
     "diff_normal": "Normal",
     "diff_hard": "Hard",
-    "diff_hint": "Higher difficulty adds rounds — and each round gets longer."
+    "diff_hint": "Higher difficulty adds rounds — and each round gets longer.",
+    "invite": "Invite"
   },
   "colduel": {
     "title": "Colour Recall Duel · MemoryDuel",
@@ -1247,5 +1248,36 @@
     "seo_title_emoji_ghost": "Emoji Ghost — Choose Your Duel",
     "seo_title_chimp_test": "Chimp Test — Choose Your Duel",
     "seo_title_word_recall": "Word Recall — Choose Your Duel"
+  },
+  "md": {
+    "share_invite_title": "Invite a friend",
+    "share_room_code": "Room code",
+    "share_scan": "Scan to join the same duel",
+    "share_free": "Free to play — no sign-up",
+    "share_cta": "Play a free game",
+    "share_copied": "Link copied",
+    "share_copy_failed": "Copy failed",
+    "share_saved": "Image saved",
+    "share_stat_game": "Game",
+    "share_stat_status": "Status",
+    "share_stat_waiting": "Waiting",
+    "share_stat_mode": "Mode",
+    "share_stat_1v1": "1 v 1",
+    "share_stat_site": "Site",
+    "share_stat_time": "Time",
+    "share_stat_moves": "Rounds",
+    "share_result_win": "Victory",
+    "share_result_good": "Good game",
+    "share_big_win": "WIN",
+    "share_big_loss": "LOSS",
+    "share_win_sub": "You held the edge",
+    "share_loss_sub": "Better luck next time",
+    "share_close": "Close",
+    "share_scan_tap": "Scan or tap the link",
+    "share_scan_sub": "Invite a friend to your duel",
+    "share_link_aria": "Share link",
+    "share_copy": "Copy",
+    "share_save": "Save Image",
+    "share_sys": "Share"
   }
 }
