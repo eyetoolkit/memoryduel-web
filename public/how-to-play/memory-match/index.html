@@ -3,7 +3,7 @@
 <head>
 <!-- md-theme:early -->
 <script>(function(){try{var t=localStorage.getItem('md-theme2');if(t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();</script>
-  <script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:60,fallback:"en"};</script>
+  <script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:65,fallback:"en"};</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <!-- standalone 下 iOS 状态栏取 theme-color，缺失会落回成系统默认色。与 manifest 的 background_color 一致：#fff7ed -->
@@ -125,48 +125,58 @@
       <h2>🎮 Game Modes at MemoryDuel</h2>
 
       <div class="mode-grid">
-        <div class="mode-card">
-          <div class="icon">🔄</div>
-          <h3>Card Match</h3>
-          <p>Flip two cards at a time. Find all matching pairs. Simple rules, challenging execution.</p>
-        </div>
-        <div class="mode-card">
-          <div class="icon">🔢</div>
-          <h3>Digit Span</h3>
-          <p>Remember a sequence of digits in order. Train short-term memory capacity.</p>
-        </div>
-        <div class="mode-card">
-          <div class="icon">📝</div>
-          <h3>Sequence Recall</h3>
-          <p>Watch a sequence of tiles light up, then replay it. Classic brain training exercise.</p>
-        </div>
-        <div class="mode-card">
+        <a class="mode-card" href="/games/sequence-memory/lobby/">
           <div class="icon">⚡</div>
-          <h3>Flash Recall</h3>
-          <p>Numbers flash briefly on screen. Recall them in order. Speed + accuracy challenge.</p>
-        </div>
+          <h3>Sequence Memory</h3>
+          <p>Tiles light up one by one on a 3×3 grid. Tap them back in the same order.</p>
+        </a>
+        <a class="mode-card" href="/games/number-recall/lobby/">
+          <div class="icon">🔢</div>
+          <h3>Number Recall</h3>
+          <p>Digits flash one at a time. Type the whole string back from memory.</p>
+        </a>
+        <a class="mode-card" href="/games/color-recall/lobby/">
+          <div class="icon">🎨</div>
+          <h3>Colour Recall</h3>
+          <p>Five colours appear, then vanish. Rebuild each one on the colour wheel.</p>
+        </a>
+        <a class="mode-card" href="/games/emoji-ghost/lobby/">
+          <div class="icon">👻</div>
+          <h3>Emoji Ghost</h3>
+          <p>A row of symbols flashes, then disappears. Pick the one that was in the set.</p>
+        </a>
+        <a class="mode-card" href="/games/chimp-test/lobby/">
+          <div class="icon">🐒</div>
+          <h3>Chimp Test</h3>
+          <p>Numbers flash on a 5×5 grid, then vanish. Tap every cell that held one.</p>
+        </a>
+        <a class="mode-card" href="/games/word-recall/lobby/">
+          <div class="icon">📝</div>
+          <h3>Word Recall</h3>
+          <p>Words appear one by one. Mark each one as seen or new.</p>
+        </a>
       </div>
 
-      <h2>📖 How Card Match Works</h2>
+      <h2>📖 How a Memory Round Works</h2>
 
       <div class="strategy-card">
-        <h3>Step 1: Survey the Board</h3>
-        <p>Before flipping any card, take a moment to glance at all cards on the board. Even a brief glance helps encode their positions in your visual-spatial memory.</p>
+        <h3>Step 1: Encode</h3>
+        <p>Watch the memorise phase without looking away. Everything you need is shown once — digits flash one at a time, tiles light up in order, colours appear for a few seconds.</p>
       </div>
 
       <div class="strategy-card">
-        <h3>Step 2: Flip Two Cards</h3>
-        <p>Tap or click to flip the first card. Memorize its symbol and position. Then flip a second card. If they match, both stay face up. If not, both flip back after a brief delay.</p>
+        <h3>Step 2: Hold</h3>
+        <p>The moment the phase ends, the information is gone from the screen. This is the part that trains you: holding a fading trace in working memory while you get ready to act.</p>
       </div>
 
       <div class="strategy-card">
-        <h3>Step 3: Use Both Short-Term and Long-Term Memory</h3>
-        <p>The key to Card Match is dividing your memory into two systems: which cards you've already matched (keep these in working memory) and which cards are where (spatial memory). Using both simultaneously exercises both brain regions.</p>
+        <h3>Step 3: Retrieve</h3>
+        <p>Replay it — tap the tiles, type the digits, rebuild the colours. Your answer is scored by the server against the same puzzle, so both players in a duel are judged identically.</p>
       </div>
 
       <div class="strategy-card">
-        <h3>Step 4: Track Your Progress</h3>
-        <p>MemoryDuel tracks your personal bests: fewest moves, fastest time, highest streak. Improving these scores over time is the clearest evidence of improved memory.</p>
+        <h3>Step 4: Repeat tomorrow</h3>
+        <p>The Daily Memory Challenge rotates three of these games every day, and everyone gets the same puzzles. Short daily sessions beat occasional long ones.</p>
       </div>
 
       <h2>🧠 Why Memory Games Are Effective</h2>
@@ -208,8 +218,8 @@
       </details>
 
       <details class="faq-item">
-        <summary>What's the difference between digit span and card match?</summary>
-        <p>Digit span primarily trains verbal/symbolic short-term memory. Card match primarily trains visual-spatial memory. Both are valuable — and different brain regions support each. The best training programs include both types.</p>
+        <summary>What's the difference between number recall and chimp test?</summary>
+        <p>Number Recall trains verbal/symbolic short-term memory — you hold an ordered string of digits. Chimp Test trains visual-spatial memory — you hold positions on a grid, in any order. Both are valuable, and different brain regions support each.</p>
       </details>
 
       <div class="cta-row">
@@ -242,9 +252,9 @@
       <a href="/terms/" data-i18n="nav.terms">Terms</a>
       <a href="/contact/" data-i18n="nav.contact">Contact</a>
     </div>
-    <div class="sf-copy" data-i18n="home.footer">© 2026 MemoryDuel · No Ads · No Tracking · Pure Static</div>
+    <div class="sf-copy" data-i18n="home.footer">© 2026 MemoryDuel · Free to play · Anonymous analytics only after consent</div>
   </div>
-<div class="sf-note">© 2026 MemoryDuel · Free to play, privacy-first, pure brain training</div>
+<div class="sf-note">© 2026 MemoryDuel · Free to play · Anonymous analytics only after consent</div>
     </footer>
   <script src="/js/chrome-mem.js?v=1" defer></script>
 <script src="/shared/site-header.js?v=ds2-13"></script>

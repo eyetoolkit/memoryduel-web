@@ -206,7 +206,7 @@
     "mathduel_name": "NumeriDuel マスデュエル",
     "boardduel_name": "BoardDuel ボードゲーム",
     "memoryduel_name": "MemoryDuel メモリデュエル",
-    "footer": "© 2026 MemoryDuel · 広告なし · 追跡なし · 完全静的",
+    "footer": "© 2026 MemoryDuel · 無料でプレイ · 同意後のみ匿名統計を使用",
     "btn_start_duel": "開始 バトル",
     "btn_login_register": "ログイン / 登録",
     "duel_vs": "VS",
@@ -889,7 +889,7 @@
     "games_sub": "記憶を鍛える2つの方法——相手と戦う、または時間と自分自身に勝つ。",
     "game_knowledge": "ナレッジ・デュエル",
     "game_knowledge_d": "科学・歴史・地理のクイズ対決。相手やAIと競い、1問15秒。",
-    "game_daily_d": "毎日3つの新しい記憶レベル——数字の記憶、シーケンス記憶、色の記憶。全員同じ問題で、連続記録が積み重なります。",
+    "game_daily_d": "5つの記憶ゲームから毎日3つをローテーション。全員同じ問題で、連続記録が毎日積み重なります。",
     "tag_live": "公開中",
     "tag_pvp": "1対1",
     "tag_46k": "46,000問以上",
@@ -1071,7 +1071,7 @@
     "chimp_h2": "チンパー・テスト",
     "chimp_help": "グリッドに数字がフラッシュして消えます。数字があったマスをすべてタップしてください。",
     "chimp_ready": "再生",
-    "chimp_pick": "数字があった {n} マスをすべてタップ。",
+    "chimp_pick": "数字が表示されていたマスをすべてタップしてください。",
     "chimp_done": "完了",
     "word_h2": "単語記憶",
     "word_help": "単語が1つずつ表示されます。その後、それぞれを「見た／初めて」と判定します。",
@@ -1085,7 +1085,11 @@
     "lobby_mt_chimp": "チンパー・テスト",
     "lobby_md_chimp": "グリッドの数字が点滅して消えます。数字があったマスをすべてタップ。",
     "lobby_mt_word": "単語記憶",
-    "lobby_md_word": "単語が1つずつ表示され、それぞれを「見た／初めて」と判定します。"
+    "lobby_md_word": "単語が1つずつ表示され、それぞれを「見た／初めて」と判定します。",
+    "chimp_count_live": "選択中：{n}",
+    "seq_progress": "{m} 個中 {n} 個タップ済み",
+    "seq_submit": "提出",
+    "num_submit": "提出"
   },
   "duel": {
     "seq_title": "シーケンス記憶デュエル",
@@ -1159,7 +1163,16 @@
     "wait_title": "あなたのラウンドはすべて終了です",
     "wait_body": "相手はまだラウンドが残っています。相手が終了すると自動的に決着します。このページに留まるか、コードを持って後で戻ってきてください。",
     "checking": "相手の完了を確認中…",
-    "settled_banner": "決着しました"
+    "settled_banner": "決着しました",
+    "chimp_count_live": "選択中：{n}",
+    "submit": "提出",
+    "seq_progress": "{m} 個中 {n} 個タップ済み",
+    "num_tip": "覚えている数字を入力してから提出してください。",
+    "difficulty": "難易度",
+    "diff_easy": "かんたん",
+    "diff_normal": "ふつう",
+    "diff_hard": "むずかしい",
+    "diff_hint": "難易度が高いほどラウンド数が増え、各ラウンドの内容も長くなります。"
   },
   "colduel": {
     "title": "色彩記憶対戦 · MemoryDuel",

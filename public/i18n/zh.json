@@ -203,7 +203,7 @@
     "footer_terms": "服务条款",
     "footer_copy": "© 2026 MemoryDuel · 知识对战 · 无广告 · 纯静态",
     "site_network": "🎯 我们的品牌矩阵",
-    "footer": "© 2026 MemoryDuel · 无广告 · 无追踪 · 纯静态",
+    "footer": "© 2026 MemoryDuel · 免费游玩 · 仅在同意后使用匿名统计",
     "btn_start_duel": "开始对战",
     "btn_login_register": "登录 / 注册",
     "duel_vs": "VS",
@@ -889,7 +889,7 @@
     "games_sub": "两种训练记忆的方式——与人对战，或与时间和自己较量。",
     "game_knowledge": "知识对决",
     "game_knowledge_d": "科学与历史地理知识对决。和朋友或 AI 对手竞速，每题 15 秒。",
-    "game_daily_d": "每天三关全新记忆挑战——数字广度、序列记忆、色彩记忆。所有人题目相同，连胜每天累积。",
+    "game_daily_d": "每天从五款记忆游戏中轮换三关。所有人题目相同，连胜每天累积。",
     "tag_live": "已上线",
     "tag_pvp": "1v1",
     "tag_46k": "46,000+ 道题",
@@ -1071,7 +1071,7 @@
     "chimp_h2": "猩猩测试",
     "chimp_help": "数字在网格上闪现后消失，点出刚才显示过数字的所有格子。",
     "chimp_ready": "开始",
-    "chimp_pick": "点出刚才有数字的 {n} 个格子。",
+    "chimp_pick": "点出所有出现过数字的格子。",
     "chimp_done": "完成",
     "word_h2": "词语记忆",
     "word_help": "词语逐个出现，之后为每个词标记「见过」或「没见过」。",
@@ -1085,7 +1085,11 @@
     "lobby_mt_chimp": "猩猩测试",
     "lobby_md_chimp": "数字在网格上闪现后消失，点出所有刚才显示过数字的格子。",
     "lobby_mt_word": "词语记忆",
-    "lobby_md_word": "词语逐个出现，之后为每个词标记「见过」或「没见过」。"
+    "lobby_md_word": "词语逐个出现，之后为每个词标记「见过」或「没见过」。",
+    "chimp_count_live": "已选：{n}",
+    "seq_progress": "已点 {n} / {m}",
+    "seq_submit": "提交",
+    "num_submit": "提交"
   },
   "duel": {
     "seq_title": "序列记忆对决",
@@ -1159,7 +1163,16 @@
     "wait_title": "你的轮次已全部完成",
     "wait_body": "对手还有轮次没打完。对方完成后本局自动结算——你可以留在此页，或稍后用房码回来查看结果。",
     "checking": "正在等待对手完成…",
-    "settled_banner": "本局已结算"
+    "settled_banner": "本局已结算",
+    "chimp_count_live": "已选：{n}",
+    "submit": "提交",
+    "seq_progress": "已点 {n} / {m}",
+    "num_tip": "输入你记住的数字，然后提交。",
+    "difficulty": "难度",
+    "diff_easy": "简单",
+    "diff_normal": "普通",
+    "diff_hard": "困难",
+    "diff_hint": "难度越高轮次越多，且每轮的内容更长。"
   },
   "colduel": {
     "title": "颜色记忆对决 · MemoryDuel",

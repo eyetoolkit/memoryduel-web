@@ -203,7 +203,7 @@
     "footer_terms": "Terms of Service",
     "footer_copy": "© 2026 MemoryDuel · Knowledge Battle · Ad-free · Pure Static",
     "site_network": "🎯 Our Brand Portfolio",
-    "footer": "© 2026 MemoryDuel · No Ads · No Tracking · Pure Static",
+    "footer": "© 2026 MemoryDuel · Free to play · Anonymous analytics only after consent",
     "btn_start_duel": "Start Battle",
     "btn_login_register": "Login / Register",
     "duel_vs": "VS",
@@ -889,7 +889,7 @@
     "games_sub": "Two ways to train your memory — one against an opponent, one against yourself and the clock.",
     "game_knowledge": "Knowledge Duel",
     "game_knowledge_d": "Head-to-head quizzes across science, history and geography. Race a friend or an AI opponent, 15 seconds per question.",
-    "game_daily_d": "Three fresh memory levels every day — number recall, sequence memory and colour recall. Same puzzle for everyone, streak built daily.",
+    "game_daily_d": "Three of five memory games, rotated every day. Same puzzles for everyone, streak builds daily.",
     "tag_live": "Live",
     "tag_pvp": "1v1",
     "tag_46k": "46,000+ questions",
@@ -1071,7 +1071,7 @@
     "chimp_h2": "Chimp Test",
     "chimp_help": "Numbers flash on the grid, then vanish. Tap every cell that held a number.",
     "chimp_ready": "Show me",
-    "chimp_pick": "Tap all {n} cells that held a number.",
+    "chimp_pick": "Tap every cell that held a number.",
     "chimp_done": "Done",
     "word_h2": "Word Recall",
     "word_help": "Words appear one by one. Afterwards, mark each as seen or new.",
@@ -1085,7 +1085,11 @@
     "lobby_mt_chimp": "Chimp Test",
     "lobby_md_chimp": "Numbers flash on a grid, then vanish. Tap every cell that held one.",
     "lobby_mt_word": "Word Recall",
-    "lobby_md_word": "Words appear one by one. Then mark each as seen or new."
+    "lobby_md_word": "Words appear one by one. Then mark each as seen or new.",
+    "chimp_count_live": "Selected: {n}",
+    "seq_progress": "Tapped {n} of {m}",
+    "seq_submit": "Submit",
+    "num_submit": "Submit"
   },
   "duel": {
     "seq_title": "Sequence Memory Duel",
@@ -1159,7 +1163,16 @@
     "wait_title": "All your rounds are done",
     "wait_body": "Your opponent still has rounds to play. The duel settles as soon as they finish — stay on this page or come back later with your code.",
     "checking": "Checking your opponent…",
-    "settled_banner": "Duel settled"
+    "settled_banner": "Duel settled",
+    "chimp_count_live": "Selected: {n}",
+    "submit": "Submit",
+    "seq_progress": "Tapped {n} of {m}",
+    "num_tip": "Type as many digits as you remember, then submit.",
+    "difficulty": "Difficulty",
+    "diff_easy": "Easy",
+    "diff_normal": "Normal",
+    "diff_hard": "Hard",
+    "diff_hint": "Higher difficulty adds rounds — and each round gets longer."
   },
   "colduel": {
     "title": "Colour Recall Duel · MemoryDuel",

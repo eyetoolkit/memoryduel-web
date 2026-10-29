@@ -200,9 +200,14 @@ function fetchAnswerLang() {
 /* 🔴 word-recall 取题专用：带 lang 走同一条 /puzzle 出口。
    不能让 daily-game.ts 自己去拼 query —— lang 漏传时后端会静默回落 en，
    中文玩家拿到英文单词却不报错，是最难查的一类静默失败。 */
-async function fetchPuzzleInLang(game, round, lang) {
+async function fetchPuzzleInLang(game, round, lang, opts) {
   const l = String(lang || fetchAnswerLang()).toLowerCase();
   const qs = new URLSearchParams({ game: String(game), round: String(round), lang: l });
+  /* 🔴 2026-10-29：练习（solo / 难度档）带 practice=1。
+     /puzzle 的 round 上界默认是**每日赛程长度** level.rounds（多数游戏是 3），
+     而难度 hard 档要跑 5 轮 —— 不带这个参数，第 4/5 轮会被服务端
+     挡成 400 bad_round，练习模式在最后两轮直接报错。 */
+  if (opts && opts.practice) qs.set('practice', '1');
   let r;
   try {
     r = await fetchTimeout(`${API}/puzzle?${qs}`, {

@@ -141,11 +141,12 @@ async function playNumber(puzzle: any): Promise<{ answer: string }> {
   card.innerHTML = `
     <h2 class="dc-h2">${esc(t('dc.num_h2', 'Number Recall'))}</h2>
     <p class="dc-help">${esc(t('dc.num_help', 'Watch the digits, then type them from memory.'))}</p>
-    <div class="dc-num-stage hide" id="stage" aria-live="off">${esc(s)}</div>
+    <div class="dc-num-stage hide" id="stage" aria-live="off"></div>
     <input class="dc-input" id="ans" inputmode="numeric" autocomplete="off"
-           maxlength="${digits.length}" placeholder="${'0'.repeat(digits.length)}"
+           maxlength="${digits.length}" placeholder=""
            aria-label="${esc(t('dc.num_aria', 'Digits you remember'))}" disabled />
-    <button class="dc-btn" id="go" type="button" style="margin-top:14px">${esc(t('dc.num_ready', 'I am ready'))}</button>`;
+    <button class="dc-btn" id="go" type="button" style="margin-top:14px">${esc(t('dc.num_ready', 'I am ready'))}</button>
+    <button class="dc-btn" id="numSubmit" type="button" style="margin-top:14px;display:none">${esc(t('dc.num_submit', 'Submit'))}</button>`;
 
   const stage = $('#stage') as HTMLElement;
   const go = $('#go') as HTMLButtonElement;
@@ -166,26 +167,31 @@ async function playNumber(puzzle: any): Promise<{ answer: string }> {
     stage.classList.add('show');
     await sleep(600);
   }
-  // 整串再展示一拍，然后抹掉
-  stage.textContent = s;
-  void stage.offsetWidth;
-  stage.classList.add('show');
-  await sleep(1100);
+  /* 🔴 P0 修复（2026-10-29）：删掉「整串再展示一拍」这一段（原 `stage.textContent = s; await sleep(1100)`）。
+     实测截图里中央直接显示完整数字串，玩家只要等最后一眼就能抄下答案，
+     数字广度训练与每日挑战的公平性同时失效。
+     另：初始 HTML 里原本直接写着 `${s}`（靠 .hide 遮住但源码可见，F12 即可偷看），
+     已改为空容器，答案只在闪现的那一拍进入 DOM。 */
   stage.textContent = '';
   stage.classList.add('hide');
   stage.classList.remove('show');
 
   ans.disabled = false;
   ans.focus();
+  const numSubmit = document.getElementById('numSubmit') as HTMLButtonElement;
+  numSubmit.style.display = '';
 
   const typed = await new Promise<string>((resolve) => {
+    /* 🔴 不再「输满位数自动提交」：玩家没有确认/退格机会，
+       记不清时也必须硬凑满位数才能推进。改为显式提交（回车亦可）。 */
+    const settle = () => resolve(ans.value);
     ans.addEventListener('input', () => {
       ans.value = ans.value.replace(/\D/g, '').slice(0, digits.length);
-      if (ans.value.length === digits.length) resolve(ans.value);
     });
     ans.addEventListener('keydown', (e) => {
-      if ((e as KeyboardEvent).key === 'Enter' && ans.value.length) resolve(ans.value);
+      if ((e as KeyboardEvent).key === 'Enter') settle();
     });
+    numSubmit.addEventListener('click', settle);
   });
 
   return { answer: typed };
@@ -233,7 +239,24 @@ async function playSequence(puzzle: any): Promise<{ answer: number[] }> {
 
   // 按序点击
   const picked: number[] = [];
+  /* 🔴 2026-10-29：补「已点计数 + 显式提交出口」。
+     原实现只有「点满 N 个才推进」一条路径，玩家记不清后面几步时
+     既看不到已点几个，也没有提前结束的办法，只能乱点凑数或刷新页面。 */
+  const seqProg = document.createElement('p');
+  seqProg.className = 'dc-help';
+  seqProg.textContent = t('dc.seq_progress', 'Tapped {n} of {m}')
+    .replace('{n}', '0').replace('{m}', String(seq.length));
+  card.appendChild(seqProg);
+  const seqSubmit = document.createElement('button');
+  seqSubmit.className = 'dc-btn';
+  seqSubmit.id = 'seqSubmit';
+  seqSubmit.type = 'button';
+  seqSubmit.style.marginTop = '14px';
+  seqSubmit.textContent = t('dc.seq_submit', 'Submit');
+  card.appendChild(seqSubmit);
+
   await new Promise<void>((resolve) => {
+    function done() { gridEl.removeEventListener('click', onClick); resolve(); }
     const onClick = (e: Event) => {
       const el = (e.target as HTMLElement).closest('.dc-seq-cell') as HTMLElement | null;
       if (!el) return;
@@ -241,12 +264,12 @@ async function playSequence(puzzle: any): Promise<{ answer: number[] }> {
       picked.push(i);
       el.classList.add(i === seq[picked.length - 1] ? 'lit' : 'wrong');
       setTimeout(() => el.classList.remove('lit', 'wrong'), 220);
-      if (picked.length === seq.length) {
-        gridEl.removeEventListener('click', onClick);
-        resolve();
-      }
+      seqProg.textContent = t('dc.seq_progress', 'Tapped {n} of {m}')
+        .replace('{n}', String(picked.length)).replace('{m}', String(seq.length));
+      if (picked.length === seq.length) done();
     };
     gridEl.addEventListener('click', onClick);
+    seqSubmit.addEventListener('click', done);
   });
 
   return { answer: picked };
@@ -302,7 +325,7 @@ async function playColor(puzzle: any): Promise<{ answer: Array<{ h: number; s: n
         .replace('{n}', String(i + 1))
         .replace('{total}', String(colors.length)))}</p>
       <div class="dc-color-target" style="width:100%;height:120px;background:${target}" aria-label="${esc(t('dc.col_target', 'Target colour'))}"></div>
-      <div class="dc-wheel" id="wheel" style="background:conic-gradient(from 0deg,#FF0000,#FFFF00,#00FF00,#00FFFF,#0000FF,#FF00FF,#FF0000)"
+      <div class="dc-wheel" id="wheel" style="background:radial-gradient(closest-side,#ffffff 0%,rgba(255,255,255,0) 40%,rgba(0,0,0,0.5) 85%,rgba(0,0,0,0.85) 100%),conic-gradient(from 0deg,#FF0000,#FFFF00,#00FF00,#00FFFF,#0000FF,#FF00FF,#FF0000)"
            role="application" aria-label="${esc(t('dc.col_wheel', 'Colour wheel'))}"></div>
       <p class="dc-wheel-hint">${esc(t('dc.col_hint', 'Click or drag on the wheel to set hue and lightness; use the sliders for saturation.'))}</p>
       <div class="dc-sliders">
@@ -393,8 +416,11 @@ async function playEmojiGhost(puzzle: any): Promise<{ answer: number }> {
   go.style.display = 'none';
 
   // 集合闪现：逐个淡入再整体消失
+  /* 🔴 2026-10-29：时长随集合大小缩放，与 duel-sequence.ts 的 emojiShowMs 同式
+     （基线 2200ms + 每个符号 280ms）。写死 3400ms 时，练习档把轮数开到 10 轮
+     后集合会长到 12 个符号，3.4 秒看不完，玩家只会觉得被坑而非变难。 */
   row.innerHTML = set.map((e) => `<span class="dc-emoji">${esc(e)}</span>`).join('');
-  await sleep(3400);
+  await sleep(2200 + 280 * set.length);
   row.innerHTML = '';
 
   // 四选一
@@ -454,34 +480,51 @@ async function playChimp(puzzle: any): Promise<{ answer: number[] }> {
   // 网格先铺空格子，再逐个闪数字
   gridEl.innerHTML = Array.from({ length: size }, (_, i) => cell(i)).join('');
   const nodes = Array.from(gridEl.querySelectorAll<HTMLElement>('.dc-chimp-cell'));
+  /* 🔴 P0 修复（2026-10-29）：闪完**立刻**清空该格，而不是等全部闪完再统一清。
+     原实现只 `remove('lit')`，而 `.dc-chimp-cell.lit` 只改背景/边框/字色、
+     不承担可见性 —— 数字会一直留在格子里，玩家扫一眼全盘即可抄下位置，
+     记忆环节形同不存在。逐格即清才符合京都大学原范式。 */
   for (const pos of positions) {
     nodes[pos].textContent = String(positions.indexOf(pos) + 1);
     nodes[pos].classList.add('lit');
     await sleep(700);
     nodes[pos].classList.remove('lit');
+    nodes[pos].textContent = '';
     await sleep(180);
   }
   await sleep(500);
-  nodes.forEach((n) => { n.textContent = ''; });
+  nodes.forEach((n) => { n.textContent = ''; });   // 兜底：确保无残留
 
-  // 点出所有数字格（点错允许继续，但会多计一格错位）
+  // 点出所有数字格（允许超点，误点由服务端判分扣分）
   card.innerHTML = `
     <h2 class="dc-h2">${esc(t('dc.chimp_h2', 'Chimp Test'))}</h2>
-    <p class="dc-help">${esc(t('dc.chimp_pick', `Tap all ${positions.length} cells that held a number.`).replace('{n}', String(positions.length)))}</p>
+    <p class="dc-help">${esc(t('dc.chimp_pick', 'Tap every cell that held a number.'))}</p>
+    <p class="dc-help" id="chimpCount">${esc(t('dc.chimp_count_live', 'Selected: {n}').replace('{n}', '0'))}</p>
     <div class="dc-chimp-grid" id="grid" style="grid-template-columns:repeat(${grid},1fr)">
       ${Array.from({ length: size }, (_, i) => cell(i)).join('')}
     </div>
     <button class="dc-btn" id="go2" type="button" style="margin-top:14px">${esc(t('dc.chimp_done', 'Done'))}</button>`;
 
   const grid2 = $('#grid')!;
+  const countEl = document.getElementById('chimpCount') as HTMLElement | null;
   const picked: number[] = [];
+  /* 🔴 2026-10-29 两处改动：
+     ① 不再把「有几个数字」印进提示、也不再限制最多只能选 N 格 ——
+        这两件事合起来把「回忆数量」这一维难度彻底移除，玩家数着点满即可。
+        现在改为实时显示已选数、可再点一次取消、允许超点，误点由服务端判分扣分。
+     ② 不再逐格给 lit/wrong 对错反馈：原判断 `i === positions[picked.length - 1]`
+        假定玩家按数字出现顺序点，但 Chimp Test 是**顺序无关**的 ——
+        习惯从左上角扫的玩家会在点对格子时看到 wrong，被自己的界面误导。 */
   grid2.addEventListener('click', (e) => {
     const el = (e.target as HTMLElement).closest('.dc-chimp-cell') as HTMLElement | null;
-    if (!el || picked.length >= positions.length) return;
+    if (!el) return;
     const i = Number(el.dataset.i);
-    if (picked.includes(i)) return;
-    picked.push(i);
-    el.classList.add(i === positions[picked.length - 1] ? 'lit' : 'wrong');
+    const at = picked.indexOf(i);
+    if (at >= 0) { picked.splice(at, 1); el.classList.remove('lit'); }
+    else { picked.push(i); el.classList.add('lit'); }
+    if (countEl) {
+      countEl.textContent = t('dc.chimp_count_live', 'Selected: {n}').replace('{n}', String(picked.length));
+    }
   });
 
   await new Promise<void>((resolve) => {

@@ -111,3 +111,28 @@ html[data-theme="dark"]{
 .duel-net[hidden]{display:none}
 .duel-net-offline{background:#fdecec;color:#a02020;border-bottom:1px solid #f5c2c2}
 .duel-net-weak{background:#fff8e0;color:#8a6d00;border-bottom:1px solid #f0dfa0}
+
+/* ── 难度选择（2026-10-29 · 拆掉 ROUNDS=3 硬编码）──
+   三档 radio 组：easy=3 轮 / normal=4 轮 / hard=5 轮。
+   轮次越多，后面轮次越长（服务端 roundLen 按轮递增、受 maxLen 封顶），
+   所以这是「难度」而不是「时长」——文案里也这么写。 */
+.duel-diff{
+  display:flex;align-items:center;flex-wrap:wrap;gap:8px;
+  margin:0 0 16px;padding:10px 12px;
+  border:1px solid var(--line, #e2e8f0);border-radius:12px;
+  background:var(--card, #fff);
+}
+.duel-diff-label{font-size:13px;font-weight:700;color:var(--ink,#0f172a);font-family:var(--ui)}
+.duel-diff-btn{
+  font:inherit;font-size:13px;font-weight:600;
+  padding:6px 14px;border-radius:999px;cursor:pointer;
+  border:1px solid var(--line,#e2e8f0);background:transparent;color:var(--ink,#0f172a);
+  text-transform:capitalize;transition:background .15s,color .15s,border-color .15s;
+}
+.duel-diff-btn:hover{border-color:var(--brand,#4f46e5);color:var(--brand,#4f46e5)}
+.duel-diff-btn.on{
+  background:var(--brand,#4f46e5);border-color:var(--brand,#4f46e5);color:#fff;
+}
+.duel-diff-hint{
+  flex:1 1 100%;font-size:12px;color:var(--muted,#64748b);line-height:1.45;
+}

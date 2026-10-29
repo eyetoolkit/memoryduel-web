@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" data-site="memory">
 <head>
-<script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:60,fallback:"en"};</script>
+<script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:65,fallback:"en"};</script>
 <script src="/i18n/i18n.js?v=59"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -178,6 +178,12 @@
 </footer>
 
 <!-- 题库（分类名 + 题量）；qd8 与 train.html 同源 -->
+<!-- 🔴 2026-10-29：本页只需要**题量**（另有 /api/md/quiz/counts 端点），
+     不需要题库本体。置 MD_QUIZ_LAZY 关闭 quiz-data 的「12 分类 × 100 题」
+     全量预取（原实现在本页白下载约 1,400 题，加载 9.3 s）；
+     题目改为玩家点开某个分类真正开打时再按需拉取。
+     ⚠️ 该开关必须在 quiz-data.v9.js **之前**设置才生效。 -->
+<script>window.MD_QUIZ_LAZY = true;</script>
 <script src="/assets/quiz-data.v9.js" defer></script>
 <script type="module" src="/src/pages/knowledge-lobby.ts"></script>
 <script src="/i18n/lang-switcher.js?v=40" defer></script>

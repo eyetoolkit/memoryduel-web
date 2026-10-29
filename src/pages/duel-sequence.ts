@@ -69,17 +69,52 @@ function inferGame(): string {
   return 'sequence-memory';
 }
 const GAME: string = inferGame();
-const ROUNDS = 3;
+
+/* ═══════ 难度档（2026-10-29）═══════
+   🔴 原先 ROUNDS 恒为 3，六款记忆游戏的难度被锁死在
+      number/sequence 3→5、chimp 5→7、emoji 4→8、word 6→14
+      这类对成年人几乎不构成挑战的区间，一局 40–90 秒打完，
+      既没有难度选择，也没有个人最佳 —— 记忆类游戏留存的第一驱动力完全缺失。
+   现在按难度决定轮数：**轮次越多，后面轮次越长**（服务端 roundLen 按轮递增、
+   受 maxLen 封顶），所以服务端不需要改契约，rounds 本来就是建房参数。
+     easy   = 3 轮（原行为）
+     normal = 4 轮
+     hard   = 5 轮（配合服务端把 chimp maxLen 提到 9、word 提到 18）
+   🔴 color-recall 例外：共享题库里它只有 1 轮（1 轮 = 5 个颜色，本身就是一整套），
+      原先为凑 3 轮把**同一组颜色**重复练三遍 —— 那是机械重复，不是难度递增。
+      对战侧不受影响（服务端按房间 seed 生成多组互不相同的颜色）。 */
+type Diff = 'easy' | 'normal' | 'hard';
+const DIFF_ROUNDS: Record<Diff, number> = { easy: 3, normal: 4, hard: 5 };
+let DIFF: Diff = 'normal';
+try {
+  const q = new URLSearchParams(location.search).get('difficulty');
+  const saved = sessionStorage.getItem('duel-diff');
+  const pick = String(q || saved || 'normal');
+  if (pick === 'easy' || pick === 'hard' || pick === 'normal') DIFF = pick;
+} catch (_) { /* sessionStorage 不可用（隐私模式）时退回 normal */ }
+
+function roundsOf(): number {
+  if (GAME === 'color-recall') return 1;
+  return DIFF_ROUNDS[DIFF];
+}
 const LIT_MS = 600;
 const GAP_MS = 240;
 /** 颜色阵列的展示时长。与 daily 的 playColor 保持一致，玩家不必在两种玩法间换预期。 */
 const COLOR_SHOW_MS = 4200;
 /** 三款新游戏的展示时长。与 daily-game.ts 的同名常量逐字一致，
     免得玩家在同一款游戏的两处体验到不同时长、以为其中一处坏了。 */
-const EMOJI_SHOW_MS = 3400;
 const CHIMP_LIT_MS = 700;
 const CHIMP_GAP_MS = 180;
 const WORD_STEP_MS = 760;
+
+/* 🔴 2026-10-29：Emoji Ghost 的闪现时长改为**随集合大小缩放**。
+   原先写死 3400ms，而 hard 档第 5 轮集合已扩到 12 个符号（服务端 maxLen
+   8→12）——12 个符号只给 3.4 秒等于把难度靠「看不清」而非「记不住」堆上去，
+   玩家只会觉得被坑。基线 2200ms + 每个符号 280ms：
+   4 个 ≈ 3.3s（与原值基本一致，每日挑战体感不变）、8 个 ≈ 4.4s、12 个 ≈ 5.6s。 */
+function emojiShowMs(n: number): number {
+  return 2200 + 280 * Math.max(0, n);
+}
 
 /** 每个游戏的专属文案前缀，避免在多款游戏间写 if 分支 */
 const ICON = GAME === 'number-recall' ? '🔢'
@@ -148,7 +183,7 @@ const soloTruth: Record<number, unknown> = {};
     🔴 lang 必须带：word-recall 题目按语言分裂，不传会拿到默认语言词库，
        界面会出现「英文题配中文界面」。
     🔴🔴 round 基准不一致，这是线上真事故：
-       对战内核的 round 是 **0-based**（0..ROUNDS-1），
+       对战内核的 round 是 **0-based**（0..roundsOf()-1），
        而 /api/md/daily/puzzle 的 round 是 **1-based**（1..meta.rounds）。
        直接把对战 round 透传过去，第一轮会拿到 HTTP 400 BAD_PARAM bad_round，
        整个单人模式在第 1 轮就卡死报错 —— 而只测「进得去」的验收完全测不到。
@@ -167,7 +202,12 @@ async function soloFetchRound(round: number): Promise<{ puzzle: any }> {
      重复三轮只是把同一组颜色再练两遍，不影响判分口径，也不伪造题目。 */
   const isSinglePuzzle = GAME === 'color-recall';
   const puzzleRound = isSinglePuzzle ? 1 : round + 1;
-  const data = await W.fetchPuzzleInLang(GAME, puzzleRound, W.fetchAnswerLang());
+  /* 🔴 2026-10-29：练习模式带 practice=1。
+     难度 hard 档要跑 5 轮，而 /api/md/daily/puzzle 的 round 上界
+     默认是**每日赛程长度** level.rounds（3），第 4/5 轮会被挡成 400 bad_round。
+     practice=1 让服务端把上界放宽到 10（真实长度仍受 maxLen 封顶）。
+     每日挑战的取题与提交都不带该参数，赛程与满分口径不受影响。 */
+  const data = await W.fetchPuzzleInLang(GAME, puzzleRound, W.fetchAnswerLang(), { practice: 1 });
   const puzzle = data && data.puzzle;
   if (!puzzle) throw new Error('[duel] solo 取题响应缺少 puzzle');
 
@@ -228,23 +268,36 @@ function soloJudge(round: number, answer: unknown): any {
       if (right[i] === got[i]) hit++;
       else if (firstMiss < 0) firstMiss = i;
     }
-    /* 顺序题：首个错位之后的一律不算分（记位置记忆不是记集合） */
-    score = firstMiss >= 0
-      ? Math.round((firstMiss / right.length) * 100)
-      : Math.round((hit / right.length) * 100);
+    if (tr.kind === 'seq') {
+      /* 顺序题：首个错位之后的一律不算分（记位置记忆不是记集合）。
+         与服务端 judgeAgainst 的「按错即停」前缀比对同一口径。 */
+      score = firstMiss >= 0
+        ? Math.round((firstMiss / right.length) * 100)
+        : Math.round((hit / right.length) * 100);
+    } else {
+      /* 🔴 2026-10-29：数字串改为**逐位计分**，与服务端 judgeAgainst 对齐。
+         原实现「首个错位之后一律不算分」会让同一串数字在练习与对战里
+         拿到两个不同的分（服务端是逐位给分），玩家无从判断自己的真实水平。 */
+      score = Math.round((hit / right.length) * 100);
+    }
     perfect = hit === right.length && got.length === right.length;
   } else if (tr.kind === 'color') {
+    /* 🔴 2026-10-29：改用与服务端**完全相同**的加权欧氏公式
+       （S/B 权重 0.6、dist/1.2 截断到 0）。原实现是 (dh+ds+db)/3 无权重，
+       与 judgeAgainst 算出的分数对不上。 */
     const got = Array.isArray(answer) ? answer : [];
-    let sum = 0;
+    let total = 0;
     tr.colors.forEach((c: any, i: number) => {
       const g = got[i] || { h: 0, s: 50, b: 50 };
-      const dh = Math.min(Math.abs(c.h - g.h), 360 - Math.abs(c.h - g.h)) / 180;
+      const hd = Math.abs(c.h - g.h);
+      const dh = Math.min(hd, 360 - hd) / 180;
       const ds = Math.abs(c.s - g.s) / 100;
       const db = Math.abs(c.b - g.b) / 100;
-      sum += Math.max(0, 1 - (dh + ds + db) / 3);
+      const dist = Math.sqrt(dh * dh + ds * ds * 0.6 + db * db * 0.6);
+      total += Math.max(0, 10 * (1 - dist / 1.2));
     });
-    score = Math.round((sum / Math.max(1, tr.colors.length)) * 100);
-    perfect = score >= 95;
+    score = Math.round(total);            // 满分 = 色数 × 10，与服务端 maxScoreOf 一致
+    perfect = score >= tr.colors.length * 10 * 0.95;
   } else if (tr.kind === 'emoji') {
     /* 🔴 渲染层回传的是 options 里的**下标**（与每日挑战同构，playEmojiGhost
        也 resolve(pick) 下标），不是 emoji 本体。
@@ -302,8 +355,8 @@ async function runSolo() {
     document.getElementById('soloGo')!.addEventListener('click', () => resolve(), { once: true });
   });
 
-  for (let round = 0; round < ROUNDS; round++) {
-    showRoundTag(round + 1, ROUNDS);
+  for (let round = 0; round < roundsOf(); round++) {
+    showRoundTag(round + 1, roundsOf());
     /* 计时不在这里管：由 playRound 在题面就绪时置 soloT0，
        soloJudge 在提交瞬间写 soloElapsed[round]。 */
     const played = await playRound('', round);
@@ -388,9 +441,18 @@ const cp = COPY[GAME] || COPY['sequence-memory'];
 
 function renderEntry() {
   const card = $('#card')!;
+  const diffBtns = (['easy', 'normal', 'hard'] as Diff[]).map((d) => `
+      <button class="duel-diff-btn${d === DIFF ? ' on' : ''}" type="button" role="radio"
+              aria-checked="${d === DIFF ? 'true' : 'false'}" data-d="${d}">${esc(t(`duel.diff_${d}`, d.charAt(0).toUpperCase() + d.slice(1)))}</button>`).join('');
   card.innerHTML = `
     <h2 class="dc-h2">${esc(cp.title)}</h2>
     <p class="dc-help">${esc(cp.help)}</p>
+
+    <div class="duel-diff" role="radiogroup" aria-label="${esc(t('duel.difficulty', 'Difficulty'))}">
+      <span class="duel-diff-label">${esc(t('duel.difficulty', 'Difficulty'))}</span>
+      ${diffBtns}
+      <span class="duel-diff-hint">${esc(t('duel.diff_hint', 'Higher difficulty adds rounds — each round gets longer.'))}</span>
+    </div>
 
     <button class="dc-btn" id="createBtn" type="button">${esc(t('duel.create', 'Create a duel'))}</button>
 
@@ -406,6 +468,16 @@ function renderEntry() {
 
   document.getElementById('createBtn')!.addEventListener('click', () => doCreate());
   document.getElementById('joinBtn')!.addEventListener('click', () => doJoin());
+  /* 难度切换：改完立刻重渲染入口卡（按钮选中态 + 后续建房/开局的轮数都跟着变）。 */
+  document.querySelectorAll('.duel-diff-btn').forEach((b) => {
+    b.addEventListener('click', () => {
+      const d = (b as HTMLElement).dataset.d as Diff;
+      if (!d || d === DIFF) return;
+      DIFF = d;
+      try { sessionStorage.setItem('duel-diff', d); } catch (_) {}
+      renderEntry();
+    });
+  });
   const codeIn = document.getElementById('codeIn') as HTMLInputElement;
   codeIn.addEventListener('keydown', (e) => {
     if ((e as KeyboardEvent).key === 'Enter') doJoin();
@@ -416,7 +488,7 @@ async function doCreate() {
   try {
     // 先确保有会话，才能把「自己」和 create 响应里的房主 pid 对上
     await C().ensureSession();
-    const r = await C().createRoom(GAME, { rounds: ROUNDS });
+    const r = await C().createRoom(GAME, { rounds: roundsOf() });
     room = { code: r.code };
     /* 建房的那一刻自己必然是房主。把 create 响应里 host=true 的 pid 记下来，
        enterRoom 里与自己的 pid 比对即可 —— 不依赖 status 是否回传 host。 */
@@ -525,7 +597,7 @@ function renderWaiting(code: string, st: any) {
   if (startBtn) {
     startBtn.addEventListener('click', async () => {
       try {
-        const r = await C().startRoom(code, { game: GAME, rounds: ROUNDS });
+        const r = await C().startRoom(code, { game: GAME, rounds: roundsOf() });
         /* 🔴 只有服务端确认 started 才渲染作答界面。
            原写法 `await start(); renderPlay()` 把失败都吞进 catch 之外的路径：
            限流 429 / 网络抖动时 start 实际没生效，房间仍是 waiting，
@@ -537,7 +609,7 @@ function renderWaiting(code: string, st: any) {
             () => enterRoom(code));
           return;
         }
-        renderPlay(code, { status: 'playing', round: 0, totalRounds: ROUNDS });
+        renderPlay(code, { status: 'playing', round: 0, totalRounds: roundsOf() });
       } catch (e) {
         renderError((e as Error).message, () => enterRoom(code));
       }
@@ -569,7 +641,7 @@ function pollStatus(code: string) {
 /* ═══════════ 阶段 3：逐轮记忆对战 ═══════════ */
 async function renderPlay(code: string, st: any) {
   if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
-  const total = Number(st.totalRounds || ROUNDS);
+  const total = Number(st.totalRounds || roundsOf());
 
   /* 🔴 2026-10-13 深度审核：刷新/重进要从**已答轮次之后**继续。
      原实现恒从 round=0 开始，而 /answer 是幂等的（重复提交 already=true、
@@ -729,32 +801,37 @@ async function playRound(code: string, round: number): Promise<boolean> {
       stage.classList.add('show');
       await sleep(LIT_MS);
     }
-    stage.textContent = target;
-    void stage.offsetWidth;
-    stage.classList.add('show');
-    await sleep(1100);
+    /* 🔴 P0 修复（2026-10-29）：删掉「逐位闪完后再把整串显示 1.1 秒」这一段。
+       原实现在循环结束后执行 `stage.textContent = target; await sleep(1100)`，
+       实测截图里中央直接显示完整数字串（454），玩家只要等最后一眼就能抄下答案，
+       数字广度训练与对战公平性同时失效。背诵阶段结束即抹除，不再回显。 */
     stage.textContent = '';
     stage.classList.add('hide');
     stage.classList.remove('show');
 
     card.innerHTML = `
       <h2 class="dc-h2">${esc(t('duel.your_turn_num', 'Your turn — type the digits'))}</h2>
+      <p class="dc-help">${esc(t('duel.num_tip', 'Type as many as you remember, then submit.'))}</p>
       <input class="dc-input" id="ans" inputmode="numeric" autocomplete="off"
-             maxlength="${target.length}" placeholder="${'0'.repeat(target.length)}"
-             aria-label="${esc(t('dc.num_aria', 'Digits you remember'))}" />`;
+             maxlength="${target.length}" placeholder=""
+             aria-label="${esc(t('dc.num_aria', 'Digits you remember'))}" />
+      <button class="dc-btn" id="numSubmit" type="button" style="margin-top:14px">${esc(t('duel.submit', 'Submit'))}</button>`;
 
     const ans = $('#ans') as HTMLInputElement;
     ans.focus();
     // 🔴 同样先声明再进 Promise，避免 TDZ（见下方 sequence 分支的说明）
     const typedRef: { v: string } = { v: '' };
     await new Promise<void>((resolve) => {
+      const settle = () => { typedRef.v = ans.value; resolve(); };
       ans.addEventListener('input', () => {
+        /* 🔴 不再「输满位数即自动提交」：那样玩家没有确认/退格的机会，
+           而且记不清时必须硬凑满位数才能推进。改为显式提交（回车亦可）。 */
         ans.value = ans.value.replace(/\D/g, '').slice(0, target.length);
-        if (ans.value.length === target.length) { typedRef.v = ans.value; resolve(); }
       });
       ans.addEventListener('keydown', (e) => {
-        if ((e as KeyboardEvent).key === 'Enter' && ans.value.length) { typedRef.v = ans.value; resolve(); }
+        if ((e as KeyboardEvent).key === 'Enter') settle();
       });
+      document.getElementById('numSubmit')!.addEventListener('click', settle);
     });
     answer = typedRef.v;
   } else if (isColor) {
@@ -785,7 +862,7 @@ async function playRound(code: string, round: number): Promise<boolean> {
           .replace('{n}', String(i + 1)).replace('{total}', String(colors.length)))}</h2>
         <div class="dc-color-target" style="width:100%;height:120px;background:${target}" aria-label="${esc(t('dc.col_target', 'Target colour'))}"></div>
         <div class="dc-wheel" id="wheel" role="application" aria-label="${esc(t('dc.col_wheel', 'Colour wheel'))}"
-             style="background:conic-gradient(from 0deg,#FF0000,#FFFF00,#00FF00,#00FFFF,#0000FF,#FF00FF,#FF0000)"></div>
+             style="background:radial-gradient(closest-side,#ffffff 0%,rgba(255,255,255,0) 40%,rgba(0,0,0,0.5) 85%,rgba(0,0,0,0.85) 100%),conic-gradient(from 0deg,#FF0000,#FFFF00,#00FF00,#00FFFF,#0000FF,#FF00FF,#FF0000)"></div>
         <p class="dc-wheel-hint">${esc(t('dc.col_hint', 'Click or drag on the wheel to set hue and lightness; use the sliders for saturation.'))}</p>
         <div class="dc-sliders">
           <div class="dc-slider-row"><span>H</span><input type="range" id="h" min="0" max="359" value="0" /><output id="ho">0</output></div>
@@ -849,7 +926,7 @@ async function playRound(code: string, round: number): Promise<boolean> {
 
     const row = $('#row')!;
     row.innerHTML = emojiSet.map((e) => `<span class="dc-emoji">${esc(e)}</span>`).join('');
-    await sleep(EMOJI_SHOW_MS);
+    await sleep(emojiShowMs(emojiSet.length));
     row.innerHTML = '';
 
     card.innerHTML = `
@@ -893,32 +970,47 @@ async function playRound(code: string, round: number): Promise<boolean> {
       n.textContent = String(k + 1);
       n.classList.add('lit');
       await sleep(CHIMP_LIT_MS);
+      /* 🔴 P0 修复（2026-10-29）：闪完**立刻**清空该格，而不是等全部闪完再统一清。
+         原实现只做 `remove('lit')`，而 `.dc-chimp-cell.lit` 只改背景/边框/字色、
+         不承担可见性 —— 于是数字一直留在格子里，直到最后一格闪完才被清掉。
+         实测：5 个数字时，玩家在第 3 个数字出现时就能看到 1/2/3 三个数字
+         同时停在网格上，扫一眼即可抄下全部位置，记忆环节形同不存在。
+         京都大学原范式就是「闪一下就消失」，此处必须逐格即清。 */
       n.classList.remove('lit');
+      n.textContent = '';
       await sleep(CHIMP_GAP_MS);
     }
     await sleep(500);
-    nodes.forEach((n) => { n.textContent = ''; });
+    nodes.forEach((n) => { n.textContent = ''; });   // 兜底：确保无残留
 
     card.innerHTML = `
       <h2 class="dc-h2">${esc(t('duel.chimp_pick', 'Tap every cell that held a number.'))}</h2>
-      <p class="dc-help">${esc(t('duel.chimp_count', 'There were {n} numbers.').replace('{n}', String(chimpPositions.length)))}</p>
+      <p class="dc-help" id="chimpCount">${esc(t('duel.chimp_count_live', 'Selected: {n}').replace('{n}', '0'))}</p>
       <div class="dc-chimp-grid" id="grid" style="grid-template-columns:repeat(${chimpGrid},1fr)">
         ${Array.from({ length: size }, (_, i) => cell(i)).join('')}
       </div>
       <button class="dc-btn" id="done" type="button" style="margin-top:14px">${esc(t('dc.chimp_done', 'Done'))}</button>`;
 
     const grid2 = $('#grid')!;
+    const countEl = document.getElementById('chimpCount') as HTMLElement | null;
     /* 🔴 数组必须在 Promise **外部**声明：写成
        `const picked = await new Promise(r => { ...picked.push(i) })`
        会让回调里的 picked 处于暂时性死区，点第一格就抛 ReferenceError，
        页面停在「轮到你」且点击无反应。 */
     const picked: number[] = [];
+    /* 🔴 2026-10-29 改动：不再把「有几个数字」直接印在提示里，
+       也不再限制最多只能选 N 格 —— 那两件事合起来把「回忆数量」这一维
+       难度彻底移除，玩家只要数着点满 N 个即可。
+       现在改为：已选计数实时显示、可再点一次取消、允许超点，
+       超点由服务端 judgeAgainst 按误点扣分（服务端同步补上了惩罚）。 */
     grid2.addEventListener('click', (e) => {
       const el = (e.target as HTMLElement).closest('.dc-chimp-cell') as HTMLElement | null;
-      if (!el || picked.length >= chimpPositions.length) return;
+      if (!el) return;
       const i = Number(el.dataset.i);
-      if (picked.includes(i)) return;
-      picked.push(i);
+      const at = picked.indexOf(i);
+      if (at >= 0) { picked.splice(at, 1); el.classList.remove('lit'); }
+      else { picked.push(i); el.classList.add('lit'); }
+      if (countEl) countEl.textContent = t('duel.chimp_count_live', 'Selected: {n}').replace('{n}', String(picked.length));
       /* 用 .lit（daily-challenge.css 里已定义）而不是自造 .picked ——
          另起类名就得再补一条样式，漏补时选中态完全不可见，
          玩家会以为点击没生效。.wrong 是每日挑战的即时反馈，
@@ -1012,6 +1104,22 @@ async function playRound(code: string, round: number): Promise<boolean> {
     nodes.forEach((n) => n.removeAttribute('disabled'));
     card.querySelector('.dc-h2')!.textContent = t('duel.your_turn', 'Your turn — tap them back');
 
+    /* 🔴 2026-10-29：作答阶段补「已点计数 + 显式提交出口」。
+       原实现只有「点满 N 个才自动推进」一条路径 —— 玩家记不清后面几步时，
+       既看不到已经点了几个，也没有提前结束的办法，只能乱点凑数或刷新页面。 */
+    const seqProg = document.createElement('p');
+    seqProg.className = 'dc-help';
+    seqProg.textContent = t('duel.seq_progress', 'Tapped {n} of {m}')
+      .replace('{n}', '0').replace('{m}', String(seq.length));
+    card.querySelector('.dc-h2')!.after(seqProg);
+    const seqSubmit = document.createElement('button');
+    seqSubmit.className = 'dc-btn';
+    seqSubmit.id = 'seqSubmit';
+    seqSubmit.type = 'button';
+    seqSubmit.style.marginTop = '14px';
+    seqSubmit.textContent = t('duel.submit', 'Submit');
+    card.appendChild(seqSubmit);
+
     /* 🔴 先在 Promise **外部**声明数组再传入：
        若写成 `const picked = await new Promise(r => { ... picked.push(i) ... })`，
        回调里访问 picked 时它还处在暂时性死区（TDZ），
@@ -1019,17 +1127,22 @@ async function playRound(code: string, round: number): Promise<boolean> {
        —— 页面停在「轮到你了」且点了没反应，极难从表象定位。 */
     const picked: number[] = [];
     await new Promise<void>((resolve) => {
+      const gridEl = document.getElementById('grid')!;
+      function done() {
+        gridEl.removeEventListener('click', onClick);
+        resolve();
+      }
       const onClick = (e: Event) => {
         const el = (e.target as HTMLElement).closest('.dc-seq-cell') as HTMLElement | null;
         if (!el) return;
         const i = Number(el.dataset.i);
         picked.push(i);
-        if (picked.length >= seq.length) {
-          document.getElementById('grid')!.removeEventListener('click', onClick);
-          resolve();
-        }
+        seqProg.textContent = t('duel.seq_progress', 'Tapped {n} of {m}')
+          .replace('{n}', String(picked.length)).replace('{m}', String(seq.length));
+        if (picked.length >= seq.length) done();
       };
-      document.getElementById('grid')!.addEventListener('click', onClick);
+      gridEl.addEventListener('click', onClick);
+      seqSubmit.addEventListener('click', done);
     });
     answer = picked;
   }
@@ -1084,7 +1197,7 @@ async function playRound(code: string, round: number): Promise<boolean> {
       finishRoom() 仍保留为兜底重试（响应丢失时用），
       服务端对「赛程未完成」回 WAITING_FOR_OPPONENT，属正常形态而非错误。 */
 async function showResult(code: string) {
-  showRoundTag(ROUNDS, ROUNDS);
+  showRoundTag(roundsOf(), roundsOf());
   const card = $('#card')!;
   card.innerHTML = `<div class="dc-loading">${esc(t('duel.scoring', 'Scoring…'))}</div>`;
 

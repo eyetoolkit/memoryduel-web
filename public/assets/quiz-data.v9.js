@@ -130,6 +130,9 @@
       loaded = null;
       loading = false;
       loadGen++; // invalidate in-flight ensureLoaded from previous lang
+      /* 惰性模式下切语言也不预取：等真正需要题目（开打）时再拉。
+         否则切一次语言就又把 12 个分类全拉一遍，等于把上面的优化废掉。 */
+      if (window.MD_QUIZ_LAZY) return;
       ensureLoaded().then(function (stats) {
         window.dispatchEvent(new CustomEvent('memoryduel-ready', { detail: stats || null }));
       });
@@ -319,9 +322,23 @@
     return loaded;
   }
 
-  ensureLoaded().then(function (stats) {
-    window.dispatchEvent(new CustomEvent('memoryduel-ready', { detail: stats || null }));
-  });
+  /* 🔴 2026-10-29：全量预取改为**可关闭**。
+     原实现在脚本末尾无条件 ensureLoaded()，一次性串行拉 12 个分类 × 100 题
+     （约 1,400 题 / 140 KB+）。而知识对决大厅只需要**题量**——
+     它另有 /api/md/quiz/counts 端点，一次返回全部分类真实总数，零 D1。
+     实测该页因此加载 9.3 s，其中绝大部分时间花在下载永远用不到的题目上，
+     /train 的 networkidle 甚至在 60 s 内都静不下来。
+     需要题库的页面（train.html / battle）保持自动；只显示题量的页面
+     在引入本脚本**之前**置 `window.MD_QUIZ_LAZY = true`，
+     题目改为真正开打时由 ensureLoaded() 按需拉取。 */
+  if (!window.MD_QUIZ_LAZY) {
+    ensureLoaded().then(function (stats) {
+      window.dispatchEvent(new CustomEvent('memoryduel-ready', { detail: stats || null }));
+    });
+  } else {
+    // 惰性模式：照常发一次 ready（此时 QUESTIONS 为空），只关心 counts 的消费方不受影响
+    window.dispatchEvent(new CustomEvent('memoryduel-ready', { detail: { lazy: true, total: 0, lang: LANG } }));
+  }
 
   window.MemoryDuelQuiz = {
     CATEGORIES: CATEGORIES,

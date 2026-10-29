@@ -206,7 +206,7 @@
     "mathduel_name": "NumeriDuel Duel de Maths",
     "boardduel_name": "Board Duel Duel de Plateau",
     "memoryduel_name": "MemoryDuel Bataille de Connaissances",
-    "footer": "© 2026 MemoryDuel · Sans pub · Sans suivi · Statique pur",
+    "footer": "© 2026 MemoryDuel · Jeu gratuit · Statistiques anonymes uniquement après consentement",
     "btn_start_duel": "Démarrer le Duel",
     "btn_login_register": "Connexion / Inscription",
     "duel_vs": "VS",
@@ -889,7 +889,7 @@
     "games_sub": "Deux façons d’entraîner ta mémoire — contre un adversaire, ou contre le temps et toi-même.",
     "game_knowledge": "Duel de connaissances",
     "game_knowledge_d": "Des quiz en tête à tête sur les sciences, l’histoire et la géographie. Affronte un ami ou l’IA, 15 secondes par question.",
-    "game_daily_d": "Trois niveaux de mémoire neufs chaque jour : mémorisation des chiffres, des séquences et des couleurs. Le même défi pour tous, avec une série quotidienne.",
+    "game_daily_d": "Trois jeux de mémoire sur cinq, en rotation chaque jour. Les mêmes défis pour tous, série quotidienne.",
     "tag_live": "En ligne",
     "tag_pvp": "1v1",
     "tag_46k": "46 000+ questions",
@@ -1071,7 +1071,7 @@
     "chimp_h2": "Test du Chimpanzé",
     "chimp_help": "Des chiffres apparaissent sur la grille puis disparaissent. Touchez chaque case qui portait un chiffre.",
     "chimp_ready": "Afficher",
-    "chimp_pick": "Touchez les {n} cases qui portaient un chiffre.",
+    "chimp_pick": "Touche toutes les cases qui affichaient un chiffre.",
     "chimp_done": "Terminé",
     "word_h2": "Mémoire des Mots",
     "word_help": "Les mots apparaissent un par un. Ensuite, indiquez pour chacun s'il a déjà été vu.",
@@ -1085,7 +1085,11 @@
     "lobby_mt_chimp": "Test du Chimpanzé",
     "lobby_md_chimp": "Des chiffres apparaissent sur la grille puis disparaissent. Touchez chaque case qui en portait un.",
     "lobby_mt_word": "Mémoire des Mots",
-    "lobby_md_word": "Les mots apparaissent un par un. Ensuite, indiquez pour chacun s'il a été vu."
+    "lobby_md_word": "Les mots apparaissent un par un. Ensuite, indiquez pour chacun s'il a été vu.",
+    "chimp_count_live": "Sélectionné : {n}",
+    "seq_progress": "{n} sur {m} touchées",
+    "seq_submit": "Valider",
+    "num_submit": "Valider"
   },
   "duel": {
     "seq_title": "Duel de séquences",
@@ -1159,7 +1163,16 @@
     "wait_title": "Vous avez terminé toutes vos manches",
     "wait_body": "Votre adversaire a encore des manches à jouer. Le duel sera tranché dès qu’il aura fini : restez sur cette page ou revenez plus tard avec votre code.",
     "checking": "En attente de votre adversaire…",
-    "settled_banner": "Duel réglé"
+    "settled_banner": "Duel réglé",
+    "chimp_count_live": "Sélectionné : {n}",
+    "submit": "Valider",
+    "seq_progress": "{n} sur {m} touchées",
+    "num_tip": "Saisis autant de chiffres que tu t'en souviens, puis valide.",
+    "difficulty": "Difficulté",
+    "diff_easy": "Facile",
+    "diff_normal": "Normal",
+    "diff_hard": "Difficile",
+    "diff_hint": "Une difficulté plus élevée ajoute des manches — et chaque manche devient plus longue."
   },
   "colduel": {
     "title": "Duel des couleurs · MemoryDuel",

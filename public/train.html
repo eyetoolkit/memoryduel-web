@@ -3,7 +3,7 @@
 <head>
 <!-- md-theme:early -->
 <script>(function(){try{var t=localStorage.getItem('md-theme2');if(t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();</script>
-  <script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:60,fallback:"en"};</script>
+  <script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:65,fallback:"en"};</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <!-- standalone 下 iOS 状态栏取 theme-color，缺失会回落成系统默认色（与本站暖橙/米白不搭）。
@@ -285,9 +285,27 @@
     /* ===== Battle 配置 ===== */
     var TOTAL_ROUNDS = 10;
     var PER_QUESTION_MS = 15000;      // 15 秒 / 题
-    var BOT_MIN_THINK = 2000;          // 2 秒
-    var BOT_MAX_THINK = 9000;          // 9 秒
-    var BOT_ACCURACY = 0.62;           // AI 整体正确率（随难度可调）
+    /* 🔴 2026-10-29：AI 难度档。
+       原先三个常量写死（2–9 秒思考 / 62% 正确率），而类别选择与难度诉求
+       在 UI 上无从体现 —— 玩家只能和一个固定强度的对手打，打两局就腻。
+       三档同时改「抢答延迟 + 正确率 + 抽题难度」：只改正确率没有体感，
+       只改延迟会让 AI 显得忽快忽慢而不像变强。
+       🔴 思考上限从 9 秒降到 2.6 秒：9 秒超过 15 秒答题窗口的一半以上，
+          实测「Bot is thinking…」长时间常驻，玩家会以为卡住了。 */
+    var BOT_TIERS = {
+      easy:   { min: 1600, max: 2600, acc: 0.55, diff: [1] },      // 只出 easy
+      normal: { min: 900,  max: 1800, acc: 0.80, diff: [1, 2] },   // easy + medium
+      hard:   { min: 350,  max: 900,  acc: 0.95, diff: [2, 3] },   // medium + hard
+    };
+    var AI_DIFF = 'normal';
+    try {
+      var _d = String(params.get('difficulty') || sessionStorage.getItem('md-ai-diff') || 'normal');
+      if (BOT_TIERS[_d]) AI_DIFF = _d;
+    } catch (e) {}
+    function botTier() { return BOT_TIERS[AI_DIFF] || BOT_TIERS.normal; }
+    var BOT_MIN_THINK = botTier().min;
+    var BOT_MAX_THINK = botTier().max;
+    var BOT_ACCURACY = botTier().acc;
 
     var BOT_NAMES_BY_LANG = (function () {
       var m = {};
@@ -380,6 +398,13 @@
     };
 
     function startBattle(questions) {
+      /* 按难度档过滤题目难度；过滤后题量不足一局时退回原池
+         （宁可题目难度不符，也不能因为没题而开局失败）。 */
+      var _tier = botTier();
+      var _pool = (questions || []).filter(function (q) {
+        return !q.diff || _tier.diff.indexOf(q.diff) >= 0;
+      });
+      if (_pool.length >= 10) questions = _pool;
       if (!questions || questions.length === 0) {
         showError('No questions available for this category.');
         return;

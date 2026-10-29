@@ -51,8 +51,9 @@ declare global {
         round: number;
         puzzle: any;
       }>;
-      /** word-recall 专用：带 lang 取题（漏传会静默拿到英语词库） */
-      fetchPuzzleInLang: (game: string, round: number, lang: string) => Promise<{
+      /** word-recall 专用：带 lang 取题（漏传会静默拿到英语词库）
+       *  第 4 参 opts.practice=1 时服务端放宽 round 上界（练习/难度档要用第 4、5 轮） */
+      fetchPuzzleInLang: (game: string, round: number, lang: string, opts?: { practice?: number | boolean }) => Promise<{
         date: string;
         game: string;
         round: number;
