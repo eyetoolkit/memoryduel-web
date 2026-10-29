@@ -24,7 +24,7 @@ interface InviteCardConfig {
   stats?: [string, string][];
   url: string; qrSrc: string | null;
   tone: string;
-  brand: string; domain: string; scanText: string; ctaText: string;
+  brand: string; domain: string; scanText: string; ctaText: string; noQrText?: string;
   fileBase: string;
   texts: InviteCardTexts;
 }
@@ -122,6 +122,7 @@ export async function openShareCard(d: ShareData): Promise<void> {
     domain: 'memoryduel.com',
     scanText: i18nText('md.share_scan', 'Scan to join the same duel'),
     ctaText: i18nText('md.share_cta', 'Play a free game'),
+    noQrText: i18nText('md.share_free', 'Free to play — no sign-up'),
     fileBase: 'memoryduel',
     texts: textsOf(),
   }));
