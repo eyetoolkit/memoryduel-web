@@ -1172,8 +1172,7 @@
     "diff_easy": "Facile",
     "diff_normal": "Normal",
     "diff_hard": "Difficile",
-    "diff_hint": "Une difficulté plus élevée ajoute des manches — et chaque manche devient plus longue.",
-    "invite": "Inviter"
+    "diff_hint": "Une difficulté plus élevée ajoute des manches — et chaque manche devient plus longue."
   },
   "colduel": {
     "title": "Duel des couleurs · MemoryDuel",
@@ -1248,36 +1247,5 @@
     "seo_title_emoji_ghost": "Fantôme Emoji — Choisissez votre duel",
     "seo_title_chimp_test": "Test du Chimpanzé — Choisissez votre duel",
     "seo_title_word_recall": "Mémoire des Mots — Choisissez votre duel"
-  },
-  "md": {
-    "share_invite_title": "Inviter un ami",
-    "share_room_code": "Code du salon",
-    "share_scan": "Scannez pour rejoindre le duel",
-    "share_free": "Gratuit — sans inscription",
-    "share_cta": "Jouez une partie gratuite",
-    "share_copied": "Lien copié",
-    "share_copy_failed": "Échec de la copie",
-    "share_saved": "Image enregistrée",
-    "share_stat_game": "Jeu",
-    "share_stat_status": "Statut",
-    "share_stat_waiting": "En attente",
-    "share_stat_mode": "Mode",
-    "share_stat_1v1": "1 contre 1",
-    "share_stat_site": "Site",
-    "share_stat_time": "Temps",
-    "share_stat_moves": "Manches",
-    "share_result_win": "Victoire",
-    "share_result_good": "Belle partie",
-    "share_big_win": "GAGNÉ",
-    "share_big_loss": "PERDU",
-    "share_win_sub": "Tu as gardé l'avantage",
-    "share_loss_sub": "Plus de chance la prochaine fois",
-    "share_close": "Fermer",
-    "share_scan_tap": "Scannez ou touchez le lien",
-    "share_scan_sub": "Invitez un ami à ton duel",
-    "share_link_aria": "Lien de partage",
-    "share_copy": "Copier",
-    "share_save": "Enregistrer l'image",
-    "share_sys": "Partager"
   }
 }

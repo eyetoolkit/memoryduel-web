@@ -1172,8 +1172,7 @@
     "diff_easy": "かんたん",
     "diff_normal": "ふつう",
     "diff_hard": "むずかしい",
-    "diff_hint": "難易度が高いほどラウンド数が増え、各ラウンドの内容も長くなります。",
-    "invite": "招待"
+    "diff_hint": "難易度が高いほどラウンド数が増え、各ラウンドの内容も長くなります。"
   },
   "colduel": {
     "title": "色彩記憶対戦 · MemoryDuel",
@@ -1248,36 +1247,5 @@
     "seo_title_emoji_ghost": "絵文字ゴースト — 対戦を選択",
     "seo_title_chimp_test": "チンパテスト — 対戦を選択",
     "seo_title_word_recall": "ワードリコール — 対戦を選択"
-  },
-  "md": {
-    "share_invite_title": "友を招待",
-    "share_room_code": "ルームコード",
-    "share_scan": "スキャンして同じ対戦に参加",
-    "share_free": "無料で遊べる・登録不要",
-    "share_cta": "無料で対戦しよう",
-    "share_copied": "リンクをコピーしました",
-    "share_copy_failed": "コピーに失敗しました",
-    "share_saved": "画像を保存しました",
-    "share_stat_game": "ゲーム",
-    "share_stat_status": "状態",
-    "share_stat_waiting": "待機中",
-    "share_stat_mode": "モード",
-    "share_stat_1v1": "1 対 1",
-    "share_stat_site": "サイト",
-    "share_stat_time": "時間",
-    "share_stat_moves": "ラウンド",
-    "share_result_win": "勝利",
-    "share_result_good": "いい試合だった",
-    "share_big_win": "勝ち",
-    "share_big_loss": "負け",
-    "share_win_sub": "リードを守った",
-    "share_loss_sub": "次は頑張ろう",
-    "share_close": "閉じる",
-    "share_scan_tap": "スキャンまたはリンクをタップ",
-    "share_scan_sub": "友をあなたの対戦に招待",
-    "share_link_aria": "共有リンク",
-    "share_copy": "コピー",
-    "share_save": "画像を保存",
-    "share_sys": "共有"
   }
 }

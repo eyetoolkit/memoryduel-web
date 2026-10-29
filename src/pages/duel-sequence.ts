@@ -22,7 +22,6 @@
  */
 
 import type {} from '../shared/duel-room';
-import { shareInvite } from '../games/share-card';
 
 type Room = { code: string; game?: string; players?: any[]; status?: string; round?: number; totalRounds?: number };
 
@@ -497,10 +496,6 @@ async function doCreate() {
     const cred = C().loadCred();
     iAmHost = !!(hostPid && cred && hostPid === cred.pid);
     await enterRoom(r.code);
-    /* 🔴 2026-10-29：建房者进房后立刻弹邀请卡（对齐 BoardDuel 的「邀请好友」弹窗：
-       Canvas 600×760 大图 + 二维码 + 6 位房码 + 链接 + 复制/保存/分享）。
-       guest 深链进来时 iAmHost=false，不会弹。 */
-    if (iAmHost) shareInvite(GAME, (COPY[GAME] || COPY['sequence-memory']).title, r.code, 'indigo');
   } catch (e) {
     renderError((e as Error).message, () => doCreate());
   }
@@ -572,7 +567,6 @@ function renderWaiting(code: string, st: any) {
     <div class="duel-code-box">
       <span class="duel-code-big" id="codeBig">${esc(code)}</span>
       <button class="dc-btn ghost small" id="copyBtn" type="button">${esc(t('duel.copy', 'Copy'))}</button>
-      ${isHost ? `<button class="dc-btn ghost small" id="inviteBtn" type="button">${esc(t('duel.invite', 'Invite'))}</button>` : ''}
     </div>
     <p class="duel-players" id="playersLine">${esc(t('duel.players_in', 'In the duel: '))}${esc((st.players || []).map((p: any) => p.name).join(', '))}</p>
     ${isHost ? `<button class="dc-btn" id="startBtn" type="button">${esc(t('duel.start', 'Start duel'))}</button>` : ''}
@@ -596,14 +590,6 @@ function renderWaiting(code: string, st: any) {
         }
         copyBtn.textContent = t('duel.copy_manual', 'Select and copy');
       }
-    });
-  }
-
-  /* host 随时能重新唤出邀请卡（建房瞬间弹过一次，刷新后也能再开） */
-  const inviteBtn = document.getElementById('inviteBtn');
-  if (inviteBtn) {
-    inviteBtn.addEventListener('click', () => {
-      shareInvite(GAME, (COPY[GAME] || COPY['sequence-memory']).title, code, 'indigo');
     });
   }
 
