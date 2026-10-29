@@ -1172,7 +1172,8 @@
     "diff_easy": "Leicht",
     "diff_normal": "Normal",
     "diff_hard": "Schwer",
-    "diff_hint": "Höhere Schwierigkeit fügt Runden hinzu — und jede Runde wird länger."
+    "diff_hint": "Höhere Schwierigkeit fügt Runden hinzu — und jede Runde wird länger.",
+    "invite": "Einladen"
   },
   "colduel": {
     "title": "Farb-Duell · MemoryDuel",
@@ -1247,5 +1248,36 @@
     "seo_title_emoji_ghost": "Emoji-Geist — Wähle dein Duell",
     "seo_title_chimp_test": "Schimpansen-Test — Wähle dein Duell",
     "seo_title_word_recall": "Wörter Erinnern — Wähle dein Duell"
+  },
+  "md": {
+    "share_invite_title": "Freund einladen",
+    "share_room_code": "Raum-Code",
+    "share_scan": "Scannen und am Duell teilnehmen",
+    "share_free": "Kostenlos — keine Anmeldung",
+    "share_cta": "Gratis eine Partie spielen",
+    "share_copied": "Link kopiert",
+    "share_copy_failed": "Kopieren fehlgeschlagen",
+    "share_saved": "Bild gespeichert",
+    "share_stat_game": "Spiel",
+    "share_stat_status": "Status",
+    "share_stat_waiting": "Warten",
+    "share_stat_mode": "Modus",
+    "share_stat_1v1": "1 gegen 1",
+    "share_stat_site": "Seite",
+    "share_stat_time": "Zeit",
+    "share_stat_moves": "Runden",
+    "share_result_win": "Sieg",
+    "share_result_good": "Gute Partie",
+    "share_big_win": "SIEG",
+    "share_big_loss": "NIEDERLAGE",
+    "share_win_sub": "Du hattest die Nase vorn",
+    "share_loss_sub": "Beim nächsten Mal!",
+    "share_close": "Schließen",
+    "share_scan_tap": "Scannen oder Link antippen",
+    "share_scan_sub": "Lad einen Freund zu deinem Duell ein",
+    "share_link_aria": "Link teilen",
+    "share_copy": "Kopieren",
+    "share_save": "Bild speichern",
+    "share_sys": "Teilen"
   }
 }
