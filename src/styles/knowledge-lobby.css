@@ -1,0 +1,204 @@
+/* ═══════════════════════════════════════════════════════════════
+   MemoryDuel · 知识对决大厅 · 概念稿视觉落地（2026-10-31）
+   ---------------------------------------------------------------------------
+   设计主张（与 _memoryduel-design 概念稿一致）：
+     组织原则 = Versus 对半分割（你/对手二元色），避开套路化首页。
+     调色板   = 靛蓝(--orange 你方) + 珊瑚(--rival 对手) + 金(--gold 点睛)。
+     字体     = Space Grotesk(展示) + Sora(正文)，复用 home.css 的自托管字体与
+                --disp/--ui/--mono token，暗色与 iOS 手感层一并继承。
+     克制点   = 全页唯一用力处就是「VS 对半分割 + 金火花」，其余安静。
+   🔴 只补两个色：--rival(珊瑚) --gold(金)；其余全部走 home.css 已有 token，
+      不另起炉灶，保证与全站暗色/字体/手感一致，不回归。
+   ═══════════════════════════════════════════════════════════════ */
+
+:root{
+  /* 珊瑚（对手方）：填充用深一档保证白字 AA(大字号≥3:1)，文字用更深档保证 AA */
+  --rival:#FF6B5C; --rival-deep:#E2493B; --rival-ink:#C2410C;
+  --rival-soft:rgba(255,107,92,.10);
+  /* 金（点睛：VS 字 / 火花 / 主推标签），不当正文底 */
+  --gold:#F5B300; --gold-soft:rgba(245,179,0,.16);
+  /* 你方浅底 */
+  --you-soft:rgba(79,70,229,.08);
+}
+
+/* 视觉隐藏（屏幕阅读器可见）；原由 daily-challenge.css 提供，本页已移除该文件 */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* ── 容器：移动优先，单栏居中 ── */
+.kb-wrap{max-width:720px;margin:0 auto;padding:0 18px}
+.kb-page{background-attachment:scroll} /* 内容页不固定背景，避免移动端重绘 */
+
+/* ── 英雄区 ── */
+.kb-hero{padding:30px 0 8px;text-align:center}
+.kb-hero h1{
+  font-family:var(--disp);font-weight:700;line-height:1.08;letter-spacing:-.02em;
+  font-size:clamp(28px,7vw,42px);margin:0 0 12px;
+}
+.kb-hero h1 em{font-style:normal;color:var(--orange)}
+.kb-hero .sub{color:var(--mute);font-size:15.5px;line-height:1.55;max-width:34ch;margin:0 auto}
+
+/* ── VS 对半分割（唯一用力处） ── */
+.kb-versus{
+  margin:24px 0 6px;display:grid;grid-template-columns:1fr auto 1fr;align-items:stretch;
+  border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;
+  background:var(--card);box-shadow:0 14px 36px -18px rgba(27,26,46,.30);
+}
+.kb-pane{
+  padding:20px 14px;display:flex;flex-direction:column;align-items:center;gap:9px;
+  min-height:104px;justify-content:center;
+}
+.kb-pane.you{background:var(--you-soft)}
+.kb-pane.rival{background:var(--rival-soft)}
+.kb-pane .who{
+  font-family:var(--disp);font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+}
+.kb-pane.you .who{color:var(--orange-deep)}
+.kb-pane.rival .who{color:var(--rival-ink)}
+.kb-pane .av{
+  width:44px;height:44px;border-radius:50%;display:grid;place-items:center;
+  font-family:var(--disp);font-weight:700;font-size:17px;color:#fff;
+}
+.kb-pane.you .av{background:var(--orange)}
+.kb-pane.rival .av{background:var(--rival-deep)}
+.kb-pane .st{font-size:12.5px;color:var(--mute);font-weight:600}
+
+.kb-seam{
+  position:relative;display:grid;place-items:center;background:var(--card);padding:0 6px;
+}
+.kb-seam::before{
+  content:"";position:absolute;inset:0;width:2px;left:50%;transform:translateX(-50%);
+  background:linear-gradient(var(--orange),var(--rival));opacity:.5;
+}
+.kb-seam .vs{
+  width:40px;height:40px;border-radius:50%;background:var(--ink);color:var(--gold);
+  font-family:var(--disp);font-weight:700;font-size:14px;display:grid;place-items:center;
+  z-index:2;box-shadow:0 0 0 4px var(--card),0 0 0 5px var(--line);
+}
+/* 金火花：装饰性点睛，reduced-motion 下静止 */
+.kb-seam .spark{
+  position:absolute;width:8px;height:8px;border-radius:50%;background:var(--gold);opacity:.4;z-index:1;
+  box-shadow:0 0 9px 2px rgba(245,179,0,.6);
+}
+.kb-seam .s1{left:26%;top:24%} .kb-seam .s2{left:74%;top:28%;animation-delay:.2s}
+.kb-seam .s3{left:22%;top:66%} .kb-seam .s4{left:78%;top:62%;animation-delay:.4s}
+
+/* ── CTA ── */
+.kb-cta-row{margin:24px 0 2px;display:flex;justify-content:center}
+.kb-start{font-family:var(--disp);font-weight:700;font-size:18px;padding:16px 30px}
+.kb-start .bolt{font-size:17px}
+.kb-status{
+  text-align:center;font-size:13.5px;font-weight:700;color:var(--orange-deep);
+  margin:12px auto 0;max-width:36ch;min-height:18px;
+}
+
+/* ── 面板与标题 ── */
+.kb-panel{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:20px;margin-top:18px;
+}
+.kb-sec-h{
+  font-family:var(--disp);font-weight:700;font-size:19px;margin:0 0 14px;
+  display:flex;flex-direction:column;gap:2px;
+}
+.kb-sec-h small{font-family:var(--ui);font-weight:600;font-size:12.5px;color:var(--mute)}
+
+/* ── 分类网格（沿用 knowledge-lobby.ts 的 .cat/.cat-card/.ci/.cn/.cq 契约） ── */
+.kb-catgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(82px,1fr));gap:10px}
+.kb-catgrid .cat{
+  background:var(--card);color:var(--ink);border:1px solid var(--line);
+  border-radius:13px;padding:12px 6px;cursor:pointer;text-align:center;font-family:var(--ui);
+  transition:transform .12s,border-color .12s,background .12s;
+  display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;
+}
+.kb-catgrid .cat:hover:not(:disabled){transform:translateY(-2px)}
+.kb-catgrid .cat .ci{font-size:22px;line-height:1}
+.kb-catgrid .cat .cn{font-size:12.5px;font-weight:700}
+.kb-catgrid .cat .cq{font-size:10.5px;color:var(--mute);font-weight:600}
+.kb-catgrid .cat.on{border-color:var(--orange);background:var(--you-soft);color:var(--orange-deep)}
+.kb-catgrid .cat.locked,.kb-catgrid .cat:disabled{opacity:.5;cursor:not-allowed}
+
+/* ── 模式卡（vs AI / 建房 / 加房） ── */
+.kb-modes{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.kb-mode{
+  border:1px solid var(--line);background:var(--card);border-radius:var(--r-md);
+  padding:16px;font-family:var(--ui);text-align:left;color:var(--ink);
+  transition:border-color .12s,transform .12s,box-shadow .12s;min-width:0;
+  display:flex;gap:12px;
+}
+.kb-mode.feat{grid-column:1 / -1;border-color:var(--orange)}
+.kb-mode:hover{border-color:var(--orange);transform:translateY(-2px);box-shadow:0 8px 22px rgba(79,70,229,.12)}
+a.kb-mode{text-decoration:none;cursor:pointer}
+.kb-mode .mi{font-size:24px;line-height:1;flex:none}
+.kb-mode>div:last-child{display:flex;flex-direction:column;min-width:0}
+.kb-mode .mt{font-family:var(--disp);font-weight:700;font-size:16px}
+.kb-mode .md{font-size:13px;color:var(--mute);line-height:1.5;margin:4px 0 10px}
+.kb-mode .md:last-child{margin-bottom:0}
+.kb-tag{
+  align-self:flex-start;margin-top:auto;font-size:11px;font-weight:700;letter-spacing:.02em;
+  padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--mute);
+}
+.kb-tag.is-gold{color:var(--orange-deep);border-color:rgba(79,70,229,.4);background:var(--you-soft)}
+.kb-tag.is-live{color:var(--rival-ink);border-color:rgba(255,107,92,.4);background:var(--rival-soft)}
+
+/* 加房输入 */
+.kb-join{display:flex;gap:8px;margin-top:2px;flex-wrap:wrap}
+.kb-room-in{
+  flex:1;min-width:120px;font-family:var(--mono);letter-spacing:.16em;font-size:16px;
+  text-align:center;text-transform:uppercase;padding:11px 12px;border:1px solid var(--line);
+  border-radius:11px;background:var(--card);color:var(--ink);
+}
+.kb-room-in::placeholder{letter-spacing:normal;text-transform:none;color:#b9bccb;font-size:14px}
+.kb-btn{background:var(--orange-ink);color:#fff;border:0;font-family:var(--ui);font-weight:700;
+  border-radius:11px;padding:0 18px;min-height:44px;cursor:pointer;font-size:14px}
+.kb-btn:hover{background:var(--orange-ink-hover)}
+.kb-err{font-size:12.5px;color:var(--rival-ink);font-weight:600;margin:8px 0 0}
+
+/* ── 规则面板 ── */
+.kb-rules-panel .pnote{font-size:13px;color:var(--mute);margin:0 0 14px;line-height:1.5}
+.kb-rules{display:flex;flex-direction:column;gap:2px}
+.kb-rules .dc-side-row{display:flex;align-items:center;gap:11px;padding:9px 2px;border-bottom:1px solid var(--line)}
+.kb-rules .dc-side-row:last-child{border-bottom:0}
+.kb-rules .dc-side-row .ico{font-size:17px;flex:none}
+.kb-rules .dc-side-row .nm{font-size:13.5px;font-weight:600;color:var(--ink)}
+
+/* ── 页脚 ── */
+.kb-foot{
+  text-align:center;color:var(--mute);font-size:13px;font-weight:600;
+  padding:26px 18px 40px;
+}
+
+/* ── 移动端：VS 转上下、模式单栏、分类 3 列 ── */
+@media(max-width:520px){
+  .kb-versus{grid-template-columns:1fr;grid-template-rows:auto auto auto}
+  .kb-seam{padding:6px 0}
+  .kb-seam::before{width:100%;height:2px;left:0;top:50%;transform:translateY(-50%);
+    background:linear-gradient(90deg,var(--orange),var(--rival))}
+  .kb-modes{grid-template-columns:1fr}
+  .kb-catgrid{grid-template-columns:repeat(3,1fr)}
+}
+
+/* ── 动效：仅火花呼吸；尊重 reduced-motion ── */
+@media(prefers-reduced-motion:no-preference){
+  .kb-seam .spark{animation:kb-spark 2.2s ease-in-out infinite}
+  @keyframes kb-spark{0%,100%{opacity:.3;transform:scale(.55)}45%{opacity:1;transform:scale(1.15)}}
+}
+@media(prefers-reduced-motion:reduce){
+  .kb-seam .spark{opacity:.35}
+  .kb-versus{box-shadow:none}
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   暗色：只补本文件新增的珊瑚/金分量；其余 token 由 home.css 暗块统一管。
+   ═══════════════════════════════════════════════════════════════ */
+html[data-theme="dark"]{
+  --rival-soft:rgba(255,107,92,.14);
+  --rival-ink:#FF8A7E;          /* 暗底上的珊瑚文字，压深底 ≥4.5:1 */
+  --gold-soft:rgba(245,179,0,.18);
+  --you-soft:rgba(129,140,248,.14);
+  .kb-versus{box-shadow:0 16px 40px -18px rgba(0,0,0,.6)}
+  .kb-pane.you .who{color:var(--orange-deep)}
+  .kb-pane.rival .who{color:var(--rival-ink)}
+  .kb-seam .vs{box-shadow:0 0 0 4px var(--card)}
+  .kb-mode.feat{border-color:var(--orange-bright)}
+  .kb-tag.is-gold{color:var(--orange-bright)}
+}
