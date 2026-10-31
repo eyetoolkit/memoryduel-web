@@ -228,8 +228,8 @@ h1 em{font-style:normal;color:var(--orange)}
 .games-block{padding:40px 24px 8px}
 .games-ttl{font-family:var(--disp);font-weight:700;font-size:24px;text-align:center}
 .games-sub{text-align:center;font-size:13.5px;color:var(--mute);margin-top:6px;max-width:56ch;margin-left:auto;margin-right:auto}
-.games-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:22px}
-.gcard{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:var(--rd);padding:20px;min-width:0;position:relative;transition:transform .14s,border-color .14s,box-shadow .14s;cursor:pointer;touch-action:manipulation}
+.games-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin-top:22px}
+.gcard{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:var(--rd);padding:20px;min-width:0;position:relative;transition:transform .14s,border-color .14s,box-shadow .14s;cursor:pointer;touch-action:manipulation;flex:0 1 400px;max-width:400px}
 .gcard:hover{transform:translateY(-3px);border-color:var(--orange);box-shadow:0 8px 22px rgba(79,70,229,.13)}
 .gcard:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 /* 游戏图标 chip（2026-10-29）：56px 容器 + 40px SVG（sprite use）。
@@ -269,7 +269,7 @@ footer{background:var(--ink);color:#fff;margin-top:20px;padding:36px 24px}
   .duo{grid-template-columns:1fr}
   .steps{grid-template-columns:1fr}
   .feats{grid-template-columns:repeat(2,1fr)}
-  .games-grid{grid-template-columns:1fr}
+  .games-grid{flex-direction:column;align-items:stretch}.gcard{flex:1 1 auto;max-width:none}
 }
 @media(max-width:639px){
   .nav-in{padding:12px 14px;gap:10px}

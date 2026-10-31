@@ -232,7 +232,7 @@
     <h1 data-i18n-html="home_v2.hero_h1">Outsmart your opponents, <em>one question</em> at a time.</h1>
     <p class="sub" data-i18n="home_v2.hero_sub">1v1 knowledge duel across science, history, geography and more. No login, no install — tap to play.</p>
     <div class="cta-row">
-      <a class="btn btn-primary" href="#lobby" data-i18n="home_v2.cta_start">Start a Duel</a>
+      <a class="btn btn-primary" href="/games/knowledge-duel/lobby/" data-i18n="home_v2.cta_start">Start a Knowledge Duel</a>
       <a class="btn btn-ghost" href="#online" id="ctaOnline" data-i18n="home_v2.cta_online">Find an online match</a>
     </div>
     <div class="chips">
@@ -251,14 +251,13 @@
   </div>
 </section>
 
-<!-- ═══════════ 游戏矩阵：平台入口（一个游戏一张卡） ═══════════ -->
+<!-- ═══════════ 知识对决：首页唯一主推游戏（其余 7 款已于 2026-10-31 软下线，见 memory） ═══════════ -->
 <section class="games-block wrap" id="games" aria-label="Games">
   <h2 class="games-ttl" data-i18n="home_v2.games_title">Pick a game</h2>
   <p class="games-sub" data-i18n="home_v2.games_sub">Two ways to train your memory — one against an opponent, one against yourself and the clock.</p>
   <div class="games-grid">
 
-    <!-- 2026-10-23：知识对决改走独立大厅页（选分类 + 四模式），不再直达 /battle/。
-         /battle/ 仍是公开自由局与广告投放落地页，保留原样，只是不再作为首页主入口。 -->
+    <!-- 知识对决：唯一保留的游戏，走独立大厅页（选分类 + 四模式）。 -->
     <a class="gcard" href="/games/knowledge-duel/lobby/" data-stage="live">
       <div class="gcard-icon" aria-hidden="true"><svg focusable="false"><use href="#ig-knowledge"/></svg></div>
       <div class="gcard-title" data-i18n="home_v2.game_knowledge">Knowledge Duel</div>
@@ -269,90 +268,6 @@
         <span class="gcard-tag" data-i18n="home_v2.tag_46k">46,000+ questions</span>
       </div>
       <span class="gcard-cta" data-i18n="home_v2.game_play">Play now →</span>
-    </a>
-
-    <a class="gcard" href="/games/daily-challenge/" data-stage="live">
-      <div class="gcard-icon" aria-hidden="true"><svg focusable="false"><use href="#ig-daily"/></svg></div>
-      <div class="gcard-title" data-i18n="dc.game_title">Daily Memory Challenge</div>
-      <p class="gcard-desc" data-i18n="home_v2.game_daily_d">Three of five memory games, rotated every day. Same puzzles for everyone, streak builds daily.</p>
-      <div class="gcard-tags">
-        <span class="gcard-tag new" data-i18n="home_v2.tag_new">New</span>
-        <span class="gcard-tag" data-i18n="home_v2.tag_daily">Daily</span>
-        <span class="gcard-tag" data-i18n="home_v2.tag_streak">Streak</span>
-      </div>
-      <span class="gcard-cta" data-i18n="home_v2.game_modes">See all modes →</span>
-    </a>
-
-    <a class="gcard" href="/games/sequence-memory/lobby/" data-stage="live">
-      <div class="gcard-icon" aria-hidden="true"><svg focusable="false"><use href="#ig-sequence"/></svg></div>
-      <div class="gcard-title" data-i18n="duel.seq_title">Sequence Memory Duel</div>
-      <p class="gcard-desc" data-i18n="home_v2.game_seq_d">Memorise the tile sequence, then tap it back. Same sequence for both players, server-scored — send a room code and compare.</p>
-      <div class="gcard-tags">
-        <span class="gcard-tag new" data-i18n="home_v2.tag_new">New</span>
-        <span class="gcard-tag" data-i18n="home_v2.tag_pvp">1v1</span>
-        <span class="gcard-tag" data-i18n="home_v2.tag_async">Async</span>
-      </div>
-      <span class="gcard-cta" data-i18n="home_v2.game_modes">See all modes →</span>
-    </a>
-
-    <a class="gcard" href="/games/number-recall/lobby/" data-stage="live">
-      <div class="gcard-icon" aria-hidden="true"><svg focusable="false"><use href="#ig-number"/></svg></div>
-      <div class="gcard-title" data-i18n="duel.num_title">Number Recall Duel</div>
-      <p class="gcard-desc" data-i18n="home_v2.game_num_d">Digits flash one by one — type the whole string back. Same number for both players, server-scored, no login.</p>
-      <div class="gcard-tags">
-        <span class="gcard-tag new" data-i18n="home_v2.tag_new">New</span>
-        <span class="gcard-tag" data-i18n="home_v2.tag_pvp">1v1</span>
-        <span class="gcard-tag" data-i18n="home_v2.tag_async">Async</span>
-      </div>
-      <span class="gcard-cta" data-i18n="home_v2.game_modes">See all modes →</span>
-    </a>
-
-    <a class="gcard" href="/games/color-recall/lobby/" data-stage="live">
-      <div class="gcard-icon" aria-hidden="true"><svg focusable="false"><use href="#ig-colour"/></svg></div>
-      <div class="gcard-title" data-i18n="duel.col_title">Colour Recall Duel</div>
-      <p class="gcard-desc" data-i18n="home_v2.game_col_d">Five colours appear, then vanish — rebuild each one on the wheel. Same colours for both players, closest match wins.</p>
-      <div class="gcard-tags">
-        <span class="gcard-tag new" data-i18n="home_v2.tag_new">New</span>
-        <span class="gcard-tag" data-i18n="home_v2.tag_pvp">1v1</span>
-        <span class="gcard-tag" data-i18n="home_v2.tag_async">Async</span>
-      </div>
-      <span class="gcard-cta" data-i18n="home_v2.game_modes">See all modes →</span>
-    </a>
-
-    <a class="gcard" href="/games/emoji-ghost/lobby/" data-stage="live">
-      <div class="gcard-icon" aria-hidden="true"><svg focusable="false"><use href="#ig-ghost"/></svg></div>
-      <div class="gcard-title" data-i18n="duel.emoji_title">Emoji Ghost Duel</div>
-      <p class="gcard-desc" data-i18n="duel.emoji_help">A row of symbols flashes, then one is missing. Your opponent gets the exact same set — pick the ghost correctly.</p>
-      <div class="gcard-tags">
-        <span class="gcard-tag new" data-i18n="home_v2.tag_new">New</span>
-        <span class="gcard-tag" data-i18n="home_v2.tag_pvp">1v1</span>
-        <span class="gcard-tag" data-i18n="home_v2.tag_async">Async</span>
-      </div>
-      <span class="gcard-cta" data-i18n="home_v2.game_modes">See all modes →</span>
-    </a>
-
-    <a class="gcard" href="/games/chimp-test/lobby/" data-stage="live">
-      <div class="gcard-icon" aria-hidden="true"><svg focusable="false"><use href="#ig-chimp"/></svg></div>
-      <div class="gcard-title" data-i18n="duel.chimp_title">Chimp Test Duel</div>
-      <p class="gcard-desc" data-i18n="duel.chimp_help">Numbers flash on the grid, then vanish. Your opponent gets the exact same grid — tap every cell that held a number.</p>
-      <div class="gcard-tags">
-        <span class="gcard-tag new" data-i18n="home_v2.tag_new">New</span>
-        <span class="gcard-tag" data-i18n="home_v2.tag_pvp">1v1</span>
-        <span class="gcard-tag" data-i18n="home_v2.tag_async">Async</span>
-      </div>
-      <span class="gcard-cta" data-i18n="home_v2.game_modes">See all modes →</span>
-    </a>
-
-    <a class="gcard" href="/games/word-recall/lobby/" data-stage="live">
-      <div class="gcard-icon" aria-hidden="true"><svg focusable="false"><use href="#ig-word"/></svg></div>
-      <div class="gcard-title" data-i18n="duel.word_title">Word Recall Duel</div>
-      <p class="gcard-desc" data-i18n="duel.word_help">Words appear one by one. Your opponent gets the exact same words — mark each as seen or new.</p>
-      <div class="gcard-tags">
-        <span class="gcard-tag new" data-i18n="home_v2.tag_new">New</span>
-        <span class="gcard-tag" data-i18n="home_v2.tag_pvp">1v1</span>
-        <span class="gcard-tag" data-i18n="home_v2.tag_async">Async</span>
-      </div>
-      <span class="gcard-cta" data-i18n="home_v2.game_modes">See all modes →</span>
     </a>
 
   </div>
