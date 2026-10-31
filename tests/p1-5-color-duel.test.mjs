@@ -194,15 +194,15 @@ test('色轮无障碍属性齐备（wheel 是 role=application 的自定义控�
 /* ═══════════════════════════════════════════════════════════════
    5. 入口：首页 + sitemap
    ═══════════════════════════════════════════════════════════════ */
-test('首页游戏矩阵含 color-recall 卡片', () => {
+test('软下线后首页游戏矩阵不再含 color-recall 卡片', () => {
   const home = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
-  // 🔴 2026-10-20：原断言锚 `href="/games/color-recall/"`（不带 lobby），是 10-14 把
-  //    三款游戏路由抽成 inferGame() 后漏改的过时断言。首页实际给的是
-  //    `href="/games/color-recall/lobby/"`（与其他 5 款游戏一致的 lobby 入口范式）。
-  //    改判「首页有 color-recall 的任意入口」，不锚精确尾部，避免「写法变化即假失败」。
-  assert.ok(home.includes('/games/color-recall/'), '首页应有 color-recall 入口');
-  assert.ok(home.includes('data-i18n="duel.col_title"'), '卡片标题应走 i18n');
-  assert.ok(home.includes('data-i18n="home_v2.game_col_d"'), '卡片描述应走 i18n');
+  // 🔴 2026-10-31：知识对决聚焦 —— 其余 7 款游戏（含 color-recall）软下线，从首页入口移除。
+  //    软下线 = 游戏页源文件 + vite 入口 + worker daily API 全部保留（URL 仍可访问），
+  //    只收掉「曝光面」：首页卡片 + sitemap 索引。此处断言「不再出现」即守护软下线契约。
+  assert.ok(!home.includes('/games/color-recall/'), '软下线后首页不应有 color-recall 入口');
+  const cards = (home.match(/class="gcard"/g) || []).length;
+  assert.strictEqual(cards, 1, '首页应只剩 1 张游戏卡（knowledge-duel）');
+  assert.ok(home.includes('/games/knowledge-duel/lobby/'), 'knowledge-duel 入口应保留');
 });
 
 test('vite.config 必须注册 color 入口（否则构建静默丢弃，线上 404）', () => {
@@ -241,10 +241,13 @@ test('games/ 下每个页面都已注册进 vite input', () => {
   }
 });
 
-test('sitemap 含 color-recall 落地页', () => {
+test('软下线后 sitemap 不再含 color-recall（SEO 收敛）', () => {
   const sm = fs.readFileSync(path.join(ROOT, 'public/sitemap.xml'), 'utf8');
-  assert.ok(sm.includes('https://memoryduel.com/games/color-recall/'),
-    '新落地页不进 sitemap 等于对 SEO 不存在');
+  // 2026-10-31：软下线，下线游戏落地页从 sitemap 移除（URL 仍可访问，只是不再主动索引）
+  assert.ok(!sm.includes('https://memoryduel.com/games/color-recall/'),
+    '软下线后 sitemap 不应含 color-recall');
+  assert.ok(sm.includes('https://memoryduel.com/games/knowledge-duel/lobby/'),
+    'knowledge-duel 应保留在 sitemap');
 });
 
 test('color 页面 SEO 头与另两款对齐（title/canonical/OG/hreflang）', () => {
