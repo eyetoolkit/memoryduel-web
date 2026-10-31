@@ -130,6 +130,8 @@
   /* 记分板 */
   .battle-scores{display:grid; grid-template-columns:1fr auto 1fr; gap:12px; align-items:center; margin-bottom:18px}
   .score-card{display:flex; align-items:center; gap:11px; background:rgba(27,26,46,.04); border:1px solid var(--line); border-radius:16px; padding:12px 14px}
+  .score-card.you{background:var(--indigo-soft); border-color:rgba(79,70,229,.32)}
+  .score-card.bot{background:var(--rival-soft); border-color:rgba(255,107,92,.32)}
   .score-card.bot{flex-direction:row-reverse; text-align:right}
   .score-card .av{width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; font-size:16px; font-family:var(--disp); flex:none}
   .score-card .av.you{background:var(--indigo)}
@@ -137,7 +139,10 @@
   .score-meta{min-width:0}
   .score-name{font-size:13px; color:var(--mute); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
   .score-val{font-family:var(--mono); font-weight:700; font-size:24px; color:var(--ink); line-height:1.1}
-  .vs-badge{background:var(--ink); color:var(--gold); padding:6px 12px; border-radius:999px; font-size:12px; font-weight:700; font-family:var(--disp)}
+  .vs-badge{position:relative; background:var(--ink); color:var(--gold); padding:9px 15px; border-radius:999px; font-size:13px; font-weight:700; font-family:var(--disp)}
+  .vs-badge .sp{position:absolute; width:6px; height:6px; border-radius:50%; background:var(--gold); box-shadow:0 0 8px 2px rgba(245,179,0,.55)}
+  .vs-badge .sp.s1{left:-8px; top:-5px}
+  .vs-badge .sp.s2{right:-9px; bottom:-4px; animation-delay:.3s}
 
   /* 题干 */
   .battle-question{font-family:var(--disp); font-weight:700; font-size:clamp(19px,3.2vw,26px); line-height:1.22; letter-spacing:-.01em; margin:6px 0 20px; min-height:54px}
@@ -193,6 +198,17 @@
     .score-card .av{width:36px; height:36px; font-size:13px}
     .score-card .av.ai{font-size:16px}
   }
+  /* ── 入场编排（stage 显示时触发一次）+ VS 火花呼吸；尊重 reduced-motion ── */
+  @media(prefers-reduced-motion:no-preference){
+    .battle-stage.active .score-card.you{animation:md-in-l .4s cubic-bezier(.2,.8,.3,1) both}
+    .battle-stage.active .score-card.bot{animation:md-in-r .4s cubic-bezier(.2,.8,.3,1) both}
+    .battle-stage.active .vs-badge{animation:md-vs-pop .45s cubic-bezier(.2,1.4,.4,1) both .15s}
+    .vs-badge .sp{animation:md-spark 2.2s ease-in-out infinite}
+    @keyframes md-in-l{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
+    @keyframes md-in-r{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+    @keyframes md-vs-pop{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+    @keyframes md-spark{0%,100%{opacity:.35;transform:scale(.6)}45%{opacity:1;transform:scale(1.15)}}
+  }
   @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.battle-timer .timer-fill{transition:none!important}}
 
   /* ── 暗色：VS 变量翻暗 + 背景/顶栏/卡片阴影适配（中性色由 tokens.css 暗块接管）── */
@@ -211,7 +227,8 @@
   }
   html[data-theme="dark"] .battle-top{background:rgba(15,23,42,.82)}
   html[data-theme="dark"] .battle-card{box-shadow:0 18px 44px rgba(0,0,0,.45)}
-  html[data-theme="dark"] .score-card{background:rgba(255,255,255,.05)}
+  html[data-theme="dark"] .score-card.you{background:var(--indigo-soft)}
+  html[data-theme="dark"] .score-card.bot{background:var(--rival-soft)}
   html[data-theme="dark"] .battle-result .score-big{color:var(--text)}
   </style>
   <link rel="stylesheet" href="/css/shared/tokens.css?v=p4fix2">
@@ -260,7 +277,7 @@
             <div class="score-val" id="battleYouScore">0</div>
           </div>
         </div>
-        <div class="vs-badge">VS</div>
+        <div class="vs-badge">VS<span class="sp s1"></span><span class="sp s2"></span></div>
         <div class="score-card bot">
           <div class="score-meta">
             <div class="score-name" id="battleBotName">AI</div>
