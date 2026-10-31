@@ -51,21 +51,32 @@
      ---------------------------------------------------------------
      真源依据：design/memoryduel-game.html（重设计交付包）
      落地约束（README §4）：CSP font-src 'self' → 字体走 tokens.css 自托管
-       （Space Grotesk 400/700 · Inter 400/500/700 · JetBrains Mono 500/700）；
-       白字压品牌一律 #C2410C；AI 对手用跨站商标靛蓝 #4F46E5。
+       （Space Grotesk 400/700 · Sora 400/700 可变 · JetBrains Mono 500/700）；
+       VS 语言：你方靛蓝 #4F46E5 / 对手珊瑚 #FF6B5C / 点睛金 #F5B300（与知识对决大厅一致）。
      红线：JS 对战引擎（battle IIFE）一行未动，所有 id/class 契约保留。
      ═══════════════════════════════════════════════════════════════ */
+  /* Sora（正文）— 对齐知识对决大厅；可变单文件，font-weight 轴取用 */
+  @font-face{font-family:'Sora';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/sora-latin.woff2') format('woff2')}
+  @font-face{font-family:'Sora';font-style:normal;font-weight:700;font-display:swap;src:url('/fonts/sora-latin.woff2') format('woff2')}
   :root{
-    --orange:#EA580C; --orange-deep:#C2410C; --orange-bright:#F97316;
-    --paper:#FAF6F1; --card:#fff; --ink:#1C1408; --mute:#6B5A45; --line:#EAD9C7;
-    --amber:#F59E0B; --green:#22C55E; --red:#DC2626; --indigo-sig:#4F46E5;
+    /* 中性色跟随 tokens.css（<link> 后加载）：暗色自动翻亮，并修复此前暗色下文字不翻的 bug */
+    --paper:var(--bg);
+    --card:var(--surface);
+    --ink:var(--text);
+    --mute:var(--text-muted);
+    --line:var(--border);
+    /* VS 语言：你方靛蓝 / 对手珊瑚 / 点睛金 —— 与知识对决大厅一致 */
+    --indigo:#4F46E5; --indigo-deep:#4338CA; --indigo-soft:rgba(79,70,229,.10);
+    --rival:#FF6B5C; --rival-deep:#E2493B; --rival-ink:#C2410C; --rival-soft:rgba(255,107,92,.10);
+    --gold:#F5B300; --gold-soft:rgba(245,179,0,.16);
+    --green:#22C55E; --red:#DC2626;
     --disp:'Space Grotesk',system-ui,sans-serif;
-    --ui:'Inter',system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    --ui:'Sora',system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
     --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
     --rd:20px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  :focus-visible{outline:2px solid var(--orange);outline-offset:3px}
+  :focus-visible{outline:2px solid var(--indigo);outline-offset:3px}
 
   /* ===== 对战舞台：暖纸 + 网格 + 橙色氤氲（与首页同源） ===== */
   /* [2026-10-09 沉浸增强] safe-area + 动态视口高度：避免刘海/灵动岛/Home Indicator
@@ -74,10 +85,10 @@
     position:fixed; inset:0; z-index:1000; display:none;
     background-color:var(--paper);
     background-image:
-      radial-gradient(circle at 16% 12%,rgba(234,88,12,.06) 0,transparent 42%),
-      radial-gradient(circle at 86% 80%,rgba(245,158,11,.05) 0,transparent 40%),
-      linear-gradient(rgba(180,120,60,.05) 1px,transparent 1px),
-      linear-gradient(90deg,rgba(180,120,60,.05) 1px,transparent 1px);
+      radial-gradient(circle at 16% 12%,rgba(79,70,229,.07) 0,transparent 42%),
+      radial-gradient(circle at 86% 80%,rgba(255,107,92,.06) 0,transparent 40%),
+      linear-gradient(rgba(27,26,46,.04) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(27,26,46,.04) 1px,transparent 1px);
     background-size:100% 100%,100% 100%,32px 32px,32px 32px;
     background-attachment:fixed;
     overflow-y:auto; -webkit-font-smoothing:antialiased; color:var(--ink);
@@ -94,39 +105,39 @@
     display:flex; align-items:center; gap:12px;
     /* [2026-10-09 沉浸增强] 顶部安全区：贴着刘海/灵动岛下沿，不进内容 */
     padding:calc(12px + env(safe-area-inset-top)) 18px 12px;
-    background:rgba(250,246,241,.86); backdrop-filter:blur(10px);
+    background:rgba(255,255,255,.80); backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line); z-index:2;
   }
   .battle-back{font-size:24px; font-weight:700; color:var(--mute); text-decoration:none; padding:2px 10px; border-radius:10px; line-height:1}
-  .battle-back:hover{color:var(--orange-deep); background:rgba(234,88,12,.08)}
-  .battle-pill{font-weight:700; font-size:13px; background:#FFF6F0; color:var(--orange-deep); padding:6px 13px; border-radius:999px; border:1px solid var(--line); font-family:var(--disp); white-space:nowrap}
+  .battle-back:hover{color:var(--indigo-deep); background:var(--indigo-soft)}
+  .battle-pill{font-weight:700; font-size:13px; background:var(--indigo-soft); color:var(--indigo-deep); padding:6px 13px; border-radius:999px; border:1px solid rgba(79,70,229,.28); font-family:var(--disp); white-space:nowrap}
   .battle-spacer{flex:1}
   .battle-round{font-family:var(--mono); font-weight:700; font-size:13px; color:var(--mute); white-space:nowrap}
-  .battle-round b{color:var(--orange-deep); font-size:15px}
+  .battle-round b{color:var(--indigo-deep); font-size:15px}
   .battle-timer{display:flex; align-items:center; gap:9px}
-  .battle-timer .timer-val{font-family:var(--mono); font-weight:700; font-size:14px; color:var(--orange-deep); min-width:26px; text-align:right}
+  .battle-timer .timer-val{font-family:var(--mono); font-weight:700; font-size:14px; color:var(--indigo-deep); min-width:26px; text-align:right}
   .battle-timer .timer-bar{width:84px; height:8px; border-radius:999px; background:var(--line); overflow:hidden}
-  .battle-timer .timer-fill{display:block; height:100%; width:100%; background:var(--amber); transition:width .2s linear}
+  .battle-timer .timer-fill{display:block; height:100%; width:100%; background:var(--gold); transition:width .2s linear}
   .battle-timer .timer-fill.warn{background:var(--red)}
 
   /* 主卡 */
   .battle-card{
     background:var(--card); border:1px solid var(--line); border-radius:var(--rd);
-    box-shadow:0 18px 44px rgba(120,70,20,.10);
+    box-shadow:0 18px 44px rgba(27,26,46,.12);
     max-width:720px; width:100%; padding:24px; margin:20px auto 40px;
   }
 
   /* 记分板 */
   .battle-scores{display:grid; grid-template-columns:1fr auto 1fr; gap:12px; align-items:center; margin-bottom:18px}
-  .score-card{display:flex; align-items:center; gap:11px; background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:12px 14px}
+  .score-card{display:flex; align-items:center; gap:11px; background:rgba(27,26,46,.04); border:1px solid var(--line); border-radius:16px; padding:12px 14px}
   .score-card.bot{flex-direction:row-reverse; text-align:right}
   .score-card .av{width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; font-size:16px; font-family:var(--disp); flex:none}
-  .score-card .av.you{background:var(--orange)}
-  .score-card .av.ai{background:var(--indigo-sig); font-size:20px}
+  .score-card .av.you{background:var(--indigo)}
+  .score-card .av.ai{background:var(--rival); font-size:20px}
   .score-meta{min-width:0}
   .score-name{font-size:13px; color:var(--mute); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-  .score-val{font-family:var(--mono); font-weight:700; font-size:24px; color:var(--orange-deep); line-height:1.1}
-  .vs-badge{background:var(--orange); color:#fff; padding:6px 12px; border-radius:999px; font-size:12px; font-weight:700; font-family:var(--disp)}
+  .score-val{font-family:var(--mono); font-weight:700; font-size:24px; color:var(--ink); line-height:1.1}
+  .vs-badge{background:var(--ink); color:var(--gold); padding:6px 12px; border-radius:999px; font-size:12px; font-weight:700; font-family:var(--disp)}
 
   /* 题干 */
   .battle-question{font-family:var(--disp); font-weight:700; font-size:clamp(19px,3.2vw,26px); line-height:1.22; letter-spacing:-.01em; margin:6px 0 20px; min-height:54px}
@@ -135,22 +146,22 @@
   .battle-options{display:grid; grid-template-columns:1fr 1fr; gap:11px}
   .battle-opt{
     display:flex; align-items:center; gap:12px; width:100%; text-align:left;
-    border:2px solid var(--line); background:#fff; border-radius:14px;
+    border:2px solid var(--line); background:var(--card); border-radius:14px;
     padding:14px 16px; font-size:15px; font-weight:600; color:var(--ink); cursor:pointer;
     font-family:var(--ui); transition:transform .1s,border-color .1s,background .1s;
   }
-  .battle-opt:hover:not(:disabled){transform:translateY(-1px); border-color:var(--orange); background:#FFF6F0}
+  .battle-opt:hover:not(:disabled){transform:translateY(-1px); border-color:var(--indigo); background:var(--indigo-soft)}
   .battle-opt:disabled{cursor:default; opacity:.92}
-  .battle-opt .opt-letter{width:28px; height:28px; border-radius:50%; background:rgba(234,88,12,.1); color:var(--orange-deep); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; font-family:var(--mono); flex:none}
+  .battle-opt .opt-letter{width:28px; height:28px; border-radius:50%; background:var(--indigo-soft); color:var(--indigo-deep); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; font-family:var(--mono); flex:none}
   .battle-opt.correct{border-color:var(--green); background:rgba(34,197,94,.14)}
   .battle-opt.correct .opt-letter{background:var(--green); color:#fff}
   .battle-opt.wrong{border-color:var(--red); background:rgba(220,38,38,.08)}
   .battle-opt.wrong .opt-letter{background:var(--red); color:#fff}
 
   /* 解释 / 思考 / 操作 */
-  .battle-explain{margin-top:14px; padding:12px 14px; background:rgba(234,88,12,.07); border-radius:12px; font-size:13px; color:var(--mute); line-height:1.5; display:none}
+  .battle-explain{margin-top:14px; padding:12px 14px; background:var(--indigo-soft); border-radius:12px; font-size:13px; color:var(--mute); line-height:1.5; display:none}
   .battle-explain.show{display:block}
-  .battle-explain b{color:var(--orange-deep)}
+  .battle-explain b{color:var(--indigo-deep)}
   .battle-bot-thinking{text-align:center; padding:12px; color:var(--mute); font-size:13px; font-style:italic}
   .battle-actions{display:flex; gap:10px; justify-content:center; margin-top:18px; flex-wrap:wrap}
 
@@ -160,14 +171,14 @@
   .battle-result.win h2{color:var(--green)}
   .battle-result.lose h2{color:var(--red)}
   .battle-result.draw h2{color:var(--mute)}
-  .battle-result .score-big{font-family:var(--mono); font-weight:900; font-size:48px; color:var(--orange-deep); margin:14px 0}
+  .battle-result .score-big{font-family:var(--mono); font-weight:900; font-size:48px; color:var(--text-strong); margin:14px 0}
   .battle-result p{color:var(--mute); font-size:14px; margin-top:6px}
 
   /* 按钮（与首页一致：.btn=实心琥珀主按钮，.btn.ghost=描边次按钮） */
-  .btn{border:0; font-family:var(--ui); font-weight:700; cursor:pointer; border-radius:12px; font-size:15px; padding:12px 20px; transition:transform .12s,background .12s; display:inline-flex; align-items:center; gap:8px; justify-content:center; background:var(--orange); color:#fff}
-  .btn:hover{background:var(--orange-deep); transform:translateY(-1px)}
+  .btn{border:0; font-family:var(--ui); font-weight:700; cursor:pointer; border-radius:12px; font-size:15px; padding:12px 20px; transition:transform .12s,background .12s; display:inline-flex; align-items:center; gap:8px; justify-content:center; background:var(--indigo); color:#fff}
+  .btn:hover{background:var(--indigo-deep); transform:translateY(-1px)}
   .btn.ghost,.btn-ghost{background:transparent; color:var(--ink); border:1px solid var(--line)}
-  .btn.ghost:hover,.btn-ghost:hover{background:transparent; border-color:var(--orange); color:var(--orange-deep); transform:none}
+  .btn.ghost:hover,.btn-ghost:hover{background:transparent; border-color:var(--indigo); color:var(--indigo-deep); transform:none}
 
   @media(max-width:560px){
     /* [2026-10-09 沉浸增强] 移动端顶栏同样保留安全区上沿 */
@@ -183,6 +194,25 @@
     .score-card .av.ai{font-size:16px}
   }
   @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.battle-timer .timer-fill{transition:none!important}}
+
+  /* ── 暗色：VS 变量翻暗 + 背景/顶栏/卡片阴影适配（中性色由 tokens.css 暗块接管）── */
+  html[data-theme="dark"]{
+    --indigo-soft:rgba(99,102,241,.16);
+    --rival-soft:rgba(255,107,92,.16);
+    --rival-ink:#FF8A7E;
+    --gold-soft:rgba(245,179,0,.18);
+  }
+  html[data-theme="dark"] .battle-stage{
+    background-image:
+      radial-gradient(circle at 16% 12%,rgba(99,102,241,.10) 0,transparent 42%),
+      radial-gradient(circle at 86% 80%,rgba(255,107,92,.08) 0,transparent 40%),
+      linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+  }
+  html[data-theme="dark"] .battle-top{background:rgba(15,23,42,.82)}
+  html[data-theme="dark"] .battle-card{box-shadow:0 18px 44px rgba(0,0,0,.45)}
+  html[data-theme="dark"] .score-card{background:rgba(255,255,255,.05)}
+  html[data-theme="dark"] .battle-result .score-big{color:var(--text)}
   </style>
   <link rel="stylesheet" href="/css/shared/tokens.css?v=p4fix2">
   <link rel="stylesheet" href="/css/shared/brand-ds2.css?v=ds2-23">
