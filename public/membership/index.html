@@ -3,23 +3,23 @@
 <head>
 <!-- md-theme:early -->
 <script>(function(){try{var t=localStorage.getItem('md-theme2');if(t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();</script>
-  <script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:67,fallback:"en"};</script>
+  <script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:68,fallback:"en"};</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <!-- standalone 下 iOS 状态栏取 theme-color，缺失会落回成系统默认色。与 manifest 的 background_color 一致：#fff7ed -->
   <meta name="theme-color" content="#fff7ed">
 <title data-i18n-title="membership.title">Membership Center · MemoryDuel</title>
 <meta name="description" data-i18n="membership.meta_desc" content="View coin balance, daily quests, invite progress, and ad-free privileges. Earn coins playing games for ad-free access. Invite friends for bonus rewards.">
-<link rel="canonical" href="https://memoryduel.com/membership/">
+<link rel="canonical" href="https://www.memoryduel.com/membership/">
 
   
-  <link rel="alternate" hreflang="zh-CN" href="https://memoryduel.com/membership/" />
-  <link rel="alternate" hreflang="en" href="https://memoryduel.com/membership/?lang=en" />
-  <link rel="alternate" hreflang="ja" href="https://memoryduel.com/membership/?lang=ja" />
-  <link rel="alternate" hreflang="es" href="https://memoryduel.com/membership/?lang=es" />
-  <link rel="alternate" hreflang="fr" href="https://memoryduel.com/membership/?lang=fr" />
-  <link rel="alternate" hreflang="de" href="https://memoryduel.com/membership/?lang=de" />
-  <link rel="alternate" hreflang="x-default" href="https://memoryduel.com/membership/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://www.memoryduel.com/membership/" />
+  <link rel="alternate" hreflang="en" href="https://www.memoryduel.com/membership/?lang=en" />
+  <link rel="alternate" hreflang="ja" href="https://www.memoryduel.com/membership/?lang=ja" />
+  <link rel="alternate" hreflang="es" href="https://www.memoryduel.com/membership/?lang=es" />
+  <link rel="alternate" hreflang="fr" href="https://www.memoryduel.com/membership/?lang=fr" />
+  <link rel="alternate" hreflang="de" href="https://www.memoryduel.com/membership/?lang=de" />
+  <link rel="alternate" hreflang="x-default" href="https://www.memoryduel.com/membership/" />
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
 <meta property="og:title" data-i18n="membership.title" content="Membership Center · MemoryDuel">
 <meta property="og:description" data-i18n="membership.subtitle" content="One-stop management for coins, quests, and invites. Earn coins playing games for ad-free access.">
@@ -270,7 +270,9 @@
     });
 
     function checkLogin(){
-      fetch((window.API_BASE || '') + '/auth/me', {credentials:'same-origin'})
+      // 2026-11-04：旧路径 /auth/me 每次访问都 404 并打一条 console error，
+      // 再 fallback 到正确端点。直接请求 /api/auth/me，去掉脏请求。
+      fetch((window.API_BASE || '') + '/api/auth/me', {credentials:'same-origin'})
         .then(function(r){ return r.json(); })
         .then(function(d){
           if (d && d.uuid) {
@@ -361,7 +363,7 @@
         .then(function(r){ return r.json(); })
         .then(function(d){
           if (!d || d.error) return;
-          document.getElementById('m-invite-link').value = d.urls[0] || ('https://memoryduel.com/?ref='+d.code);
+          document.getElementById('m-invite-link').value = d.urls[0] || ('https://www.memoryduel.com/?ref='+d.code);
           document.getElementById('m-invite-count').textContent = d.valid_invites;
           if (d.next_milestone) {
             document.getElementById('m-invite-next').textContent =
@@ -588,7 +590,7 @@
         <svg class="duel-icon sf-emoji" aria-hidden="true"><use href="/shared/icons.svg#duel-chess"></use></svg>
         <span data-i18n="mm_membership_3">BoardDuel</span>
       </a>
-      <a href="https://memoryduel.com/" class="sf-item current">
+      <a href="https://www.memoryduel.com/" class="sf-item current">
         <svg class="duel-icon sf-emoji" aria-hidden="true"><use href="/shared/icons.svg#duel-brain"></use></svg>
         <span data-i18n="mm_membership_4">MemoryDuel</span>
       </a>

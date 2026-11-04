@@ -151,6 +151,24 @@ async function loadRank(): Promise<void> {
     div.className = 'rank-empty';
     div.textContent = text;
     list.appendChild(div);
+    // 2026-11-04：渲染结束后必须清 aria-busy，否则屏幕阅读器一直报「加载中」
+    list.setAttribute('aria-busy', 'false');
+  };
+
+  /* 真实社区尚未形成时，榜单前 6 名往往全是 Player#### / 玩家#### 自动昵称
+     （rating 1000–1025、wins 0–1）。把这种名单放在首屏社会证明位反而伤信任，
+     改成「本周挑战目标」行动卡。有一个真实自定义昵称就照常显示榜单。 */
+  const isAutoName = (n: unknown) => /^(?:Player|玩家)[\s_-]?\d{3,6}$/.test(String(n || '').trim());
+  const showChallenge = () => {
+    const card = $('rankChallenge');
+    if (!card) return false;
+    list.hidden = true;
+    list.innerHTML = '';
+    list.setAttribute('aria-busy', 'false');
+    card.hidden = false;
+    const head = document.querySelector<HTMLElement>('.ar-board-head');
+    if (head) head.hidden = true;
+    return true;
   };
 
   try {
@@ -167,11 +185,14 @@ async function loadRank(): Promise<void> {
     const rows = json.ok && Array.isArray(json.data?.list) ? json.data!.list!.slice(0, 6) : [];
 
     if (!rows.length) {
+      if (showChallenge()) return;
       empty('No ranked players yet — win your first duel to appear here.');
       return;
     }
+    if (rows.every((p) => isAutoName(p.name)) && showChallenge()) return;
 
     list.innerHTML = rows.map((p, i) => rowHtml(i, p)).join('');
+    list.setAttribute('aria-busy', 'false');
     // 昵称/首字母用 textContent 写，避免把用户可控字符串拼进 HTML
     list.querySelectorAll<HTMLElement>('.rank-row').forEach((el, i) => {
       const name = localizeGuestName(rows[i]?.name, lang) || `Player ${i + 1}`;

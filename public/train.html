@@ -3,7 +3,7 @@
 <head>
 <!-- md-theme:early -->
 <script>(function(){try{var t=localStorage.getItem('md-theme2');if(t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();</script>
-  <script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:67,fallback:"en"};</script>
+  <script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:68,fallback:"en"};</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <!-- standalone 下 iOS 状态栏取 theme-color，缺失会回落成系统默认色（与本站暖橙/米白不搭）。
@@ -19,8 +19,8 @@
   <meta property="og:site_name" content="MemoryDuel" />
   <meta property="og:title" data-i18n="train.og_title" content="🧠 MemoryDuel · Memory Training Games" />
   <meta property="og:description" data-i18n="train.og_desc" content="Card matching, digit flash, word flashcards. Multiple difficulty levels. Personal bests saved locally. Free to play, privacy-first." />
-  <meta property="og:url" content="https://memoryduel.com/train.html" />
-  <meta property="og:image" content="https://memoryduel.com/og-default.jpg" />
+  <meta property="og:url" content="https://www.memoryduel.com/train.html" />
+  <meta property="og:image" content="https://www.memoryduel.com/og-default.jpg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="632" />
   <meta property="og:image:alt" data-i18n="train.og_image_alt" content="MemoryDuel Training - Memory Games" />
@@ -29,20 +29,20 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" data-i18n="train.twitter_title" content="🧠 MemoryDuel · Memory Training" />
   <meta name="twitter:description" data-i18n="train.twitter_desc" content="Card matching, digit flash, word flashcards · Offline memory training" />
-  <meta name="twitter:image" content="https://memoryduel.com/og-default.jpg" />
+  <meta name="twitter:image" content="https://www.memoryduel.com/og-default.jpg" />
 
   <!-- SEO: Canonical -->
-  <link rel="canonical" href="https://memoryduel.com/train.html" />
+  <link rel="canonical" href="https://www.memoryduel.com/train.html" />
 
   
   
-  <link rel="alternate" hreflang="zh-CN" href="https://memoryduel.com/train.html" />
-  <link rel="alternate" hreflang="en" href="https://memoryduel.com/train.html?lang=en" />
-  <link rel="alternate" hreflang="ja" href="https://memoryduel.com/train.html?lang=ja" />
-  <link rel="alternate" hreflang="es" href="https://memoryduel.com/train.html?lang=es" />
-  <link rel="alternate" hreflang="fr" href="https://memoryduel.com/train.html?lang=fr" />
-  <link rel="alternate" hreflang="de" href="https://memoryduel.com/train.html?lang=de" />
-  <link rel="alternate" hreflang="x-default" href="https://memoryduel.com/train.html" />
+  <link rel="alternate" hreflang="zh-CN" href="https://www.memoryduel.com/train.html" />
+  <link rel="alternate" hreflang="en" href="https://www.memoryduel.com/train.html?lang=en" />
+  <link rel="alternate" hreflang="ja" href="https://www.memoryduel.com/train.html?lang=ja" />
+  <link rel="alternate" hreflang="es" href="https://www.memoryduel.com/train.html?lang=es" />
+  <link rel="alternate" hreflang="fr" href="https://www.memoryduel.com/train.html?lang=fr" />
+  <link rel="alternate" hreflang="de" href="https://www.memoryduel.com/train.html?lang=de" />
+  <link rel="alternate" hreflang="x-default" href="https://www.memoryduel.com/train.html" />
 <!-- SEO: hreflang -->
 
     <style>
@@ -247,6 +247,16 @@
     font-family:'Sora',system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
   }
   html[data-theme="dark"][data-site="memory"] body{background-color:#0B1120}
+  /* 2026-11-04 P1-4：390px 视口实测 scrollWidth=399（9px 横向滚动）。
+     越界元素是 identity.js 注入到 .sh-me 的 .idt-bar（宽 167px，left 419），
+     把整条 .sh-in 撑破。窄屏隐藏身份条并收紧间距，身份功能仍可在桌面使用。 */
+  @media (max-width: 640px){
+    html[data-site="memory"] #site-header .sh-me{display:none!important}
+    html[data-site="memory"] #site-header .sh-in{gap:8px}
+    html[data-site="memory"] #site-header .sh-actions{gap:4px}
+    /* cookie 横幅改为 60px 单行条后仍会 fixed 遮挡底部，给对战区留出滚动余量 */
+    html[data-site="memory"] body:has(.duel-consent){padding-bottom:68px}
+  }
   </style>
   <link rel="manifest" href="/manifest.zh.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -338,6 +348,14 @@
     // 防御性默认：裸 /train.html（侧栏/Header/书签/直接输入 URL）自动当 AI 训练启动。
     // 此前 mode 和 room 都空时静默 return，页面永远停在 "Loading…"（浏览器冒烟 BUG）。
     if (!mode && !room) { mode = 'ai'; }
+    /* 2026-11-04 P2：非法 mode（旧链接 ?mode=easy / hard / 拼写错误）原先没有
+       任何分支能消费，battleQuestion 永远停在 "Loading…" 且无报错。
+       统一回退到 ai 并把 URL 规范化，避免刷新后重复踩坑。 */
+    if (mode && mode !== 'ai' && mode !== 'online') {
+      console.warn('[train] 未知 mode=' + mode + '，已回退到 ai');
+      mode = 'ai';
+      try { var _u = new URL(location.href); _u.searchParams.set('mode', 'ai'); history.replaceState(null, '', _u); } catch (e) {}
+    }
     // 教师端进房提示（classroom pill）
     if (room) {
       var pill = document.getElementById('classroomPill');

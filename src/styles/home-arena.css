@@ -24,8 +24,8 @@ body.home-arena .ar-logo{font-size:19px;letter-spacing:-.03em}
 body.home-arena .ar-logo .mk{width:10px;height:19px;border-radius:3px;box-shadow:none;background:var(--ar-you);transform:skewX(-8deg)}
 body.home-arena .ar-links{gap:26px;font-size:13.5px}
 body.home-arena .ar-links a:hover{color:var(--ar-you)}
-body.home-arena .ar-signin{font-size:13px;padding:9px 16px;min-height:40px;border-radius:10px}
-body.home-arena .ar-burger{display:none;width:38px;height:38px}
+body.home-arena .ar-signin{font-size:13px;padding:9px 16px;min-height:44px;border-radius:10px}
+body.home-arena .ar-burger{display:none;width:44px;height:44px}
 body.home-arena .ar-drawer{position:absolute;top:68px;left:0;right:0;bottom:auto;background:var(--card);padding:8px 26px 18px;box-shadow:0 14px 32px rgba(16,20,45,.12);overflow:visible;border-bottom:1px solid var(--line)}
 body.home-arena .ar-drawer .nav-drawer-in a{min-height:48px;font-size:16px;border-bottom:1px solid var(--line)}
 
@@ -99,7 +99,7 @@ body.home-arena .ar-vs-badge i+i{top:auto;bottom:-6px;left:auto;right:2px;animat
 @keyframes ar-spark{50%{opacity:.25;transform:scale(.6)}}
 body.home-arena .ar-duel-q{font-family:var(--disp);font-weight:700;font-size:20px;line-height:1.32;letter-spacing:-.02em;color:#16182C;margin:22px 4px 16px}
 body.home-arena .ar-opts{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-body.home-arena .ar-opt{position:relative;display:flex;align-items:center;gap:10px;text-align:left;background:#fff;border:1.5px solid #E6E8F1;border-radius:11px;padding:11px 12px;font-family:var(--ui);font-size:13px;font-weight:600;color:#2A2E45;transition:.15s;min-height:0;cursor:pointer}
+body.home-arena .ar-opt{position:relative;display:flex;align-items:center;gap:10px;text-align:left;background:#fff;border:1.5px solid #E6E8F1;border-radius:11px;padding:11px 12px;font-family:var(--ui);font-size:13px;font-weight:600;color:#2A2E45;transition:.15s;min-height:44px;cursor:pointer}
 body.home-arena .ar-opt:hover{border-color:var(--ar-you);background:#F8F8FF;transform:translateY(-1px)}
 body.home-arena .ar-opt i{width:22px;height:22px;flex:none;border-radius:7px;display:grid;place-items:center;background:#F0F1F8;font:700 10px var(--mono);font-style:normal;color:#7A8098}
 body.home-arena .ar-opt.correct{border-color:#22C55E;background:#EDFBF2;color:#12683A}
@@ -161,7 +161,7 @@ body.home-arena .ar-eco{margin-top:14px;padding:12px 14px;border-radius:12px;bac
 body.home-arena .ar-eco-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
 body.home-arena .ar-eco-balance{font:700 18px var(--mono);color:var(--ink)}
 body.home-arena .ar-eco-coin{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--ar-gold);margin-right:7px;vertical-align:middle}
-body.home-arena .ar-eco-checkin{font:700 12px var(--ui);background:var(--ar-you);color:#fff;border:0;border-radius:9px;padding:8px 12px;min-height:36px;cursor:pointer}
+body.home-arena .ar-eco-checkin{font:700 12px var(--ui);background:var(--ar-you);color:#fff;border:0;border-radius:9px;padding:8px 12px;min-height:44px;cursor:pointer}
 body.home-arena .ar-eco-sub{font-size:11.5px;color:var(--mute);margin-top:7px}
 
 body.home-arena .ar-final{position:relative;overflow:hidden;background:linear-gradient(120deg,#4F46E5,#5B4BE8 48%,#FF6B5C 160%);color:#fff;text-align:center;padding:82px 0}
@@ -244,3 +244,13 @@ html[data-theme="dark"] body.home-arena .ar-float{background:rgba(23,26,44,.95)}
 @media(prefers-reduced-motion:reduce){
   body.home-arena *,body.home-arena *:before,body.home-arena *:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 }
+
+/* ── 2026-11-04 P1-2：榜单全是自动昵称时改显示「本周挑战目标」 ──
+   榜单 / 挑战卡 / 表头由 home.ts loadRank() 切 hidden；
+   .ar-board-head 是 display:flex，必须显式压过 hidden 默认样式。 */
+body.home-arena .ar-board [hidden]{display:none!important}
+body.home-arena .ar-board-challenge{display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:26px 4px 10px}
+body.home-arena .ar-challenge-mark{display:grid;place-items:center;width:52px;height:52px;border-radius:14px;background:rgba(79,70,229,.10);color:var(--ar-you);font:800 18px var(--mono)}
+body.home-arena .ar-board-challenge h3{margin:2px 0 0;font:700 22px/1.25 var(--disp);letter-spacing:-.02em;color:var(--ink)}
+body.home-arena .ar-board-challenge p{margin:0;font-size:14px;line-height:1.65;color:var(--mute)}
+body.home-arena .ar-board-challenge .ar-btn-gold{font-size:14px;padding:12px 20px;min-height:48px;box-shadow:0 4px 0 var(--ar-gold-edge)}

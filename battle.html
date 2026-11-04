@@ -3,7 +3,7 @@
 <head>
 <!-- md-theme:early -->
 <script>(function(){try{var t=localStorage.getItem('md-theme2');if(t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();</script>
-<script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:67,fallback:"en"};</script>
+<script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:68,fallback:"en"};</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <meta name="theme-color" content="#FAF6F1">
@@ -13,13 +13,13 @@
      配合 canonical 指向无参 /battle/，教师带 ?c= 的邀请链接不会重复收录 -->
 <meta name="robots" content="index,follow">
 <link rel="icon" type="image/svg+xml" href="/favicon.ico">
-<link rel="canonical" href="https://memoryduel.com/battle/">
+<link rel="canonical" href="https://www.memoryduel.com/battle/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="MemoryDuel">
-<meta property="og:url" content="https://memoryduel.com/battle/">
+<meta property="og:url" content="https://www.memoryduel.com/battle/">
 <meta property="og:title" content="Knowledge Battle · 10 Questions, 15 Seconds Each · MemoryDuel">
 <meta property="og:description" content="Free 1v1 knowledge battle. Ten questions, 15 seconds each, first correct answer takes the point. Science, history, geography, sport, movies and more.">
-<meta property="og:image" content="https://memoryduel.com/og-default.jpg">
+<meta property="og:image" content="https://www.memoryduel.com/og-default.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="632">
 <link rel="stylesheet" href="/css/shared/tokens.css">
@@ -84,5 +84,27 @@
 <script type="module" src="/src/pages/battle.ts"></script>
 <!-- md-theme:module -->
 <script type="module" src="/shared/theme.js?v=1"></script>
+<script>
+/* 2026-11-04 P2：本页既没有 #site-header .sh-actions 也没有 .nav，
+   theme.js 的 ensureButton() 会走 1.2s 重试兜底把按钮塞进 body，
+   而 paint() 早已在此之前执行完 —— 结果是一个既无图标也无 aria-label
+   的空按钮（深度复查实测 btnNoName=1）。补齐可访问名与图标。
+   不改 /shared/theme.js：它是三站共享文件，本地单站改动会被漂移同步覆盖。 */
+(function () {
+  var MOON = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13A8 8 0 1 1 11 4a6.5 6.5 0 0 0 9 9z"/></svg>';
+  function fix() {
+    var b = document.querySelector('button.md-theme');
+    if (!b) return false;
+    if (!b.getAttribute('aria-label')) b.setAttribute('aria-label', 'Switch to dark');
+    if (!b.getAttribute('title')) b.setAttribute('title', 'Switch to dark');
+    if (!b.innerHTML.trim()) b.innerHTML = MOON;
+    return true;
+  }
+  if (fix()) return;
+  var mo = new MutationObserver(function () { if (fix()) mo.disconnect(); });
+  mo.observe(document.documentElement, { childList: true, subtree: true });
+  setTimeout(function () { mo.disconnect(); }, 5000);
+})();
+</script>
 </body>
 </html>

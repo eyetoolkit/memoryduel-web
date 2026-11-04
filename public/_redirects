@@ -1,0 +1,20 @@
+# MemoryDuel 全站收敛 · 2026-11-04
+# 7 款游戏已于 2026-10-31 软下线（首页与导航撤卡），本轮改为真下线：
+# 旧链接 / 搜索引擎收录一律 301 到唯一主推的知识对决大厅，不再留可玩的空房间。
+# ⚠️ CF Pages 的 _redirects 先于静态文件系统匹配；源文件保留在仓库仅作归档，
+#    vite.config.ts 已移除这些 MPA 入口，生产 dist 不再产出对应 HTML。
+/games/color-recall*       /games/knowledge-duel/lobby/ 301
+/games/daily-challenge*    /games/knowledge-duel/lobby/ 301
+/games/emoji-ghost*        /games/knowledge-duel/lobby/ 301
+/games/number-recall*      /games/knowledge-duel/lobby/ 301
+/games/sequence-memory*    /games/knowledge-duel/lobby/ 301
+/games/chimp-test*         /games/knowledge-duel/lobby/ 301
+/games/word-recall*        /games/knowledge-duel/lobby/ 301
+
+# 6 个语言落地页：从 meta-refresh 空壳改为真 301（HTML 保留 canonical/noindex 兜底）。
+/de/  /?lang=de 301
+/zh/  /?lang=zh 301
+/ja/  /?lang=ja 301
+/es/  /?lang=es 301
+/fr/  /?lang=fr 301
+/en/  /?lang=en 301

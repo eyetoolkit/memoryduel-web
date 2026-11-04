@@ -3,7 +3,7 @@
 <head>
 <!-- md-theme:early -->
 <script>(function(){try{var t=localStorage.getItem('md-theme2');if(t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();</script>
-<script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:67,fallback:"en"};</script>
+<script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:68,fallback:"en"};</script>
 <script src="/i18n/i18n.js?v=59"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -16,22 +16,27 @@
 <meta property="og:site_name" content="MemoryDuel">
 <meta property="og:title" content="MemoryDuel — Answer first. Win the duel.">
 <meta property="og:description" content="Ten questions, 15 seconds each. Answer first to score. Play AI or a real opponent, no login required.">
-<meta property="og:url" content="https://memoryduel.com/">
-<meta property="og:image" content="https://memoryduel.com/og-default.jpg">
+<meta property="og:url" content="https://www.memoryduel.com/">
+<meta property="og:image" content="https://www.memoryduel.com/og-default.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="MemoryDuel — Answer first. Win the duel.">
 <meta name="twitter:description" content="Ten questions, 15 seconds each. Answer first to score. No login, no install.">
-<meta name="twitter:image" content="https://memoryduel.com/og-default.jpg">
-<link rel="canonical" href="https://memoryduel.com/">
-<link rel="alternate" hreflang="en" href="https://memoryduel.com/">
-<link rel="alternate" hreflang="x-default" href="https://memoryduel.com/">
+<meta name="twitter:image" content="https://www.memoryduel.com/og-default.jpg">
+<link rel="canonical" href="https://www.memoryduel.com/">
+<link rel="alternate" hreflang="en" href="https://www.memoryduel.com/">
+<link rel="alternate" hreflang="zh-CN" href="https://www.memoryduel.com/?lang=zh">
+<link rel="alternate" hreflang="ja" href="https://www.memoryduel.com/?lang=ja">
+<link rel="alternate" hreflang="es" href="https://www.memoryduel.com/?lang=es">
+<link rel="alternate" hreflang="fr" href="https://www.memoryduel.com/?lang=fr">
+<link rel="alternate" hreflang="de" href="https://www.memoryduel.com/?lang=de">
+<link rel="alternate" hreflang="x-default" href="https://www.memoryduel.com/">
 <link rel="manifest" href="/manifest.webmanifest">
 <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "VideoGame",
     "name": "MemoryDuel - Knowledge Battle",
-    "url": "https://memoryduel.com/",
+    "url": "https://www.memoryduel.com/",
     "description": "Real-time 1v1 knowledge battle covering 12 categories in 6 languages.",
     "genre": ["Trivia", "Quiz", "Multiplayer"],
     "operatingSystem": "Any (Web Browser)",
@@ -103,7 +108,9 @@
       </div>
       <p class="ar-micro" data-i18n="home_v3.cta_micro">No login · No install · No ads</p>
       <div class="ar-stats">
-        <div class="ar-stat-lead"><strong>46,000<span>+</span></strong><small data-i18n="home_v3.stat_questions">questions</small></div>
+        <!-- 题量不再硬编码：/js/home-arena.mjs 读 /api/md/quiz/counts 覆盖；
+             接口失败时保留静态兜底，不会因为一次网络抖动变成空白或 NaN。 -->
+        <div class="ar-stat-lead"><strong id="arQuestionCount">46,000<span>+</span></strong><small data-i18n="home_v3.stat_questions">questions</small></div>
         <div><strong>6</strong><small data-i18n="home_v3.stat_languages">languages</small></div>
         <div><strong>15<span>s</span></strong><small data-i18n="home_v3.stat_perq">per question</small></div>
       </div>
@@ -182,7 +189,7 @@
       <p class="ar-sec-sub" data-i18n="home_v3.modes_sub">Three ways in. All of them start in one tap.</p>
     </div>
     <div class="ar-mode-grid">
-      <a class="gcard" href="/games/knowledge-duel/lobby/">
+      <a class="gcard" href="/games/knowledge-duel/lobby/" data-stage="live">
         <span class="ar-ribbon" data-i18n="home_v2.tag_live">Live</span>
         <div class="ar-mode-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28"><rect x="4" y="7" width="16" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="9" cy="13" r="1.4" fill="currentColor"/><circle cx="15" cy="13" r="1.4" fill="currentColor"/><path d="M12 4v3M8 19v2M16 19v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
         <h3 data-i18n="home_v3.mode_ai_t">vs AI</h3>
@@ -216,6 +223,15 @@
     <div class="ar-board">
       <div class="ar-board-head"><span data-i18n="home_v2.top_title">Top players</span><span data-i18n="home_v3.rank_score">Score</span></div>
       <div class="rank-list" id="topRankList" aria-busy="true" aria-live="polite" aria-label="Top players"></div>
+      <!-- 榜单前 6 名全是 Player#### 自动昵称时（真实社区尚未形成），
+           不把机器人名单摆在社会证明位，改成本周挑战目标 + 一个行动 CTA。
+           由 home.ts loadRank() 切换 hidden；文案静态挂 data-i18n，切语言自动生效。 -->
+      <div class="ar-board-challenge" id="rankChallenge" hidden>
+        <span class="ar-challenge-mark" aria-hidden="true">#1</span>
+        <h3 data-i18n="home_v3.rank_challenge_title">Be the first on the board</h3>
+        <p data-i18n="home_v3.rank_challenge_sub">The weekly leaderboard resets every Monday. Win one duel and the top spot is yours.</p>
+        <a class="btn ar-btn-gold" href="/games/knowledge-duel/lobby/" data-i18n="home_v3.cta_main">Start a duel — it's free</a>
+      </div>
       <div class="ar-eco" id="ecoCard" aria-live="polite">
         <div class="ar-eco-row">
           <span class="ar-eco-balance"><span class="ar-eco-coin" aria-hidden="true"></span><span class="ar-eco-num" id="ecoNum">—</span></span>
@@ -247,7 +263,7 @@
     <div class="sites">
       <a href="https://boardduel.com"><span class="pip" style="background:#2FC4C9"></span>BoardDuel</a>
       <a href="https://numeriduel.com"><span class="pip" style="background:#F59E0B"></span>NumeriDuel</a>
-      <a class="cur" href="https://memoryduel.com"><span class="pip" style="background:#4F46E5"></span>MemoryDuel</a>
+      <a class="cur" href="https://www.memoryduel.com"><span class="pip" style="background:#4F46E5"></span>MemoryDuel</a>
     </div>
     <div class="foot-links">
       <a href="/about/" data-i18n="nav.about">About</a><a href="/teacher/" data-i18n="nav.teacher">Teachers</a><a href="/contact/" data-i18n="nav.contact">Contact</a><a href="/privacy/" data-i18n="nav.privacy">Privacy</a><a href="/terms/" data-i18n="nav.terms">Terms</a><a href="/how-to-play/memory-match/" data-i18n="home_v2.nav_how">How to play</a>
@@ -257,7 +273,11 @@
 </footer>
 
 <!-- 题库数据：battle-sw-quiz-lang.test.mjs 要求首页引用文件名带版本号的 quiz-data.vN.js，
-     且 home.mjs 的分类渲染 / 题库加载失败横幅仍依赖它。defer 不阻塞首屏。 -->
+     所以文件保留，但首页不做题 —— 用惰性开关关掉它自带的 12 分类全量预取。
+     🔴 2026-11-04 P1-1 实测修正：只堵 home.mjs 的 bindQuizUpdates() 不够，
+        quiz-data.js 尾部 if (!window.MD_QUIZ_LAZY) 会自己 ensureLoaded() 拉 12 次
+        /quiz/bundle；两处必须同时关。该开关也覆盖切语言路径（setLang 内已判）。 -->
+<script>window.MD_QUIZ_LAZY = true;</script>
 <script src="/assets/quiz-data.v9.js" defer></script>
 <script type="module" src="/assets/js/home.mjs"></script>
 <script type="module" src="/src/pages/home.ts"></script>

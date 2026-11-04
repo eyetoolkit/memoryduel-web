@@ -384,6 +384,12 @@ function bindRoomActions() {
 
 // ---------- 题库更新时重渲染 ----------
 function bindQuizUpdates() {
+  /* 🔴 2026-11-04 P1-1：新版首页没有 #catGrid（分类卡已收进独立大厅页），
+     renderCategories() 本来就是 no-op，但下面的 ensureLoaded() 会绕过
+     MD_QUIZ_LAZY 开关把 12 个分类的题库全量预取一遍（4–12 次 /quiz/bundle、
+     约 55KB）。A/B/C 三组真浏览器对照证实：拦掉 quiz-data 后 bundle 归零，
+     而榜单 / 主 CTA / 对战卡全部正常。首页不做题，直接返回。 */
+  if (!$('catGrid')) return;
   // quiz-data.js 异步加载题目，加载完成后触发 memoryduel-ready
   window.addEventListener('memoryduel-ready', (ev) => {
     renderCategories();

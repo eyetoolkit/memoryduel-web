@@ -97,6 +97,13 @@
     btn.type = "button";
     btn.className = "md-theme";
     btn.setAttribute("aria-pressed", "false");
+    /* 🔴 2026-11-04：按钮可能是「重试兜底」路径在 paint() 之后才创建的
+       （无 #site-header/.nav 的页面要走 1.2s 重试再塞进 body），结果是
+       一个既无图标也无 aria-label 的空圆按钮。创建时就带上默认值，
+       paint() 随后会按当前主题覆盖，两者不冲突。 */
+    btn.setAttribute("aria-label", "Switch to dark");
+    btn.setAttribute("title", "Switch to dark");
+    btn.innerHTML = ICON_MOON;
 
     var actions = document.querySelector("#site-header .sh-actions");
     if (actions) {

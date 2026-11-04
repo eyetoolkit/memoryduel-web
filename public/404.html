@@ -3,7 +3,7 @@
 <head>
 <!-- md-theme:early -->
 <script>(function(){try{var t=localStorage.getItem('md-theme2');if(t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();</script>
-  <script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:67,fallback:"en"};</script>
+  <script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:68,fallback:"en"};</script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1, viewport-fit=cover">
   <title data-i18n-title="404.title" data-i18n-title-suffix=" · Memory Duel">404 - Page Not Found</title>
@@ -17,16 +17,16 @@
   <!-- 404 页不设 canonical：任何指向具体 URL 的 canonical 对错误页都是错误信号 -->
   
   
-  <link rel="alternate" hreflang="zh-CN" href="https://memoryduel.com/" />
-  <link rel="alternate" hreflang="en" href="https://memoryduel.com/?lang=en" />
-  <link rel="alternate" hreflang="ja" href="https://memoryduel.com/?lang=ja" />
-  <link rel="alternate" hreflang="es" href="https://memoryduel.com/?lang=es" />
-  <link rel="alternate" hreflang="fr" href="https://memoryduel.com/?lang=fr" />
-  <link rel="alternate" hreflang="de" href="https://memoryduel.com/?lang=de" />
-  <link rel="alternate" hreflang="x-default" href="https://memoryduel.com/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://www.memoryduel.com/" />
+  <link rel="alternate" hreflang="en" href="https://www.memoryduel.com/?lang=en" />
+  <link rel="alternate" hreflang="ja" href="https://www.memoryduel.com/?lang=ja" />
+  <link rel="alternate" hreflang="es" href="https://www.memoryduel.com/?lang=es" />
+  <link rel="alternate" hreflang="fr" href="https://www.memoryduel.com/?lang=fr" />
+  <link rel="alternate" hreflang="de" href="https://www.memoryduel.com/?lang=de" />
+  <link rel="alternate" hreflang="x-default" href="https://www.memoryduel.com/" />
 <style>
     :root { --p: #ea580c; --bg: #fff7ed; --t: #1e1b4b; --m: #6b7280; --p-h: #c2410c; }
-    /* chrome-mem 侧栏适配变量（贴品牌：深靛墨 + 橙色强调，与 404 theme-color 一致） */
+/* 2026-11-04：旧 chrome-mem 侧栏已移除，以下仅保留品牌变量 */
     :root { --ink:#1e1b4b; --mute:#6b7280; --card:#fff; --line:rgba(23,24,40,.08); --orange:#ea580c; --orange-ink:#c2410c; }
     html[data-theme="dark"] { --bg:#1a1410; --card:#2a2118; --t:#f5f1ea; --m:#a89b88; --line:rgba(255,255,255,.12); --orange:#ff8a3d; --orange-ink:#ffb27a; }
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -72,11 +72,7 @@
       border: 1.5px solid var(--p);
     }
     .nf-btn.secondary:hover { background: var(--p); color: #fff; }
-    /* chrome-mem.js 自带 body.mc-on 让位规则（padding-left:var(--mc-w)），
-       此处只补品牌变量 + 隐藏旧顶栏/页脚，避免与注入器叠加成双倍偏移 */
-    /* chrome-mem 激活后隐藏旧顶栏（site-header.js 注入）与页脚（与侧栏导航重复） */
-    body.mc-on #site-header,
-    body.mc-on .sites-footer{ display:none!important; }
+    /* 2026-11-04：旧侧栏已移除，共享顶栏与页脚正常显示 */
   </style>
   <link rel="stylesheet" href="/css/shared/tokens.css?v=p4fix2">
   <link rel="stylesheet" href="/css/shared/brand-ds2.css?v=ds2-23">
@@ -102,7 +98,7 @@
      data-nav='[{"label":"Home","href":"/","i18n":"nav.home"}]'
      data-cta-label="Home" data-cta-href="/" data-cta-i18n="nav.home"></div>
 
-  <div class="nf-emoji">🧠</div>
+  <div class="nf-emoji" aria-hidden="true"><svg class="duel-icon" style="width:1em;height:1em;color:var(--p)"><use href="/shared/icons.svg#duel-brain"></use></svg></div>
   <div class="nf-code">404</div>
   <h1 class="nf-title" data-i18n="mm_404_1">Page Not Found</h1>
   <p class="nf-msg" data-i18n="mm_404_2">The page you visited does not exist or has been removed.</p>
@@ -110,7 +106,6 @@
     <a href="/" class="nf-btn" data-i18n="404.btn_home">← Back to Home</a>
     <a href="javascript:history.back()" class="nf-btn secondary" data-i18n="404.btn_back">Go Back</a>
   </div>
-  <script src="/js/chrome-mem.js?v=1" defer></script>
   <script src="/shared/site-header.js?v=ds2-13"></script>
   <script src="/shared/sso-bridge.js?v=1" defer></script>
 <footer class="sites-footer">
@@ -125,7 +120,7 @@
         <svg class="duel-icon sf-emoji" aria-hidden="true"><use href="/shared/icons.svg#duel-chess"></use></svg>
         <span data-i18n="mm_404_4">BoardDuel</span>
       </a>
-      <a href="https://memoryduel.com/" class="sf-item current">
+      <a href="https://www.memoryduel.com/" class="sf-item current">
         <svg class="duel-icon sf-emoji" aria-hidden="true"><use href="/shared/icons.svg#duel-brain"></use></svg>
         <span data-i18n="mm_404_5">MemoryDuel</span>
       </a>

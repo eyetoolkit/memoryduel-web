@@ -87,9 +87,9 @@ MemoryDuel（memoryduel.com）是一个面向全球用户的在线记忆力训�
 
 ## 8. 链接
 
-- 主页：https://memoryduel.com/
-- 训练模式：https://memoryduel.com/train
-- 玩法说明：https://memoryduel.com/how-to-play/memory-match/
-- 关于：https://memoryduel.com/about/
-- Sitemap：https://memoryduel.com/sitemap.xml
-- LLMs 精简版：https://memoryduel.com/llms.txt
+- 主页：https://www.memoryduel.com/
+- 训练模式：https://www.memoryduel.com/train
+- 玩法说明：https://www.memoryduel.com/how-to-play/memory-match/
+- 关于：https://www.memoryduel.com/about/
+- Sitemap：https://www.memoryduel.com/sitemap.xml
+- LLMs 精简版：https://www.memoryduel.com/llms.txt

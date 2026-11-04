@@ -45,7 +45,7 @@ MemoryDuel（memoryduel.com）是一个在线记忆力训练平台，通过翻�
 
 ## 链接
 
-- 主页：https://memoryduel.com/
-- 训练模式：https://memoryduel.com/train
-- 玩法说明：https://memoryduel.com/how-to-play/memory-match/
-- Sitemap：https://memoryduel.com/sitemap.xml
+- 主页：https://www.memoryduel.com/
+- 训练模式：https://www.memoryduel.com/train
+- 玩法说明：https://www.memoryduel.com/how-to-play/memory-match/
+- Sitemap：https://www.memoryduel.com/sitemap.xml

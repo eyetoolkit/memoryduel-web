@@ -205,49 +205,45 @@ test('软下线后首页游戏矩阵不再含 color-recall 卡片', () => {
   assert.ok(home.includes('/games/knowledge-duel/lobby/'), 'knowledge-duel 入口应保留');
 });
 
-test('vite.config 必须注册 color 入口（否则构建静默丢弃，线上 404）', () => {
-  // 🔴 本轮真踩：只建了 games/color-recall/index.html 就以为完事，
-  //    构建**零报错**、dist 里根本没有该目录、线上 404。
-  //    Vite 未注册的 MPA 入口就是被静默丢掉，没有任何提示。
-  //    这条断言的作用是让「忘了注册」变成一次明确红灯。
+/* ── 2026-11-04 契约变更：软下线 → 真下线 ──
+   10-31 的「软下线」只收掉首页卡片，14 个游戏页仍完整可玩、可被索引，
+   被全站深度复查判为 P0（当前「不删不推」是最差状态）。现改为：
+     ① vite input 只保留 knowledgeLobby，生产 dist 不再产出下线页；
+     ② public/_redirects 把 7 个 slug 全部 301 到大厅；
+     ③ sitemap / 首页入口只保留知识对决。
+   下面两条测试跟着改：过去守「别漏注册」，现在守「别把下线页加回来 +
+   301 不能有缺口」。源文件暂留仓库归档，历史回归测试仍会读它们。 */
+const RETIRED = [
+  'color-recall', 'daily-challenge', 'emoji-ghost', 'number-recall',
+  'sequence-memory', 'chimp-test', 'word-recall',
+];
+
+test('真下线后 vite.config 不再注册任何已下线游戏入口', () => {
   const cfg = fs.readFileSync(path.join(ROOT, 'vite.config.ts'), 'utf8');
-  assert.ok(/colorDuel:\s*resolve\(here,\s*'games\/color-recall\/index\.html'\)/.test(cfg),
-    'color 入口未注册进 rollupOptions.input —— 构建会静默丢弃、线上 404');
+  for (const g of RETIRED) {
+    assert.ok(!cfg.includes(`games/${g}/`), `${g} 仍注册在 vite input —— 下线页会被重新产出`);
+  }
+  assert.ok(cfg.includes("'games/knowledge-duel/lobby/index.html'"),
+    '唯一主推的知识对决大厅必须注册（Vite 漏注册是静默丢弃，不报错）');
 });
 
-test('games/ 下每个页面都已注册进 vite input', () => {
-  // 通用防回归：不针对 color 写死，任何新页面漏注册都会被抓到
-  //
-  // 🔴 2026-10-23 修正：原实现假设「每个 games/<slug>/ 目录都有 index.html」，
-  //    于是 knowledge-duel（**只有 lobby/**，它的游戏页是根下的 train.html ——
-  //    一个 public 静态页，本来就不经过 vite input）被误判成
-  //    「games/knowledge-duel/index.html 未注册」。
-  //    改为**递归枚举真实存在的 html**，误报消失，顺带把大厅页也纳入守卫：
-  //    旧逻辑只查 games/<slug>/index.html，**lobby 漏注册是抓不到的**
-  //    （六个 duelLobby* 此前全靠人工注释提醒，没有机器保障）。
-  const cfg = fs.readFileSync(path.join(ROOT, 'vite.config.ts'), 'utf8');
-  const found = [];
-  const walk = (dir) => {
-    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
-      const p = path.join(dir, e.name);
-      if (e.isDirectory()) walk(p);
-      else if (e.name.endsWith('.html')) found.push(path.relative(ROOT, p).split(path.sep).join('/'));
-    }
-  };
-  walk(path.join(ROOT, 'games'));
-  assert.ok(found.length > 0, '应有游戏页面');
-  for (const rel of found) {
-    assert.ok(cfg.includes(rel), `${rel} 未注册进 vite input —— 构建静默丢弃、线上 404`);
+test('7 款下线游戏在 _redirects 里都有 301 规则', () => {
+  const redirects = fs.readFileSync(path.join(ROOT, 'public/_redirects'), 'utf8');
+  for (const g of RETIRED) {
+    const re = new RegExp(`^/games/${g}\\*\\s+/games/knowledge-duel/lobby/\\s+301\\s*$`, 'm');
+    assert.ok(re.test(redirects), `${g} 缺 301 规则 —— 旧链接会落到 404 兜底而不是回大厅`);
   }
 });
 
-test('软下线后 sitemap 不再含 color-recall（SEO 收敛）', () => {
+test('sitemap 只保留知识对决且全部使用 www 规范域', () => {
   const sm = fs.readFileSync(path.join(ROOT, 'public/sitemap.xml'), 'utf8');
-  // 2026-10-31：软下线，下线游戏落地页从 sitemap 移除（URL 仍可访问，只是不再主动索引）
-  assert.ok(!sm.includes('https://memoryduel.com/games/color-recall/'),
-    '软下线后 sitemap 不应含 color-recall');
-  assert.ok(sm.includes('https://memoryduel.com/games/knowledge-duel/lobby/'),
-    'knowledge-duel 应保留在 sitemap');
+  for (const g of RETIRED) {
+    assert.ok(!sm.includes(`/games/${g}/`), `sitemap 不应含已下线的 ${g}`);
+  }
+  assert.ok(!sm.includes('https://memoryduel.com/'), 'sitemap 仍有 301 的 apex 域');
+  assert.ok(sm.includes('https://www.memoryduel.com/games/knowledge-duel/lobby/'),
+    'knowledge-duel 大厅应保留在 sitemap');
+  assert.ok(sm.includes('<lastmod>2026-11-04</lastmod>'), '改版后 lastmod 应更新');
 });
 
 test('color 页面 SEO 头与另两款对齐（title/canonical/OG/hreflang）', () => {

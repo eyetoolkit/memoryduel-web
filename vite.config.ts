@@ -35,6 +35,19 @@ function stripEnvPlaceholders() {
   };
 }
 
+/**
+ * 🔴 2026-11-04「真下线」：7 款记忆游戏（daily-challenge / sequence-memory /
+ * number-recall / color-recall / emoji-ghost / chimp-test / word-recall）已从
+ * rollupOptions.input 移除，生产 dist 不再产出这 14 个页面；旧 URL 由
+ * public/_redirects 统一 301 到 /games/knowledge-duel/lobby/。
+ *
+ * 历史教训仍然成立：**Vite 未注册的 MPA 入口会被静默丢弃，不报错**，
+ * 线上表现为落到 404 兜底。所以现在反过来——tests/p1-5-color-duel.test.mjs
+ * 守卫「下线页不得注册、且必须有 301 规则」，避免有人误加回来。
+ *
+ * 源文件与 src/pages/duel-sequence.ts 等实现暂留仓库归档（历史回归测试仍读它们），
+ * 但不再进入产物、不再被索引、不再有可玩入口。
+ */
 export default defineConfig({
   plugins: [filterStage(), stripEnvPlaceholders()],
   build: {
@@ -42,57 +55,9 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        // M3（2026-10-01）：battle.html 为第二个 MPA 入口
-        // 教师邀请链接 /?mode=battle&c=XXX 跳转至 /battle/ 时由 home.ts 处理，
-        // 此处只负责静态资源产出。
         main: resolve(here, 'index.html'),
         battle: resolve(here, 'battle.html'),
-
-        // 多游戏升级 P0-5（2026-10-12）：每日记忆挑战
-        // 🔴 必须注册进 rollupOptions.input，否则构建不产出页面（静默丢弃，无报错）。
-        // ⚠️ input 的 key 即产物名：dailyChallenge → assets/dailyChallenge-<hash>.js
-        //    验收脚本按 key 搜产物，不是 daily-<hash>.js
-        dailyChallenge: resolve(here, 'games/daily-challenge/index.html'),
-        dailyChallengeLobby: resolve(here, 'games/daily-challenge/lobby/index.html'),
-
-        // P1-2（2026-10-12）：Sequence Memory 双人对战
-        // ⚠️ key 即产物名：sequenceDuel → assets/sequenceDuel-<hash>.js
-        sequenceDuel: resolve(here, 'games/sequence-memory/index.html'),
-
-        // P1-3（2026-10-12）：Number Recall 对战。
-        // 🔴 两个入口**共用同一个 TS 模块**（按路径推断 game），不是两份实现。
-        numberDuel: resolve(here, 'games/number-recall/index.html'),
-
-        // P1-5（2026-10-13）：Colour Recall 对战。第三个共用 duel-sequence.ts 的入口。
-        // ⚠️ key 即产物名：colorDuel → assets/colorDuel-<hash>.js
-        //    注意：三款对战入口会产出三个各自 hash 的 bundle，内容相同但互不共享 ——
-        //    这是 MPA 的固有代价（浏览器按页面缓存），接受它，不要试图合并。
-        colorDuel: resolve(here, 'games/color-recall/index.html'),
-
-        // P2（2026-10-13）：三款新游戏的对战入口。第四/五/六个共用 duel-sequence.ts 的入口。
-        // 🔴 必须注册进 rollupOptions.input，否则构建**静默丢弃**、不产出页面也不报错，
-        //    线上表现为该 URL 落到 404 兜底页（内容还是全站导航，肉眼看像「页面坏了」）。
-        emojiDuel: resolve(here, 'games/emoji-ghost/index.html'),
-        chimpDuel: resolve(here, 'games/chimp-test/index.html'),
-        wordDuel: resolve(here, 'games/word-recall/index.html'),
-
-        /* P3（2026-10-14）：六款对战游戏的大厅页（模式选择）。
-           🔴 必须逐个显式注册，否则构建**静默丢弃**、不产出页面也不报错，
-              线上表现为该 URL 落到 404 兜底（内容还是全站导航，肉眼像「页面坏了」）。
-           ⚠️ input 的 key 即产物名：duelLobbySeq → assets/duelLobbySeq-<hash>.js
-              **不是** duel-lobby-<hash>.js。验收脚本按 key 搜产物。 */
-        duelLobbySeq: resolve(here, 'games/sequence-memory/lobby/index.html'),
-        duelLobbyNum: resolve(here, 'games/number-recall/lobby/index.html'),
-        duelLobbyCol: resolve(here, 'games/color-recall/lobby/index.html'),
-        duelLobbyEmoji: resolve(here, 'games/emoji-ghost/lobby/index.html'),
-        duelLobbyChimp: resolve(here, 'games/chimp-test/lobby/index.html'),
-        duelLobbyWord: resolve(here, 'games/word-recall/lobby/index.html'),
-
-        // 知识对决大厅（2026-10-23）：Knowledge Battle 的独立大厅页（选分类 + 四模式）。
-        // 🔴 与上面六款不同源：那六款走 duel-lobby.ts（异步房码，服务端无匹配队列/无 AI），
-        //    知识对决走 train.html 内联引擎（自带 AI）+ /api/md/match/join 真实匹配端点，
-        //    故**四个模式全部真实可用**，不需要灰态占位。
-        // 🔴 必须注册，否则构建**静默丢弃**、不产出页面也不报错，线上落 404 兜底。
+        // 知识对决大厅：当前唯一主推的落地页（选分类 + 四模式，全部真实可用）。
         // ⚠️ key 即产物名：knowledgeLobby → assets/knowledgeLobby-<hash>.js
         knowledgeLobby: resolve(here, 'games/knowledge-duel/lobby/index.html'),
       },

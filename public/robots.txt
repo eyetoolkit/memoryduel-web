@@ -44,7 +44,7 @@ Allow: /
 User-agent: cohere-ai
 Allow: /
 
-Sitemap: https://memoryduel.com/sitemap.xml
-LLMs: https://memoryduel.com/llms.txt
-LLMs-Full: https://memoryduel.com/llms-full.txt
-AI: https://memoryduel.com/ai.txt
+Sitemap: https://www.memoryduel.com/sitemap.xml
+LLMs: https://www.memoryduel.com/llms.txt
+LLMs-Full: https://www.memoryduel.com/llms-full.txt
+AI: https://www.memoryduel.com/ai.txt

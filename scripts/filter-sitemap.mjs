@@ -29,7 +29,7 @@ const sitemapPath = resolve(root, 'dist', 'sitemap.xml');
 const xml = await readFile(sitemapPath, 'utf8');
 const removed = [];
 
-const out = xml.replace(/<url>[\s\S]*?<\/url>\s*/g, (block) => {
+let out = xml.replace(/<url>[\s\S]*?<\/url>\s*/g, (block) => {
   const m = block.match(/<loc>[^<]*\/games\/([a-z0-9-]+)\//);
   if (m && !live.has(m[1])) {
     removed.push(m[1]);
@@ -38,9 +38,11 @@ const out = xml.replace(/<url>[\s\S]*?<\/url>\s*/g, (block) => {
   return block;
 });
 
-if (removed.length) {
-  await writeFile(sitemapPath, out, 'utf8');
-  console.log('[sitemap] 已移除未上线游戏条目: ' + removed.join(', '));
-} else {
-  console.log('[sitemap] 无需调整');
-}
+/* 2026-11-04：以前 lastmod 是静态快照（9-11 / 10-22），11-04 大改版后
+   搜索引擎没有重抓信号。构建时统一写当天，让每次发布都能被及时重抓。
+   注意这不是「假装每天更新」：只有真的产生新部署才会跑这个脚本。 */
+const today = new Date().toISOString().slice(0, 10);
+out = out.replace(/<lastmod>[\d-]+<\/lastmod>/g, `<lastmod>${today}</lastmod>`);
+
+await writeFile(sitemapPath, out, 'utf8');
+console.log('[sitemap] lastmod=' + today + (removed.length ? ' | 已移除未上线游戏: ' + removed.join(', ') : ' | 无需移除'));
