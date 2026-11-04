@@ -3,7 +3,7 @@
 <head>
 <!-- md-theme:early -->
 <script>(function(){try{var t=localStorage.getItem('md-theme2');if(t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();</script>
-  <script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:68,fallback:"en"};</script>
+  <script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:69,fallback:"en"};</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <!-- standalone 下 iOS 状态栏取 theme-color，缺失会回落成系统默认色（与本站暖橙/米白不搭）。
@@ -165,6 +165,17 @@
   .battle-opt.correct .opt-letter{background:var(--green); color:#fff}
   .battle-opt.wrong{border-color:var(--red); background:rgba(220,38,38,.08)}
   .battle-opt.wrong .opt-letter{background:var(--red); color:#fff}
+  /* 2026-11-04 服务端权威对决：逐题不泄题，只标「你的选择 / 对手选择」 */
+  .battle-opt.picked{border-color:var(--indigo); background:var(--indigo-soft)}
+  .battle-opt.bot-pick{box-shadow:inset 0 0 0 2px var(--rival)}
+  .battle-opt.hint-excluded{opacity:.38; text-decoration:line-through}
+  .battle-hint{background:transparent; color:var(--indigo-deep); border:1px dashed var(--indigo); font-size:13px; padding:10px 14px}
+  .battle-hint:disabled{opacity:.45; cursor:default}
+  .battle-result .res-meta{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:12px 0}
+  .battle-result .res-chip{background:var(--indigo-soft); color:var(--indigo-deep); border-radius:999px; padding:6px 12px; font-size:13px; font-weight:700}
+  .battle-result .res-review{text-align:left; margin:18px auto 0; max-width:620px; max-height:240px; overflow:auto; font-size:13px}
+  .battle-result .res-review summary{cursor:pointer; color:var(--indigo-deep); font-weight:700}
+  .battle-result .res-review li{padding:6px 0; border-bottom:1px solid var(--line); color:var(--mute)}
 
   /* 解释 / 思考 / 操作 */
   .battle-explain{margin-top:14px; padding:12px 14px; background:var(--indigo-soft); border-radius:12px; font-size:13px; color:var(--mute); line-height:1.5; display:none}
@@ -384,9 +395,9 @@
       if (BOT_TIERS[_d]) AI_DIFF = _d;
     } catch (e) {}
     function botTier() { return BOT_TIERS[AI_DIFF] || BOT_TIERS.normal; }
-    var BOT_MIN_THINK = botTier().min;
-    var BOT_MAX_THINK = botTier().max;
-    var BOT_ACCURACY = botTier().acc;
+    /* 2026-11-04：三档数值的真相源已移到服务端 lib/duel-tiers.js。
+       前端只把选中的档位名传给 /duel/start；botTier() 仅在降级练习模式里
+       用于本地生成节奏（服务端不可用时不能白屏）。 */
 
     var BOT_NAMES_BY_LANG = (function () {
       var m = {};
@@ -466,38 +477,37 @@
 
     /* ===== Battle State ===== */
     var B = {
-      questions: [],
-      idx: 0,
-      youScore: 0,
-      botScore: 0,
-      timer: null,
-      timerStart: 0,
-      answered: false,
-      botAnswered: false,
-      botCorrect: false,
+      questions: [], idx: 0, youScore: 0, botScore: 0,
+      timer: null, timerStart: 0, answered: false, botAnswered: false,
       botThinkTimer: null,
+      /* 2026-11-04：服务端权威对决。题目/答案/bot 作答全部由 /duel/start 签发，
+         客户端只记录「点了哪个选项、用了多少毫秒」，结算走 /duel/result。
+         practiceMode 只在服务端不可用时启用，明确不计战绩。 */
+      duelId: '', botPlan: [], answers: [], practiceMode: false,
+      hintUsed: 0, hintMax: 2, hintCost: 20, submitting: false,
     };
 
-    function startBattle(questions) {
-      /* 按难度档过滤题目难度；过滤后题量不足一局时退回原池
-         （宁可题目难度不符，也不能因为没题而开局失败）。 */
-      var _tier = botTier();
-      var _pool = (questions || []).filter(function (q) {
-        return !q.diff || _tier.diff.indexOf(q.diff) >= 0;
-      });
-      if (_pool.length >= 10) questions = _pool;
-      if (!questions || questions.length === 0) {
+    function startBattle(cfg) {
+      if (!cfg || !cfg.questions || cfg.questions.length === 0) {
         showError('No questions available for this category.');
         return;
       }
-      B.questions = shuffleArr(questions.slice(0, Math.max(TOTAL_ROUNDS, questions.length))).slice(0, TOTAL_ROUNDS);
-      B.idx = 0;
-      B.youScore = 0;
-      B.botScore = 0;
+      B.questions = cfg.questions.slice(0, TOTAL_ROUNDS);
+      B.botPlan = (cfg.bot || []).slice(0, B.questions.length);
+      B.duelId = cfg.duelId || '';
+      B.practiceMode = !!cfg.practice;
+      B.hintMax = cfg.hintMax || 2;
+      B.hintCost = cfg.hintCost || 20;
+      B.answers = new Array(B.questions.length);
+      B.idx = 0; B.youScore = 0; B.botScore = 0; B.hintUsed = 0; B.submitting = false;
       document.getElementById('battleStage').classList.add('active');
       document.getElementById('battleTotal').textContent = B.questions.length;
       document.getElementById('battleBotName').textContent = pickBotName();
       document.getElementById('battleYouName').textContent = T('train.you_label','You');
+      var pill = document.getElementById('battleTitle');
+      if (pill) pill.textContent = B.practiceMode
+        ? ('⚔️ ' + T('duel.practice_title','Practice · not ranked'))
+        : ('⚔️ ' + T('duel.ranked_title','Ranked AI Duel') + ' · ' + AI_DIFF);
       updateScores();
       nextQuestion();
     }
@@ -509,10 +519,9 @@
     }
 
     function nextQuestion() {
-      if (B.idx >= B.questions.length) { finishBattle(); return; }
+      if (B.idx >= B.questions.length) { submitResult(); return; }
       B.answered = false;
       B.botAnswered = false;
-      B.botCorrect = false;
 
       var q = B.questions[B.idx];
       var lang = getLang();
@@ -526,8 +535,6 @@
         text = (q.qn && (q.qn[lang] || q.qn.en)) || q.q || '';
         options = (q.op && (q.op[lang] || q.op.en)) || q.options || [];
       }
-      var correct = q.ans;
-
       document.getElementById('battleQuestion').textContent = text;
       document.getElementById('battleExplain').classList.remove('show');
       document.getElementById('battleExplain').innerHTML = '';
@@ -546,12 +553,12 @@
       var optsEl = document.getElementById('battleOptions');
       optsEl.innerHTML = optsHtml;
       Array.prototype.forEach.call(optsEl.querySelectorAll('.battle-opt'), function(btn) {
-        btn.addEventListener('click', function() { onUserAnswer(parseInt(btn.dataset.idx, 10), correct); });
+        btn.addEventListener('click', function() { onUserAnswer(parseInt(btn.dataset.idx, 10)); });
       });
 
       startTimer();
-      // Bot 同时开始“思考”
-      scheduleBotAnswer(correct);
+      scheduleBotAnswer();   // bot 按服务端预生成的节奏独立作答，不受玩家点击影响
+      renderHintButton();
     }
 
     function startTimer() {
@@ -572,119 +579,187 @@
       }, 100);
     }
 
-    function scheduleBotAnswer(correct) {
+    /* 2026-11-04 P0-1：bot 的作答由服务端在 /duel/start 时预生成（命中率、
+       思考延迟、本轮得分都是服务端算好的），这里只负责按 thinkMs 播放动画。
+       旧实现里玩家一答就 clearTimeout(botThinkTimer) → AI 本轮弃权，
+       形成「每题 1 秒内点答案」的唯一主导策略。现在双方各答各的，
+       速度只影响速度分，不再取消对手作答。 */
+    function scheduleBotAnswer() {
       if (B.botThinkTimer) clearTimeout(B.botThinkTimer);
-      var thinkMs = BOT_MIN_THINK + Math.random() * (BOT_MAX_THINK - BOT_MIN_THINK);
-      document.getElementById('battleBotThinking').style.display = 'block';
+      var plan = B.botPlan[B.idx] || { thinkMs: 1200, option: -1, gained: 0 };
+      var thinking = document.getElementById('battleBotThinking');
+      thinking.style.display = 'block';
       B.botThinkTimer = setTimeout(function() {
-        document.getElementById('battleBotThinking').style.display = 'none';
-        // Bot 答题：正确率 BOT_ACCURACY，否则随机错答
-        B.botCorrect = Math.random() < BOT_ACCURACY;
-        var q = B.questions[B.idx];
-        var options = (q.op && (q.op[getLang()] || q.op.en)) || q.options || [];
-        var wrong = [];
-        for (var i = 0; i < options.length; i++) if (i !== correct) wrong.push(i);
-        var botAnswer = B.botCorrect
-          ? correct
-          : (wrong.length ? wrong[Math.floor(Math.random() * wrong.length)] : correct);
+        B.botThinkTimer = null;
+        thinking.style.display = 'none';
+        B.botAnswered = true;
+        B.botScore += Number(plan.gained) || 0;
         var btns = document.querySelectorAll('.battle-opt');
-        if (btns[botAnswer] && !B.answered) {
-          // 用户还没答：Bot 抢先给分
-          if (B.botCorrect) { B.botScore++; updateScores(); }
-        }
-        // 保存 Bot 的选择，等到 onUserAnswer 高亮
-        B._botChoice = botAnswer;
-      }, thinkMs);
+        if (btns[plan.option]) btns[plan.option].classList.add('bot-pick');
+        updateScores();
+        maybeAdvance();
+      }, plan.thinkMs);
     }
 
-    function onUserAnswer(idx, correct) {
+    function maybeAdvance() {
+      if (!B.answered || !B.botAnswered) return;  // 等双方都落子才进下一题
+      setTimeout(showNextButton, 500);
+    }
+
+    function renderHintButton() {
+      var host = document.getElementById('battleActions');
+      if (!host) return;
+      host.innerHTML = '';
+      if (B.practiceMode || B.hintUsed >= B.hintMax) return;
+      var btn = document.createElement('button');
+      btn.className = 'btn battle-hint';
+      btn.textContent = '💡 ' + T('duel.hint','Hint') + ' −' + B.hintCost + ' ' +
+        T('duel.coins','coins') + ' (' + (B.hintMax - B.hintUsed) + ')';
+      btn.addEventListener('click', function() {
+        if (B.answered || btn.disabled || !B.duelId) return;
+        btn.disabled = true;
+        mdApi('POST', '/api/md/duel/hint', { duelId: B.duelId, round: B.idx })
+          .then(function (r) {
+            (r.exclude || []).forEach(function (i) {
+              var b = document.querySelector('.battle-opt[data-idx="' + i + '"]');
+              if (b) { b.classList.add('hint-excluded'); b.disabled = true; }
+            });
+            B.hintUsed = Number(r.hintsUsed) || (B.hintUsed + 1);
+            var ex = document.getElementById('battleExplain');
+            ex.innerHTML = T('duel.hint_ok','Two wrong answers removed. Choose quickly!');
+            ex.classList.add('show');
+            renderHintButton();
+          })
+          .catch(function (e) {
+            btn.disabled = false;
+            var msg = (e && e.msg) || '';
+            var text = msg === 'login_required' ? T('duel.hint_login','Sign in to use hints.') :
+                       msg === 'insufficient_coins' ? T('duel.hint_no_coins','Not enough coins.') :
+                       (T('duel.hint_fail','Hint unavailable. ') + escHtml(e && e.message));
+            var ex = document.getElementById('battleExplain');
+            ex.innerHTML = text;
+            ex.classList.add('show');
+          });
+      });
+      host.appendChild(btn);
+    }
+
+    function onUserAnswer(idx) {
       if (B.answered) return;
       B.answered = true;
       clearInterval(B.timer);
-      if (B.botThinkTimer) { clearTimeout(B.botThinkTimer); B.botThinkTimer = null; }
-      document.getElementById('battleBotThinking').style.display = 'none';
-
+      /* 只记录「选了哪个 + 用了多久」；不判分、不泄题、不取消 bot 定时器。
+         判分在 /duel/result，正确答案与解释结算时才一次性返回。 */
+      B.answers[B.idx] = { option: idx, ms: Math.max(0, Date.now() - B.timerStart) };
       var btns = document.querySelectorAll('.battle-opt');
-      if (btns[correct]) btns[correct].classList.add('correct');
-      if (idx === correct) B.youScore++;
-      else if (btns[idx]) btns[idx].classList.add('wrong');
-
+      if (btns[idx]) btns[idx].classList.add('picked');
       Array.prototype.forEach.call(btns, function(b) { b.disabled = true; });
-
-      // 显示解释
-      var q = B.questions[B.idx];
-      var lang = getLang();
-      var explain = (q.ex && (q.ex[lang] || q.ex.en)) || q.explain || '';
-      if (explain) {
-        document.getElementById('battleExplain').innerHTML =
-          T('battle.answer_prefix','Answer: ') + '<b>' + (correct + 1) + '</b> · ' + explain;
-        document.getElementById('battleExplain').classList.add('show');
-      }
-
-      // 高亮 Bot 的选择
-      var botChoice = B._botChoice;
-      if (typeof botChoice === 'number' && btns[botChoice] && !btns[botChoice].classList.contains('correct') && !btns[botChoice].classList.contains('wrong')) {
-        if (B.botCorrect) btns[botChoice].classList.add('correct');
-        else btns[botChoice].classList.add('wrong');
-      }
-
-      updateScores();
-      setTimeout(showNextButton, 800);
+      document.getElementById('battleActions').innerHTML = '';
+      maybeAdvance();
     }
 
     function onUserTimeout() {
+      if (B.answered) return;
       B.answered = true;
-      if (B.botThinkTimer) { clearTimeout(B.botThinkTimer); B.botThinkTimer = null; }
-      document.getElementById('battleBotThinking').style.display = 'none';
+      B.answers[B.idx] = { option: -1, ms: PER_QUESTION_MS };
       var btns = document.querySelectorAll('.battle-opt');
-      var correct = B.questions[B.idx].ans;
-      if (btns[correct]) btns[correct].classList.add('correct');
       Array.prototype.forEach.call(btns, function(b) { b.disabled = true; });
-      var q = B.questions[B.idx];
-      var lang = getLang();
-      var explain = (q.ex && (q.ex[lang] || q.ex.en)) || q.explain || '';
-      if (explain) {
-        document.getElementById('battleExplain').innerHTML =
-          T('battle.timeout_prefix','⏰ Time\'s up! ') + T('battle.answer_prefix','Answer: ') + '<b>' + (correct + 1) + '</b> · ' + explain;
-        document.getElementById('battleExplain').classList.add('show');
-      }
-      // Bot 可能已经抢答加分了
-      setTimeout(showNextButton, 400);
+      document.getElementById('battleActions').innerHTML = '';
+      maybeAdvance();   // bot 定时器照常跑完，不因玩家超时被取消
     }
 
     function showNextButton() {
       var isLast = B.idx >= B.questions.length - 1;
-      var html = '<button class="btn" id="battleNext">' + (isLast ? T('battle.see_result','See Result') : T('battle.next','Next →')) + '</button>';
-      document.getElementById('battleActions').innerHTML = html;
+      var label = isLast ? T('battle.see_result','See Result') : T('battle.next','Next →');
+      document.getElementById('battleActions').innerHTML =
+        '<button class="btn" id="battleNext">' + label + '</button>';
       document.getElementById('battleNext').addEventListener('click', function() {
+        if (isLast) { submitResult(); return; }
         B.idx++;
         updateScores();
         nextQuestion();
       });
     }
 
-    function finishBattle() {
+    /* 2026-11-04 P0-2：结算走服务端。旧实现只 innerHTML 换一张卡，
+       rating / wins / coins / 任务全部零写入（D1 里 136/140 人恒 1000）。 */
+    function submitResult() {
+      if (B.submitting) return;
+      B.submitting = true;
       clearInterval(B.timer);
       if (B.botThinkTimer) { clearTimeout(B.botThinkTimer); B.botThinkTimer = null; }
-      document.getElementById('battleBotThinking').style.display = 'none';
-      var outcome, title;
-      if (B.youScore > B.botScore) { outcome = 'win'; title = T('battle.you_win','🎉 You win!'); }
-      else if (B.youScore < B.botScore) { outcome = 'lose'; title = T('battle.you_lose','😔 You lose. Try again!'); }
-      else { outcome = 'draw'; title = T('battle.draw','🤝 Draw!'); }
-      var youVal = B.youScore;
-      var botVal = B.botScore;
-      var total = B.questions.length;
+      var answers = [];
+      for (var i = 0; i < B.questions.length; i++) {
+        var a = B.answers[i];
+        answers.push(a ? { option: a.option, ms: a.ms } : { option: -1, ms: PER_QUESTION_MS });
+      }
+      if (B.practiceMode) { renderResult(localPracticeResult(answers)); return; }
       var card = document.getElementById('battleCard');
-      card.innerHTML =
+      card.innerHTML = '<div class="battle-result"><h2>' + T('duel.settling','Settling…') + '</h2>' +
+        '<p>' + T('duel.settling_sub','Saving your rating, coins and quest progress.') + '</p></div>';
+      mdApi('POST', '/api/md/duel/result', { duelId: B.duelId, answers: answers })
+        .then(function (r) { renderResult(r); })
+        .catch(function (e) {
+          B.submitting = false;
+          card.innerHTML = '<div class="battle-result"><h2>😕 ' + T('duel.settle_failed','Could not save this duel') + '</h2>' +
+            '<p>' + escHtml(e && e.message) + '</p><div class="battle-actions">' +
+            '<button class="btn" id="battleRetry">' + T('duel.retry','Retry') + '</button>' +
+            '<button class="btn ghost" onclick="location.reload()">🔁 ' + T('train.battle_retry','Play again') + '</button>' +
+            '</div></div>';
+          var rb = document.getElementById('battleRetry');
+          if (rb) rb.addEventListener('click', submitResult);
+        });
+    }
+
+    /* 练习模式（服务端 /duel/start 不可用时的降级）：本地按同一公式算分，
+       但明确不计战绩、不发币。数值口径与服务端 duel-tiers.js 保持一致。 */
+    function localPracticeResult(answers) {
+      var you = 0, bot = 0, per = [];
+      for (var i = 0; i < B.questions.length; i++) {
+        var q = B.questions[i], a = answers[i];
+        var correct = a.option === q.ans;
+        var gained = correct ? 10 + Math.round(5 * Math.max(0, Math.min(1, 1 - a.ms / PER_QUESTION_MS))) : 0;
+        var p = B.botPlan[i] || { gained: 0, option: -1 };
+        you += gained; bot += Number(p.gained) || 0;
+        per.push({ round: i, yourOption: a.option, correctOption: q.ans, correct: correct,
+          botOption: p.option, botCorrect: p.option === q.ans, yourGained: gained,
+          botGained: Number(p.gained) || 0 });
+      }
+      return { youScore: you, botScore: bot,
+        outcome: you > bot ? 'win' : (you < bot ? 'lose' : 'draw'),
+        practice: true, perQuestion: per, rating: null, ratingDelta: 0, coinsEarned: 0 };
+    }
+
+    function renderResult(r) {
+      var outcome = r.outcome || 'draw';
+      var title = outcome === 'win' ? T('battle.you_win','🎉 You win!') :
+                  outcome === 'lose' ? T('battle.you_lose','😔 You lose. Try again!') :
+                  T('battle.draw','🤝 Draw!');
+      var chips = '';
+      if (r.practice) {
+        chips = '<span class="res-chip">' + T('duel.practice_note','Practice mode · no rank or coins') + '</span>';
+      } else {
+        chips += '<span class="res-chip">' + T('duel.rating','Rating') + ' ' +
+          (r.rating != null ? r.rating : '—') +
+          (r.ratingDelta ? ' (' + (r.ratingDelta > 0 ? '+' : '') + r.ratingDelta + ')' : '') + '</span>';
+        if (r.tier) chips += '<span class="res-chip">' + escHtml(String(r.tier)) + '</span>';
+        if (r.coinsEarned) chips += '<span class="res-chip">+' + r.coinsEarned + ' ' + T('duel.coins','coins') + '</span>';
+      }
+      var review = '<details class="res-review"><summary>' + T('duel.review','Review all questions') + '</summary><ul>' +
+        (r.perQuestion || []).map(function (p) {
+          return '<li>#' + (p.round + 1) + ' · ' +
+            (p.correct ? '✅ ' + T('duel.correct','Correct') : '❌ ' + T('duel.wrong','Wrong')) +
+            ' · ' + T('duel.your_score','You') + ' +' + p.yourGained +
+            ' / ' + T('duel.bot_score','AI') + ' +' + p.botGained + '</li>';
+        }).join('') + '</ul></details>';
+      var youVal = r.youScore, botVal = r.botScore;
+      document.getElementById('battleCard').innerHTML =
         '<div class="battle-result ' + outcome + '">' +
           '<h2>' + title + '</h2>' +
-          '<div class="battle-scores">' +
-            '<div class="score-card you"><div class="score-name">' + T('train.you_label','You') + '</div><div class="score-val">' + youVal + '</div></div>' +
-            '<div class="vs-badge">VS</div>' +
-            '<div class="score-card bot"><div class="score-name">' + document.getElementById('battleBotName').textContent + '</div><div class="score-val">' + botVal + '</div></div>' +
-          '</div>' +
           '<div class="score-big">' + youVal + ' : ' + botVal + '</div>' +
-          '<p style="color:#6b7280;margin-top:8px">' + T('train.total_questions','Total {n} questions · You got {y} right').replace('{n}', total).replace('{y}', youVal) + '</p>' +
+          '<p>' + T('duel.score_note','Correct = 10 pts, plus up to 5 for answer speed.') + '</p>' +
+          '<div class="res-meta">' + chips + '</div>' +
+          review +
           '<div class="battle-actions">' +
             '<button class="btn" onclick="location.reload()">🔁 ' + T('train.battle_retry','Play again') + '</button>' +
             '<button class="btn ghost" onclick="location.href=\'/\'">← ' + T('battle.back_lobby','Back to Lobby') + '</button>' +
@@ -692,40 +767,77 @@
         '</div>';
     }
 
+    /* 2026-11-04：主推 AI 局改为服务端签发。一次 /duel/start 拿到 10 题 +
+       bot 节奏，替代旧的 13 次 /quiz/bundle 预取（约 −150KB / −12 次限流）。 */
     function startAiBattle(category) {
-      // Fast single-category load (avoid waiting for 12×2000 serial ensureLoaded)
+      mdApi('POST', '/api/md/duel/start', {
+        category: category, difficulty: AI_DIFF, lang: getLang(),
+      }).then(function (d) {
+        if (!d || !d.duelId || !d.questions || d.questions.length < TOTAL_ROUNDS) {
+          throw new Error('bad start payload');
+        }
+        var lang = getLang();
+        var questions = d.questions.map(function (q) {
+          return {
+            q: q.q, options: q.options, _qid: q.qid, _rawLang: lang,
+            diff: ({ easy: 1, medium: 2, hard: 3 })[q.difficulty] || 2,
+            ans: -1, ex: null, explain: '',
+          };
+        });
+        startBattle({
+          questions: questions, bot: d.bot, duelId: d.duelId, practice: false,
+          hintMax: (d.hint && d.hint.maxPerDuel) || 2,
+          hintCost: (d.hint && d.hint.cost) || 20,
+        });
+      }).catch(function (err) {
+        /* 降级路径：后端不可用绝不白屏，改成明确的「练习模式 · 不计战绩」。 */
+        console.warn('[MD duel] 服务端开局失败，降级练习模式：', err && err.message);
+        startPracticeBattle(category);
+      });
+    }
+
+    function startPracticeBattle(category) {
       var Q = window.MemoryDuelQuiz;
+      function build(pool) {
+        var tier = botTier();
+        var filtered = pool.filter(function (q) { return !q.diff || tier.diff.indexOf(q.diff) >= 0; });
+        if (filtered.length >= TOTAL_ROUNDS) pool = filtered;
+        pool = shuffleArr(pool.slice()).slice(0, TOTAL_ROUNDS);
+        var bot = pool.map(function (q) {
+          var n = (q.options || []).length || 4;
+          var correct = Math.random() < tier.acc;
+          var option = q.ans, wrong = [];
+          if (!correct) {
+            for (var i = 0; i < n; i++) if (i !== q.ans) wrong.push(i);
+            option = wrong.length ? wrong[Math.floor(Math.random() * wrong.length)] : q.ans;
+          }
+          var thinkMs = Math.round(tier.min + Math.random() * (tier.max - tier.min));
+          var gained = correct ? 10 + Math.round(5 * Math.max(0, 1 - thinkMs / PER_QUESTION_MS)) : 0;
+          return { thinkMs: thinkMs, option: option, gained: gained };
+        });
+        startBattle({ questions: pool, bot: bot, practice: true });
+      }
       if (!Q || !Q.fetchBundle) {
-        // quiz-data.js still loading: wait for memoryduel-quiz-ready
         window.addEventListener('memoryduel-quiz-ready', function once() {
-          startAiBattle(category);
+          startPracticeBattle(category);
         }, { once: true });
         return;
       }
-      // Sync quiz lang to ?lang / i18n before any fetch (do not use static html lang —
-      // markup defaults to en and would clobber a stored zh preference).
-      try {
-        var want = params.get('lang')
-          || ((window.i18n && window.i18n.getLang) ? window.i18n.getLang() : null);
-        if (want && Q.setLang) Q.setLang(want);
-      } catch (e) {}
-      // 1) Already loaded for current lang? Use cache (skip wrongly-langued cache via _rawLang)
-      var pool = (Q.byCategory && Q.byCategory(category)) || [];
+      try { if (Q.setLang) Q.setLang(getLang()); } catch (e) {}
       var curLang = (Q.getLang && Q.getLang()) || 'en';
-      pool = pool.filter(function (q) { return !q._rawLang || q._rawLang === curLang; });
-      if (pool.length > 0) { startBattle(pool); return; }
-      // 2) Fast-path: fetch only this category (count=60, ~0.4s)
-      Q.fetchBundle(category, 1).then(function(arr) {
-        // Push to QUESTIONS so byCategory works on retry
-        if (arr && arr.length > 0) {
+      var pool = ((Q.byCategory && Q.byCategory(category)) || [])
+        .filter(function (q) { return !q._rawLang || q._rawLang === curLang; });
+      if (pool.length >= TOTAL_ROUNDS) { build(pool); return; }
+      Q.fetchBundle(category, 1).then(function (arr) {
+        if (arr && arr.length && Q.QUESTIONS) {
           for (var i = 0; i < arr.length; i++) Q.QUESTIONS.push(arr[i]);
         }
-        var pool2 = (Q.byCategory && Q.byCategory(category)) || [];
-        pool2 = pool2.filter(function (q) { return !q._rawLang || q._rawLang === curLang; });
-        if (pool2.length > 0) startBattle(pool2);
+        var p2 = ((Q.byCategory && Q.byCategory(category)) || [])
+          .filter(function (q) { return !q._rawLang || q._rawLang === curLang; });
+        if (p2.length) build(p2);
         else showError('"' + category + '" ' + T('battle.quiz_empty_inline','Quiz bank is empty. Please choose another category.'));
-      }).catch(function(err) {
-        console.error('[MD fetchBundle catch]', err);
+      }).catch(function (e) {
+        console.error('[MD fetchBundle catch]', e);
         showError(T('battle.load_failed','Failed to load quiz data. Please refresh and try again.'));
       });
     }

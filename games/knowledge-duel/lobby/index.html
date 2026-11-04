@@ -3,7 +3,7 @@
 <head>
 <!-- md-theme:early（防 FOUC；与首页同源：md-theme2 + 跟随系统） -->
 <script>(function(){try{var t=localStorage.getItem('md-theme2');if(t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();</script>
-<script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:68,fallback:"en"};</script>
+<script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:69,fallback:"en"};</script>
 <script src="/i18n/i18n.js?v=59"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -95,6 +95,23 @@
     <div class="kb-catgrid" id="catGrid" role="radiogroup" aria-label="Category"></div>
   </section>
 
+  <!-- ═══════════ 难度选择（2026-11-04：三档数值早在代码里，但一直没 UI 入口） ═══════════ -->
+  <section class="kb-panel" aria-labelledby="diffTitle">
+    <h2 class="kb-sec-h" id="diffTitle"><span data-i18n="dl.diff_h2">Choose your AI difficulty</span><small data-i18n="dl.diff_h2_small">Harder rivals earn more rating.</small></h2>
+    <div class="kb-diff" id="kbDiff" role="radiogroup" aria-label="AI difficulty">
+      <button type="button" class="kb-diff-btn" data-diff="easy" role="radio" aria-checked="false">
+        <b data-i18n="dl.diff_easy">Easy</b><small data-i18n="dl.diff_easy_d">Slower rival · +8 rating on a win</small>
+      </button>
+      <button type="button" class="kb-diff-btn on" data-diff="normal" role="radio" aria-checked="true">
+        <b data-i18n="dl.diff_normal">Normal</b><small data-i18n="dl.diff_normal_d">Balanced rival · +15 rating</small>
+      </button>
+      <button type="button" class="kb-diff-btn" data-diff="hard" role="radio" aria-checked="false">
+        <b data-i18n="dl.diff_hard">Hard</b><small data-i18n="dl.diff_hard_d">Fast and sharp · +25 rating</small>
+      </button>
+    </div>
+    <p class="kb-diff-note" data-i18n="dl.diff_note">Difficulty applies to vs AI duels. Online rooms always use the normal rival.</p>
+  </section>
+
   <!-- ═══════════ 模式（vs AI 主推 + 建房 + 加房；在线匹配已由英雄区一键覆盖） ═══════════
        🔴 诚信铁律：四个模式全部真实可用（端点逐条核实，见 knowledge-lobby.ts）。 -->
   <section class="kb-panel" aria-labelledby="modesTitle">
@@ -107,7 +124,7 @@
         <div class="mi" aria-hidden="true">🤖</div>
         <div>
           <div class="mt" data-i18n="home_v2.tab_ai">vs AI</div>
-          <div class="md">The AI answers in 2–9 seconds and gets about 62% right. Always ready — no waiting for anyone.</div>
+          <div class="md" data-i18n="dl.md_ai">Ten questions, 15s each. A correct answer is 10 points plus up to 5 for speed. Pick a difficulty above — harder rivals earn more rating.</div>
           <span class="kb-tag is-gold" data-i18n="dl.tag_main">Main event</span>
         </div>
       </a>
@@ -142,10 +159,10 @@
     </div>
   </section>
 
-  <!-- ═══════════ 规则（只讲真实规则，绝不复用速度奖励口径） ═══════════ -->
+  <!-- ═══════════ 规则（2026-11-04：AI 局与在线局已统一为同一套速度计分公式） ═══════════ -->
   <aside class="kb-panel">
     <h3 id="rulesTitle" data-i18n="dl.side_rules_title" style="font-family:var(--disp);font-weight:700;font-size:17px;margin:0 0 4px">How duels are scored</h3>
-    <p class="pnote" data-i18n="dl.side_rules_note">Every fact below is enforced by the server, not by your browser.</p>
+    <p class="pnote" data-i18n="dl.side_rules_note">Questions, answers, scoring and results are all settled by the server, not your browser.</p>
     <div class="kb-rules" id="kbRules"></div>
   </aside>
 

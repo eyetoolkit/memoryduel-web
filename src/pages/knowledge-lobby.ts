@@ -17,12 +17,13 @@
  *     创建房间 → POST /api/md/room/create      → /train.html?room=CODE
  *     加入房间 → 校验 6 位码                    → /train.html?room=CODE
  *
- * 🔴 诚信铁律（本页最重要的约束）：
- *   知识对决（train.html）**答对即 +1 分，没有速度加成**。
- *   六款异步对战（duel-sequence.ts）才有「按耗时给速度奖励」的口径。
- *   两者计分规则不同 —— 侧栏只讲本游戏真实的规则，
- *   绝不复用 dl.rule_speed（"Faster answers earn a speed bonus"），
- *   否则等于向玩家承诺一个不存在的奖励。
+ * 🔴 诚信铁律（2026-11-04 修订，系统修复后）：
+ *   AI 局与在线房间已统一到**服务端唯一计分公式**
+ *   `correct ? 10 + round(5 × speed) : 0`（speed ∈ [0,1]，15s 窗口）。
+ *   题目、答案、bot 作答、判分、结算全在 /api/md/duel/* 与 room.js，
+ *   客户端不再持有正确答案，也不再自行判分。
+ *   侧栏必须讲这套真实规则，不得再写「1 分/答对」或「~62% right」——
+ *   旧文案对应的两套互斥口径已经下线。
  *
  * 本页不跑任何游戏逻辑，也不自行建房开局：建房/匹配只拿 code，
  * 真正的入局与错误态由 train.html 自己的引擎负责。
@@ -86,6 +87,19 @@ function setStatus(msg: string, show: boolean): void {
   s.textContent = msg;
 }
 
+/** 动态节点的译文（kbRules 内部用 innerHTML 生成，不能挂 data-i18n）。 */
+function tr(key: string, fallback: string): string {
+  try {
+    const g = window as unknown as {
+      __t?: (k: string, f?: string) => string;
+      t?: (k: string, f?: string) => string;
+    };
+    if (g.__t) return g.__t(key, fallback);
+    if (g.t) return g.t(key, fallback);
+  } catch (_) { /* ignore */ }
+  return fallback;
+}
+
 /* ─── 会话：pid/token 由服务端签发，客户端不自造（F-010） ─── */
 
 interface Sess { pid: string; token: string }
@@ -130,6 +144,51 @@ function mdName(): string {
    两套 class 同时给：.cat/.ci/.cn/.cq 是设计稿皮肤，.cat-card/.selected 是 JS 契约。 */
 
 let selectedCat = '';
+
+/* 2026-11-04：三档难度终于有 UI 入口。此前全站只有 train.html 读
+   ?difficulty= / sessionStorage['md-ai-diff']，没有任何按钮写入，
+   所有真实玩家恒定落在 normal。 */
+const DIFFS = ['easy', 'normal', 'hard'] as const;
+let selectedDiff: string = 'normal';
+
+function aiHref(): string {
+  return `/train.html?mode=ai&cat=${encodeURIComponent(selectedCat || 'general')}` +
+    `&difficulty=${encodeURIComponent(selectedDiff)}&lang=${curLang()}`;
+}
+
+function syncAiHref(): void {
+  const ai = el<HTMLAnchorElement>('kbAiBtn');
+  if (ai) ai.setAttribute('href', aiHref());
+}
+
+function selectDiff(d: string): void {
+  if (DIFFS.indexOf(d as typeof DIFFS[number]) < 0) return;
+  selectedDiff = d;
+  try { sessionStorage.setItem('md-ai-diff', d); } catch (_) { /* ignore */ }
+  const grid = el<HTMLDivElement>('kbDiff');
+  if (grid) grid.querySelectorAll<HTMLElement>('.kb-diff-btn').forEach((b) => {
+    const on = b.dataset.diff === d;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-checked', on ? 'true' : 'false');
+  });
+  syncAiHref();
+}
+
+function initDiff(): void {
+  let d = 'normal';
+  try {
+    d = String(new URLSearchParams(location.search).get('difficulty')
+      || sessionStorage.getItem('md-ai-diff') || 'normal');
+  } catch (_) { d = 'normal'; }
+  selectedDiff = DIFFS.indexOf(d as typeof DIFFS[number]) >= 0 ? d : 'normal';
+  const grid = el<HTMLDivElement>('kbDiff');
+  if (grid) grid.querySelectorAll<HTMLElement>('.kb-diff-btn').forEach((b) => {
+    const on = b.dataset.diff === selectedDiff;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-checked', on ? 'true' : 'false');
+  });
+  syncAiHref();
+}
 
 // 实时题量：服务端 /quiz/counts 返回的全分类真实总数。
 // null = 尚未拉取（首渲用静态 COUNTS 兜底）；{} = 拉过但无/失败（同样退回静态）。
@@ -215,11 +274,8 @@ function selectCat(card: HTMLElement): void {
   card.setAttribute('aria-checked', 'true');
   selectedCat = card.dataset.cat || '';
 
-  // vs AI 卡：href 随选中分类回填（无 JS 时也能落到默认分类开打）
-  const ai = el<HTMLAnchorElement>('kbAiBtn');
-  if (ai && selectedCat) {
-    ai.setAttribute('href', `/train.html?mode=ai&cat=${encodeURIComponent(selectedCat)}&lang=${curLang()}`);
-  }
+  // vs AI 卡：href 随选中分类 + 难度回填（无 JS 时也能落到默认分类开打）
+  syncAiHref();
   const note = el<HTMLElement>('kbSelNote');
   const nm = card.querySelector('.cn');
   if (note && nm) note.textContent = `${nm.textContent || selectedCat} · 10 questions · 15s each`;
@@ -241,11 +297,10 @@ function startMatch(): void {
       method: 'POST', headers: authHeaders(s),
       body: JSON.stringify({ category: selectedCat || 'general', name: mdName() }),
     })
-      .then((r) => r.json() as Promise<{ ok?: boolean; data?: { code?: string; matchId?: string } }>)
+      .then((r) => r.json() as Promise<{ ok?: boolean; data?: { code?: string; matchId?: string; ai?: boolean; aiName?: string | null } }>)
       .then((j) => {
         if (j.ok && j.data && j.data.code) {
-          setStatus('✅ Matched! Joining room…', true);
-          location.href = `/train.html?room=${encodeURIComponent(j.data.code)}&lang=${curLang()}`;
+          goToRoom(j.data.code, !!j.data.ai, j.data.aiName || '');
           return;
         }
         if (j.ok && j.data && j.data.matchId) {
@@ -275,11 +330,10 @@ function pollMatch(matchId: string, s: Sess, startedAt: number, attempt: number)
   fetch((W.API_BASE || '') + '/api/md/match/poll?matchId=' + encodeURIComponent(matchId), {
     headers: authHeaders(s),
   })
-    .then((r) => r.json() as Promise<{ ok?: boolean; data?: { code?: string } }>)
+    .then((r) => r.json() as Promise<{ ok?: boolean; data?: { code?: string; ai?: boolean; aiName?: string | null } }>)
     .then((j) => {
       if (j.ok && j.data && j.data.code) {
-        setStatus('✅ Matched!', true);
-        location.href = `/train.html?room=${encodeURIComponent(j.data.code)}&lang=${curLang()}`;
+        goToRoom(j.data.code, !!j.data.ai, j.data.aiName || '');
         return;
       }
       setStatus('⏳ Waiting for opponent…', true);
@@ -290,6 +344,21 @@ function pollMatch(matchId: string, s: Sess, startedAt: number, attempt: number)
       setStatus('❌ Connection error', true);
       if (btn) delete btn.dataset.busy;
     });
+}
+
+/* 2026-11-04 P1-1：服务端 /match/poll 在 8s 无人时返回 ai:true。
+   此前 pollMatch() 只判 j.data.code，把 AI 兜底当成真人配对报「Matched!」，
+   首页还写「水平相近的真人玩家」。现在必须明示，并给 1.4s 让玩家看到。 */
+function goToRoom(code: string, isAi: boolean, aiName: string): void {
+  const url = `/train.html?room=${encodeURIComponent(code)}&lang=${curLang()}` + (isAi ? '&ai=1' : '');
+  if (isAi) {
+    setStatus('🤖 ' + tr('dl.match_ai_fallback', 'No players online — an AI rival has been arranged.')
+      + (aiName ? ' (' + aiName + ')' : ''), true);
+    setTimeout(() => { location.href = url; }, 1400);
+    return;
+  }
+  setStatus('✅ ' + tr('dl.match_real', 'Matched with a real player! Joining room…'), true);
+  location.href = url;
 }
 
 /* ─── 建房 / 加房 ─── */
@@ -303,7 +372,9 @@ function createRoom(): void {
   getSession().then((s) =>
     fetch((W.API_BASE || '') + '/api/md/room/create', {
       method: 'POST', headers: authHeaders(s),
-      body: JSON.stringify({ mode: '1v1', rounds: 10, maxPlayers: 2 }),
+      /* 2026-11-04：补上 category。此前 createRoom() 不传，房间静默回落 general，
+         玩家在大厅选的分类白选。 */
+      body: JSON.stringify({ mode: '1v1', rounds: 10, maxPlayers: 2, category: selectedCat || 'general' }),
     })
       .then((r) => r.json() as Promise<{ ok?: boolean; data?: { code?: string } }>)
       .then((j) => {
@@ -344,11 +415,11 @@ function renderRules(): void {
   const host = el<HTMLDivElement>('kbRules');
   if (!host) return;
   const rows: Array<[string, string]> = [
-    ['🎯', '10 questions per duel'],
-    ['⏱️', '15 seconds per question'],
-    ['✅', 'One point per correct answer'],
-    ['🤖', 'vs AI: the bot answers in 2–9s and gets ~62% right'],
-    ['🌐', 'Online: the server scores both sides'],
+    ['🎯', tr('dl.rule_rounds', '10 questions per duel')],
+    ['⏱️', tr('dl.rule_time', '15 seconds per question')],
+    ['✅', tr('dl.rule_score', 'Correct = 10 pts, plus up to 5 for answer speed')],
+    ['🤖', tr('dl.rule_ai', 'vs AI: difficulty changes rival speed and accuracy')],
+    ['🌐', tr('dl.rule_online', 'Online: the server scores both sides')],
   ];
   host.innerHTML = rows
     .map(([ico, nm]) => `<div class="dc-side-row"><span class="ico">${esc(ico)}</span><span class="nm">${esc(nm)}</span></div>`)
@@ -358,6 +429,7 @@ function renderRules(): void {
 /* ─── 装配 ─── */
 
 function main(): void {
+  initDiff();
   renderRules();
 
   // 题库异步到位后重渲染（补题量）；quiz-data.js 是 defer，可能晚于本模块
@@ -378,6 +450,8 @@ function main(): void {
     const d = (e as CustomEvent<{ lang?: string }>).detail;
     loadLiveCounts(d && d.lang ? String(d.lang).split('-')[0].toLowerCase() : curLang());
     renderCategories();
+    renderRules();
+    syncAiHref();
   });
 
   const grid = el<HTMLDivElement>('catGrid');
@@ -388,6 +462,12 @@ function main(): void {
       selectCat(card);
     });
   }
+
+  const diffGrid = el<HTMLDivElement>('kbDiff');
+  if (diffGrid) diffGrid.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLElement>('.kb-diff-btn');
+    if (btn && btn.dataset.diff) selectDiff(btn.dataset.diff);
+  });
 
   el<HTMLButtonElement>('kbMatchBtn')?.addEventListener('click', startMatch);
   el<HTMLButtonElement>('kbCreateBtn')?.addEventListener('click', createRoom);
