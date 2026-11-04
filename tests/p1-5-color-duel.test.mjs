@@ -253,13 +253,15 @@ test('color 页面 SEO 头与另两款对齐（title/canonical/OG/hreflang）', 
     // 裸标签断言会随范式升级而误报，故改为断言「属性齐全 + 键名正确 + 英文兜底文案不变」。
     '<title data-i18n-title="colduel.title">Colour Recall Duel · MemoryDuel</title>',
     '<meta name="description" data-i18n="colduel.meta_desc"',
-    '<link rel="canonical" href="https://memoryduel.com/games/color-recall/" />',
-    'property="og:url" content="https://memoryduel.com/games/color-recall/"',
+    // 2026-11-04：全站 SEO 契约统一到 www（apex 已 301），域名断言同步更新。
+    '<link rel="canonical" href="https://www.memoryduel.com/games/color-recall/" />',
+    'property="og:url" content="https://www.memoryduel.com/games/color-recall/"',
     'name="twitter:card" content="summary_large_image"',
     'hreflang="x-default"',
   ]) {
     assert.ok(html.includes(needle), `color 页缺 ${needle}`);
   }
+  assert.ok(!html.includes('https://memoryduel.com/'), 'color 页仍残留 301 的 apex 域');
 });
 
 /* ═══════════════════════════════════════════════════════════════
@@ -407,4 +409,33 @@ test('房码不存在时给出明确提示而不是弹回入口页', () => {
     assert.ok(d.duel && typeof d.duel.room_not_found === 'string' && d.duel.room_not_found.trim(),
       `${lg} 缺 duel.room_not_found`);
   }
+});
+
+/* ═══ 2026-11-04：共享契约层守卫 ═══
+   /shared/consent.css 由 eyetoolkit/fe-shared 真相源同步，build-gate 的
+   sync:shared:check 会拦下站内直改（本轮真踩过一次红）。本站的 44px 触摸目标
+   与移动端单行横幅修正放在 /css/consent-md.css，必须加载在共享样式之后；
+   漏挂任一页就会静默退回「约 80px 横幅遮住对战页第四个选项」。 */
+test('所有引用共享 consent.css 的页面都挂了站点覆盖层且顺序正确', () => {
+  const walk = (dir) => fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
+    const p = path.join(dir, e.name);
+    if (e.isDirectory()) {
+      return ['.git', 'node_modules', 'dist'].includes(e.name) ? [] : walk(p);
+    }
+    return e.name.endsWith('.html') ? [p] : [];
+  });
+  let checked = 0;
+  for (const p of walk(ROOT)) {
+    const html = fs.readFileSync(p, 'utf8');
+    if (!html.includes('/shared/consent.css')) continue;
+    checked++;
+    const rel = path.relative(ROOT, p);
+    assert.ok(html.includes('/css/consent-md.css'), `${rel} 漏挂 consent-md.css`);
+    assert.ok(html.indexOf('/shared/consent.css') < html.indexOf('/css/consent-md.css'),
+      `${rel} 覆盖层必须排在共享样式之后才生效`);
+  }
+  assert.ok(checked >= 30, `只扫到 ${checked} 页，扫描范围可能漏了`);
+  const overlay = fs.readFileSync(path.join(ROOT, 'public/css/consent-md.css'), 'utf8');
+  assert.ok(/min-height:\s*44px/.test(overlay), '覆盖层丢了 44px 触摸目标');
+  assert.ok(/-webkit-line-clamp:\s*1/.test(overlay), '覆盖层丢了单行文案（横幅会回到 80px）');
 });
