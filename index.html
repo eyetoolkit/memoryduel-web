@@ -3,23 +3,23 @@
 <head>
 <!-- md-theme:early -->
 <script>(function(){try{var t=localStorage.getItem('md-theme2');if(t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();</script>
-<script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:66,fallback:"en"};</script>
+<script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:67,fallback:"en"};</script>
 <script src="/i18n/i18n.js?v=59"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#FAF6F1">
-<title>MemoryDuel — Knowledge Battle, 5 minutes at a time</title>
+<meta name="theme-color" content="#0A0E1E">
+<title>MemoryDuel — Answer first. Win the duel.</title>
 <meta name="description" content="1v1 knowledge duel across science, history, geography, sports, movies and more. Ten questions, 15 seconds each, answer first to score. No login, no install, no ads.">
 <meta name="keywords" content="knowledge battle,trivia,quiz duel,1v1,ai sparring,online quiz,multiplayer trivia">
 <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="MemoryDuel">
-<meta property="og:title" content="MemoryDuel — Knowledge Battle, 5 minutes at a time">
+<meta property="og:title" content="MemoryDuel — Answer first. Win the duel.">
 <meta property="og:description" content="Ten questions, 15 seconds each. Answer first to score. Play AI or a real opponent, no login required.">
 <meta property="og:url" content="https://memoryduel.com/">
 <meta property="og:image" content="https://memoryduel.com/og-default.jpg">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="MemoryDuel — Knowledge Battle, 5 minutes at a time">
+<meta name="twitter:title" content="MemoryDuel — Answer first. Win the duel.">
 <meta name="twitter:description" content="Ten questions, 15 seconds each. Answer first to score. No login, no install.">
 <meta name="twitter:image" content="https://memoryduel.com/og-default.jpg">
 <link rel="canonical" href="https://memoryduel.com/">
@@ -38,344 +38,208 @@
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
   }
 </script>
-<!-- 重设计皮肤真源：src/styles/home.css（原 home-papergames.css 保留作回滚） -->
+<!-- 基础品牌 token（--orange / --disp / --ui / --mono / 暗色层）仍由 home.css 提供：
+     knowledge-lobby.css 等页面依赖它，且 p1-4-share-card.test.mjs 守卫 --orange 定义。 -->
 <link rel="stylesheet" href="/src/styles/home.css">
-<!-- 🔴 2026-10-14 E1：首屏关键字体预加载，避免 FOUT 与文字跳动。
-     只预加载首屏真实用到的 3 个（h1 用 Space Grotesk 700，正文用 Inter 400/700）；
-     JetBrains Mono 只用于计时器/排名数字，非首屏关键路径，不预加载。
-     ⚠️ crossorigin 必须带 —— woff2 是跨域字体请求，缺了会二次下载反而更慢。 -->
+<!-- 竞技场首页皮肤（body.home-arena 作用域，不影响其它页面） -->
+<link rel="stylesheet" href="/src/styles/home-arena.css">
+<!-- 首屏真正用到的字体：Space Grotesk 700（h1）+ Sora 可变（正文）。
+     🔴 旧版预加载 Inter 400/700 但 home.css 正文用 Sora，约 47KB 白下载（已移除）。 -->
 <link rel="preload" href="/fonts/space-grotesk-latin-700.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/inter-latin-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/inter-latin-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/sora-latin.woff2" as="font" type="font/woff2" crossorigin>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Memory Duel">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
-<link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)" href="/splash-1170x2532.png">
-<link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)" href="/splash-1290x2796.png">
-<link rel="apple-touch-startup-image" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)" href="/splash-1284x2778.png">
-<link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" href="/splash-750x1334.png">
 <script src="/js/sw-register.js" defer></script>
-<!-- analytics-bootstrap (Phase0) -->
 <link rel="stylesheet" href="/shared/consent.css?v=ph0-1">
 <script>window.__GA4_ID__="G-2YY4FC8G44";</script>
 <script src="/shared/analytics.js?v=ph0-1" defer></script>
 </head>
 
-<!-- 🔴 2026-10-14 无障碍整改 A2：skip-link 必须是 body 下第一个可聚焦元素 -->
+<body class="home-arena">
+<!-- A2：skip-link 必须是 body 下第一个可聚焦元素 -->
 <a class="skip-link" href="#main">Skip to main content</a>
 
-<!-- ═══════════ 顶栏导航（重设计：顶栏替代旧侧栏 chrome） ═══════════ -->
-<nav class="nav" aria-label="Main"><div class="nav-in">
-  <a class="logo" href="/"><span class="mk"></span>MemoryDuel</a>
-  <div class="nav-links">
-    <a href="#lobby" data-i18n="home_v2.nav_play">Play</a><a href="#how" data-i18n="home_v2.nav_how">How to play</a><a href="#features" data-i18n="home_v2.features_nav">Features</a><a href="#globalTop" data-i18n="home_v2.nav_leaderboard">Leaderboard</a>
+<!-- ═══════ 顶栏（保留 .nav / #navBurger / #navDrawer / .nav-drawer-in 契约） ═══════ -->
+<nav class="nav ar-nav" aria-label="Main"><div class="nav-in ar-nav-in">
+  <a class="logo ar-logo" href="/"><span class="mk"></span>MemoryDuel</a>
+  <div class="nav-links ar-links">
+    <a href="#play" data-i18n="home_v2.nav_play">Play</a>
+    <a href="#how" data-i18n="home_v2.nav_how">How to play</a>
+    <a href="#modes" data-i18n="home_v2.features_nav">Features</a>
+    <a href="#globalTop" data-i18n="home_v2.nav_leaderboard">Leaderboard</a>
   </div>
   <span class="spacer"></span><div id="lang-switcher"></div>
-  <a class="btn btn-ghost" href="/membership/" data-i18n="home_v2.sign_in">Sign in</a>
-  <!-- 🔴 2026-10-14 C1 修复：639px 以下 .nav-links 隐藏，此前 4 个导航锚点完全失联。
-       桌面端 display:none，只有移动断点才显示。aria-expanded 由 src/pages/home.ts 的 bindNav() 维护。 -->
-  <button class="nav-burger" id="navBurger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navDrawer">
+  <a class="btn btn-ghost ar-signin" href="/membership/" data-i18n="home_v2.sign_in">Sign in</a>
+  <button class="nav-burger ar-burger" id="navBurger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navDrawer">
     <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
   </button>
 </div></nav>
-
-<!-- 🔴 2026-10-14 C1：移动端导航抽屉。挂 body.nav-open，桌面端不渲染。 -->
-<div class="nav-drawer" id="navDrawer" hidden>
+<div class="nav-drawer ar-drawer" id="navDrawer" hidden>
   <div class="nav-drawer-in">
-    <a href="#lobby" data-i18n="home_v2.nav_play">Play</a>
+    <a href="#play" data-i18n="home_v2.nav_play">Play</a>
     <a href="#how" data-i18n="home_v2.nav_how">How to play</a>
-    <a href="#features" data-i18n="home_v2.features_nav">Features</a>
+    <a href="#modes" data-i18n="home_v2.features_nav">Features</a>
     <a href="#globalTop" data-i18n="home_v2.nav_leaderboard">Leaderboard</a>
     <a href="/membership/" data-i18n="home_v2.sign_in">Sign in</a>
   </div>
 </div>
 
-<!-- ═══════════ 游戏图标 sprite（2026-10-29）：8 枚手绘 SVG · viewBox 48×48 ═══════════
-     设计语言：tile 盘面母题 · 实心=闪现过的内容 · 虚线=消失待回忆（呼应数独语法）。
-     内部颜色走 --i-* 变量（定义见 home.css :root / html[data-theme=dark]），跟随亮暗主题。
-     内联 sprite = 零额外请求，8 枚共约 4KB。 -->
-<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
-  <defs>
-    <!-- 知识对决：两张答题卡对峙，前卡亮绿勾 -->
-    <symbol id="ig-knowledge" viewBox="0 0 48 48">
-      <rect x="7" y="9" width="21" height="28" rx="4" style="fill:var(--i-card);stroke:var(--i-mut);stroke-width:2"/>
-      <g style="stroke:var(--i-line);stroke-width:2.6;stroke-linecap:round">
-        <path d="M12.5 18h9M12.5 24h6M12.5 30h8"/>
-      </g>
-      <rect x="20" y="13" width="21" height="28" rx="4" style="fill:var(--i-card);stroke:var(--i-ink);stroke-width:2"/>
-      <circle cx="30.5" cy="21.5" r="4.6" style="fill:#22C55E"/>
-      <path d="M28.4 21.6l1.5 1.5 2.7-3.1" fill="none" style="stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"/>
-      <rect x="25" y="29.5" width="11" height="3.2" rx="1.6" style="fill:#4F46E5"/>
-      <rect x="25" y="35" width="7.5" height="3.2" rx="1.6" style="fill:var(--i-line)"/>
-    </symbol>
-    <!-- 每日挑战：日历 · 3 实格 2 虚格（3 of 5） -->
-    <symbol id="ig-daily" viewBox="0 0 48 48">
-      <rect x="9" y="11" width="30" height="28" rx="4" style="fill:var(--i-card);stroke:var(--i-ink);stroke-width:2"/>
-      <g style="stroke:var(--i-ink);stroke-width:2.4;stroke-linecap:round">
-        <path d="M17 7.5v6M31 7.5v6"/>
-      </g>
-      <path d="M9.8 19h28.4" style="stroke:var(--i-line);stroke-width:1.8"/>
-      <g style="fill:#4F46E5">
-        <rect x="14.2" y="23" width="6.4" height="6.4" rx="1.8"/>
-        <rect x="22.3" y="23" width="6.4" height="6.4" rx="1.8"/>
-        <rect x="30.4" y="23" width="6.4" height="6.4" rx="1.8"/>
-      </g>
-      <g style="fill:none;stroke:var(--i-mut);stroke-width:1.7;stroke-dasharray:2.6 2.4" stroke-linecap="round">
-        <rect x="14.2" y="31.2" width="6.4" height="6.4" rx="1.8"/>
-        <rect x="22.3" y="31.2" width="6.4" height="6.4" rx="1.8"/>
-      </g>
-    </symbol>
-    <!-- 序列记忆：3×3 盘面 · 一条 1→2→3 递亮路径 -->
-    <symbol id="ig-sequence" viewBox="0 0 48 48">
-      <g style="fill:none;stroke:var(--i-line);stroke-width:1.8">
-        <rect x="10" y="10" width="9" height="9" rx="2.5"/>
-        <rect x="31" y="10" width="9" height="9" rx="2.5"/>
-        <rect x="10" y="20.5" width="9" height="9" rx="2.5"/>
-        <rect x="31" y="20.5" width="9" height="9" rx="2.5"/>
-        <rect x="10" y="31" width="9" height="9" rx="2.5"/>
-        <rect x="20.5" y="31" width="9" height="9" rx="2.5"/>
-        <rect x="31" y="31" width="9" height="9" rx="2.5"/>
-      </g>
-      <g style="fill:#4F46E5">
-        <rect x="10" y="10" width="9" height="9" rx="2.5"/>
-        <rect x="20.5" y="10" width="9" height="9" rx="2.5"/>
-        <rect x="20.5" y="20.5" width="9" height="9" rx="2.5"/>
-      </g>
-      <g font-size="6.6" font-weight="700" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central" font-family="var(--mono)">
-        <text x="14.5" y="14.8">1</text>
-        <text x="25" y="14.8">2</text>
-        <text x="25" y="25.3">3</text>
-      </g>
-    </symbol>
-    <!-- 数字回忆：7 · 4 · ▢（第三位虚线待回忆） -->
-    <symbol id="ig-number" viewBox="0 0 48 48">
-      <rect x="6.5" y="15" width="12" height="18" rx="3.5" style="fill:#4F46E5"/>
-      <rect x="18.5" y="15" width="12" height="18" rx="3.5" style="fill:#4F46E5"/>
-      <rect x="30.5" y="15" width="12" height="18" rx="3.5" style="fill:none;stroke:var(--i-mut);stroke-width:2;stroke-dasharray:3.2 2.8" stroke-linecap="round"/>
-      <g font-size="11" font-weight="700" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central" font-family="var(--mono)">
-        <text x="12.5" y="24.4">7</text>
-        <text x="24.5" y="24.4">4</text>
-      </g>
-      <g style="fill:var(--i-line)">
-        <circle cx="14" cy="39" r="1.8"/><circle cx="24" cy="39" r="1.8"/>
-      </g>
-      <circle cx="34" cy="39" r="1.8" style="fill:none;stroke:var(--i-mut);stroke-width:1.5"/>
-    </symbol>
-    <!-- 颜色回忆：色盘 · 三实一虚 -->
-    <symbol id="ig-colour" viewBox="0 0 48 48">
-      <circle cx="9.5" cy="24" r="4.6" style="fill:#4F46E5"/>
-      <circle cx="19" cy="24" r="4.6" style="fill:#22C55E"/>
-      <circle cx="28.5" cy="24" r="4.6" style="fill:#F59E0B"/>
-      <circle cx="38" cy="24" r="4.6" style="fill:none;stroke:var(--i-mut);stroke-width:1.9;stroke-dasharray:2.8 2.6"/>
-    </symbol>
-    <!-- 幽灵符号：四格中一格幽灵缺失 -->
-    <symbol id="ig-ghost" viewBox="0 0 48 48">
-      <rect x="6.5" y="19.5" width="9" height="9" rx="2.5" style="fill:var(--i-card);stroke:var(--i-ink);stroke-width:1.8"/>
-      <circle cx="11" cy="24" r="2" style="fill:#4F46E5"/>
-      <rect x="16.5" y="19.5" width="9" height="9" rx="2.5" style="fill:var(--i-card);stroke:var(--i-ink);stroke-width:1.8"/>
-      <rect x="20.9" y="21.9" width="4.2" height="4.2" rx="1" style="fill:#F59E0B"/>
-      <rect x="26.5" y="19.5" width="9" height="9" rx="2.5" style="fill:none;stroke:var(--i-mut);stroke-width:1.8;stroke-dasharray:2.8 2.4"/>
-      <path d="M29.2 27.1c0-2.1 1.4-3.4 3-3.4s3 1.3 3 3.4v1.3c-.7-.5-1.2-.5-1.6 0-.4.5-.9.5-1.4 0-.5-.5-1-.5-1.4 0-.4.5-.9.5-1.6 0z" style="fill:var(--i-mut)"/>
-      <rect x="36.5" y="19.5" width="9" height="9" rx="2.5" style="fill:var(--i-card);stroke:var(--i-ink);stroke-width:1.8"/>
-      <path d="M38.9 24.9l4.2-1.6-1.6 4.2" fill="none" style="stroke:#22C55E;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"/>
-    </symbol>
-    <!-- 黑猩猩测试：4×4 盘面 · 散落 1/2/3 -->
-    <symbol id="ig-chimp" viewBox="0 0 48 48">
-      <g style="fill:none;stroke:var(--i-line);stroke-width:1.5">
-        <rect x="8.5" y="8.5" width="7" height="7" rx="2"/>
-        <rect x="24.5" y="8.5" width="7" height="7" rx="2"/>
-        <rect x="32.5" y="8.5" width="7" height="7" rx="2"/>
-        <rect x="8.5" y="16.5" width="7" height="7" rx="2"/>
-        <rect x="16.5" y="16.5" width="7" height="7" rx="2"/>
-        <rect x="32.5" y="16.5" width="7" height="7" rx="2"/>
-        <rect x="8.5" y="24.5" width="7" height="7" rx="2"/>
-        <rect x="16.5" y="24.5" width="7" height="7" rx="2"/>
-        <rect x="24.5" y="24.5" width="7" height="7" rx="2"/>
-        <rect x="8.5" y="32.5" width="7" height="7" rx="2"/>
-        <rect x="16.5" y="32.5" width="7" height="7" rx="2"/>
-        <rect x="24.5" y="32.5" width="7" height="7" rx="2"/>
-        <rect x="32.5" y="32.5" width="7" height="7" rx="2"/>
-      </g>
-      <g style="fill:#4F46E5">
-        <rect x="16.5" y="8.5" width="7" height="7" rx="2"/>
-        <rect x="24.5" y="16.5" width="7" height="7" rx="2"/>
-        <rect x="32.5" y="24.5" width="7" height="7" rx="2"/>
-      </g>
-      <g font-size="5.6" font-weight="700" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central" font-family="var(--mono)">
-        <text x="20" y="12.3">1</text>
-        <text x="28" y="20.3">2</text>
-        <text x="36" y="28.3">3</text>
-      </g>
-    </symbol>
-    <!-- 单词回忆：词条行 · seen 勾 / new 问号 -->
-    <symbol id="ig-word" viewBox="0 0 48 48">
-      <rect x="8" y="13.5" width="22" height="9.5" rx="4.7" style="fill:var(--i-card);stroke:var(--i-ink);stroke-width:2"/>
-      <path d="M12.5 18.2h9" style="stroke:var(--i-line);stroke-width:2.6;stroke-linecap:round"/>
-      <circle cx="37" cy="18.2" r="4.6" style="fill:#22C55E"/>
-      <path d="M35 18.3l1.5 1.5 2.6-3" fill="none" style="stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"/>
-      <rect x="8" y="27.5" width="22" height="9.5" rx="4.7" style="fill:var(--i-card);stroke:var(--i-ink);stroke-width:2"/>
-      <path d="M12.5 32.2h6.5" style="stroke:var(--i-line);stroke-width:2.6;stroke-linecap:round"/>
-      <circle cx="37" cy="32.2" r="4.6" style="fill:none;stroke:#F59E0B;stroke-width:2"/>
-      <text x="37" y="33.4" font-size="7.2" font-weight="700" fill="#F59E0B" text-anchor="middle" dominant-baseline="central" font-family="var(--mono)">?</text>
-    </symbol>
-  </defs>
-</svg>
-
-<!-- 🔴 2026-10-14 A2：正文包裹进 <main> 地标 -->
 <main id="main">
 
-<!-- ═══════════ Hero：左文案 + 右实战预览卡（首屏即产品） ═══════════ -->
-<section class="hero wrap">
-  <div>
-    <span class="badge" data-i18n="home_v2.badge">🧠 Knowledge Battle</span>
-    <h1 data-i18n-html="home_v2.hero_h1">Outsmart your opponents, <em>one question</em> at a time.</h1>
-    <p class="sub" data-i18n="home_v2.hero_sub">1v1 knowledge duel across science, history, geography and more. No login, no install — tap to play.</p>
-    <div class="cta-row">
-      <a class="btn btn-primary" href="/games/knowledge-duel/lobby/" data-i18n="home_v2.cta_start">Start a Knowledge Duel</a>
-      <a class="btn btn-ghost" href="#online" id="ctaOnline" data-i18n="home_v2.cta_online">Find an online match</a>
+<!-- ═══════ HERO · 竞技场（VS 对半分割 + 单主 CTA + 真实对战卡） ═══════ -->
+<section class="ar-hero" id="play">
+  <div class="ar-lights" aria-hidden="true"></div>
+  <div class="wrap ar-hero-grid">
+    <div class="ar-hero-copy">
+      <p class="ar-eyebrow"><span class="ar-pulse" aria-hidden="true"></span><span data-i18n="home_v3.eyebrow">Real-time 1v1 trivia / No sign-up</span></p>
+      <h1 data-i18n-html="home_v3.hero_h1">Answer first.<br><span class="ar-h1-you">You</span> <span class="ar-h1-vs">vs</span> <span class="ar-h1-rival">the world.</span></h1>
+      <p class="ar-lede" data-i18n="home_v3.hero_sub">Ten questions. Fifteen seconds each. Answer first to score — against an AI or a real player.</p>
+      <div class="ar-cta-stack">
+        <!-- id=startAiBtn 复用 home.mjs bindAiStart()：一键直达 /train.html?cat=general&mode=ai -->
+        <button class="btn ar-btn-gold" id="startAiBtn" type="button" data-i18n="home_v3.cta_main">Start a duel — it's free</button>
+        <a class="btn ar-btn-outline" href="/games/knowledge-duel/lobby/" data-i18n="home_v3.cta_friend">Play a friend with a room code</a>
+      </div>
+      <p class="ar-micro" data-i18n="home_v3.cta_micro">No login · No install · No ads</p>
+      <div class="ar-stats">
+        <div class="ar-stat-lead"><strong>46,000<span>+</span></strong><small data-i18n="home_v3.stat_questions">questions</small></div>
+        <div><strong>6</strong><small data-i18n="home_v3.stat_languages">languages</small></div>
+        <div><strong>15<span>s</span></strong><small data-i18n="home_v3.stat_perq">per question</small></div>
+      </div>
     </div>
-    <div class="chips">
-      <span data-i18n-html="home_v2.chip_questions">📚 <b>46,000+</b> questions</span><span data-i18n-html="home_v2.chip_languages">🌐 <b>6</b> languages</span><span data-i18n-html="home_v2.chip_perq">⏱ <b>15s</b> per question</span><span data-i18n-html="home_v2.chip_private">🔒 No ads · no tracking</span>
+
+    <!-- 真实产品界面：15s 倒计时 + 阵营记分 + 可点选项（JS: /js/home-arena.mjs） -->
+    <div class="ar-stage">
+      <div class="ar-stage-halo" aria-hidden="true"></div>
+      <div class="ar-duel" id="arDuel">
+        <div class="ar-duel-top">
+          <span class="ar-round" data-i18n="home_v3.duel_round">ROUND</span> <b id="arRoundNum">1</b> / 10
+          <span class="ar-clock"><span class="ar-clock-num" id="arClockNum">15s</span><span class="ar-clock-bar"><i id="arClockBar"></i></span></span>
+        </div>
+        <div class="ar-scoreline">
+          <div class="ar-side you">
+            <span class="ar-avatar">Y</span>
+            <span class="ar-who"><b data-i18n="home_v3.duel_you">You</b><small data-i18n="home_v3.duel_ready">Ready to play</small></span>
+            <b class="ar-pts">0</b>
+          </div>
+          <span class="ar-vs-badge">VS<i></i><i></i></span>
+          <div class="ar-side rival">
+            <b class="ar-pts">1</b>
+            <span class="ar-who"><b data-i18n="home_v3.duel_rival">Rival</b><small>Player4821</small></span>
+            <span class="ar-avatar">R</span>
+          </div>
+        </div>
+        <p class="ar-duel-q" data-i18n="home_v2.preview_q">Which planet is known as the Red Planet?</p>
+        <div class="ar-opts">
+          <button class="ar-opt" type="button"><i>A</i> Venus</button>
+          <button class="ar-opt correct" type="button"><i>B</i> Mars <span class="ar-tick">✓</span></button>
+          <button class="ar-opt" type="button"><i>C</i> Jupiter</button>
+          <button class="ar-opt" type="button"><i>D</i> Saturn</button>
+        </div>
+        <div class="ar-duel-foot"><span data-i18n="home_v3.duel_meta">Science · 15s each</span><span data-i18n="home_v3.duel_first">First correct answer scores</span></div>
+      </div>
+      <div class="ar-float ar-f1" aria-hidden="true">+1</div>
+      <div class="ar-float ar-f2" aria-hidden="true">0.8s</div>
     </div>
   </div>
-  <div class="preview" aria-hidden="true">
-    <div class="pv-top"><span class="pv-tag" data-i18n="home_v2.preview_vs_ai">vs AI</span><span class="timer">⏱ 09s<span class="bar"><i></i></span></span></div>
-    <div class="pv-q" data-i18n="home_v2.preview_q">Which planet is known as the Red Planet?</div>
-    <div class="pv-cat" data-i18n="home_v2.preview_cat">🔬 Science · 15s each</div>
-    <div class="pv-opts">
-      <div class="pv-opt">Venus</div><div class="pv-opt ok">Mars</div>
-      <div class="pv-opt">Jupiter</div><div class="pv-opt">Saturn</div>
-    </div>
-    <div class="pv-foot"><span class="you">You 1</span><span class="ai">AI 0</span></div>
+  <div class="ar-edge" aria-hidden="true"></div>
+</section>
+
+<!-- ═══════ HOW IT WORKS（复用 home_v2 三步键） ═══════ -->
+<section class="ar-section wrap" id="how" aria-label="How to play">
+  <div class="ar-sec-head">
+    <h2 data-i18n="home_v2.how_title">New here? Three steps.</h2>
+    <p class="ar-sec-sub" data-i18n="home_v3.how_sub">No account, no tutorial, no waiting room. You are playing in under ten seconds.</p>
+  </div>
+  <div class="ar-steps">
+    <article class="ar-step">
+      <span class="ar-step-n" data-i18n="home_v2.step1_n">Step 1</span>
+      <div class="ar-step-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26"><rect x="3" y="3" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M17.5 14v7M14 17.5h7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+      <h3 data-i18n="home_v2.step1_t">Pick a category</h3>
+      <p data-i18n="home_v2.step1_d">Science, history, movies — choose what you know best.</p>
+    </article>
+    <article class="ar-step">
+      <span class="ar-step-n" data-i18n="home_v2.step2_n">Step 2</span>
+      <div class="ar-step-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3.5 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+      <h3 data-i18n="home_v2.step2_t">Start a duel</h3>
+      <p data-i18n="home_v2.step2_d">Face the AI, match a random player, or share a room code with a friend.</p>
+    </article>
+    <article class="ar-step">
+      <span class="ar-step-n" data-i18n="home_v2.step3_n">Step 3</span>
+      <div class="ar-step-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26"><path d="M7 4h10v5a5 5 0 0 1-10 0z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3M12 14v4M8 20h8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+      <h3 data-i18n="home_v2.step3_t">Answer first to win</h3>
+      <p data-i18n="home_v2.step3_d">Beat the clock and your rival. Climb the ladder, earn badges.</p>
+    </article>
   </div>
 </section>
 
-<!-- ═══════════ 知识对决：首页唯一主推游戏（其余 7 款已于 2026-10-31 软下线，见 memory） ═══════════ -->
-<section class="games-block wrap" id="games" aria-label="Games">
-  <h2 class="games-ttl" data-i18n="home_v2.games_title">Pick a game</h2>
-  <p class="games-sub" data-i18n="home_v2.games_sub">Two ways to train your memory — one against an opponent, one against yourself and the clock.</p>
-  <div class="games-grid">
-
-    <!-- 知识对决：唯一保留的游戏，走独立大厅页（选分类 + 四模式）。 -->
-    <a class="gcard" href="/games/knowledge-duel/lobby/" data-stage="live">
-      <div class="gcard-icon" aria-hidden="true"><svg focusable="false"><use href="#ig-knowledge"/></svg></div>
-      <div class="gcard-title" data-i18n="home_v2.game_knowledge">Knowledge Duel</div>
-      <p class="gcard-desc" data-i18n="home_v2.game_knowledge_d">Head-to-head quizzes across science, history and geography. Race a friend or an AI opponent, 15 seconds per question.</p>
-      <div class="gcard-tags">
-        <span class="gcard-tag live" data-i18n="home_v2.tag_live">Live</span>
-        <span class="gcard-tag" data-i18n="home_v2.tag_pvp">1v1</span>
-        <span class="gcard-tag" data-i18n="home_v2.tag_46k">46,000+ questions</span>
-      </div>
-      <span class="gcard-cta" data-i18n="home_v2.game_play">Play now →</span>
-    </a>
-
+<!-- ═══════ MODES（首张卡保留 gcard 类契约：软下线门禁要求恰好 1 张） ═══════ -->
+<section class="ar-modes" id="modes" aria-label="Battle modes">
+  <div class="wrap">
+    <div class="ar-sec-head center">
+      <h2 data-i18n="home_v3.modes_title">Always someone to play.</h2>
+      <p class="ar-sec-sub" data-i18n="home_v3.modes_sub">Three ways in. All of them start in one tap.</p>
+    </div>
+    <div class="ar-mode-grid">
+      <a class="gcard" href="/games/knowledge-duel/lobby/">
+        <span class="ar-ribbon" data-i18n="home_v2.tag_live">Live</span>
+        <div class="ar-mode-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28"><rect x="4" y="7" width="16" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="9" cy="13" r="1.4" fill="currentColor"/><circle cx="15" cy="13" r="1.4" fill="currentColor"/><path d="M12 4v3M8 19v2M16 19v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <h3 data-i18n="home_v3.mode_ai_t">vs AI</h3>
+        <p data-i18n="home_v3.mode_ai_d">An opponent that is always ready. Pick a category and go — best for your first duel.</p>
+        <span class="ar-mode-cta" data-i18n="home_v2.game_play">Play now →</span>
+      </a>
+      <a class="ar-mode-card" href="/games/knowledge-duel/lobby/?mode=online">
+        <div class="ar-mode-ico online" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9S14.5 18.3 12 21c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></div>
+        <h3 data-i18n="home_v3.mode_online_t">Online match</h3>
+        <p data-i18n="home_v3.mode_online_d">Get paired with a real player at your level. No lobby, no waiting list.</p>
+        <span class="ar-mode-cta" data-i18n="home_v3.mode_cta">Find a match →</span>
+      </a>
+      <a class="ar-mode-card" href="/games/knowledge-duel/lobby/#room">
+        <div class="ar-mode-ico friend" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28"><rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M7 10h3M7 14h6M14 10h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <h3 data-i18n="home_v3.mode_friend_t">Private room</h3>
+        <p data-i18n="home_v3.mode_friend_d">Six-letter code, one friend, zero friction. Share the code and you are in.</p>
+        <span class="ar-mode-cta" data-i18n="home_v3.mode_cta_room">Create a room →</span>
+      </a>
+    </div>
   </div>
 </section>
 
-<!-- ═══════════ 双面板：左 模式+分类+特性 | 右 Top Players+天梯 ═══════════ -->
-<section class="duo wrap" id="lobby" aria-label="Battle modes and leaderboard">
-  <div>
-    <div class="panel">
-      <!-- 🔴 2026-10-14 A3：div.sec-ttl → h2（区块标题改语义标签，修大纲跳级） -->
-      <h2 class="sec-ttl" data-i18n="home_v2.sec_battle_title">Choose your battle</h2>
-      <div class="sec-sub" data-i18n="home_v2.sec_battle_sub">AI sparring is always ready. Online match looks for a real opponent.</div>
-
-      <!-- 🔴 2026-10-14 A5：补 tab 的 id / aria-controls，与下方 tabpanel 形成完整关联 -->
-      <div class="tabs" id="modeToggle" role="tablist" aria-label="Battle mode">
-        <button class="tab on" id="tabAi" data-m="ai" role="tab" aria-selected="true" aria-controls="aiPanel" type="button" data-i18n="home_v2.tab_ai">🤖 vs AI</button>
-        <button class="tab" id="tabOnline" data-m="online" role="tab" aria-selected="false" aria-controls="onlinePanel" tabindex="-1" type="button" data-i18n="home_v2.tab_online">🌐 Online</button>
-      </div>
-
-      <!-- 🔴 2026-10-14 A4：匹配状态改 role=status，读屏可播报「匹配中/已取消」 -->
-      <div id="aiPanel" role="tabpanel" aria-labelledby="tabAi">
-        <div class="cat-grid" id="catGrid"></div>
-        <!-- 已选分类小字：home.mjs 写入「<分类名> · 10 questions · 15s each」 -->
-        <div class="sel-note" id="catSel">Pick one to start</div>
-        <button class="btn btn-primary" id="startAiBtn" type="button" style="width:100%" data-i18n="home_v2.start_duel">⚔️ Start Duel</button>
-        <a class="solo-link" href="/train.html" data-i18n="home_v2.practice_solo">Practice solo first →</a>
-      </div>
-
-      <!-- 🔴 2026-10-14 A4/A5：面板加 aria-labelledby；状态区加 role=status / aria-live -->
-      <div id="onlinePanel" role="tabpanel" aria-labelledby="tabOnline" hidden style="display:none">
-        <div class="field" id="online">
-          <label data-i18n="home_v2.quick_match">Quick match</label>
-          <button class="btn btn-primary" id="startMatchBtn" type="button" style="width:100%" data-i18n="home_v2.start_matching">⚡ Start Matching</button>
-          <div class="match-status" id="matchStatus" role="status" aria-live="polite"></div>
-          <button class="btn btn-ghost" id="cancelMatchBtn" type="button" style="width:100%;display:none" data-i18n="home_v2.cancel">Cancel</button>
-        </div>
-        <div class="divider" data-i18n="home_v2.or_friend">or play a friend</div>
-        <div class="field">
-          <label for="roomInput" data-i18n="home_v2.room_code_label">Enter room code</label>
-          <input class="room-in" id="roomInput" maxlength="6" inputmode="latin" autocomplete="off" spellcheck="false" aria-label="Room code" data-i18n-aria-label="home_v2.room_code_label" placeholder="ABC123">
-          <!-- 🔴 A4：房间码校验错误用 role=alert，读屏立即播报 -->
-          <div class="room-err" id="roomErr" role="alert" data-i18n="home_v2.room_err">Room codes are 6 letters or digits.</div>
-        </div>
-        <div class="row2">
-          <button class="btn btn-ghost" id="joinBtn" type="button" data-i18n="home_v2.join_room">Join Room</button>
-          <button class="btn btn-ghost" id="createRoomBtn" type="button">➕ Create</button>
-        </div>
-        <div class="match-status" id="onlineRooms" role="status" aria-live="polite"></div>
-      </div>
+<!-- ═══════ LEADERBOARD（保留 #topRankList / #ecoCard 真实数据契约） ═══════ -->
+<section class="ar-section wrap ar-rank" id="globalTop" aria-label="Leaderboard">
+  <div class="ar-rank-grid">
+    <div class="ar-rank-copy">
+      <h2 data-i18n="home_v3.rank_title">The fastest minds on the board.</h2>
+      <p class="ar-sec-sub" data-i18n="home_v3.rank_sub">Weekly reset, so every Monday is a fresh shot at the top 10%. Your score follows you when you sign in.</p>
+      <a class="btn ar-btn-outline-dark" href="/membership/" data-i18n="home_v2.scoring">How scoring works →</a>
     </div>
-
-    <div class="panel" id="features">
-      <!-- 🔴 2026-10-14 A3：同改 h2 -->
-      <h2 class="sec-ttl" data-i18n="home_v2.features_title">Why MemoryDuel</h2>
-      <div class="sec-sub" data-i18n="home_v2.features_sub">Built for fast, fair, private knowledge duels.</div>
-      <div class="feats">
-        <!-- 🔴 A3：feat h4 → h3（原先 H2 后直接跳 H4，属跳级） -->
-        <div class="feat"><div class="fi" aria-hidden="true">⏱</div><h3 data-i18n="home_v2.feat1_t">Timed quizzes</h3><p data-i18n="home_v2.feat1_d">15s pressure makes every round sharp.</p></div>
-        <div class="feat"><div class="fi" aria-hidden="true">🌍</div><h3 data-i18n="home_v2.feat2_t">6 languages</h3><p data-i18n="home_v2.feat2_d">Play in your language, anywhere.</p></div>
-        <div class="feat"><div class="fi" aria-hidden="true">🤖</div><h3 data-i18n="home_v2.feat3_t">AI sparring</h3><p data-i18n="home_v2.feat3_d">Always-ready opponent, any time.</p></div>
-        <div class="feat"><div class="fi" aria-hidden="true">🏆</div><h3 data-i18n="home_v2.feat4_t">Leaderboards</h3><p data-i18n="home_v2.feat4_d">Weekly reset, badges for top 10%.</p></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 右：真实排行榜（home.ts 拉 /api/md/rank） -->
-  <div id="globalTop">
-    <div class="panel">
-      <!-- 🔴 2026-10-14 A3：同改 h2 -->
-      <h2 class="sec-ttl" data-i18n="home_v2.top_title">🏆 Top players</h2>
-      <div class="sec-sub" data-i18n="home_v2.top_sub">The best minds dueling right now.</div>
-      <!-- #5 经济卡：余额 + 每日签到（PvP 发币可见 + 留存钩子）。
-           拉数走 fe-shared public/shared/coins.mjs，匿名/失败降级，不写假数据。 -->
-      <div class="eco-card" id="ecoCard" aria-live="polite">
-        <div class="eco-row">
-          <span class="eco-balance"><span class="eco-coin" aria-hidden="true">🪙</span> <span class="eco-num" id="ecoNum">—</span></span>
-          <button class="eco-checkin" id="ecoCheckin" type="button">Sign in +10</button>
-        </div>
-        <div class="eco-sub" id="ecoSub" data-i18n="home_v2.eco_sub_earn">Earn coins every duel. Sign in to see your balance.</div>
-      </div>
-      <!-- 🔴 D1：异步榜单加载骨架，避免空白观感与 CLS（JS 到位后被替换） -->
+    <div class="ar-board">
+      <div class="ar-board-head"><span data-i18n="home_v2.top_title">Top players</span><span data-i18n="home_v3.rank_score">Score</span></div>
       <div class="rank-list" id="topRankList" aria-busy="true" aria-live="polite" aria-label="Top players"></div>
-      <div class="rank-foot">
-        <a href="/membership/" data-i18n="home_v2.scoring">How scoring works →</a>
-      </div>
-      <div class="ladder" aria-hidden="true">
-        <div class="seg">B1</div><div class="seg">B2</div><div class="seg">S1</div>
-        <div class="seg hi">G1</div><div class="seg hi">G2</div><div class="seg hi">M</div>
+      <div class="ar-eco" id="ecoCard" aria-live="polite">
+        <div class="ar-eco-row">
+          <span class="ar-eco-balance"><span class="ar-eco-coin" aria-hidden="true"></span><span class="ar-eco-num" id="ecoNum">—</span></span>
+          <button class="ar-eco-checkin" id="ecoCheckin" type="button" data-i18n="home_v2.eco_checkin">Sign in +10</button>
+        </div>
+        <div class="ar-eco-sub" id="ecoSub" data-i18n="home_v2.eco_sub_earn">Earn coins every duel. Sign in to see your balance.</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ═══════════ 三步上手 ═══════════ -->
-<section class="block wrap" id="how" aria-label="How to play">
-  <!-- 🔴 2026-10-14 A3：div.how-ttl → h2 -->
-  <h2 class="how-ttl" data-i18n="home_v2.how_title">New here? Three steps.</h2>
-  <div class="steps" style="margin-top:20px">
-    <div class="step"><div class="n" data-i18n="home_v2.step1_n">Step 1</div><h3 data-i18n="home_v2.step1_t">Pick a category</h3><p data-i18n="home_v2.step1_d">Science, history, movies — choose what you know best.</p></div>
-    <div class="step"><div class="n" data-i18n="home_v2.step2_n">Step 2</div><h3 data-i18n="home_v2.step2_t">Start a duel</h3><p data-i18n="home_v2.step2_d">Face the AI, match a random player, or share a room code with a friend.</p></div>
-    <div class="step"><div class="n" data-i18n="home_v2.step3_n">Step 3</div><h3 data-i18n="home_v2.step3_t">Answer first to win</h3><p data-i18n="home_v2.step3_d">Beat the clock and your rival. Climb the ladder, earn badges.</p></div>
+<!-- ═══════ FINAL CTA ═══════ -->
+<section class="ar-final" id="play-now">
+  <div class="wrap ar-final-in">
+    <h2 data-i18n-html="home_v3.final_title">Your first duel is<br>one tap away.</h2>
+    <p data-i18n="home_v3.final_sub">Pick a category. Ten questions. Somebody wins.</p>
+    <a class="btn ar-btn-gold big" href="/train.html?cat=general&amp;mode=ai" data-i18n="home_v2.cta_start">Start a Duel</a>
+    <p class="ar-micro light" data-i18n="home_v3.final_micro">No sign-up required · Works on any device</p>
   </div>
 </section>
-</main><!-- 🔴 2026-10-14 A2：正文地标闭合，页脚保持在 main 之外 -->
+</main>
 
-<!-- ═══════════ 页脚（深墨；三站 pip 各站品牌色，MemoryDuel 保持 #4F46E5） ═══════════ -->
-<footer>
-  <div class="foot-in">
+<footer class="ar-footer">
+  <div class="wrap ar-foot-in">
     <div>
       <div class="foot-brand"><span class="mk"></span>MemoryDuel</div>
       <p class="foot-blurb" data-i18n="home_v2.footer_blurb">Knowledge battles, 5 minutes at a time. Ad-free and private by default.</p>
@@ -392,21 +256,18 @@
   <div class="copy" data-i18n="home_v2.footer_copy">© 2026 MemoryDuel · Explore the Duel family</div>
 </footer>
 
-<!-- 题库数据（经典脚本，触发 memoryduel-ready 事件） -->
-<!-- 🔴 2026-10-29：改为 defer。原来是同步脚本，会阻塞 HTML 解析与首屏渲染，
-     而它一执行就串行拉 12 个分类 × 100 题（约 1,400 题），首页首屏其实
-     只需要分类网格与排行榜。改 defer 后不再阻塞解析；
-     后续 home.mjs 是 module（本身即 defer 语义），文档顺序保证 quiz-data 先执行。 -->
+<!-- 题库数据：battle-sw-quiz-lang.test.mjs 要求首页引用文件名带版本号的 quiz-data.vN.js，
+     且 home.mjs 的分类渲染 / 题库加载失败横幅仍依赖它。defer 不阻塞首屏。 -->
 <script src="/assets/quiz-data.v9.js" defer></script>
-<!-- 首页交互：模式切换 / 分类网格 / 在线匹配 / 房间（依赖上面的 quiz-data） -->
 <script type="module" src="/assets/js/home.mjs"></script>
-<!-- 首页装配：真实排行榜 + Online 模式钩子 -->
 <script type="module" src="/src/pages/home.ts"></script>
-<!-- #5 经济卡：余额 + 每日签到（import fe-shared public/shared/coins.mjs） -->
 <script type="module" src="/js/eco-home.mjs?v=1"></script>
+<!-- 竞技场首屏交互：倒计时 / 选项反馈（不触碰对战引擎） -->
+<script type="module" src="/js/home-arena.mjs?v=1"></script>
 <script src="/i18n/lang-switcher.js?v=40" defer></script>
-<!-- md-theme:module -->
 <script type="module" src="/shared/theme.js?v=1"></script>
-<script src="/js/chrome-mem.js?v=1" defer></script>
+<!-- 🔴 2026-11-04：首页不再加载 /js/chrome-mem.js。
+     旧 chrome 会注入 body.mc-on（桌面右移 236px）、隐藏新顶栏，
+     并在侧栏继续展示 7 款已软下线的游戏。大厅页早已移除且验证正常。 -->
 </body>
 </html>

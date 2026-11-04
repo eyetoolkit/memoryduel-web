@@ -3,7 +3,7 @@
 <head>
 <!-- md-theme:early -->
 <script>(function(){try{var t=localStorage.getItem('md-theme2');if(t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();</script>
-  <script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:66,fallback:"en"};</script>
+  <script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:67,fallback:"en"};</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <!-- standalone 下 iOS 状态栏取 theme-color，缺失会回落成系统默认色（与本站暖橙/米白不搭）。
@@ -78,12 +78,15 @@
   *{box-sizing:border-box;margin:0;padding:0}
   :focus-visible{outline:2px solid var(--indigo);outline-offset:3px}
 
-  /* ===== 对战舞台：暖纸 + 网格 + 橙色氤氲（与首页同源） ===== */
+  /* ===== 对战舞台：冷靛蓝纸 + 网格（2026-11-04 与首页/大厅统一） ===== */
   /* [2026-10-09 沉浸增强] safe-area + 动态视口高度：避免刘海/灵动岛/Home Indicator
      遮挡内容；min-height:100dvh（带 100vh 回退）让移动端工具栏收起后仍占满屏。 */
   .battle-stage{
     position:fixed; inset:0; z-index:1000; display:none;
-    background-color:var(--paper);
+    /* 画布不再走 tokens.css 的 --bg（#FAF6F1 暖纸）；显式冷底 + Sora，
+       与首页 Arena / 知识对决大厅的视觉语言一致。只动 style 层。 */
+    background-color:#F4F5F9;
+    font-family:var(--ui);
     background-image:
       radial-gradient(circle at 16% 12%,rgba(79,70,229,.07) 0,transparent 42%),
       radial-gradient(circle at 86% 80%,rgba(255,107,92,.06) 0,transparent 40%),
@@ -219,6 +222,7 @@
     --gold-soft:rgba(245,179,0,.18);
   }
   html[data-theme="dark"] .battle-stage{
+    background-color:#0B1120;
     background-image:
       radial-gradient(circle at 16% 12%,rgba(99,102,241,.10) 0,transparent 42%),
       radial-gradient(circle at 86% 80%,rgba(255,107,92,.08) 0,transparent 40%),
@@ -233,6 +237,17 @@
   </style>
   <link rel="stylesheet" href="/css/shared/tokens.css?v=p4fix2">
   <link rel="stylesheet" href="/css/shared/brand-ds2.css?v=ds2-23">
+  <!-- 2026-11-04：tokens.css 里 html[data-site="memory"] body 把 --bg 设成暖纸 #FAF6F1
+       并注入橙色网格，brand-ds2.css 把 body 字体设为 Inter。两者都是三站共享文件，
+       不能改；本页用后置同特异性规则覆盖，只影响 train.html。 -->
+  <style>
+  html[data-site="memory"] body{
+    background-color:#F4F5F9;
+    background-image:none;
+    font-family:'Sora',system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  html[data-theme="dark"][data-site="memory"] body{background-color:#0B1120}
+  </style>
   <link rel="manifest" href="/manifest.zh.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
