@@ -143,15 +143,25 @@ function fmtCount(n: number): string {
   return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
-/** 拉取实时题量（服务端 /quiz/counts，一次返回全部分类真实总数，读 KV/R2 缓存零 D1）。
-   成功则覆盖静态 COUNTS 快照；失败/无数据则 liveCounts={} 标记已尝试，
-   renderCategories 退回静态兜底——绝不因接口抖动而误锁或闪「No questions yet」。 */
+/** 拉取实时题量（服务端 /quiz/counts，一次返回全部分类真实总数）。
+   🔴 2026-11-04：Worker 的 ok() 统一包一层 `{ ok, data }`，真实 payload 在 data.counts。
+   旧代码读顶层 j.counts 恒为 undefined → 实时数永远取不到，分类卡题量留空
+   （P0-b 服务端给了真实数，前端却没显示）。同时兼容裸 counts，便于本地 dev。
+   成功才重渲染；失败仅标记已尝试，保留首渲与静态 COUNTS，绝不误锁分类。 */
 function loadLiveCounts(lang: string): void {
+  type CountsResp = {
+    ok?: boolean;
+    counts?: Record<string, number>;
+    data?: { ok?: boolean; counts?: Record<string, number> };
+  };
   fetch((W.API_BASE || '') + '/api/md/quiz/counts?lang=' + encodeURIComponent(lang))
-    .then((r) => r.json() as Promise<{ ok?: boolean; counts?: Record<string, number> }>)
+    .then((r) => r.json() as Promise<CountsResp>)
     .then((j) => {
-      if (j && j.ok && j.counts) { liveCounts = j.counts; renderCategories(); }
-      else { liveCounts = {}; }
+      const counts = j && (j.counts || (j.data && j.data.counts));
+      if (counts && Object.keys(counts).length) {
+        liveCounts = counts;
+        renderCategories();
+      } else { liveCounts = {}; }
     })
     .catch(() => { liveCounts = {}; });
 }
