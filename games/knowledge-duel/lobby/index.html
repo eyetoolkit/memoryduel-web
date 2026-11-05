@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" data-site="memory">
 <head>
-<!-- md-theme:early（防 FOUC；与首页同源：md-theme2 + 跟随系统） -->
-<script>(function(){try{var t=localStorage.getItem('md-theme2');if(t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();</script>
 <script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:69,fallback:"en"};</script>
 <script src="/i18n/i18n.js?v=59"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#FAF6F1">
+<meta name="theme-color" content="#F4F5F9">
+<!-- md-theme:early（防 FOUC）：与首页同源，必须在 theme-color 之后、CSS 之前 -->
+<script>(function(){try{var t=localStorage.getItem('md-theme2');if(t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.setAttribute('data-theme','dark');var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content','#12131F');}}catch(e){}})();</script>
 <title>Knowledge Battle — MemoryDuel</title>
 <meta name="description" content="1v1 knowledge duel across 12 categories — science, history, geography and more. Ten questions, 15 seconds each. Face the AI, match a real player, or share a room code with a friend. No login required.">
 <link rel="canonical" href="https://www.memoryduel.com/games/knowledge-duel/lobby/" />
@@ -33,6 +33,8 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="stylesheet" href="/src/styles/home.css">
 <link rel="stylesheet" href="/src/styles/knowledge-lobby.css">
+<!-- 三站对齐层（与首页 / 对战页同一份） -->
+<link rel="stylesheet" href="/shared/align.css?v=1">
 <!-- 首屏关键字体预加载（CSP font-src 'self'，crossorigin 必须带） -->
 <link rel="preload" href="/fonts/space-grotesk-latin-700.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/sora-latin.woff2" as="font" type="font/woff2" crossorigin>
@@ -51,7 +53,7 @@
 <!-- ═══════════ 顶栏（复用首页 .nav：theme.js 自动注入 .md-theme 按钮） ═══════════ -->
 <header class="nav">
   <div class="nav-in">
-    <a class="logo" href="/"><span class="mk"></span>memoryduel</a>
+    <a class="logo" href="/"><span class="mk"></span>MemoryDuel</a>
     <span class="spacer"></span>
     <div id="lang-switcher"></div>
   </div>

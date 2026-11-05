@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="en" data-site="memory" data-build="%VITE_SHOW_BETA%">
 <head>
-<!-- md-theme:early -->
-<script>(function(){try{var t=localStorage.getItem('md-theme2');if(t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();</script>
 <script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:69,fallback:"en"};</script>
 <script src="/i18n/i18n.js?v=59"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0A0E1E">
+<meta name="theme-color" content="#F4F5F9">
+<!-- md-theme:early（防 FOUC）：必须在 theme-color 之后、所有 CSS 之前。
+     dark 时同步改写 meta，避免状态栏 / PWA 启动页在 DCL 前闪一下冷白。
+     与 BoardDuel index.html 同款写法。2026-11-05 方案 A：全站冷纸底
+     #F4F5F9 / 暗底 #12131F。 -->
+<script>(function(){try{var t=localStorage.getItem('md-theme2');if(t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.setAttribute('data-theme','dark');var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content','#12131F');}}catch(e){}})();</script>
 <title>MemoryDuel — Answer first. Win the duel.</title>
 <meta name="description" content="1v1 knowledge duel across science, history, geography, sports, movies and more. Ten questions, 15 seconds each, answer first to score. No login, no install, no ads.">
 <meta name="keywords" content="knowledge battle,trivia,quiz duel,1v1,ai sparring,online quiz,multiplayer trivia">
@@ -48,6 +51,9 @@
 <link rel="stylesheet" href="/src/styles/home.css">
 <!-- 竞技场首页皮肤（body.home-arena 作用域，不影响其它页面） -->
 <link rel="stylesheet" href="/src/styles/home-arena.css">
+<!-- 三站对齐层：--md-* 别名桥接 fe-shared 真相源，绕开 --ink/--paper 语义反转。
+     变量是运行时解析，加载顺序不影响消费；放在最后只为暗色块优先级稳定。 -->
+<link rel="stylesheet" href="/shared/align.css?v=1">
 <!-- 首屏真正用到的字体：Space Grotesk 700（h1）+ Sora 可变（正文）。
      🔴 旧版预加载 Inter 400/700 但 home.css 正文用 Sora，约 47KB 白下载（已移除）。 -->
 <link rel="preload" href="/fonts/space-grotesk-latin-700.woff2" as="font" type="font/woff2" crossorigin>
@@ -96,12 +102,19 @@
 
 <!-- ═══════ HERO · 竞技场（VS 对半分割 + 单主 CTA + 真实对战卡） ═══════ -->
 <section class="ar-hero" id="play">
-  <div class="ar-lights" aria-hidden="true"></div>
-  <div class="wrap ar-hero-grid">
-    <div class="ar-hero-copy">
+  <!-- 深色舞台带（2026-11-05 方案 A）：只包标题三件套，高度由内容自然决定，
+       不再铺满首屏；占比由真浏览器探针守卫 ≤40% 视口。
+       所有 id / data-i18n 契约保持原位，home.mjs / home-arena.mjs 不受影响。 -->
+  <div class="ar-band">
+    <div class="ar-lights" aria-hidden="true"></div>
+    <div class="wrap ar-band-in">
       <p class="ar-eyebrow"><span class="ar-pulse" aria-hidden="true"></span><span data-i18n="home_v3.eyebrow">Real-time 1v1 trivia / No sign-up</span></p>
       <h1 data-i18n-html="home_v3.hero_h1">Answer first.<br><span class="ar-h1-you">You</span> <span class="ar-h1-vs">vs</span> <span class="ar-h1-rival">the world.</span></h1>
       <p class="ar-lede" data-i18n="home_v3.hero_sub">Ten questions. Fifteen seconds each. Answer first to score — against an AI or a real player.</p>
+    </div>
+  </div>
+  <div class="wrap ar-hero-grid">
+    <div class="ar-hero-copy">
       <div class="ar-cta-stack">
         <!-- id=startAiBtn 复用 home.mjs bindAiStart()：一键直达 /train.html?cat=general&mode=ai -->
         <button class="btn ar-btn-gold" id="startAiBtn" type="button" data-i18n="home_v3.cta_main">Start a duel — it's free</button>

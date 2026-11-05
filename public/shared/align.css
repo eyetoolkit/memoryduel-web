@@ -1,0 +1,100 @@
+/* ============================================================
+ * MemoryDuel · 三站对齐层 / Alignment Bridge
+ * ------------------------------------------------------------
+ * 2026-11-05 · 方案 A「底层全对齐 + 保留竞技场骨架」
+ *
+ * 为什么需要这一层（务必先读，别直接删）：
+ *   fe-shared/shared/tokens.css 是三站真相源（三仓哈希 e2c334bc… 一致），
+ *   但 MemoryDuel 的 src/styles/home.css 有两个同名变量语义正好相反：
+ *
+ *     | 语义     | fe-shared 真相源      | home.css 私有层        | train.html 旧 DUEL-DS |
+ *     |----------|----------------------|------------------------|------------------------|
+ *     | 页底     | --ink   #F4F5F9      | --paper #F4F5F9        | --bg      #FAF6F1(暖) |
+ *     | 正文     | --paper #1E1B39      | --ink   #1E1B39        | --text                 |
+ *     | 卡片底   | --ink2  #FFFFFF      | --card  #FFFFFF        | --surface              |
+ *     | 描边     | --line  #E3E6F0      | --line  #E3E6F0(同值)  | --border               |
+ *     | 主色     | --brand-600 #4F46E5  | --orange #4F46E5(同值) | --brand-600 #EA580C(琥珀)|
+ *     | 点睛     | --ember #F59E0B      | --amber #F59E0B(同值)  | --gold #F5B300(自造)   |
+ *     | 卡片圆角 | --r-card 18px        | --r-lg 18px(同值)      | --rd 20px              |
+ *
+ *   直接给页面叠 <link href="/shared/tokens.css"> 会按加载顺序互相覆盖：
+ *   home.css 之后加载 → --ink/--paper 保持反转语义；tokens.css 之后加载 →
+ *   全站 body 底色变深墨、暗色整体翻车；train.html 的 inline :root 更容易被
+ *   :root 同特异性的后加载规则冲掉 --paper/--ink。
+ *
+ *   因此本层采用「不冲突命名空间 --md-*」做别名桥接：
+ *     - 不重命名、不覆盖任何既有变量（--orange/* 名保留是项目硬约定，
+ *       tests/p1-4-share-card.test.mjs 有守卫）
+ *     - 所有值镜像 fe-shared 真相源，由 tests/align-tokens.test.mjs 逐项
+ *       机器比对，杜绝「文件同步了但值漂移了」
+ *     - 三页（首页 / 大厅 / 对战）统一消费本层 → 一处改色全站生效
+ *
+ *   加载顺序约定：置于各页私有样式之后（本层只定义 --md-*，无副作用）。
+ *   本文件是站点私有层，不在 fe-shared manifest 内，不会触发漂移门禁。
+ *
+ * 色彩无障碍：主 CTA 用 --md-brand + --md-on-brand 成对取值。
+ *   亮色 #4F46E5 / #FFFFFF = 6.29:1；暗色 #818CF8 / #0E1026 ≈ 8.4:1，
+ *   两态均 ≥ WCAG AA 4.5:1。禁止用琥珀配白字（约 2.3:1）。
+ * ============================================================ */
+
+:root {
+  /* ── 面 ── */
+  --md-page-bg:      #F4F5F9;  /* ← --ink   页底（冷纸） */
+  --md-surface:      #FFFFFF;  /* ← --ink2  卡片底 */
+  --md-surface-2:    #F1F2FA;  /* ← --ink3  输入/按钮底 */
+  --md-line:         #E3E6F0;  /* ← --line */
+  --md-line-strong:  #C7CBEE;  /* ← --line2 */
+
+  /* ── 文字 ── */
+  --md-text:         #1E1B39;  /* ← --paper 正文（靛墨） */
+  --md-text-mute:    #5B6079;  /* ← --mute */
+  --md-text-mute-2:  #8A90A8;  /* ← --mute2 */
+
+  /* ── 品牌 / 语义 ── */
+  --md-brand:        #4F46E5;  /* ← --brand-600 */
+  --md-brand-strong: #4338CA;  /* ← --brand-700（hover / 描边） */
+  --md-brand-soft:   #EEF1FB;  /* ← --brand-50 */
+  --md-brand-ring:   rgba(79, 70, 229, .22);
+  --md-on-brand:     #FFFFFF;  /* ← --on-brand */
+  --md-ember:        #F59E0B;  /* ← --ember：只用于计时 / 得分 / 胜利瞬间 */
+  --md-ember-soft:   rgba(245, 158, 11, .16);
+  --md-rival:        #FF6B5C;  /* 对手方语义色（MemoryDuel 专属，收敛不扩散） */
+  --md-success:      #059669;  /* ← --success */
+  --md-danger:       #E11D48;  /* ← --danger */
+
+  /* ── 字阶 ── */
+  --md-disp: 'Space Grotesk', 'Sora', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --md-ui:   'Sora', system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+
+  /* ── 形状 / 高度 ── */
+  --md-r-card:  18px;  /* ← --r-card */
+  --md-r-btn:   12px;  /* 两站实测 11–13px，取中值 */
+  --md-nav-h:   69px;  /* 三页导航统一高度 */
+  --md-cta-h:   52px;  /* 三页主 CTA 统一高度 */
+  --md-band-max: 40vh;  /* 首页深色舞台带的占比硬上限（由真浏览器探针实测守卫） */
+
+  /* ── 阴影：全站唯一 elevation 刻度 ── */
+  --md-shadow-card: 0 1px 2px rgba(16, 20, 45, .04), 0 8px 28px rgba(16, 20, 45, .06);
+  --md-shadow-float: 0 14px 38px rgba(16, 20, 45, .12);
+}
+
+html[data-theme="dark"] {
+  --md-page-bg:      #12131F;  /* ← --ink   暗底，与两站一致 */
+  --md-surface:      #1A1B2E;  /* ← --ink2 */
+  --md-surface-2:    #222336;  /* ← --ink3 */
+  --md-line:         #2D2E48;  /* ← --line */
+  --md-line-strong:  #3A3C5A;  /* ← --line2 */
+
+  --md-text:         #E8EAF4;  /* ← --paper */
+  --md-text-mute:    #9AA0BC;  /* ← --mute */
+  --md-text-mute-2:  #6B7090;  /* ← --mute2 */
+
+  --md-brand:        #818CF8;  /* ← --brand（暗底提亮档） */
+  --md-brand-strong: #A5B4FC;  /* ← --brand-hover */
+  --md-brand-soft:   #20224A;  /* ← --brand-subtle */
+  --md-brand-ring:   rgba(129, 140, 248, .30);
+  --md-on-brand:     #0E1026;  /* ← --on-brand：亮靛蓝底必须配深字 */
+
+  --md-shadow-card:  0 1px 2px rgba(0, 0, 0, .20), 0 8px 28px rgba(0, 0, 0, .28);
+  --md-shadow-float: 0 14px 38px rgba(0, 0, 0, .42);
+}

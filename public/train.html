@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" data-site="memory">
 <head>
-<!-- md-theme:early -->
-<script>(function(){try{var t=localStorage.getItem('md-theme2');if(t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();</script>
   <script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:69,fallback:"en"};</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <!-- standalone 下 iOS 状态栏取 theme-color，缺失会回落成系统默认色（与本站暖橙/米白不搭）。
-       与 manifest 的 background_color 一致：#fff7ed -->
-  <meta name="theme-color" content="#fff7ed">
+  <!-- standalone 下 iOS 状态栏取 theme-color；2026-11-05 方案 A 全站统一冷纸底 -->
+  <meta name="theme-color" content="#F4F5F9">
+  <!-- md-theme:early（防 FOUC）：必须在 theme-color 之后、所有 CSS 之前 -->
+  <script>(function(){try{var t=localStorage.getItem('md-theme2');if(t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.setAttribute('data-theme','dark');var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content','#12131F');}}catch(e){}})();</script>
   <title data-i18n-title="train.title" data-i18n-title-suffix="Memory Training">MemoryDuel</title>
   <meta name="description" data-i18n="train.meta_desc" content="MemoryDuel solo training — card matching, digit flash memory. Multiple difficulty levels. Personal bests saved locally. Free to play, privacy-first.">
   <meta data-i18n="meta.auto.hc_记忆训练记忆力翻牌配对数字记忆_1529" name="keywords" content="Memory Training,memory,Card Matching,Number Memory,memory game,memory duel,brain training">
@@ -52,7 +51,7 @@
      真源依据：design/memoryduel-game.html（重设计交付包）
      落地约束（README §4）：CSP font-src 'self' → 字体走 tokens.css 自托管
        （Space Grotesk 400/700 · Sora 400/700 可变 · JetBrains Mono 500/700）；
-       VS 语言：你方靛蓝 #4F46E5 / 对手珊瑚 #FF6B5C / 点睛金 #F5B300（与知识对决大厅一致）。
+       VS 语言：你方靛蓝 #4F46E5 / 对手珊瑚 #FF6B5C / 点睛琥珀 var(--md-ember)（只用于计时/得分/胜利）。
      红线：JS 对战引擎（battle IIFE）一行未动，所有 id/class 契约保留。
      ═══════════════════════════════════════════════════════════════ */
   /* Sora（正文）— 对齐知识对决大厅；可变单文件，font-weight 轴取用 */
@@ -68,12 +67,12 @@
     /* VS 语言：你方靛蓝 / 对手珊瑚 / 点睛金 —— 与知识对决大厅一致 */
     --indigo:#4F46E5; --indigo-deep:#4338CA; --indigo-soft:rgba(79,70,229,.10);
     --rival:#FF6B5C; --rival-deep:#E2493B; --rival-ink:#C2410C; --rival-soft:rgba(255,107,92,.10);
-    --gold:#F5B300; --gold-soft:rgba(245,179,0,.16);
+    --gold:var(--md-ember); --gold-soft:var(--md-ember-soft);
     --green:#22C55E; --red:#DC2626;
     --disp:'Space Grotesk',system-ui,sans-serif;
     --ui:'Sora',system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
     --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
-    --rd:20px;
+    --rd:var(--md-r-card);
   }
   *{box-sizing:border-box;margin:0;padding:0}
   :focus-visible{outline:2px solid var(--indigo);outline-offset:3px}
@@ -89,7 +88,7 @@
     font-family:var(--ui);
     background-image:
       radial-gradient(circle at 16% 12%,rgba(79,70,229,.07) 0,transparent 42%),
-      radial-gradient(circle at 86% 80%,rgba(255,107,92,.06) 0,transparent 40%),
+      radial-gradient(circle at 86% 80%,rgba(99,102,241,.05) 0,transparent 40%),
       linear-gradient(rgba(27,26,46,.04) 1px,transparent 1px),
       linear-gradient(90deg,rgba(27,26,46,.04) 1px,transparent 1px);
     background-size:100% 100%,100% 100%,32px 32px,32px 32px;
@@ -126,7 +125,7 @@
   /* 主卡 */
   .battle-card{
     background:var(--card); border:1px solid var(--line); border-radius:var(--rd);
-    box-shadow:0 18px 44px rgba(27,26,46,.12);
+    box-shadow:var(--md-shadow-card);
     max-width:720px; width:100%; padding:24px; margin:20px auto 40px;
   }
 
@@ -142,8 +141,8 @@
   .score-meta{min-width:0}
   .score-name{font-size:13px; color:var(--mute); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
   .score-val{font-family:var(--mono); font-weight:700; font-size:24px; color:var(--ink); line-height:1.1}
-  .vs-badge{position:relative; background:var(--ink); color:var(--gold); padding:9px 15px; border-radius:999px; font-size:13px; font-weight:700; font-family:var(--disp)}
-  .vs-badge .sp{position:absolute; width:6px; height:6px; border-radius:50%; background:var(--gold); box-shadow:0 0 8px 2px rgba(245,179,0,.55)}
+  .vs-badge{position:relative; background:var(--md-brand); color:var(--md-on-brand); padding:9px 15px; border-radius:999px; font-size:13px; font-weight:700; font-family:var(--md-disp)}
+  .vs-badge .sp{position:absolute; width:6px; height:6px; border-radius:50%; background:var(--md-ember); box-shadow:0 0 8px 2px var(--md-ember-soft)}
   .vs-badge .sp.s1{left:-8px; top:-5px}
   .vs-badge .sp.s2{right:-9px; bottom:-4px; animation-delay:.3s}
 
@@ -194,8 +193,10 @@
   .battle-result p{color:var(--mute); font-size:14px; margin-top:6px}
 
   /* 按钮（与首页一致：.btn=实心琥珀主按钮，.btn.ghost=描边次按钮） */
-  .btn{border:0; font-family:var(--ui); font-weight:700; cursor:pointer; border-radius:12px; font-size:15px; padding:12px 20px; transition:transform .12s,background .12s; display:inline-flex; align-items:center; gap:8px; justify-content:center; background:var(--indigo); color:#fff}
-  .btn:hover{background:var(--indigo-deep); transform:translateY(-1px)}
+  /* 主按钮与首页 / 大厅同一套 token：亮色 #4F46E5+白字 6.29:1，
+     暗色 #818CF8+深字 6.28:1，两态均 ≥ WCAG AA */
+  .btn{border:0; font-family:var(--md-ui); font-weight:700; cursor:pointer; border-radius:var(--md-r-btn); font-size:15px; padding:12px 20px; min-height:44px; transition:transform .12s,background .12s; display:inline-flex; align-items:center; gap:8px; justify-content:center; background:var(--md-brand); color:var(--md-on-brand)}
+  .btn:hover{background:var(--md-brand-strong); color:var(--md-on-brand); transform:translateY(-1px)}
   .btn.ghost,.btn-ghost{background:transparent; color:var(--ink); border:1px solid var(--line)}
   .btn.ghost:hover,.btn-ghost:hover{background:transparent; border-color:var(--indigo); color:var(--indigo-deep); transform:none}
 
@@ -230,18 +231,18 @@
     --indigo-soft:rgba(99,102,241,.16);
     --rival-soft:rgba(255,107,92,.16);
     --rival-ink:#FF8A7E;
-    --gold-soft:rgba(245,179,0,.18);
+    --gold-soft:var(--md-ember-soft);
   }
   html[data-theme="dark"] .battle-stage{
-    background-color:#0B1120;
+    background-color:#12131F;
     background-image:
       radial-gradient(circle at 16% 12%,rgba(99,102,241,.10) 0,transparent 42%),
-      radial-gradient(circle at 86% 80%,rgba(255,107,92,.08) 0,transparent 40%),
+      radial-gradient(circle at 86% 80%,rgba(129,140,248,.08) 0,transparent 40%),
       linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
       linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
   }
   html[data-theme="dark"] .battle-top{background:rgba(15,23,42,.82)}
-  html[data-theme="dark"] .battle-card{box-shadow:0 18px 44px rgba(0,0,0,.45)}
+  html[data-theme="dark"] .battle-card{box-shadow:var(--md-shadow-card)}
   html[data-theme="dark"] .score-card.you{background:var(--indigo-soft)}
   html[data-theme="dark"] .score-card.bot{background:var(--rival-soft)}
   html[data-theme="dark"] .battle-result .score-big{color:var(--text)}
@@ -257,7 +258,7 @@
     background-image:none;
     font-family:'Sora',system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
   }
-  html[data-theme="dark"][data-site="memory"] body{background-color:#0B1120}
+  html[data-theme="dark"][data-site="memory"] body{background-color:#12131F}
   /* 2026-11-04 P1-4：390px 视口实测 scrollWidth=399（9px 横向滚动）。
      越界元素是 identity.js 注入到 .sh-me 的 .idt-bar（宽 167px，left 419），
      把整条 .sh-in 撑破。窄屏隐藏身份条并收紧间距，身份功能仍可在桌面使用。 */
@@ -267,6 +268,29 @@
     html[data-site="memory"] #site-header .sh-actions{gap:4px}
     /* cookie 横幅改为 60px 单行条后仍会 fixed 遮挡底部，给对战区留出滚动余量 */
     html[data-site="memory"] body:has(.duel-consent){padding-bottom:68px}
+  }
+  </style>
+  <!-- 2026-11-05 方案 A：三站对齐层（--md-* 别名，不冲突） -->
+  <link rel="stylesheet" href="/shared/align.css?v=1">
+  <style>
+  /* 旧 DUEL-DS 的 --brand-* 在 html[data-site="memory"] 是暖橙琥珀
+     (#FFF7ED…#7C2D12)，brand-ds2.css 的顶栏/按钮会跟着发黄。
+     三站共享的 /css/shared/tokens.css 不能改（sync:shared:check 会拦），
+     这里用后置同特异性覆盖：品牌槽位对齐 fe-shared 靛蓝，同时保留旧
+     tokens.css 提供的 --bg/--surface/--text 中性色与暗色翻面。 */
+  html[data-site="memory"]{
+    --brand-50:#EEF1FB; --brand-100:#E0E5FA; --brand-200:#C2CBF2;
+    --brand-400:#7B82E0; --brand-500:#5B63D6;
+    --brand-600:#4F46E5; --brand-700:#4338CA; --brand-800:#3730A3; --brand-900:#2E2588;
+    --brand:var(--brand-600); --brand-hover:var(--brand-700);
+    --brand-active:var(--brand-800); --brand-subtle:var(--brand-100);
+    --brand-ring:rgba(79,70,229,.22); --on-brand:#FFFFFF;
+    --font-sans:var(--md-ui);
+  }
+  html[data-theme="dark"][data-site="memory"]{
+    --brand-600:#6366F1; --brand-700:#818CF8; --brand:#818CF8;
+    --brand-hover:#A5B4FC; --brand-subtle:#20224A;
+    --brand-ring:rgba(129,140,248,.30); --on-brand:#0E1026;
   }
   </style>
   <link rel="manifest" href="/manifest.zh.webmanifest">
@@ -287,7 +311,7 @@
 </head>
 <body>
 
-<div id="site-header" style="min-height:65px"
+<div id="site-header" style="min-height:69px"
      data-brand-a="Memory" data-brand-b="Duel" data-mark="duel-brain"
      data-nav='[{"label":"Home","href":"/","i18n":"nav.home"}]'
      data-cta-label="Home" data-cta-href="/" data-cta-i18n="nav.home"></div>

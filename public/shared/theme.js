@@ -24,7 +24,11 @@
   var KEY = "md-theme2";
   var LEGACY_KEY = "md-theme";
   var MIGRATED_KEY = "md-theme-followed";
-  var DARK_TC = "#0B1120"; // 与共享暗色 --bg 对齐
+  /* 2026-11-05 方案 A：theme-color 全站统一冷纸底 #F4F5F9；
+     暗色统一 #12131F —— 与 fe-shared --ink 暗色令牌、BoardDuel/NumeriDuel
+     的暗底一致。旧值 #0B1120 / #FAF6F1 是 DUEL-DS 暖纸残留，会令 iOS
+     状态栏与 PWA 启动页在跨页导航时跳色。 */
+  var DARK_TC = "#12131F";
 
   var ICON_MOON =
     '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13A8 8 0 1 1 11 4a6.5 6.5 0 0 0 9 9z"/></svg>';
@@ -51,8 +55,8 @@
     }
   }
 
-  // 记录页面原始的浅色 theme-color，切回浅色时精确还原（各页 meta 值不同）
-  var LIGHT_TC = "#FAF6F1";
+  // 记录页面原始的浅色 theme-color，切回浅色时精确还原（统一后各页均为 #F4F5F9）
+  var LIGHT_TC = "#F4F5F9";
   try {
     var m0 = document.querySelector('meta[name="theme-color"]');
     if (m0 && m0.getAttribute("content")) LIGHT_TC = m0.getAttribute("content");

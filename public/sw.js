@@ -22,10 +22,18 @@
       让部分已打开过的用户拿到旧 HTML + 旧 SW 缓存。升 V 强制弃掉全部
       客户端旧缓存；同日 / 的 max-age 600→60（见 _headers）。
 
+   🔴 2026-11-05：V 从 mdusw-v3 升到 mdusw-v4 ——
+      三站对齐改版（方案 A）新增 /shared/align.css，并改了
+      /shared/theme.js 的 DARK_TC / LIGHT_TC（#0B1120/#FAF6F1 →
+      #12131F/#F4F5F9）。/shared/ 是 stale-while-revalidate：V 不变的话
+      activate 不清旧缓存，老用户首次访问仍会命中缓存里的旧 theme.js，
+      把 iOS 状态栏 / PWA 启动页改回暖橙，等于改版对用户没生效。
+      升 V 让 activate 一次性弃掉 mdusw-v3 全部旧缓存。
+
    ⚠️ 记录与成绩走 localStorage（无后端账号），离线可用性与 SW 无关；
       本 SW 只解决「断网时页面还能打开 + 静态资源秒开」。
    ═══════════════════════════════════════════════════════════════ */
-const V = 'mdusw-v3';
+const V = 'mdusw-v4';
 const ASSET_RE = /^\/(assets|fonts)\//;
 const ICON_RE = /^\/(favicon\.ico|apple-touch-icon\.png|icon-192\.png|icon-512\.png|icon-maskable-512\.png|manifest(\.[a-z]{2})?\.webmanifest)$/;
 
