@@ -33,7 +33,7 @@
    ⚠️ 记录与成绩走 localStorage（无后端账号），离线可用性与 SW 无关；
       本 SW 只解决「断网时页面还能打开 + 静态资源秒开」。
    ═══════════════════════════════════════════════════════════════ */
-const V = 'mdusw-v4';
+const V = 'mdusw-v5';
 const ASSET_RE = /^\/(assets|fonts)\//;
 const ICON_RE = /^\/(favicon\.ico|apple-touch-icon\.png|icon-192\.png|icon-512\.png|icon-maskable-512\.png|manifest(\.[a-z]{2})?\.webmanifest)$/;
 
