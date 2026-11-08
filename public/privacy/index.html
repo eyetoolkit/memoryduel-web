@@ -115,6 +115,7 @@
 
       <h2 data-i18n="mm_privacy_16">3. Cookie usage</h2>
       <p data-i18n-html="mm_privacy_17">We may use one cookie (<code>pid</code>) to store an anonymous account ID for recognizing the same user on the leaderboard. You can clear browser cookies anytime.</p>
+      <p><strong>Anonymous visit counting</strong>: in addition to the optional, consent-based analytics described above, we run a first-party, cookieless counter at <code>/__uv</code> to measure how many distinct browsers visit each day. Our edge server derives a short-lived daily hash from the request's IP address, user agent and the UTC date, then keeps only the aggregate count. It sets no cookies, reads no form input, uses no third-party service and does not build a cross-site profile. Because it is strictly anonymous aggregate statistics, it does not depend on the analytics consent choice.</p>
 
       <h2 data-i18n="mm_privacy_18">4. Data storage & retention</h2>
       <p data-i18n="mm_privacy_19">Local training records stay in your browser and are deleted when you clear browser data. Battle leaderboard data is served by Cloudflare edge storage; aggregate stats are periodically purged.</p>

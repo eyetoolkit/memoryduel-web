@@ -33,7 +33,7 @@
    ⚠️ 记录与成绩走 localStorage（无后端账号），离线可用性与 SW 无关；
       本 SW 只解决「断网时页面还能打开 + 静态资源秒开」。
    ═══════════════════════════════════════════════════════════════ */
-const V = 'mdusw-v5';
+const V = 'mdusw-v6';
 const ASSET_RE = /^\/(assets|fonts)\//;
 const ICON_RE = /^\/(favicon\.ico|apple-touch-icon\.png|icon-192\.png|icon-512\.png|icon-maskable-512\.png|manifest(\.[a-z]{2})?\.webmanifest)$/;
 
@@ -53,6 +53,8 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
   if (url.pathname.startsWith('/api/') || url.pathname === '/ws' || url.pathname.startsWith('/ws')) return;
+  // /__uv 匿名访问计数：绝不缓存、绝不离线回落（否则漏计 / 重复计数）
+  if (url.pathname === '/__uv') return;
 
   // 1) 带内容 hash 的构建产物与字体：cache-first（immutable）
   if (ASSET_RE.test(url.pathname) || ICON_RE.test(url.pathname)) {
