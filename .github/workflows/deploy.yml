@@ -1,0 +1,31 @@
+# Push-to-deploy: main branch -> Cloudflare Pages (wrangler, via GitHub Actions)
+# Secrets (set once in repo Settings > Secrets and variables > Actions):
+#   CLOUDFLARE_API_KEY, CLOUDFLARE_EMAIL, CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_PAGES_PROJECT
+name: deploy
+on:
+  push:
+    branches: [ main ]
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 10 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: pnpm install --frozen-lockfile --config.ignore-scripts=true
+      - run: pnpm run build
+      - name: Deploy to Cloudflare Pages
+        run: |
+          npx wrangler@4 pages deploy dist \
+            --project-name="${CLOUDFLARE_PAGES_PROJECT}" \
+            --branch=main --commit-dirty=true
+        env:
+          CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_KEY }}
+          CLOUDFLARE_EMAIL: ${{ secrets.CLOUDFLARE_EMAIL }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_PAGES_PROJECT: ${{ secrets.CLOUDFLARE_PAGES_PROJECT }}
