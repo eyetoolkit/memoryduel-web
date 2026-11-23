@@ -116,6 +116,21 @@
   .battle-spacer{flex:1}
   .battle-round{font-family:var(--mono); font-weight:700; font-size:13px; color:var(--mute); white-space:nowrap}
   .battle-round b{color:var(--indigo-deep); font-size:15px}
+  /* 末题双倍徽章（P0-2）：只在第 10 题出现，用脉冲描边抢注意力，
+     让玩家临到最后一题就知道「这题值两倍」 */
+  .battle-final{
+    display:none; font-family:var(--mono); font-weight:800; font-size:11px;
+    letter-spacing:.06em; color:#fff; padding:5px 10px; border-radius:999px;
+    white-space:nowrap; background:linear-gradient(135deg,var(--gold),var(--red));
+    animation:finalPulse 1.5s ease-out infinite;
+  }
+  .battle-final.on{display:inline-block}
+  @keyframes finalPulse{
+    0%   {box-shadow:0 0 0 0 rgba(239,68,68,.55)}
+    70%  {box-shadow:0 0 0 9px rgba(239,68,68,0)}
+    100% {box-shadow:0 0 0 0 rgba(239,68,68,0)}
+  }
+  @media (prefers-reduced-motion: reduce){ .battle-final{animation:none} }
   .battle-timer{display:flex; align-items:center; gap:9px}
   .battle-timer .timer-val{font-family:var(--mono); font-weight:700; font-size:14px; color:var(--indigo-deep); min-width:26px; text-align:right}
   .battle-timer .timer-bar{width:84px; height:8px; border-radius:999px; background:var(--line); overflow:hidden}
@@ -184,6 +199,9 @@
   .battle-explain b.ex-ok{color:var(--green)}
   .battle-explain b.ex-bad{color:var(--red)}
   .battle-explain .ex-text{margin-top:6px; color:var(--text-strong); font-size:13.5px; line-height:1.6}
+  /* 末题倍率标记：跟在「答对」后面，强调这是双倍题 */
+  .battle-explain .ex-x2{font-style:normal; font-weight:800; font-size:11px; letter-spacing:.04em;
+    color:#fff; background:var(--red); padding:1px 6px; border-radius:999px; margin-left:4px; vertical-align:1px}
   .battle-bot-thinking{text-align:center; padding:12px; color:var(--mute); font-size:13px; font-style:italic}
   .battle-actions{display:flex; gap:10px; justify-content:center; margin-top:18px; flex-wrap:wrap}
 
@@ -328,6 +346,7 @@
       <span class="battle-pill" id="classroomPill" style="display:none" data-i18n="md_teacher.classroom_pill">Classroom</span>
       <span class="battle-pill" id="battleTitle">⚔️ AI Battle</span>
       <span class="battle-spacer"></span>
+      <span class="battle-final" id="battleFinalBadge">FINAL · 2×</span>
       <span class="battle-round">Round <b id="battleCur">1</b> / <span id="battleTotal">10</span></span>
       <span class="battle-timer">
         <span class="timer-val" id="battleTimerVal">15</span>
@@ -406,6 +425,30 @@
     /* ===== Battle 配置 ===== */
     var TOTAL_ROUNDS = 10;
     var PER_QUESTION_MS = 15000;      // 15 秒 / 题
+    /* 2026-11-24 P0-2：计分口径与服务端 lib/duel-tiers.js 严格对齐。
+       答对 = round(15 × (0.35 + 0.65 × speed))，末题再 ×2 —— 秒答 15、
+       压线 5，速度杠杆 2.9 倍；第 10 题 10~30 分。
+       🔴 这里的三条降级路径（revealLocal / localPracticeResult /
+          startPracticeBattle 生成 bot 节奏）全部调 scoreLocal()，
+          改公式只改本函数一处，别再各写一份常数。 */
+    var SCORE_MAX = 15, SCORE_FLOOR = 0.35, FINAL_MULT = 2;
+    /* 纯函数版：轮数由调用方显式给。生成 bot 节奏时 B.questions 还没填，
+       不能依赖 B，必须走这个。 */
+    function scoreAt(correct, ms, round, total) {
+      if (!correct) return 0;
+      var n = Number(total) || TOTAL_ROUNDS;
+      var speed = Math.max(0, Math.min(1, 1 - ms / PER_QUESTION_MS));
+      var base = Math.round(SCORE_MAX * (SCORE_FLOOR + (1 - SCORE_FLOOR) * speed));
+      return Math.round(base * (n > 1 && round === n - 1 ? FINAL_MULT : 1));
+    }
+    function isFinalRound(round) {
+      var n = (B && B.questions && B.questions.length) || TOTAL_ROUNDS;
+      return n > 1 && round === n - 1;
+    }
+    function scoreLocal(correct, ms, round) {
+      return scoreAt(correct, ms, round,
+        (B && B.questions && B.questions.length) || TOTAL_ROUNDS);
+    }
     /* 🔴 2026-10-29：AI 难度档。
        原先三个常量写死（2–9 秒思考 / 62% 正确率），而类别选择与难度诉求
        在 UI 上无从体现 —— 玩家只能和一个固定强度的对手打，打两局就腻。
@@ -575,6 +618,9 @@
       document.getElementById('battleExplain').innerHTML = '';
       document.getElementById('battleBotThinking').style.display = 'none';
       document.getElementById('battleActions').innerHTML = '';
+      /* 末题双倍提示：进第 10 题就亮徽章，别等答完才知道这题值两倍 */
+      var finalBadge = document.getElementById('battleFinalBadge');
+      if (finalBadge) finalBadge.classList.toggle('on', isFinalRound(B.idx));
 
       var letters = ['A','B','C','D','E','F'];
       var optsHtml = '';
@@ -675,12 +721,11 @@
       var q = B.questions[round];
       if (!q || typeof q.ans !== 'number' || q.ans < 0) return;
       var correct = option === q.ans;
-      var gained = correct
-        ? 10 + Math.round(5 * Math.max(0, Math.min(1, 1 - ms / PER_QUESTION_MS)))
-        : 0;
+      var gained = scoreLocal(correct, ms, round);
       paintReveal({
         round: round, yourOption: option, correctOption: q.ans, correct: correct,
-        yourGained: gained, explain: q.explain || q.ex || null,
+        yourGained: gained, mult: isFinalRound(round) ? FINAL_MULT : 1,
+        explain: q.explain || q.ex || null,
       });
     }
 
@@ -696,8 +741,10 @@
 
       var head;
       if (r.correct) {
+        var dbl = (Number(r.mult) || 1) > 1
+          ? ' <i class="ex-x2">×' + (Number(r.mult) || 1) + '</i>' : '';
         head = '<b class="ex-ok">✓ ' +
-               T('duel.correct', zhOnly('答对', 'Correct')) +
+               T('duel.correct', zhOnly('答对', 'Correct')) + dbl +
                ' +' + (Number(r.yourGained) || 0) + '</b>';
       } else if (yi < 0) {
         head = '<b class="ex-bad">⏱ ' +
@@ -830,10 +877,11 @@
       for (var i = 0; i < B.questions.length; i++) {
         var q = B.questions[i], a = answers[i];
         var correct = a.option === q.ans;
-        var gained = correct ? 10 + Math.round(5 * Math.max(0, Math.min(1, 1 - a.ms / PER_QUESTION_MS))) : 0;
+        var gained = scoreLocal(correct, a.ms, i);
         var p = B.botPlan[i] || { gained: 0, option: -1 };
         you += gained; bot += Number(p.gained) || 0;
         per.push({ round: i, yourOption: a.option, correctOption: q.ans, correct: correct,
+          mult: isFinalRound(i) ? FINAL_MULT : 1,
           botOption: p.option, botCorrect: p.option === q.ans, yourGained: gained,
           botGained: Number(p.gained) || 0 });
       }
@@ -859,7 +907,8 @@
       }
       var review = '<details class="res-review"><summary>' + T('duel.review','Review all questions') + '</summary><ul>' +
         (r.perQuestion || []).map(function (p) {
-          return '<li>#' + (p.round + 1) + ' · ' +
+          return '<li>#' + (p.round + 1) +
+            ((Number(p.mult) || 1) > 1 ? ' <b class="ex-x2">×' + p.mult + '</b>' : '') + ' · ' +
             (p.correct ? '✅ ' + T('duel.correct','Correct') : '❌ ' + T('duel.wrong','Wrong')) +
             ' · ' + T('duel.your_score','You') + ' +' + p.yourGained +
             ' / ' + T('duel.bot_score','AI') + ' +' + p.botGained + '</li>';
@@ -869,7 +918,8 @@
         '<div class="battle-result ' + outcome + '">' +
           '<h2>' + title + '</h2>' +
           '<div class="score-big">' + youVal + ' : ' + botVal + '</div>' +
-          '<p>' + T('duel.score_note','Correct = 10 pts, plus up to 5 for answer speed.') + '</p>' +
+          '<p>' + T('duel.score_note', zhOnly('答对 5~15 分（越快越高），第 10 题双倍。',
+            'Correct = 5–15 pts by speed · final question ×2.')) + '</p>' +
           '<div class="res-meta">' + chips + '</div>' +
           review +
           '<div class="battle-actions">' +
@@ -915,7 +965,7 @@
         var filtered = pool.filter(function (q) { return !q.diff || tier.diff.indexOf(q.diff) >= 0; });
         if (filtered.length >= TOTAL_ROUNDS) pool = filtered;
         pool = shuffleArr(pool.slice()).slice(0, TOTAL_ROUNDS);
-        var bot = pool.map(function (q) {
+        var bot = pool.map(function (q, qi) {
           var n = (q.options || []).length || 4;
           var correct = Math.random() < tier.acc;
           var option = q.ans, wrong = [];
@@ -924,7 +974,7 @@
             option = wrong.length ? wrong[Math.floor(Math.random() * wrong.length)] : q.ans;
           }
           var thinkMs = Math.round(tier.min + Math.random() * (tier.max - tier.min));
-          var gained = correct ? 10 + Math.round(5 * Math.max(0, 1 - thinkMs / PER_QUESTION_MS)) : 0;
+          var gained = scoreAt(correct, thinkMs, qi, pool.length);
           return { thinkMs: thinkMs, option: option, gained: gained };
         });
         startBattle({ questions: pool, bot: bot, practice: true });
