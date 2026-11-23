@@ -180,6 +180,10 @@
   .battle-explain{margin-top:14px; padding:12px 14px; background:var(--indigo-soft); border-radius:12px; font-size:13px; color:var(--mute); line-height:1.5; display:none}
   .battle-explain.show{display:block}
   .battle-explain b{color:var(--indigo-deep)}
+  /* 2026-11-23 逐题揭晓：对错色条 + 解释正文 */
+  .battle-explain b.ex-ok{color:var(--green)}
+  .battle-explain b.ex-bad{color:var(--red)}
+  .battle-explain .ex-text{margin-top:6px; color:var(--text-strong); font-size:13.5px; line-height:1.6}
   .battle-bot-thinking{text-align:center; padding:12px; color:var(--mute); font-size:13px; font-style:italic}
   .battle-actions{display:flex; gap:10px; justify-content:center; margin-top:18px; flex-wrap:wrap}
 
@@ -510,6 +514,9 @@
          practiceMode 只在服务端不可用时启用，明确不计战绩。 */
       duelId: '', botPlan: [], answers: [], practiceMode: false,
       hintUsed: 0, hintMax: 2, hintCost: 20, submitting: false,
+      /* 2026-11-23：逐题揭晓。revealPending 用于「揭晓未回来前不急着进下一题」，
+         revealCache 存每题的服务端判定，advanceScheduled 防重复排程。 */
+      revealPending: null, revealCache: {}, advanceScheduled: false,
     };
 
     function startBattle(cfg) {
@@ -525,6 +532,7 @@
       B.hintCost = cfg.hintCost || 20;
       B.answers = new Array(B.questions.length);
       B.idx = 0; B.youScore = 0; B.botScore = 0; B.hintUsed = 0; B.submitting = false;
+      B.revealPending = null; B.revealCache = {}; B.advanceScheduled = false;
       document.getElementById('battleStage').classList.add('active');
       document.getElementById('battleTotal').textContent = B.questions.length;
       document.getElementById('battleBotName').textContent = pickBotName();
@@ -547,6 +555,8 @@
       if (B.idx >= B.questions.length) { submitResult(); return; }
       B.answered = false;
       B.botAnswered = false;
+      B.revealPending = null;
+      B.advanceScheduled = false;
 
       var q = B.questions[B.idx];
       var lang = getLang();
@@ -628,7 +638,78 @@
 
     function maybeAdvance() {
       if (!B.answered || !B.botAnswered) return;  // 等双方都落子才进下一题
-      setTimeout(showNextButton, 500);
+      if (B.advanceScheduled) return;             // 双方谁后落子都可能触发，只排一次
+      B.advanceScheduled = true;
+      /* 揭晓请求没回来就先等它：保证玩家一定看到对错与解释，
+         而不是下一题按钮先冒出来把人顶走。 */
+      var pending = B.revealPending || Promise.resolve();
+      pending.then(function () { setTimeout(showNextButton, 450); },
+                   function () { setTimeout(showNextButton, 450); });
+    }
+
+    /* ─── 2026-11-23 逐题揭晓 ───────────────────────────────────────
+       旧行为：答完只记录 option+ms，不出对错，10 题全答完才在结算页
+       一次性公布。150 秒的对局里玩家收不到任何反馈，而每题都带
+       explain，等于白存。
+       新行为：每答一题立刻揭晓「对/错 + 正确答案 + 解释 + 本轮得分」。
+       安全性由服务端保证：/duel/reveal 会把本次作答一并落 KV，
+       结算以服务端记录为准，事后改答案无效。 */
+    function revealRound(option, ms) {
+      var round = B.idx;
+      if (B.practiceMode || !B.duelId) { revealLocal(round, option, ms); return; }
+      var p = mdApi('POST', '/api/md/duel/reveal', {
+        duelId: B.duelId, round: round, option: option, ms: ms,
+      }).then(function (r) {
+        B.revealCache[round] = r;
+        paintReveal(r);
+        return r;
+      }).catch(function (e) {
+        /* 揭晓失败不阻塞对局：结算时 /duel/result 仍会给出完整结果 */
+        console.warn('[duel reveal]', e && (e.msg || e.message));
+      });
+      B.revealPending = p;
+    }
+
+    /* 练习模式（无服务端对局）用本地题库的 ans 判分，公式与服务端一致 */
+    function revealLocal(round, option, ms) {
+      var q = B.questions[round];
+      if (!q || typeof q.ans !== 'number' || q.ans < 0) return;
+      var correct = option === q.ans;
+      var gained = correct
+        ? 10 + Math.round(5 * Math.max(0, Math.min(1, 1 - ms / PER_QUESTION_MS)))
+        : 0;
+      paintReveal({
+        round: round, yourOption: option, correctOption: q.ans, correct: correct,
+        yourGained: gained, explain: q.explain || q.ex || null,
+      });
+    }
+
+    function paintReveal(r) {
+      var btns = document.querySelectorAll('.battle-opt');
+      var ci = Number(r.correctOption);
+      var yi = Number(r.yourOption);
+      if (btns[ci] && ci >= 0) btns[ci].classList.add('correct');
+      if (yi >= 0 && !r.correct && btns[yi]) btns[yi].classList.add('wrong');
+
+      B.youScore += Number(r.yourGained) || 0;
+      updateScores();
+
+      var head;
+      if (r.correct) {
+        head = '<b class="ex-ok">✓ ' + T('duel.correct','Correct') +
+               ' +' + (Number(r.yourGained) || 0) + '</b>';
+      } else if (yi < 0) {
+        head = '<b class="ex-bad">⏱ ' + T('duel.timeout','Time up') +
+               '</b> ' + T('duel.answer_was','The answer was') + ' ' +
+               escHtml(String((B.questions[r.round] &&
+                 (B.questions[r.round].options || [])[ci]) || ''));
+      } else {
+        head = '<b class="ex-bad">✕ ' + T('duel.wrong','Not quite') + '</b>';
+      }
+      var ex = document.getElementById('battleExplain');
+      ex.innerHTML = head + (r.explain
+        ? '<div class="ex-text">' + escHtml(String(r.explain)) + '</div>' : '');
+      ex.classList.add('show');
     }
 
     function renderHintButton() {
@@ -673,13 +754,15 @@
       if (B.answered) return;
       B.answered = true;
       clearInterval(B.timer);
-      /* 只记录「选了哪个 + 用了多久」；不判分、不泄题、不取消 bot 定时器。
-         判分在 /duel/result，正确答案与解释结算时才一次性返回。 */
-      B.answers[B.idx] = { option: idx, ms: Math.max(0, Date.now() - B.timerStart) };
+      /* 记录「选了哪个 + 用了多久」，随即请求逐题揭晓拿对错与解释。
+         结算仍以服务端落库的作答为准，这里改不了分。 */
+      var ms = Math.max(0, Date.now() - B.timerStart);
+      B.answers[B.idx] = { option: idx, ms: ms };
       var btns = document.querySelectorAll('.battle-opt');
       if (btns[idx]) btns[idx].classList.add('picked');
       Array.prototype.forEach.call(btns, function(b) { b.disabled = true; });
       document.getElementById('battleActions').innerHTML = '';
+      revealRound(idx, ms);
       maybeAdvance();
     }
 
@@ -690,6 +773,7 @@
       var btns = document.querySelectorAll('.battle-opt');
       Array.prototype.forEach.call(btns, function(b) { b.disabled = true; });
       document.getElementById('battleActions').innerHTML = '';
+      revealRound(-1, PER_QUESTION_MS);   // 超时也揭晓：至少让玩家看到正确答案与解释
       maybeAdvance();   // bot 定时器照常跑完，不因玩家超时被取消
     }
 
