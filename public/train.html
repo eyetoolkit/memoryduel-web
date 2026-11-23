@@ -696,15 +696,18 @@
 
       var head;
       if (r.correct) {
-        head = '<b class="ex-ok">✓ ' + T('duel.correct','Correct') +
+        head = '<b class="ex-ok">✓ ' +
+               T('duel.correct', zhOnly('答对', 'Correct')) +
                ' +' + (Number(r.yourGained) || 0) + '</b>';
       } else if (yi < 0) {
-        head = '<b class="ex-bad">⏱ ' + T('duel.timeout','Time up') +
-               '</b> ' + T('duel.answer_was','The answer was') + ' ' +
+        head = '<b class="ex-bad">⏱ ' +
+               T('duel.timeout', zhOnly('时间到', 'Time up')) + '</b> ' +
+               T('duel.answer_was', zhOnly('正确答案是', 'The answer was')) + ' ' +
                escHtml(String((B.questions[r.round] &&
                  (B.questions[r.round].options || [])[ci]) || ''));
       } else {
-        head = '<b class="ex-bad">✕ ' + T('duel.wrong','Not quite') + '</b>';
+        head = '<b class="ex-bad">✕ ' +
+               T('duel.wrong', zhOnly('答错', 'Not quite')) + '</b>';
       }
       var ex = document.getElementById('battleExplain');
       ex.innerHTML = head + (r.explain
