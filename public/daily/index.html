@@ -77,6 +77,7 @@
     --kd-amber:#FBBF24;
     --kd-amber-soft:rgba(251,191,36,.14);
   }
+  [hidden]{display:none !important}
   body{
     font-family:var(--kd-ui);
     background:var(--bg);
@@ -378,6 +379,7 @@
     'right_answer': '正确答案',
     'no_answer': '未作答',
     'loading': '加载中…',
+    'submitting': '交卷中…',
     'net_err': '网络异常，请稍后重试。',
     'retry': '重试'
   };
@@ -632,7 +634,7 @@
   function finish() {
     stopTimer();
     show('play');
-    $('kdQ').textContent = K('loading', 'Submitting…');
+    $('kdQ').textContent = K('submitting', 'Submitting…');
     $('kdOpts').innerHTML = '<div class="kd-skel" style="width:100%"></div><div class="kd-skel" style="width:80%"></div>';
     $('kdBar').style.transform = 'scaleX(0)';
 
