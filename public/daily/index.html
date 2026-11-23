@@ -112,6 +112,15 @@
   .kd-chip.hot{border-color:rgba(245,158,11,.5);background:var(--kd-amber-soft);color:#92400E}
   html[data-theme="dark"] .kd-chip.hot{color:var(--kd-amber)}
 
+  /* 金币（结果卡）：琥珀色点睛，与连胜 chip 同色系 */
+  .kd-coin{display:inline-flex;align-items:center;gap:6px;margin-top:2px;padding:5px 12px;border-radius:999px;
+    font-size:13px;font-weight:700;font-family:var(--kd-disp);
+    border:1px solid rgba(245,158,11,.45);background:var(--kd-amber-soft);color:#92400E}
+  html[data-theme="dark"] .kd-coin{color:var(--kd-amber)}
+  /* 游客提示走「一句话」样式，不做成金币药丸 —— 它不是在报收入 */
+  .kd-coin-hint{margin-top:2px;font-size:12.5px;color:var(--text-muted)}
+  .kd-coin-hint a{color:var(--kd-indigo);font-weight:600;text-decoration:underline;text-underline-offset:2px}
+
   /* ─── 卡片 ─── */
   .kd-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--kd-r);
     box-shadow:0 1px 2px rgba(16,18,28,.04),0 12px 32px -18px rgba(16,18,28,.20);padding:22px}
@@ -270,6 +279,7 @@
       <li><span class="n">1</span><span><b>10 questions, 15 seconds each.</b> Answer fast &mdash; a correct answer is worth 5 to 15 points by speed.</span></li>
       <li><span class="n">2</span><span><b>One attempt a day.</b> Your score is settled by the server, not your browser. Refreshing does not give you a reroll.</span></li>
       <li><span class="n">3</span><span><b>Same set for everyone.</b> The board resets at 00:00 UTC, so come back tomorrow to keep your streak.</span></li>
+      <li><span class="n">4</span><span><b>Earn coins.</b> Signed in, a run pays 15&ndash;60 coins &mdash; 15 for showing up, +2 per correct answer, +25 for a perfect run. Board and streak work without an account.</span></li>
     </ul>
     <button class="kd-btn" type="button" id="kdStart">
       <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M7 4l13 8-13 8V4z" fill="currentColor"/></svg>
@@ -305,6 +315,7 @@
       <div class="kd-res-txt">
         <h2 id="kdVerdict">Nice run</h2>
         <p id="kdSummary">—</p>
+        <p class="kd-coin" id="kdCoins" hidden></p>
       </div>
     </div>
 
@@ -381,7 +392,11 @@
     'loading': '加载中…',
     'submitting': '交卷中…',
     'net_err': '网络异常，请稍后重试。',
-    'retry': '重试'
+    'retry': '重试',
+    'coins': '金币',
+    'signin': '登录',
+    'coins_hint': '登录后本局可领金币。',
+    'coins_cap': '今日金币已达上限（250），本局不发金币。'
   };
   var lang = (function () {
     try {
@@ -495,7 +510,8 @@
       if (d.played) {
         S.result = {
           score: d.played.score, correct: d.played.correct, total: S.questions.length,
-          ms: d.played.ms, marks: d.played.marks || [], replayed: true
+          ms: d.played.ms, marks: d.played.marks || [], replayed: true,
+          coins: d.played.coins || 0, coinsGuest: !!d.coinsGuest
         };
         paintResult(S.result, d);
         show('result');
@@ -658,6 +674,7 @@
         ? 'Your session expired. Reload the page and try again.'
         : K('net_err', 'Network hiccup. Your answers are still saved in this browser — reload and submit again.');
       $('kdGrid').innerHTML = '';
+      $('kdCoins').hidden = true;
       $('kdReviewWrap').hidden = true;
       $('kdShare').disabled = true;
       // 答案还在 localStorage 草稿里，重试不需要重做整局
@@ -717,8 +734,35 @@
 
     $('kdShare').disabled = false;
     $('kdShareTxt').textContent = K('share', 'Share result');
+    paintCoins(r);
     $('kdNextNote').textContent = r.replayed ? K('done_today', 'Already submitted today. See you tomorrow.')
       : K('next', 'New set at 00:00 UTC — come back to keep the streak.');
+  }
+
+  /* 金币行三种形态：
+       · 游客      → 登录引导（游客没有钱包，见后端 isGuestPid）
+       · 已发 >0   → +N coins 药丸
+       · 已发 =0   → 日闸打满提示（不是「没发」，是「今天不能再发了」）
+     刷新后 coins 从 today.played 回来，所以这里只看结果不区分首交/replay。 */
+  function paintCoins(r) {
+    var el = $('kdCoins');
+    var n = Number(r.coins) || 0;
+    if (r.coinsGuest) {
+      el.hidden = false;
+      el.className = 'kd-coin-hint';
+      el.innerHTML = '<a href="/membership/">' + K('signin', 'Sign in') + '</a> ' + K('coins_hint', 'to earn coins for today\'s run.');
+      return;
+    }
+    if (n > 0) {
+      el.hidden = false;
+      el.className = 'kd-coin';
+      el.textContent = '+' + n + ' ' + K('coins', 'coins');
+      return;
+    }
+    // 0 金币：只有「登录账号 + 已交卷」才会走到这里，说明当日 250 上限已经打满
+    el.hidden = false;
+    el.className = 'kd-coin-hint';
+    el.textContent = K('coins_cap', 'Daily coin limit reached — no coins for this run.');
   }
 
   function verdictOf(correct, total) {
