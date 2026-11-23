@@ -105,6 +105,28 @@ let answeredCount = 0;
 let timerHandle: number | null = null;
 let currentIdx = 0;
 
+/* P1-9 分品类段位缓冲：局内只往数组里塞，finish() 时一次性写 localStorage。
+   tierSeenIdx 防同一题被记两次（onAnswer 可能因超时/点击并发重入）。
+   规则实现与红线见 public/js/category-tiers.mjs（打包页与遗留页共用同一份）。 */
+const tierBuf: Array<{ cat: string; ok: boolean }> = [];
+const tierSeenIdx = new Set<number>();
+
+/** 把本局作答一次性落盘。
+ *  🔴 三条纪律：
+ *    ① 只在 finish() 调一次 —— 逐题写 localStorage 在 iOS 私密模式会撞
+ *       QuotaExceeded 被静默吞掉，而且写 10 次纯属浪费；
+ *    ② 整段 try/catch —— 段位是纯装饰，绝不能让存储异常打断结算渲染；
+ *    ③ 模块没加载成功（离线/被拦截）就静默跳过，不降级、不报错。 */
+function flushTiers() {
+  if (!tierBuf.length) return;
+  const api = window.CategoryTiers;
+  if (api) {
+    try { api.record(tierBuf.slice()); } catch { /* 装饰性数据，失败即放弃 */ }
+  }
+  tierBuf.length = 0;
+  tierSeenIdx.clear();
+}
+
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T | null;
 
 function show(elId: string) {
@@ -205,6 +227,20 @@ function onAnswer(correct: boolean) {
   answeredCount += 1;
   if (correct) solvedCount += 1;
 
+  /* P1-9 分品类段位（localStorage，纯展示）。
+     🔴 每轮只记一次：onAnswer 有两条可能重入的路径
+        （倒计时到点 + 用户点击几乎同时；题库残缺分支也会直接判错），
+        用 currentIdx 去重，避免同一题算两次。
+     真正的落盘在 finish()，一局一次写。 */
+  if (!tierSeenIdx.has(currentIdx)) {
+    tierSeenIdx.add(currentIdx);
+    const cq = questions[currentIdx];
+    tierBuf.push({
+      cat: String((cq && (cq.cn || (cq as { cat?: string }).cat)) || 'general'),
+      ok: correct === true,
+    });
+  }
+
   // 单题上报（每题一次 round，最细粒度；后端去重靠 round 序号）
   if (roomCode) {
     reportRound(roomCode, {
@@ -231,6 +267,9 @@ function onAnswer(correct: boolean) {
 
 function finish() {
   clearTimer();
+  /* P1-9：先落段位再渲染结算 —— 反过来一旦渲染抛错，这一局的得分就白打了。
+     纯 localStorage，无网络、无并发、不会失败到影响下面任何一步。 */
+  flushTiers();
   const elapsed = Date.now() - startedAt;
   const pass = solvedCount >= TOTAL * PASS_THRESHOLD;
   const outcome = pass ? 'win' : 'loss';

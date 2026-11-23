@@ -83,6 +83,10 @@
 </main>
 
 <script src="/assets/quiz-data.v9.js"></script>
+<!-- P1-9 分品类段位：模块与 lobby/train.html 共用同一份（见 /js/category-tiers.mjs）。
+     必须排在 battle.ts 之前 —— 同为 type="module"，按文档顺序执行；
+     battle.ts 只在 finish() 用 window.CategoryTiers，即使顺序反了也只是跳过段位，不会报错。 -->
+<script type="module" src="/js/category-tiers.mjs?v=1"></script>
 <script type="module" src="/src/pages/battle.ts"></script>
 <!-- md-theme:module -->
 <script type="module" src="/shared/theme.js?v=1"></script>

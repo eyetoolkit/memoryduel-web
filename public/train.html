@@ -384,6 +384,10 @@
 <script defer src="/js/sidebar.js?v=sb34"></script>
 <script src="/i18n/i18n.js?v=59" defer></script>
 <script src="/assets/quiz-data.v9.js" defer></script>
+<!-- P1-9 分品类段位：与大厅页 / /battle/ 共用同一份实现（/js/category-tiers.mjs）。
+     module 天然 defer，本页内联引擎只在结算时才读 window.CategoryTiers，
+     时序上永远够；被拦/离线时 flushTiers() 直接静默跳过，不影响结算。 -->
+<script type="module" src="/js/category-tiers.mjs?v=1"></script>
 
 <!-- Battle Engine: real AI / Online duel game logic -->
   <script>
@@ -562,6 +566,49 @@
       revealPending: null, revealCache: {}, advanceScheduled: false,
     };
 
+    /* ===== P1-9 分品类段位（纯本地展示，2026-11-24） =====
+       规则实现全部在 /js/category-tiers.mjs（大厅页与 /battle/ 共用同一份），
+       本页只负责「攒一局的结果 + 结束时交一次」。
+
+       🔴 为什么这里不逐题判分类：train.html 一局只跑**一个**分类
+          （?cat= 或房间的 category），逐题分类是多余的；
+          而且服务端 /duel/start 下发的题目里根本没有分类字段。
+       🔴 三条红线同模块头注释：不参与结算 / 不记题目内容 / 一局只写一次。 */
+    var TIER_MARKS = [];        // 下标 = round，值 = true(对) / false(错)
+    var TIERS_FLUSHED = false;  // 一局只能写一次；重开/重试都不该重复计
+
+    function runCategory() {
+      // 在线局的分类只有拿到房态后才知道，所以取值放在结算时，不能放在记分时
+      if (mode === 'online') return (OL.category || 'general');
+      return (cat || 'general');
+    }
+
+    function markTier(round, correct) {
+      if (TIERS_FLUSHED) return;
+      var r = Number(round);
+      if (!(r >= 0) || r >= TOTAL_ROUNDS) return;
+      TIER_MARKS[r] = (correct === true);
+    }
+
+    /* 结算入口调用：题已答满，把整局一次性写进 localStorage。
+       🔴 必须整段 try/catch 且失败即放弃 —— 段位是装饰，
+          绝不能让 QuotaExceeded / 私密模式把结算页打崩。 */
+    function flushTiers() {
+      if (TIERS_FLUSHED) return;
+      TIERS_FLUSHED = true;
+      var api = window.CategoryTiers;
+      if (!api) return;
+      var c = runCategory();
+      var pairs = [];
+      for (var i = 0; i < TIER_MARKS.length; i++) {
+        if (typeof TIER_MARKS[i] !== 'boolean') continue;
+        pairs.push({ cat: c, ok: TIER_MARKS[i] });
+      }
+      if (!pairs.length) return;
+      try { api.record(pairs); } catch (e) { /* 装饰性数据，失败即放弃 */ }
+    }
+
+
     function startBattle(cfg) {
       if (!cfg || !cfg.questions || cfg.questions.length === 0) {
         showError('No questions available for this category.');
@@ -730,6 +777,10 @@
     }
 
     function paintReveal(r) {
+      /* P1-9：这里是对错唯一落点 —— 服务端揭晓（paintReveal）、
+         本地练习降级（revealLocal → paintReveal）都汇到这，
+         所以段位只需挂这一处，不必在每个调用点各写一遍。 */
+      markTier(r && r.round, r && r.correct);
       var btns = document.querySelectorAll('.battle-opt');
       var ci = Number(r.correctOption);
       var yi = Number(r.yourOption);
@@ -845,6 +896,10 @@
     function submitResult() {
       if (B.submitting) return;
       B.submitting = true;
+      /* P1-9：题已答满（nextQuestion 判 idx 越界才走到这里），先落段位。
+         放在最前面 —— 后面无论走服务端结算、还是降级本地练习，
+         都不会漏记；而且 localStorage 同步写，不存在竞态。 */
+      flushTiers();
       clearInterval(B.timer);
       if (B.botThinkTimer) { clearTimeout(B.botThinkTimer); B.botThinkTimer = null; }
       var answers = [];
@@ -1316,6 +1371,8 @@
       Array.prototype.forEach.call(btns, function (b) { b.disabled = true; });
       mdApi('POST', '/api/md/answer', { code: OL.code, round: OL.idx, option: idx, ms: ms })
         .then(function (r) {
+          /* P1-9：在线局的对错只在服务端应答里，这里是对错唯一落点 */
+          markTier(OL.idx, r && r.correct);
           if (r.score !== undefined) OL.myScore = r.score;
           var key = (r.answerKey !== undefined && r.answerKey !== null) ? r.answerKey : -1;
           if (btns[key]) btns[key].classList.add('correct');
@@ -1331,6 +1388,9 @@
 
     function onOnlineTimeout() {
       OL.answered = true;
+      /* P1-9：超时在服务端算 0 分（未作答），本地同样记一次「错」，
+         否则 10 题里超时的那几题会被静默跳过 —— 段位只涨不跌就成了刷量漏洞 */
+      markTier(OL.idx, false);
       var btns = document.querySelectorAll('#battleOptions .battle-opt');
       Array.prototype.forEach.call(btns, function (b) { b.disabled = true; });
       var zh = getLang() === 'zh';
@@ -1377,6 +1437,10 @@
 
     function finishOnline() {
       clearInterval(OL.timer);
+      /* P1-9：玩家 10 题答满（renderOnlineQuestion 判 OL.idx 越界才调到这里），
+         在等服务端结算之前先把段位落盘 —— 结算可能因「等对手」拖几分钟，
+         用户中途关页也不该丢掉这局的段位进度。 */
+      flushTiers();
       if (OL.pollTimer) { clearInterval(OL.pollTimer); OL.pollTimer = null; }
       /* 结算：/room/finish 同时是「赛程是否打完」的询问。
          🔴 2026-10-13 深度审核：服务端要求**全员答满**才结算，

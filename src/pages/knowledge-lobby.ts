@@ -29,6 +29,12 @@
  * 真正的入局与错误态由 train.html 自己的引擎负责。
  */
 
+/* P1-9：段位模块的类型契约（仅类型，编译后无运行时代码 —— 实现由
+   /js/category-tiers.mjs 以 <script type="module"> 挂到 window.CategoryTiers）。
+   🔴 不用 import 运行时值：那是 public/ 下的非打包文件，import 会把同一份规则
+      再打一遍进本 chunk，两处口径迟早漂移。 */
+import type { CategoryTiersApi } from '../shared/category-tiers';
+
 /* 🔴 刻意**不**用 declare global 扩展 Window：
    battle.ts 已经全局声明过 window.MemoryDuelQuiz（其 CATEGORIES 形状是 {id,label}），
    本文件若再 augment 一次，两个声明会合并成互不兼容的类型并报错
@@ -48,6 +54,9 @@ const W = window as unknown as {
   i18n?: { getLang?: () => string };
   MemoryDuelQuiz?: QuizApi;
   Identity?: { current?: () => string };
+  /* P1-9：分品类段位（/js/category-tiers.mjs 挂在 window 上，见同目录 d.ts）。
+     没加载成功（离线/被拦截）时是 undefined —— tierBadge() 已按「不画徽章」处理。 */
+  CategoryTiers?: CategoryTiersApi;
 };
 
 const POLL_MAX_MS = 90000; // 匹配最长等待，与 home.mjs POLL_MAX_MS 同值
@@ -225,6 +234,47 @@ function loadLiveCounts(lang: string): void {
     .catch(() => { liveCounts = {}; });
 }
 
+/**
+ * P1-9 分品类段位徽章。
+ *
+ * 🔴 未定级时**也渲染一个空 span**，不是省略：分类卡是
+ *    `display:flex;flex-direction:column`，少一个子元素会让「打过的分类」
+ *    比「没打过的」高 19px，同一行卡片高低不齐，非常难看。
+ *    空 span 带 min-height 占位，视觉上不存在、布局上稳定。
+ *
+ * 🔴 段位是 localStorage 里的两个整数，用户 F12 就能改成钻石 ——
+ *    所以这里**只画徽章**，绝不用它排序、推荐、限制难度或影响匹配。
+ */
+function tierBadge(cat: string, lang: string): string {
+  const api = W.CategoryTiers;
+  if (!api) return '<span class="ct" aria-hidden="true"></span>';
+  try {
+    const b = api.badge(cat, lang);
+    if (b.idx < 0 || !b.text) return '<span class="ct" aria-hidden="true"></span>';
+    return `<span class="ct tier-${esc(b.key)}" title="${esc(b.title)}">${esc(b.text)}</span>`;
+  } catch (_) {
+    return '<span class="ct" aria-hidden="true"></span>';
+  }
+}
+
+/**
+ * 选中分类的段位摘要（给 #kbSelNote 用）。未定级返回空串 ——
+ * 这里不放「未定级」三个字：它会和「Pick a category to start」抢注意力，
+ * 而玩家真正需要的是「打几局就有了」的引导，那句在徽章的 title 里。
+ */
+function tierNote(cat: string, lang: string): string {
+  const api = W.CategoryTiers;
+  if (!api) return '';
+  try {
+    const b = api.badge(cat, lang);
+    if (b.idx < 0) return '';
+    const st = api.stat(cat);
+    return `${b.text} ${Math.round(st.acc * 100)}%`;
+  } catch (_) {
+    return '';
+  }
+}
+
 function renderCategories(): void {
   const grid = el<HTMLDivElement>('catGrid');
   const Q = W.MemoryDuelQuiz;
@@ -253,7 +303,8 @@ function renderCategories(): void {
       noQ ? ' disabled' : ''} role="radio" aria-checked="false">
         <span class="ci cat-icon">${esc(c.icon || '🧩')}</span>
         <span class="cn cat-name">${esc(name)}</span>
-        <span class="cq cat-count">${esc(countText)}</span>
+        <span class="cq cat-count">${esc(countText)}</span>${
+        tierBadge(c.id, lang)}
       </button>`;
   }).join('');
 
@@ -278,7 +329,11 @@ function selectCat(card: HTMLElement): void {
   syncAiHref();
   const note = el<HTMLElement>('kbSelNote');
   const nm = card.querySelector('.cn');
-  if (note && nm) note.textContent = `${nm.textContent || selectedCat} · 10 questions · 15s each`;
+  if (note && nm) {
+    const tier = tierNote(selectedCat, curLang());
+    note.textContent = `${nm.textContent || selectedCat}${tier ? ' · ' + tier : ''}` +
+      ' · 10 questions · 15s each';
+  }
 }
 
 /* ─── 在线匹配（真实端点：join → poll） ─── */
@@ -472,6 +527,14 @@ function main(): void {
   el<HTMLButtonElement>('kbMatchBtn')?.addEventListener('click', startMatch);
   el<HTMLButtonElement>('kbCreateBtn')?.addEventListener('click', createRoom);
   el<HTMLButtonElement>('kbJoinBtn')?.addEventListener('click', joinRoom);
+
+  /* P1-9：从对局页按「返回大厅」走 bfcache 回来时，DOM 会被原样复活 ——
+     段位徽章还是开局前的旧值。pageshow(persisted) 是唯一可靠信号：
+     DOMContentLoaded 不会重跑，visibilitychange 也不一定触发。 */
+  window.addEventListener('pageshow', (e) => {
+    if ((e as PageTransitionEvent).persisted) renderCategories();
+  });
+
 
   // 房间码输入：回车即加入 + 输入时清错误
   const input = el<HTMLInputElement>('kbRoomInput');

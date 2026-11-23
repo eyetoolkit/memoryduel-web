@@ -120,6 +120,41 @@
 .kb-catgrid .cat.on{border-color:var(--orange);background:var(--you-soft);color:var(--orange-deep)}
 .kb-catgrid .cat.locked,.kb-catgrid .cat:disabled{opacity:.5;cursor:not-allowed}
 
+/* ── 分品类段位徽章（P1-9，纯本地进度，不参与任何结算） ──
+   段位色只用在**小面积**（10px 胶囊底 + 同色字），不当正文色：
+   页面已经用 --orange 表示「你」、--rival 表示「对手」，再让大块段位色上屏
+   会和这两个语义打架。视觉上它只是个安静的小标签。
+   🔴 未定级的分类渲染空 span（min-height 占位）而不是不渲染 ——
+      少一个子元素会让卡片矮 19px，同一行高低不齐。 */
+:root{
+  --tier-bronze:#B45309; --tier-bronze-l:rgba(180,83,9,.10);
+  --tier-silver:#5B6B7F; --tier-silver-l:rgba(91,107,127,.12);
+  --tier-gold:#A16207;   --tier-gold-l:rgba(161,98,7,.13);
+  --tier-plat:#0E7490;   --tier-plat-l:rgba(14,116,144,.11);
+  --tier-dia:#4338CA;    --tier-dia-l:rgba(67,56,202,.12);
+}
+html[data-theme="dark"]{
+  --tier-bronze:#F0A868; --tier-bronze-l:rgba(240,168,104,.16);
+  --tier-silver:#A9B6C8; --tier-silver-l:rgba(169,182,200,.16);
+  --tier-gold:#F5C451;   --tier-gold-l:rgba(245,196,81,.16);
+  --tier-plat:#5BD1E6;   --tier-plat-l:rgba(91,209,230,.16);
+  --tier-dia:#A5B4FC;    --tier-dia-l:rgba(165,180,252,.20);
+}
+.kb-catgrid .cat .ct{
+  font-family:var(--ui);font-size:9px;font-weight:800;line-height:1;
+  letter-spacing:.03em;padding:2px 6px;border-radius:999px;
+  /* 空 span 也占位：min-height 与有字时等高，避免整行卡片抖动 */
+  min-height:13px;display:inline-flex;align-items:center;
+  white-space:nowrap;max-width:100%;overflow:hidden;
+}
+.kb-catgrid .cat .ct.tier-bronze{color:var(--tier-bronze);background:var(--tier-bronze-l)}
+.kb-catgrid .cat .ct.tier-silver{color:var(--tier-silver);background:var(--tier-silver-l)}
+.kb-catgrid .cat .ct.tier-gold{color:var(--tier-gold);background:var(--tier-gold-l)}
+.kb-catgrid .cat .ct.tier-platinum{color:var(--tier-plat);background:var(--tier-plat-l)}
+.kb-catgrid .cat .ct.tier-diamond{color:var(--tier-dia);background:var(--tier-dia-l)}
+/* 选中态下徽章不跟着变成橙字（会和 --orange-deep 糊在一起），保持自己的色 */
+.kb-catgrid .cat.on .ct{background-clip:padding-box}
+
 /* ── 模式卡（vs AI / 建房 / 加房） ── */
 .kb-modes{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .kb-mode{

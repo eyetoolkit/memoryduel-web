@@ -191,6 +191,10 @@
 <!-- 题库（分类名 + 题量）；qd8 与 train.html 同源。置 MD_QUIZ_LAZY 关闭全量预取 -->
 <script>window.MD_QUIZ_LAZY = true;</script>
 <script src="/assets/quiz-data.v9.js" defer></script>
+<!-- P1-9 分品类段位：与 battle.html / train.html 共用同一份实现（/js/category-tiers.mjs）。
+     module 天然 defer，赶在 knowledge-lobby.ts 的 renderCategories() 首渲前挂好
+     window.CategoryTiers；万一被拦，徽章退化为空占位，不影响选分类。 -->
+<script type="module" src="/js/category-tiers.mjs?v=1"></script>
 <script type="module" src="/src/pages/knowledge-lobby.ts"></script>
 <script src="/i18n/lang-switcher.js?v=40" defer></script>
 <script type="module" src="/shared/theme.js?v=1"></script>
