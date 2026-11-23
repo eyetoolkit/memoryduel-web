@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" data-site="memory" data-build="%VITE_SHOW_BETA%">
 <head>
-<script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:69,fallback:"en"};</script>
+<script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:70,fallback:"en"};</script>
 <script src="/i18n/i18n.js?v=59"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -168,6 +168,41 @@
   <div class="ar-edge" aria-hidden="true"></div>
 </section>
 
+<!-- ═══════ 每日挑战条（P0-3，2026-11-24）═══════
+     为什么放在 hero 与 how 之间：hero 是「立刻开打」，这里是「每天回来」，
+     两种动机分开表达；同时它是首页唯一带「今日状态」的模块，
+     老用户扫一眼就知道今天还没做（js/daily-teaser.mjs 回填）。
+     样式内联：不往 home-arena.css 塞新块，避免动三站共享皮肤。 -->
+<style>
+  .ar-daily{max-width:1180px;margin:0 auto;padding:0 20px 8px}
+  .ar-daily-in{display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    border:1px solid var(--md-border,#E3E5EE);border-radius:16px;padding:14px 18px;
+    background:linear-gradient(100deg,rgba(79,70,229,.07),rgba(139,92,246,.04) 45%,transparent 80%);
+    transition:border-color .15s,transform .15s}
+  .ar-daily-in:hover{border-color:var(--md-brand,var(--brand,#4F46E5));transform:translateY(-1px)}
+  .ar-daily-ico{width:34px;height:34px;flex:0 0 auto;border-radius:10px;display:grid;place-items:center;
+    background:rgba(79,70,229,.12);color:var(--md-brand,var(--brand,#4F46E5))}
+  .ar-daily-txt{flex:1 1 260px;min-width:0}
+  .ar-daily-txt b{display:block;font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:-.01em}
+  .ar-daily-txt small{display:block;font-size:12.5px;color:var(--text-muted);margin-top:2px}
+  .ar-daily-cta{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;
+    color:#fff;background:var(--md-brand,var(--brand,#4F46E5));border-radius:999px;padding:8px 15px;white-space:nowrap}
+  .ar-daily-cta.done{background:transparent;color:var(--md-text-muted,var(--text-muted));border:1px solid var(--md-border,#E3E5EE)}
+  @media (max-width:560px){ .ar-daily-cta{width:100%;justify-content:center} }
+</style>
+<section class="ar-daily" id="daily" aria-label="Daily challenge">
+  <a class="ar-daily-in" href="/daily/" id="arDaily">
+    <span class="ar-daily-ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="18" height="18"><rect x="3" y="5" width="18" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M9 15l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+    <span class="ar-daily-txt">
+      <b data-i18n="home_v3.daily_t">Daily Challenge</b>
+      <small id="arDailySub" data-i18n="home_v3.daily_d">Ten questions, one attempt, same set for everyone. Keep your streak alive.</small>
+    </span>
+    <span class="ar-daily-cta" id="arDailyCta" data-i18n="home_v3.daily_cta">Play today →</span>
+  </a>
+</section>
+
 <!-- ═══════ HOW IT WORKS（复用 home_v2 三步键） ═══════ -->
 <section class="ar-section wrap" id="how" aria-label="How to play">
   <div class="ar-sec-head">
@@ -299,6 +334,8 @@
 <script type="module" src="/js/eco-home.mjs?v=1"></script>
 <!-- 竞技场首屏交互：倒计时 / 选项反馈（不触碰对战引擎） -->
 <script type="module" src="/js/home-arena.mjs?v=1"></script>
+<!-- 每日挑战条状态回填（今日已交卷 / 连胜 / 未开始） -->
+<script type="module" src="/js/daily-teaser.mjs?v=1"></script>
 <script src="/i18n/lang-switcher.js?v=40" defer></script>
 <script type="module" src="/shared/theme.js?v=1"></script>
 <!-- 🔴 2026-11-04：首页不再加载 /js/chrome-mem.js。

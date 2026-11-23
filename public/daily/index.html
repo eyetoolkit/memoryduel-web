@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en" data-site="memory">
+<head>
+  <script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:70,fallback:"en"};</script>
+  <script src="/i18n/i18n.js?v=59"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#F4F5F9">
+  <!-- md-theme:early（防 FOUC）：与首页同源，必须在 theme-color 之后、CSS 之前 -->
+  <script>(function(){try{var t=localStorage.getItem('md-theme2');if(t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.setAttribute('data-theme','dark');var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content','#12131F');}}catch(e){}})();</script>
+
+  <title>Daily Challenge — MemoryDuel</title>
+  <meta name="description" content="One knowledge challenge a day. Ten questions, 15 seconds each, the same set for everyone. Build a streak, climb today's board, share your result as a grid.">
+  <link rel="canonical" href="https://www.memoryduel.com/daily/">
+  <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MemoryDuel">
+  <meta property="og:url" content="https://www.memoryduel.com/daily/">
+  <meta property="og:image" content="https://www.memoryduel.com/og-default.jpg">
+  <meta property="og:title" content="Daily Challenge — MemoryDuel">
+  <meta property="og:description" content="Ten questions, one attempt, same set for everyone. Build a streak and climb today's board.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Daily Challenge — MemoryDuel">
+  <meta name="twitter:description" content="Ten questions, one attempt. Everyone gets the same set.">
+  <meta name="twitter:image" content="https://www.memoryduel.com/og-default.jpg">
+  <link rel="alternate" hreflang="zh-CN" href="https://www.memoryduel.com/daily/">
+  <link rel="alternate" hreflang="en" href="https://www.memoryduel.com/daily/?lang=en">
+  <link rel="alternate" hreflang="ja" href="https://www.memoryduel.com/daily/?lang=ja">
+  <link rel="alternate" hreflang="es" href="https://www.memoryduel.com/daily/?lang=es">
+  <link rel="alternate" hreflang="fr" href="https://www.memoryduel.com/daily/?lang=fr">
+  <link rel="alternate" hreflang="de" href="https://www.memoryduel.com/daily/?lang=de">
+  <link rel="alternate" hreflang="x-default" href="https://www.memoryduel.com/daily/">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/css/shared/tokens.css?v=p4fix2">
+  <link rel="stylesheet" href="/shared/align.css?v=1">
+  <link rel="stylesheet" href="/shared/tri-ui.css?v=1">
+  <link rel="preload" href="/fonts/space-grotesk-latin-700.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/sora-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Daily Challenge">
+
+  <style>
+  /* ═══════════════════════════════════════════════════════════════
+     每日挑战 /daily/ · 自包含皮肤（2026-11-24 P0-3）
+     ───────────────────────────────────────────────────────────────
+     为什么 CSS 内联而不是 src/styles：
+       本页放在 public/ 下（与 train.html 同策略），不过 vite 构建，
+       引用 /src/styles/*.css 在生产会 404。中立色全部走 tokens.css
+       的 --bg/--surface/--border/--text/--text-muted，暗色自动跟随，
+       品牌色用 --brand（memoryduel = 靛蓝），点睛色 --kd-amber
+       只出现在「计时 / 得分 / 连胜」。
+
+     红线：
+       · 不用 emoji 当图标（iOS 渲染不一致），图标一律 SVG 或不带
+       · 计时条宽度用 transform 而不是 width，避免每帧 layout
+     ═══════════════════════════════════════════════════════════════ */
+  :root{
+    --kd-amber:#F59E0B;
+    --kd-amber-soft:rgba(245,158,11,.12);
+    --kd-green:#16A34A;
+    --kd-green-soft:rgba(22,163,74,.10);
+    --kd-red:#DC2626;
+    --kd-red-soft:rgba(220,38,38,.09);
+    --kd-indigo:#4F46E5;
+    --kd-indigo-soft:rgba(79,70,229,.10);
+    --kd-r:18px;
+    --kd-disp:'Space Grotesk',system-ui,-apple-system,sans-serif;
+    --kd-ui:'Sora','Inter',system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  html[data-theme="dark"]{
+    --kd-indigo:#8B8CF7;
+    --kd-indigo-soft:rgba(139,140,247,.14);
+    --kd-green:#4ADE80;
+    --kd-green-soft:rgba(74,222,128,.12);
+    --kd-red:#F87171;
+    --kd-red-soft:rgba(248,113,113,.12);
+    --kd-amber:#FBBF24;
+    --kd-amber-soft:rgba(251,191,36,.14);
+  }
+  body{
+    font-family:var(--kd-ui);
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    display:flex;flex-direction:column;
+  }
+  a{color:inherit;text-decoration:none}
+  .kd-wrap{width:100%;max-width:720px;margin:0 auto;padding:18px 18px 64px;flex:1}
+
+  /* ─── 顶栏 ─── */
+  .kd-nav{display:flex;align-items:center;gap:12px;padding:6px 0 14px}
+  .kd-logo{display:inline-flex;align-items:center;gap:8px;font-family:var(--kd-disp);font-weight:700;font-size:16px;letter-spacing:-.01em}
+  .kd-logo .mk{width:18px;height:18px;border-radius:6px;background:linear-gradient(135deg,var(--kd-indigo),#8B5CF6);display:block}
+  .kd-nav .sp{flex:1}
+  .kd-navlink{font-size:13px;color:var(--text-muted);border:1px solid var(--border);border-radius:999px;padding:5px 12px;transition:.15s}
+  .kd-navlink:hover{color:var(--text);border-color:var(--text-muted)}
+
+  /* ─── 英雄区 ─── */
+  .kd-hero{text-align:center;padding:10px 0 18px}
+  .kd-eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:600;letter-spacing:.10em;text-transform:uppercase;color:var(--text-muted);font-family:var(--kd-disp)}
+  .kd-eyebrow b{color:var(--kd-indigo);font-weight:700}
+  .kd-hero h1{font-family:var(--kd-disp);font-weight:700;font-size:clamp(28px,6.2vw,40px);line-height:1.08;letter-spacing:-.025em;margin:8px 0 8px}
+  .kd-hero h1 em{font-style:normal;color:var(--kd-indigo)}
+  .kd-sub{font-size:14.5px;color:var(--text-muted);max-width:46ch;margin:0 auto}
+
+  /* ─── 状态条 ─── */
+  .kd-chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:16px 0 14px}
+  .kd-chip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;
+    background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 12px;color:var(--text-muted)}
+  .kd-chip b{color:var(--text);font-family:var(--kd-disp);font-weight:700}
+  .kd-chip.hot{border-color:rgba(245,158,11,.5);background:var(--kd-amber-soft);color:#92400E}
+  html[data-theme="dark"] .kd-chip.hot{color:var(--kd-amber)}
+
+  /* ─── 卡片 ─── */
+  .kd-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--kd-r);
+    box-shadow:0 1px 2px rgba(16,18,28,.04),0 12px 32px -18px rgba(16,18,28,.20);padding:22px}
+  .kd-card + .kd-card{margin-top:16px}
+
+  /* ─── 规则列表（Intro）─── */
+  .kd-rules{list-style:none;display:grid;gap:12px;margin:4px 0 20px}
+  .kd-rules li{display:grid;grid-template-columns:30px 1fr;gap:12px;align-items:start;font-size:14px;color:var(--text-muted)}
+  .kd-rules .n{width:26px;height:26px;border-radius:8px;background:var(--kd-indigo-soft);color:var(--kd-indigo);
+    font-family:var(--kd-disp);font-weight:700;font-size:13px;display:grid;place-items:center}
+  .kd-rules b{color:var(--text);font-weight:600}
+
+  /* ─── 按钮 ─── */
+  .kd-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;
+    font-family:var(--kd-ui);font-weight:700;font-size:15.5px;border:0;border-radius:14px;padding:15px 20px;cursor:pointer;
+    background:linear-gradient(135deg,var(--kd-indigo),#6D5CE7);color:#fff;
+    box-shadow:0 8px 20px -10px rgba(79,70,229,.75);transition:transform .12s,filter .12s}
+  .kd-btn:hover{filter:brightness(1.06)}
+  .kd-btn:active{transform:translateY(1px)}
+  .kd-btn[disabled]{opacity:.55;cursor:not-allowed;filter:none;box-shadow:none}
+  .kd-btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border);box-shadow:none}
+  .kd-btn.ghost:hover{border-color:var(--text-muted);filter:none}
+  .kd-btn.sm{width:auto;padding:10px 16px;font-size:13.5px;border-radius:11px}
+  .kd-cta-row{display:flex;gap:10px;flex-wrap:wrap}
+  .kd-cta-row .kd-btn{flex:1 1 180px;width:auto}
+
+  /* ─── 进度 + 计时 ─── */
+  .kd-top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .kd-prog{font-family:var(--kd-disp);font-weight:700;font-size:13px;color:var(--text-muted);letter-spacing:.02em}
+  .kd-prog b{color:var(--text);font-size:16px}
+  .kd-cat{margin-left:auto;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--kd-indigo);background:var(--kd-indigo-soft);padding:4px 9px;border-radius:7px}
+  .kd-track{height:4px;border-radius:99px;background:var(--border);overflow:hidden;margin-bottom:20px}
+  .kd-bar{height:100%;width:100%;background:var(--kd-indigo);transform-origin:left center;transition:transform .1s linear,background .3s}
+  .kd-bar.warn{background:var(--kd-amber)}
+  .kd-bar.danger{background:var(--kd-red)}
+
+  .kd-q{font-family:var(--kd-disp);font-weight:700;font-size:clamp(19px,3.4vw,23px);line-height:1.35;letter-spacing:-.015em;margin-bottom:18px}
+
+  /* ─── 选项 ─── */
+  .kd-opts{display:grid;gap:10px}
+  .kd-opt{display:grid;grid-template-columns:30px 1fr;gap:12px;align-items:center;text-align:left;width:100%;
+    background:var(--bg);border:1.5px solid var(--border);border-radius:13px;padding:14px 16px;cursor:pointer;
+    font-family:var(--kd-ui);font-size:15px;color:var(--text);transition:.14s}
+  .kd-opt:hover:not([disabled]){border-color:var(--kd-indigo);transform:translateY(-1px)}
+  .kd-opt .l{width:24px;height:24px;border-radius:7px;background:var(--surface);border:1px solid var(--border);
+    font-family:var(--kd-disp);font-weight:700;font-size:12.5px;color:var(--text-muted);display:grid;place-items:center}
+  .kd-opt[disabled]{cursor:default}
+  .kd-opt.on{border-color:var(--kd-indigo);background:var(--kd-indigo-soft)}
+  .kd-opt.on .l{background:var(--kd-indigo);color:#fff;border-color:transparent}
+  .kd-opt.right{border-color:var(--kd-green);background:var(--kd-green-soft)}
+  .kd-opt.right .l{background:var(--kd-green);color:#fff;border-color:transparent}
+  .kd-opt.wrong{border-color:var(--kd-red);background:var(--kd-red-soft)}
+  .kd-opt.wrong .l{background:var(--kd-red);color:#fff;border-color:transparent}
+
+  /* ─── 结果 ─── */
+  .kd-res-head{display:flex;align-items:center;gap:20px;flex-wrap:wrap;justify-content:center;margin-bottom:6px}
+  .kd-ring{position:relative;width:112px;height:112px;flex:0 0 auto}
+  .kd-ring svg{transform:rotate(-90deg)}
+  .kd-ring .in{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+  .kd-ring .in b{font-family:var(--kd-disp);font-weight:700;font-size:30px;line-height:1;display:block}
+  .kd-ring .in small{display:block;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-top:3px}
+  .kd-res-txt{text-align:left;min-width:150px}
+  .kd-res-txt h2{font-family:var(--kd-disp);font-weight:700;font-size:22px;line-height:1.2;letter-spacing:-.02em;margin-bottom:6px}
+  .kd-res-txt p{font-size:13.5px;color:var(--text-muted)}
+  .kd-res-txt p b{color:var(--text)}
+
+  .kd-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;margin:20px 0 6px}
+  .kd-grid i{aspect-ratio:1;border-radius:7px;background:var(--border);display:block;position:relative}
+  .kd-grid i.ok{background:var(--kd-green)}
+  .kd-grid i.no{background:var(--kd-red);opacity:.30}
+  .kd-grid i.skip{background:var(--border)}
+
+  .kd-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+  .kd-actions .kd-btn{flex:1 1 170px;width:auto}
+
+  /* ─── 复盘 ─── */
+  .kd-review{margin-top:6px;border-top:1px solid var(--border);padding-top:16px}
+  .kd-review h3{font-family:var(--kd-disp);font-weight:700;font-size:14px;margin-bottom:12px;color:var(--text-muted);
+    letter-spacing:.06em;text-transform:uppercase}
+  .kd-rv{padding:12px 0;border-bottom:1px solid var(--border);font-size:14px}
+  .kd-rv:last-child{border-bottom:0}
+  .kd-rv .q{font-weight:600;margin-bottom:6px;line-height:1.4}
+  .kd-rv .a{font-size:13px;color:var(--text-muted);display:grid;gap:3px}
+  .kd-rv .a span b{color:var(--kd-green);font-weight:600}
+  .kd-rv .a span.bad b{color:var(--kd-red);font-weight:600}
+  .kd-rv .ex{font-size:13px;color:var(--text-muted);margin-top:6px;padding:9px 11px;background:var(--bg);border-radius:9px;line-height:1.5}
+
+  /* ─── 日榜 ─── */
+  .kd-board-h{display:flex;align-items:baseline;gap:8px;margin-bottom:12px}
+  .kd-board-h h2{font-family:var(--kd-disp);font-weight:700;font-size:16px}
+  .kd-board-h small{color:var(--text-muted);font-size:12.5px}
+  .kd-row{display:grid;grid-template-columns:26px 1fr auto auto;gap:10px;align-items:center;padding:9px 0;
+    border-bottom:1px solid var(--border);font-size:13.5px}
+  .kd-row:last-child{border-bottom:0}
+  .kd-row .rk{font-family:var(--kd-disp);font-weight:700;color:var(--text-muted);text-align:center}
+  .kd-row .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .kd-row .cr{color:var(--text-muted);font-size:12.5px;font-variant-numeric:tabular-nums}
+  .kd-row .sc{font-family:var(--kd-disp);font-weight:700;font-variant-numeric:tabular-nums}
+  .kd-row.me{background:var(--kd-indigo-soft);border-radius:9px;padding-left:8px;padding-right:8px;margin:0 -8px}
+  .kd-row.me .rk,.kd-row.me .nm{color:var(--kd-indigo)}
+  .kd-empty{color:var(--text-muted);font-size:13.5px;padding:10px 0}
+
+  /* ─── 提示 / 错误 ─── */
+  .kd-note{font-size:12.5px;color:var(--text-muted);margin-top:12px;text-align:center}
+  .kd-err{margin-top:12px;font-size:13px;color:var(--kd-red);background:var(--kd-red-soft);border-radius:10px;padding:10px 12px}
+  .kd-resume{margin-bottom:16px;padding:12px 14px;border:1px dashed var(--border);border-radius:12px;
+    display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--text-muted)}
+  .kd-resume .sp{flex:1}
+  .kd-skel{height:14px;border-radius:6px;background:var(--border);opacity:.6;animation:kdPulse 1.2s ease-in-out infinite}
+  @keyframes kdPulse{0%,100%{opacity:.35}50%{opacity:.75}}
+
+  .kd-foot{text-align:center;font-size:12px;color:var(--text-muted);padding:26px 18px 30px}
+  .kd-foot a{text-decoration:underline;text-underline-offset:2px}
+  .kd-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  @media (max-width:480px){
+    .kd-card{padding:18px 16px}
+    .kd-ring{width:96px;height:96px}
+    .kd-res-txt{text-align:center;min-width:0;flex:1 1 100%}
+  }
+  </style>
+</head>
+<body>
+<div class="kd-wrap">
+
+  <nav class="kd-nav">
+    <a class="kd-logo" href="/"><span class="mk"></span>MemoryDuel</a>
+    <span class="sp"></span>
+    <a class="kd-navlink" href="/games/knowledge-duel/lobby/">Duel &rarr;</a>
+  </nav>
+
+  <header class="kd-hero">
+    <p class="kd-eyebrow"><span id="kdDate">TODAY</span> &middot; <b id="kdNo">#1</b></p>
+    <h1>Daily <em>Challenge</em></h1>
+    <p class="kd-sub" id="kdSub">Ten questions. One attempt. Everyone in the world gets the same set today.</p>
+  </header>
+
+  <div class="kd-chips" id="kdChips" hidden>
+    <span class="kd-chip hot" id="kdStreakChip" hidden>
+      <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M12 2s5 4.5 5 9a5 5 0 0 1-10 0c0-1.6.6-3 1.4-4.2C9.2 8.6 10 10 10 10s-.4-4.4 2-8z" fill="currentColor"/></svg>
+      <span id="kdStreakTxt">0</span>
+    </span>
+    <span class="kd-chip" id="kdRankChip" hidden>Rank <b id="kdRankTxt">—</b></span>
+    <span class="kd-chip" id="kdPlayersChip">Players <b id="kdPlayersTxt">0</b></span>
+  </div>
+
+  <!-- ═══════ Intro ═══════ -->
+  <section class="kd-card" id="viewIntro">
+    <div id="kdResumeBox" class="kd-resume" hidden>
+      <span id="kdResumeTxt">You have an unfinished run.</span>
+      <span class="sp"></span>
+      <button class="kd-btn sm ghost" type="button" id="kdResumeBtn">Resume</button>
+      <button class="kd-btn sm ghost" type="button" id="kdRestartBtn">Start over</button>
+    </div>
+    <ul class="kd-rules">
+      <li><span class="n">1</span><span><b>10 questions, 15 seconds each.</b> Answer fast &mdash; a correct answer is worth 5 to 15 points by speed.</span></li>
+      <li><span class="n">2</span><span><b>One attempt a day.</b> Your score is settled by the server, not your browser. Refreshing does not give you a reroll.</span></li>
+      <li><span class="n">3</span><span><b>Same set for everyone.</b> The board resets at 00:00 UTC, so come back tomorrow to keep your streak.</span></li>
+    </ul>
+    <button class="kd-btn" type="button" id="kdStart">
+      <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M7 4l13 8-13 8V4z" fill="currentColor"/></svg>
+      Start today's challenge
+    </button>
+    <p class="kd-note" id="kdIntroNote">No login. Your run is tied to this browser.</p>
+    <div class="kd-err" id="kdIntroErr" hidden></div>
+  </section>
+
+  <!-- ═══════ Play ═══════ -->
+  <section class="kd-card" id="viewPlay" hidden>
+    <div class="kd-top">
+      <span class="kd-prog"><b id="kdIdx">1</b> / <span id="kdTotal">10</span></span>
+      <span class="kd-cat" id="kdCat">general</span>
+    </div>
+    <div class="kd-track"><i class="kd-bar" id="kdBar"></i></div>
+    <p class="kd-q" id="kdQ">&nbsp;</p>
+    <div class="kd-opts" id="kdOpts"></div>
+  </section>
+
+  <!-- ═══════ Result ═══════ -->
+  <section class="kd-card" id="viewResult" hidden>
+    <div class="kd-res-head">
+      <div class="kd-ring">
+        <svg width="100%" height="100%" viewBox="0 0 120 120" aria-hidden="true">
+          <circle cx="60" cy="60" r="52" fill="none" stroke="var(--border)" stroke-width="9"/>
+          <circle id="kdRingFg" cx="60" cy="60" r="52" fill="none" stroke="var(--kd-indigo)" stroke-width="9"
+                  stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"
+                  style="transition:stroke-dashoffset .6s cubic-bezier(.2,.8,.2,1)"/>
+        </svg>
+        <span class="in"><b id="kdScore">0</b><small id="kdPts">pts</small></span>
+      </div>
+      <div class="kd-res-txt">
+        <h2 id="kdVerdict">Nice run</h2>
+        <p id="kdSummary">—</p>
+      </div>
+    </div>
+
+    <div class="kd-grid" id="kdGrid" aria-hidden="true"></div>
+
+    <div class="kd-actions">
+      <button class="kd-btn" type="button" id="kdShare">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M12 3v12M8 7l4-4 4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span id="kdShareTxt">Share result</span>
+      </button>
+      <button class="kd-btn ghost" type="button" id="kdRetry" hidden>Retry submit</button>
+      <a class="kd-btn ghost" href="/games/knowledge-duel/lobby/" id="kdDuelBtn">Play a duel</a>
+    </div>
+    <p class="kd-note" id="kdNextNote"></p>
+
+    <div class="kd-review" id="kdReviewWrap" hidden>
+      <h3>Review</h3>
+      <div id="kdReview"></div>
+    </div>
+  </section>
+
+  <!-- ═══════ Board ═══════ -->
+  <section class="kd-card">
+    <div class="kd-board-h">
+      <h2>Today's board</h2>
+      <small id="kdBoardNote">same set, one attempt</small>
+    </div>
+    <div id="kdBoard"><div class="kd-empty">Loading…</div></div>
+  </section>
+
+</div>
+
+<footer class="kd-foot">
+  <span>MemoryDuel · <a href="/">home</a> · <a href="/games/knowledge-duel/lobby/">duel</a> · <a href="/membership/">scoring</a></span>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ─── 文案：英文直接内联在 HTML/JS 里（SEO 与缺字典两项都稳），
+         zh 走本地表，其余语言回落英文 —— 与对决揭晓页同一策略。 ─── */
+  var ZH = {
+    'sub': '十道题，一次机会。今天全球玩家做同一套题。',
+    'start': '开始今天的挑战',
+    'intro_note': '无需登录，成绩绑定在当前浏览器。',
+    'pts': '分',
+    'players': '参与',
+    'rank': '名次',
+    'streak': '连胜',
+    'day': '天',
+    'today': '今天',
+    'board': '今日榜',
+    'board_note': '同题同卷 · 一人一次',
+    'review': '复盘',
+    'share': '分享成绩',
+    'share_done': '已复制',
+    'duel': '去打一局对决',
+    'resume': '你有一局还没交卷。',
+    'resume_btn': '继续',
+    'restart_btn': '重新开始',
+    'next': '明天 00:00 UTC 换新题，连胜别断。',
+    'done_today': '今天已经交过卷了。明天再来。',
+    'v_perfect': '满分，无懈可击',
+    'v_great': '很强',
+    'v_good': '不错',
+    'v_meh': '还行',
+    'v_low': '明天再来',
+    'correct_n': '答对',
+    'of': '/',
+    'your_answer': '你的选择',
+    'right_answer': '正确答案',
+    'no_answer': '未作答',
+    'loading': '加载中…',
+    'net_err': '网络异常，请稍后重试。',
+    'retry': '重试'
+  };
+  var lang = (function () {
+    try {
+      if (window.i18n && window.i18n.getLang) return window.i18n.getLang();
+    } catch (e) {}
+    var m = /[?&]lang=([a-z]{2})/.exec(location.search);
+    if (m) return m[1];
+    try { return (localStorage.getItem('md-lang') || localStorage.getItem('md_lang') || 'en').slice(0, 2); } catch (e) { return 'en'; }
+  })();
+  function K(key, en) { return (lang === 'zh' && ZH[key]) ? ZH[key] : en; }
+
+  /* ─── API + 会话（沿用 train.html 的 md_session 契约，绝不另起身份键）─── */
+  var sessionPromise = null;
+  function ensureSession() {
+    if (sessionPromise) return sessionPromise;
+    sessionPromise = (function () {
+      var s = null;
+      try { s = JSON.parse(localStorage.getItem('md_session') || 'null'); } catch (e) {}
+      if (s && s.pid && s.token) return Promise.resolve(s);
+      return fetch('/api/md/session', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          if (!j || !j.ok || !j.data || !j.data.pid) throw new Error('session');
+          var n = { pid: j.data.pid, token: j.data.token };
+          try { localStorage.setItem('md_session', JSON.stringify(n)); } catch (e) {}
+          return n;
+        });
+    })();
+    return sessionPromise;
+  }
+  function api(method, path, body) {
+    return ensureSession().then(function (s) {
+      var opt = { method: method, headers: { 'X-Player-ID': s.pid, 'X-Player-Token': s.token, 'X-Lang': lang } };
+      if (body) { opt.headers['Content-Type'] = 'application/json'; opt.body = JSON.stringify(body); }
+      return fetch(path, opt).then(function (r) { return r.json(); }).then(function (j) {
+        if (!j || !j.ok) {
+          var e = new Error((j && j.error && j.error.msg) || 'api_error');
+          e.code = (j && j.error && j.error.code) || '';
+          throw e;
+        }
+        return j.data;
+      });
+    });
+  }
+
+  /* ─── DOM ─── */
+  var $ = function (id) { return document.getElementById(id); };
+  var V = { intro: $('viewIntro'), play: $('viewPlay'), result: $('viewResult') };
+  var S = {
+    date: '', no: 1, questions: [], idx: 0, answers: [], timer: null, t0: 0, elapsed: 0,
+    busy: false, result: null, windowMs: 15000, streak: 0, players: 0, rank: null, pendingDraft: null
+  };
+  var DRAFT_KEY = 'md_kdaily_draft';
+
+  function show(which) {
+    Object.keys(V).forEach(function (k) { V[k].hidden = (k !== which); });
+  }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function fmtPct(n) { return Math.max(0, Math.min(100, n)); }
+
+  /* 第几天：以 2026-01-01 为 #1，纯展示用（服务端只给日期，不给编号） */
+  function dayNo(dateStr) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr || '');
+    if (!m) return 1;
+    var d = Date.UTC(+m[1], +m[2] - 1, +m[3]);
+    var base = Date.UTC(2026, 0, 1);
+    return Math.max(1, Math.round((d - base) / 86400000) + 1);
+  }
+
+  /* ─── 草稿（只在本地，交卷成功后清掉）─── */
+  function readDraft() {
+    try {
+      var d = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
+      if (d && d.date && Array.isArray(d.answers) && d.idx >= 0) return d;
+    } catch (e) {}
+    return null;
+  }
+  function saveDraft() {
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ date: S.date, idx: S.idx, answers: S.answers }));
+    } catch (e) {}
+  }
+  function clearDraft() { try { localStorage.removeItem(DRAFT_KEY); } catch (e) {} }
+
+  /* ══════════ 引导 ══════════ */
+  function boot() {
+    api('GET', '/api/md/kdaily/today').then(function (d) {
+      S.date = d.date;
+      S.no = dayNo(d.date);
+      S.questions = d.questions || [];
+      S.windowMs = d.windowMs || 15000;
+      S.streak = d.streak || 0;
+      S.players = d.players || 0;
+      S.rank = d.rank;
+      $('kdTotal').textContent = S.questions.length || 10;
+
+      var dt = new Date(d.date + 'T00:00:00Z');
+      $('kdDate').textContent = dt.toLocaleDateString(lang === 'zh' ? 'zh-CN' : lang, {
+        month: 'short', day: 'numeric', timeZone: 'UTC'
+      }).toUpperCase();
+      $('kdNo').textContent = '#' + S.no;
+      $('kdSub').textContent = K('sub', 'Ten questions. One attempt. Everyone in the world gets the same set today.');
+
+      paintChips();
+      paintBoard(d.top || []);
+
+      if (d.played) {
+        S.result = {
+          score: d.played.score, correct: d.played.correct, total: S.questions.length,
+          ms: d.played.ms, marks: d.played.marks || [], replayed: true
+        };
+        paintResult(S.result, d);
+        show('result');
+        return;
+      }
+
+      var draft = readDraft();
+      if (draft && draft.date === d.date && draft.answers.length) {
+        $('kdResumeBox').hidden = false;
+        $('kdResumeTxt').textContent = K('resume', 'You have an unfinished run.') + ' (' + draft.answers.length + '/' + S.questions.length + ')';
+        S.pendingDraft = draft;
+      }
+      show('intro');
+    }).catch(function (e) {
+      show('intro');
+      $('kdIntroErr').hidden = false;
+      $('kdIntroErr').textContent = (e && e.code === 'RATE_LIMITED')
+        ? 'Too many requests — wait a few seconds and reload.'
+        : K('net_err', 'Network hiccup. Please reload and try again.');
+      paintBoard([]);
+      $('kdStart').disabled = true;
+    });
+  }
+
+  function paintChips() {
+    $('kdChips').hidden = false;
+    $('kdStreakChip').hidden = !(S.streak > 0);
+    $('kdStreakTxt').textContent = S.streak + ' ' + K('day', 'day') + (S.streak > 1 ? (lang === 'zh' ? '' : 's') : '');
+    if (S.rank) {
+      $('kdRankChip').hidden = false;
+      $('kdRankTxt').textContent = '#' + S.rank;
+    }
+    $('kdPlayersTxt').textContent = S.players;
+  }
+
+  function paintBoard(rows) {
+    var box = $('kdBoard');
+    if (!rows || !rows.length) {
+      box.innerHTML = '<div class="kd-empty">' + esc(K('board_note', 'Nobody on the board yet today — be the first.')) + '</div>';
+      return;
+    }
+    box.innerHTML = rows.map(function (r) {
+      return '<div class="kd-row' + (r.me ? ' me' : '') + '">'
+        + '<span class="rk">' + r.rank + '</span>'
+        + '<span class="nm">' + esc(r.name) + '</span>'
+        + '<span class="cr">' + r.correct + '/' + S.questions.length + '</span>'
+        + '<span class="sc">' + r.score + '</span>'
+        + '</div>';
+    }).join('');
+  }
+
+  /* ══════════ 开局 ══════════ */
+  function startRun(resumeFrom) {
+    if (!S.questions.length) return;
+    S.answers = [];
+    S.idx = 0;
+    if (resumeFrom) {
+      S.answers = resumeFrom.answers.slice();
+      S.idx = Math.min(resumeFrom.idx || resumeFrom.answers.length, S.questions.length - 1);
+    }
+    clearDraft();
+    show('play');
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    var q = S.questions[S.idx];
+    if (!q) return;
+    $('kdIdx').textContent = (S.idx + 1);
+    $('kdCat').textContent = q.cat || 'general';
+    $('kdQ').textContent = q.q;
+
+    var letters = 'ABCD';
+    $('kdOpts').innerHTML = q.options.map(function (o, i) {
+      return '<button class="kd-opt" type="button" data-i="' + i + '">'
+        + '<span class="l">' + letters[i] + '</span><span>' + esc(o) + '</span></button>';
+    }).join('');
+    Array.prototype.forEach.call($('kdOpts').children, function (btn) {
+      btn.addEventListener('click', function () { pick(Number(btn.getAttribute('data-i'))); });
+    });
+
+    startTimer();
+  }
+
+  function startTimer() {
+    stopTimer();
+    S.t0 = Date.now();
+    S.elapsed = 0;
+    paintTimer(0);
+    S.timer = setInterval(function () {
+      S.elapsed = Date.now() - S.t0;
+      paintTimer(S.elapsed);
+      if (S.elapsed >= S.windowMs) {
+        stopTimer();
+        pick(-1);
+      }
+    }, 80);
+  }
+  function stopTimer() { if (S.timer) { clearInterval(S.timer); S.timer = null; } }
+
+  function paintTimer(ms) {
+    var left = Math.max(0, S.windowMs - ms);
+    var pct = left / S.windowMs;
+    var bar = $('kdBar');
+    bar.style.transform = 'scaleX(' + pct.toFixed(4) + ')';
+    bar.className = 'kd-bar' + (pct <= 0.2 ? ' danger' : pct <= 0.45 ? ' warn' : '');
+  }
+
+  function pick(i) {
+    if (S.busy) return;
+    S.busy = true;
+    stopTimer();
+    var q = S.questions[S.idx];
+    var ms = Math.max(0, Math.min(S.windowMs, S.elapsed || (Date.now() - S.t0)));
+    S.answers[S.idx] = { qid: q.qid, pick: i, ms: ms };
+
+    Array.prototype.forEach.call($('kdOpts').children, function (btn) {
+      btn.disabled = true;
+      if (Number(btn.getAttribute('data-i')) === i) btn.classList.add('on');
+    });
+    saveDraft();
+
+    setTimeout(function () {
+      S.busy = false;
+      S.idx++;
+      if (S.idx >= S.questions.length) {
+        finish();
+      } else {
+        saveDraft();
+        renderQuestion();
+      }
+    }, i === -1 ? 220 : 320);
+  }
+
+  /* ══════════ 交卷 ══════════ */
+  function finish() {
+    stopTimer();
+    show('play');
+    $('kdQ').textContent = K('loading', 'Submitting…');
+    $('kdOpts').innerHTML = '<div class="kd-skel" style="width:100%"></div><div class="kd-skel" style="width:80%"></div>';
+    $('kdBar').style.transform = 'scaleX(0)';
+
+    var payload = { answers: S.answers.filter(Boolean), lang: lang };
+    api('POST', '/api/md/kdaily/submit', payload).then(function (d) {
+      clearDraft();
+      S.result = d;
+      S.streak = d.streak || 0;
+      S.players = d.players || 0;
+      S.rank = d.rank;
+      paintChips();
+      paintResult(d, d);
+      paintBoard(d.top || []);
+      show('result');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }).catch(function (e) {
+      show('result');
+      $('kdScore').textContent = '!';
+      $('kdVerdict').textContent = 'Could not submit';
+      $('kdSummary').textContent = (e && e.code === 'UNAUTHORIZED')
+        ? 'Your session expired. Reload the page and try again.'
+        : K('net_err', 'Network hiccup. Your answers are still saved in this browser — reload and submit again.');
+      $('kdGrid').innerHTML = '';
+      $('kdReviewWrap').hidden = true;
+      $('kdShare').disabled = true;
+      // 答案还在 localStorage 草稿里，重试不需要重做整局
+      $('kdRetry').hidden = false;
+    });
+  }
+
+  /* ══════════ 结果渲染 ══════════ */
+  function paintResult(r, full) {
+    var total = (full && full.total) || S.questions.length || 10;
+    var correct = r.correct || 0;
+    var score = r.score || 0;
+    var maxScore = 15 * total;
+
+    $('kdScore').textContent = score;
+    $('kdPts').textContent = K('pts', 'pts');
+    $('kdVerdict').textContent = verdictOf(correct, total);
+    var mins = Math.floor((r.ms || 0) / 60000);
+    var secs = Math.round(((r.ms || 0) % 60000) / 1000);
+    $('kdSummary').innerHTML = K('correct_n', 'Correct') + ' <b>' + correct + '</b> ' + K('of', '/') + ' ' + total
+      + ' &nbsp;·&nbsp; ' + (mins > 0 ? mins + 'm ' : '') + secs + 's'
+      + (S.rank ? ' &nbsp;·&nbsp; ' + K('rank', 'Rank') + ' <b>#' + S.rank + '</b>' : '');
+
+    // 环形进度
+    var C = 2 * Math.PI * 52;
+    var pct = maxScore > 0 ? Math.min(1, score / maxScore) : 0;
+    var ring = $('kdRingFg');
+    ring.setAttribute('stroke-dasharray', C.toFixed(1));
+    ring.setAttribute('stroke-dashoffset', C.toFixed(1));
+    setTimeout(function () { ring.setAttribute('stroke-dashoffset', (C * (1 - pct)).toFixed(1)); }, 60);
+
+    // 十格战绩
+    var marks = r.marks || [];
+    $('kdGrid').innerHTML = marks.map(function (m) {
+      var cls = m.pick === -1 || m.pick == null ? 'skip' : (m.ok ? 'ok' : 'no');
+      return '<i class="' + cls + '"></i>';
+    }).join('');
+
+    // 复盘
+    if (marks.length) {
+      $('kdReviewWrap').hidden = false;
+      $('kdReview').innerHTML = S.questions.map(function (q, i) {
+        var m = marks[i] || {};
+        var yours = (m.pick == null || m.pick === -1) ? K('no_answer', 'No answer') : q.options[m.pick];
+        var right = q.options[m.answer];
+        return '<div class="kd-rv">'
+          + '<div class="q">' + (i + 1) + '. ' + esc(q.q) + '</div>'
+          + '<div class="a"><span class="' + (m.ok ? '' : 'bad') + '">' + K('your_answer', 'Your pick') + ': <b>' + esc(yours) + '</b></span>'
+          + (m.ok ? '' : '<span>' + K('right_answer', 'Correct') + ': <b>' + esc(right) + '</b></span>')
+          + '</div>'
+          + (m.explain ? '<div class="ex">' + esc(m.explain) + '</div>' : '')
+          + '</div>';
+      }).join('');
+    } else {
+      $('kdReviewWrap').hidden = true;
+    }
+
+    $('kdShare').disabled = false;
+    $('kdShareTxt').textContent = K('share', 'Share result');
+    $('kdNextNote').textContent = r.replayed ? K('done_today', 'Already submitted today. See you tomorrow.')
+      : K('next', 'New set at 00:00 UTC — come back to keep the streak.');
+  }
+
+  function verdictOf(correct, total) {
+    var p = total ? correct / total : 0;
+    if (p === 1) return K('v_perfect', 'Flawless');
+    if (p >= 0.8) return K('v_great', 'Sharp');
+    if (p >= 0.6) return K('v_good', 'Solid');
+    if (p >= 0.4) return K('v_meh', 'Decent');
+    return K('v_low', 'Tomorrow is another day');
+  }
+
+  /* ══════════ 分享（Wordle 式方阵，无剧透）══════════ */
+  function shareText() {
+    var r = S.result || {};
+    var marks = r.marks || [];
+    var cells = marks.map(function (m) {
+      if (m.pick === -1 || m.pick == null) return '⬜';
+      return m.ok ? '🟩' : '🟥';
+    });
+    var rows = [];
+    for (var i = 0; i < cells.length; i += 5) rows.push(cells.slice(i, i + 5).join(''));
+    return 'MemoryDuel Daily #' + S.no + ' · ' + (r.correct || 0) + '/' + (S.questions.length || 10)
+      + ' · ' + (r.score || 0) + ' pts'
+      + (S.streak ? ' · 🔥' + S.streak : '') + '\n'
+      + rows.join('\n') + '\n'
+      + 'https://www.memoryduel.com/daily/';
+  }
+
+  function doShare() {
+    var text = shareText();
+    var done = function () {
+      $('kdShareTxt').textContent = K('share_done', 'Copied');
+      setTimeout(function () { $('kdShareTxt').textContent = K('share', 'Share result'); }, 1800);
+    };
+    if (navigator.share) {
+      navigator.share({ text: text, url: 'https://www.memoryduel.com/daily/' }).then(done).catch(function () {
+        copyFallback(text, done);
+      });
+      return;
+    }
+    copyFallback(text, done);
+  }
+  function copyFallback(text, done) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(function () { legacyCopy(text, done); });
+    } else {
+      legacyCopy(text, done);
+    }
+  }
+  function legacyCopy(text, done) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) { window.prompt('Copy your result:', text); }
+    document.body.removeChild(ta);
+  }
+
+  /* ══════════ 事件 ══════════ */
+  $('kdStart').addEventListener('click', function () {
+    $('kdStart').disabled = true;
+    startRun(null);
+  });
+  $('kdResumeBtn').addEventListener('click', function () { startRun(S.pendingDraft || null); });
+  $('kdRestartBtn').addEventListener('click', function () {
+    clearDraft();
+    $('kdResumeBox').hidden = true;
+    startRun(null);
+  });
+  $('kdShare').addEventListener('click', doShare);
+  $('kdRetry').addEventListener('click', function () {
+    $('kdRetry').hidden = true;
+    finish();
+  });
+
+  // 键盘：1-4 / A-D 选项，避免手机外接键盘用户点不到
+  document.addEventListener('keydown', function (e) {
+    if (V.play.hidden) return;
+    var k = e.key.toLowerCase();
+    var idx = -1;
+    if (/^[1-4]$/.test(k)) idx = Number(k) - 1;
+    else if (/^[a-d]$/.test(k)) idx = k.charCodeAt(0) - 97;
+    if (idx >= 0) {
+      var btn = $('kdOpts').children[idx];
+      if (btn && !btn.disabled) btn.click();
+    }
+  });
+
+  // 页面隐藏时停表（不是暂停——回来后按真实流逝时间继续，避免「切标签页白嫖时间」）
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { stopTimer(); }
+    else if (!V.play.hidden && !S.busy && S.t0) {
+      S.elapsed = Date.now() - S.t0;
+      paintTimer(S.elapsed);
+      if (S.elapsed >= S.windowMs) { pick(-1); } else { startTimerFrom(S.elapsed); }
+    }
+  });
+  function startTimerFrom(offset) {
+    stopTimer();
+    var t0 = Date.now() - offset;
+    S.t0 = t0;
+    S.timer = setInterval(function () {
+      S.elapsed = Date.now() - t0;
+      paintTimer(S.elapsed);
+      if (S.elapsed >= S.windowMs) { stopTimer(); pick(-1); }
+    }, 80);
+  }
+
+  boot();
+})();
+</script>
+<script src="/i18n/lang-switcher.js?v=40" defer></script>
+<script type="module" src="/shared/theme.js?v=1"></script>
+</body>
+</html>

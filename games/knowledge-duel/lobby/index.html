@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" data-site="memory">
 <head>
-<script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:69,fallback:"en"};</script>
+<script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:70,fallback:"en"};</script>
 <script src="/i18n/i18n.js?v=59"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -129,6 +129,19 @@
           <div class="mt" data-i18n="home_v2.tab_ai">vs AI</div>
           <div class="md" data-i18n="dl.md_ai">Ten questions, 15s each. Answer fast — a correct answer is worth 5–15 points by speed, and the final question scores double. Pick a difficulty above — harder rivals earn more rating.</div>
           <span class="kb-tag is-gold" data-i18n="dl.tag_main">Main event</span>
+        </div>
+      </a>
+
+      <!-- 02 · 每日挑战（P0-3，2026-11-24）——
+           后端 /api/md/kdaily/* 是知识题每日一局：同题同卷、服务端判分、
+           连胜 + 日榜。放在 vs AI 之后、建房之前：它是「每天都回来」的入口，
+           与「现在就跟人打一局」是两种不同的动机，不该挤在同一个位置。 -->
+      <a class="kb-mode" id="kbDailyBtn" href="/daily/" data-mode="daily">
+        <div class="mi" aria-hidden="true">📅</div>
+        <div>
+          <div class="mt" data-i18n="dl.mt_daily">Daily challenge</div>
+          <div class="md" data-i18n="dl.md_daily">Ten questions, one attempt, the same set for everyone. Server-scored, with a streak and a daily board — new set at 00:00 UTC.</div>
+          <span class="kb-tag is-gold" data-i18n="dl.tag_daily">One a day</span>
         </div>
       </a>
 
