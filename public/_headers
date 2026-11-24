@@ -39,6 +39,13 @@
 /.git/*
   X-Robots-Tag: noindex
 
+# i18n 语言包长缓存（2026-11-07：审计 P1，ja.json 实测 max-age=0 拉取 2.4s）
+# 安全依据：i18n.js 运行时按 BASE_URL+lang+'.json?v='+DICT_VERSION 拉取（?v= 作 cache-buster），
+# 字典更新时站点 bump dictVersion（__I18N_CONFIG__）→ URL 变化 → 边缘缓存自然失效。
+# 7 天 + must-revalidate：即便某次漏 bump 版本，一周后也会强制回源自愈。
+/i18n/*.json
+  Cache-Control: public, max-age=604800, must-revalidate
+
 # Battle / train HTML: short edge cache so quiz-data ?v= bumps land fast
 /train.html
   Cache-Control: public, max-age=60, must-revalidate
