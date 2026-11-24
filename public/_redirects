@@ -25,7 +25,12 @@
 # 接收方点开 302 → /train.html?room=ABC123，与直接用长链进房等价。
 # 🔴 必须 302 而不是 301：房码是**按房间**变化的，同一个 /j/ 路径不同 code
 #    是不同目标；永久重定向会被浏览器长期缓存，房码就永远改不了。
-# 🔴 :splat 放在 query 里是 CF Pages 支持的写法（官方 _redirects 允许在
-#    destination 的路径与查询串中使用占位符）。上线后必须实测一条：
-#    curl -sI https://www.memoryduel.com/j/ABC123 | grep -i location
+# 🔴 :splat 放在 query 里是有效的，2026-11-24 已线上实测：
+#      curl -sI https://www.memoryduel.com/j/ABC123
+#      → HTTP/2 302, location: /train.html?room=ABC123
+# 🔴 完整链路是 2 跳：/j/CODE → (302) /train.html?room=CODE → (308)
+#    /train?room=CODE。后一跳是 CF Pages 对 *.html 的 pretty-URL 归一化，
+#    查询串会原样保留（实测 final room=CODE 仍在）。看着像断了一环，
+#    其实没断 —— 别为了"少一跳"把这里改成 /train?room=:splat，那会让
+#    本站出现第二种 train 地址形态，前后端各处拼链接的写法迟早对不上。
 /j/*  /train.html?room=:splat  302
