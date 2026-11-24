@@ -1285,7 +1285,9 @@
     "seo_title_word_recall": "Mémoire des Mots — Choisissez votre duel",
     "mt_daily": "Défi du jour",
     "md_daily": "Dix questions, une tentative, le même tirage pour tous. Corrigé côté serveur, avec série et classement du jour — nouveau tirage à 00:00 UTC.",
-    "tag_daily": "Un par jour"
+    "tag_daily": "Un par jour",
+    "war_title": "Votre défi est prêt",
+    "war_sub": "Envoyez le code à un ami. Vous pouvez commencer maintenant : il rejoindra le même duel quand il voudra."
   },
   "md": {
     "share_invite_title": "Inviter un ami",

@@ -257,3 +257,103 @@ html[data-theme="dark"]{
 .kb-diff-btn.on b{color:var(--orange-deep)}
 .kb-diff-note{font-size:12px;color:var(--mute);margin:10px 0 0}
 @media(max-width:560px){.kb-diff{grid-template-columns:1fr}.kb-diff-btn{min-height:0}}
+
+/* ═══════════════════════════════════════════════════════════════
+   P1-12 · 「战书」卡片（2026-11-24）
+   ---------------------------------------------------------------------------
+   设计意图 = 登机牌。全卡只有房码一处用力：字号拉到 30-42px、
+   字距 .26em 拉开、等宽数字对齐；其余（标签、链接、按钮）全部压到安静档。
+   与页面既有的「VS 对半分割 + 金火花」不冲突：那是英雄区的主视觉，
+   这张卡是操作区，只在建房那一刻出现。
+
+   🔴 三处必须显式写、不能靠默认值：
+      1. .kb-war[hidden] —— 见下，作者 display 会盖掉浏览器对 [hidden] 的处理
+      2. 触控目标 ≥44px —— 移动端分享是这张卡的主场景，按钮太窄点不中
+      3. letter-spacing 会给末字后也加一份字距，靠 text-indent 补回来才视觉居中
+   ═══════════════════════════════════════════════════════════════ */
+.kb-war{
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  margin-top:18px;padding:22px 20px 20px;
+  background:var(--card);border:1px solid var(--orange);
+  border-radius:var(--md-r-card);
+  /* 唯一一处「这卡是新出现的」暗示：主色描边 + 淡主色投影，不抢英雄区的戏 */
+  box-shadow:0 10px 26px -14px rgba(79,70,229,.45);
+  scroll-margin-top:84px;
+}
+.kb-war:focus{outline:none}
+.kb-war[hidden]{display:none}   /* 🔴 没有这条，上面的 display:flex 会赢过 [hidden] */
+
+.kb-war-kicker{
+  font-family:var(--disp);font-size:10.5px;font-weight:700;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--orange-deep);
+}
+.kb-war-title{
+  font-family:var(--disp);font-weight:700;line-height:1.2;
+  font-size:clamp(20px,5vw,26px);margin:6px 0 0;
+}
+.kb-war-sub{color:var(--mute);font-size:14px;line-height:1.55;max-width:38ch;margin:8px 0 0}
+
+/* ── 票根：虚线框 + 上淡下透，唯一「用力」的地方 ── */
+.kb-war-ticket{
+  width:100%;max-width:380px;margin:16px 0 14px;padding:16px 16px 13px;
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  border:1px dashed rgba(79,70,229,.42);border-radius:14px;
+  background:linear-gradient(180deg,var(--you-soft),transparent 72%);
+}
+.kb-war-cap{
+  font-family:var(--disp);font-size:10.5px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--mute);
+}
+.kb-war-code{
+  font-family:var(--mono);font-weight:700;color:var(--ink);
+  font-size:clamp(30px,9vw,42px);line-height:1.12;
+  /* 房码全是数字与大写字母：等宽数字 + 拉字距 = 一眼可念、可手抄 */
+  font-variant-numeric:tabular-nums;
+  letter-spacing:.26em;
+  text-indent:.26em;   /* 抵消末字后多出的那一份字距，视觉居中 */
+  word-break:break-all;
+}
+.kb-war-link{
+  font-family:var(--mono);font-size:11.5px;color:var(--mute);
+  word-break:break-all;line-height:1.4;
+}
+
+/* ── 动作 ── */
+.kb-war-acts{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;width:100%;max-width:380px}
+.kb-war-act{flex:1 1 108px;min-height:44px;font-size:14px}
+.kb-war-act.ghost{
+  background:transparent;color:var(--ink);
+  border:1px solid var(--line);
+}
+.kb-war-act.ghost:hover{background:var(--you-soft);border-color:var(--orange);color:var(--orange-deep)}
+
+.kb-war-start{
+  display:inline-flex;align-items:center;gap:8px;margin-top:14px;
+  min-height:44px;padding:0 24px;border-radius:999px;
+  background:var(--orange);color:#fff;text-decoration:none;
+  font-family:var(--disp);font-weight:700;font-size:15px;
+  transition:background .12s,transform .12s;
+}
+.kb-war-start:hover{background:var(--orange-deep);transform:translateY(-1px)}
+
+.kb-war-wait,.kb-war-msg{margin:12px 0 0;font-size:12.5px;font-weight:700;min-height:16px}
+.kb-war-wait{color:var(--mute)}
+.kb-war-msg{color:var(--orange-deep)}
+.kb-war-wait[hidden],.kb-war-msg[hidden]{display:none}
+
+@media(max-width:560px){
+  .kb-war{padding:18px 14px 16px}
+  .kb-war-act{flex:1 1 100%}          /* 窄屏三个按钮各占一行，别挤成三个小方块 */
+  .kb-war-start{width:100%;justify-content:center}
+}
+
+/* 暗色：只补本文件新引入的字面量（虚线框/投影），其余由 home.css 暗块统一管 */
+html[data-theme="dark"]{
+  .kb-war{border-color:var(--orange-bright);box-shadow:0 10px 26px -14px rgba(0,0,0,.7)}
+  .kb-war-kicker{color:var(--orange-bright)}
+  .kb-war-ticket{
+    border-color:rgba(129,140,248,.45);
+    background:linear-gradient(180deg,rgba(129,140,248,.13),transparent 72%);
+  }
+  .kb-war-msg{color:var(--orange-bright)}
+}

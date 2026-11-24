@@ -6,3 +6,10 @@ dist/
 *.log
 .DS_Store
 _design-review/
+
+# 容器内构建/部署的本地产物，不该进仓库（2026-11-24 误提交后补）
+.pnpm-store/
+.cf-branch
+.cf-build-env
+.cf-project
+CLAUDE.md

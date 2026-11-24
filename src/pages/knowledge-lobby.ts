@@ -35,6 +35,11 @@
       再打一遍进本 chunk，两处口径迟早漂移。 */
 import type { CategoryTiersApi } from '../shared/category-tiers';
 
+/* P1-12：分享卡（Canvas 绘制 + 弹窗在 /shared/invite-card.mjs，运行时动态加载）。
+   🔴 只 import 这层薄封装（~2KB），重引擎仍是 openShareCard() 内部的 import() ——
+      本页不开图就不下载那 20 多 KB。 */
+import { openShareCard } from '../games/share-card';
+
 /* 🔴 刻意**不**用 declare global 扩展 Window：
    battle.ts 已经全局声明过 window.MemoryDuelQuiz（其 CATEGORIES 形状是 {id,label}），
    本文件若再 augment 一次，两个声明会合并成互不兼容的类型并报错
@@ -96,15 +101,29 @@ function setStatus(msg: string, show: boolean): void {
   s.textContent = msg;
 }
 
-/** 动态节点的译文（kbRules 内部用 innerHTML 生成，不能挂 data-i18n）。 */
+/**
+ * 动态节点的译文（kbRules 内部用 innerHTML 生成，不能挂 data-i18n）。
+ *
+ * 🔴 2026-11-24 修：i18n 的签名是 `t(key, vars, lang, fallback)` ——
+ *    **第四参才是兜底文案**，第二参是插值变量对象。
+ *    旧写法 `t(key, fallback)` 把兜底串塞进了 vars 位，结果是：
+ *    字典缺键（或首屏 i18n 还没加载完）时 `t()` 走不到兜底分支，
+ *    屏幕上出现的是**裸 key**（如 `dl.rule_rounds`），而不是这里给的英文。
+ *    这在本页静默了很久——因为正常情况下字典都在 30ms 内就位，
+ *    只有慢网/被拦截/新加键这三种情况才会把裸 key 翻出来。
+ */
 function tr(key: string, fallback: string): string {
   try {
     const g = window as unknown as {
-      __t?: (k: string, f?: string) => string;
-      t?: (k: string, f?: string) => string;
+      __t?: (k: string, v?: unknown, l?: string, f?: string) => string;
+      t?: (k: string, v?: unknown, l?: string, f?: string) => string;
     };
-    if (g.__t) return g.__t(key, fallback);
-    if (g.t) return g.t(key, fallback);
+    const fn = g.__t || g.t;
+    if (fn) {
+      const v = fn(key, undefined, undefined, fallback);
+      // 仍返回裸 key 说明 i18n 实现没认兜底参数 —— 自己也兜一层，绝不让裸 key 上屏
+      if (typeof v === 'string' && v && v !== key) return v;
+    }
   } catch (_) { /* ignore */ }
   return fallback;
 }
@@ -416,6 +435,231 @@ function goToRoom(code: string, isAi: boolean, aiName: string): void {
   location.href = url;
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   P1-12 · 「战书」卡片（2026-11-24）
+   ───────────────────────────────────────────────────────────────────
+   建房成功后**不再**立刻 location.href 进 train.html。旧行为的问题是：
+   房主自己一眼都没看到那个 6 位码，想把码发给朋友还得退回大厅、
+   或者从对局页地址栏里手抄 —— 「异步约战」最关键的这一步（把码递出去）
+   在 UI 上是完全缺失的。现在改成先出这张卡。
+
+   🔴 房主停留在这张卡上时**必须盯房间**：好友一 join 房间就满员，
+      服务端 autoStartIfFull() 会就地开局（worker index.js handleRoom），
+      房主不在场的话，十道题的时间会在他看卡片时被白白扣光。
+      所以 watchWarRoom() 一旦看到满员/playing，立刻把人送进对局。
+
+   🔴 短链 /j/CODE 只是**分享用**的入口；卡片上的二维码仍然指向
+      /train.html?room=CODE（worker /api/md/qr 服务端渲染，见 share-card.ts
+      的 qrSrcOf）。两条路径落到同一个房间，短链失效也不影响扫码。
+   ═══════════════════════════════════════════════════════════════════ */
+
+/** 短链前缀：memoryduel.com/j/CODE → CF Pages `_redirects` 302 → train.html?room=CODE。
+    🔴 只在这里定义一次：卡片正文、复制按钮、系统分享、二维码全部由 shareUrl() 派生。
+       将来若要回退成长链（/train.html?room=），改这一个常量即可。 */
+const SHARE_PATH = '/j/';
+
+const WAR_POLL_MS = 2500;          // 房间轮询间隔（好友一进来最多 2.5s 后房主就被送走）
+const WAR_MAX_MS = 10 * 60 * 1000; // 最多盯 10 分钟，之后停止，绝不无限空转
+
+let warCode = '';
+let warTimer: number | null = null;
+let warClosed = false;             // true = 已进对局/已放弃，后续回调一律早退
+
+function shareUrl(code: string): string {
+  return location.origin + SHARE_PATH + encodeURIComponent(code);
+}
+
+/** 复制文本。Clipboard API 要求安全上下文（https）且 iOS 上必须在用户手势内同步发起；
+    不可用时退回 execCommand —— 微信内置浏览器里这条老路仍是主力。 */
+function copyText(text: string): Promise<boolean> {
+  const nav = navigator as Navigator & { clipboard?: { writeText?: (t: string) => Promise<void> } };
+  if (nav.clipboard && typeof nav.clipboard.writeText === 'function') {
+    // 有的 WebView 里 clipboard.writeText 存在但会 reject，必须接住再走老路
+    return nav.clipboard.writeText(text).then(() => true).catch(() => legacyCopy(text));
+  }
+  return Promise.resolve(legacyCopy(text));
+}
+
+function legacyCopy(text: string): boolean {
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    // 不能 display:none —— 那样选不中；移出视口但保持可选中
+    ta.style.cssText = 'position:fixed;top:0;left:-9999px;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, text.length);
+    const okDone = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return okDone;
+  } catch (_) {
+    return false;
+  }
+}
+
+function stopWarWatch(): void {
+  if (warTimer !== null) {
+    clearTimeout(warTimer);
+    warTimer = null;
+  }
+}
+
+/** 卡片上的一次性反馈（复制成功/失败）。与「等好友」那行分开，
+    否则复制提示会把等待状态顶掉，玩家会以为房间没在等。 */
+function warMsg(msg: string, show: boolean): void {
+  const m = el<HTMLParagraphElement>('kbWarMsg');
+  if (!m) return;
+  m.hidden = !show;
+  if (show) m.textContent = msg;
+}
+
+function warWait(msg: string, show: boolean): void {
+  const w = el<HTMLParagraphElement>('kbWarWait');
+  if (!w) return;
+  w.hidden = !show;
+  if (show) w.textContent = msg;
+}
+
+function enterRoom(code: string): void {
+  warClosed = true;
+  stopWarWatch();
+  location.href = `/train.html?room=${encodeURIComponent(code)}&lang=${curLang()}`;
+}
+
+/**
+ * 盯房间：好友进来（满员）或房间已开局，就把房主送进对局。
+ * 🔴 判「满员」而不只是判 status === 'playing'：autoStartIfFull 是好友
+ *    join 的**副作用**，status 的翻转要晚一次往返；先看人数能把房主
+ *    早 1 个 RTT 送走，少丢第一题的时间。
+ */
+function watchWarRoom(s: Sess, code: string, startedAt: number): void {
+  if (warClosed) return;
+  if (Date.now() - startedAt > WAR_MAX_MS) { stopWarWatch(); return; }
+
+  warTimer = window.setTimeout(() => {
+    if (warClosed) return;
+    fetch((W.API_BASE || '') + '/api/md/room/status?code=' + encodeURIComponent(code), {
+      headers: authHeaders(s),
+    })
+      .then((r) => r.json() as Promise<{
+        ok?: boolean;
+        data?: { status?: string; players?: Array<{ pid?: string }> };
+      }>)
+      .then((j) => {
+        if (warClosed) return;
+        // 房间没了 / 会话过期：静默停表。这里不弹错，房主还能点「先开始」重试
+        if (!j || !j.ok || !j.data) { stopWarWatch(); return; }
+        const d = j.data;
+        const seated = (d.players || []).length;
+        if (d.status === 'playing' || d.status === 'finished' || seated >= 2) {
+          warWait(tr('game.started', 'Game started'), true);
+          enterRoom(code);
+          return;
+        }
+        watchWarRoom(s, code, startedAt);
+      })
+      .catch(() => { if (!warClosed) watchWarRoom(s, code, startedAt); });
+  }, WAR_POLL_MS);
+}
+
+function showWarCard(code: string, s: Sess): void {
+  warCode = code;
+  warClosed = false;
+
+  const card = el<HTMLElement>('kbWar');
+  const codeEl = el<HTMLElement>('kbWarCode');
+  const linkEl = el<HTMLElement>('kbWarLink');
+  const startEl = el<HTMLAnchorElement>('kbWarStart');
+  const shareBtn = el<HTMLButtonElement>('kbWarShare');
+  const url = shareUrl(code);
+
+  if (codeEl) codeEl.textContent = code;
+  if (linkEl) linkEl.textContent = url.replace(/^https?:\/\//, '');
+  if (startEl) {
+    startEl.setAttribute('href', `/train.html?room=${encodeURIComponent(code)}&lang=${curLang()}`);
+  }
+
+  /* 系统分享面板（手机上是微信/WhatsApp 的「发送给…」原生面板）：
+     只在 navigator.share 真存在时显示这个按钮 —— 留一个点了没反应的
+     按钮，比不放按钮更伤信任。 */
+  if (shareBtn) {
+    const canShare = typeof (navigator as Navigator & { share?: unknown }).share === 'function';
+    shareBtn.hidden = !canShare;
+  }
+
+  warMsg('', false);
+  warWait(tr('home.duel_waiting', 'Waiting for opponent to join…'), true);
+
+  if (card) {
+    card.hidden = false;
+    try { card.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (_) { /* 老浏览器忽略平滑 */ }
+    /* 焦点送到卡片上（tabindex="-1"），屏幕阅读器会先读标题与房码，
+       而不是从页面顶部开始念整页。 */
+    try { card.focus(); } catch (_) { /* ignore */ }
+  }
+
+  watchWarRoom(s, code, Date.now());
+}
+
+function warCopy(): void {
+  if (!warCode) return;
+  const btn = el<HTMLButtonElement>('kbWarCopy');
+  copyText(shareUrl(warCode)).then((okDone) => {
+    warMsg(okDone ? tr('md.share_copied', 'Link copied') : tr('md.share_copy_failed', 'Copy failed'), true);
+    if (!okDone) {
+      /* 复制失败时退无可退：把码选中，让玩家长按/⌘C ——
+         总比"点了没反应"强。 */
+      const codeEl = el<HTMLElement>('kbWarCode');
+      if (codeEl && window.getSelection) {
+        try {
+          const range = document.createRange();
+          range.selectNodeContents(codeEl);
+          const sel = window.getSelection();
+          if (sel) { sel.removeAllRanges(); sel.addRange(range); }
+        } catch (_) { /* ignore */ }
+      }
+    }
+    if (btn) btn.blur();
+    window.setTimeout(() => warMsg('', false), 2000);
+  });
+}
+
+function warShare(): void {
+  if (!warCode) return;
+  const nav = navigator as Navigator & {
+    share?: (d: { title?: string; text?: string; url?: string }) => Promise<void>;
+  };
+  if (typeof nav.share !== 'function') return;
+  nav.share({
+    title: tr('dl.war_title', 'Your challenge is ready'),
+    text: tr('md.share_scan_sub', 'Invite a friend to your duel'),
+    url: shareUrl(warCode),
+  }).catch(() => { /* 用户取消分享不是错误，静默 */ });
+}
+
+/** 「存成图片」：复用 share-card.ts（与六款记忆对战同一套 Canvas 引擎）。 */
+function warImage(): void {
+  if (!warCode) return;
+  void openShareCard({
+    tone: 'amber',
+    title: tr('md.share_invite_title', 'Invite a friend'),
+    subtitle: 'Knowledge Battle · ' + warCode,
+    big: warCode,
+    bigLabel: tr('md.share_room_code', 'Room code'),
+    stats: [
+      [tr('md.share_stat_game', 'Game'), 'Knowledge Battle'],
+      [tr('md.share_stat_status', 'Status'), tr('md.share_stat_waiting', 'Waiting')],
+      [tr('md.share_stat_mode', 'Mode'), tr('md.share_stat_1v1', '1 v 1')],
+    ],
+    /* 🔴 url 用短链（卡片上印的、复制出来的是同一串），
+       qrGame='quiz' 让 worker /api/md/qr 画知识对决的二维码 ——
+       它内部编码的是 /train.html?room=CODE，与短链落到同一个房间。 */
+    url: shareUrl(warCode),
+    qrGame: 'quiz',
+  }).catch(() => { /* 引擎被拦/离线：卡片本身仍可复制链接，不影响分享主路径 */ });
+}
+
 /* ─── 建房 / 加房 ─── */
 
 function createRoom(): void {
@@ -434,7 +678,12 @@ function createRoom(): void {
       .then((r) => r.json() as Promise<{ ok?: boolean; data?: { code?: string } }>)
       .then((j) => {
         if (j.ok && j.data && j.data.code) {
-          location.href = `/train.html?room=${encodeURIComponent(j.data.code)}&lang=${curLang()}`;
+          /* 🔴 P1-12：**不跳转**。先把房码摆出来让人分享，
+             再给一个「先开始」的入口。旧行为是就地 location.href，
+             房主连自己房间的码是什么都不知道，约战链路在这里断掉。 */
+          setStatus('', false);
+          delete btn.dataset.busy;
+          showWarCard(String(j.data.code), s);
           return;
         }
         throw new Error('failed');
@@ -527,6 +776,17 @@ function main(): void {
   el<HTMLButtonElement>('kbMatchBtn')?.addEventListener('click', startMatch);
   el<HTMLButtonElement>('kbCreateBtn')?.addEventListener('click', createRoom);
   el<HTMLButtonElement>('kbJoinBtn')?.addEventListener('click', joinRoom);
+
+  /* P1-12 战书卡：复制 / 系统分享 / 存图 / 先开始。
+     「先开始」是 <a href>，这里只负责停表 —— 点了就别再轮询房间，
+     否则导航过程中还可能触发一次 enterRoom() 造成二次跳转。 */
+  el<HTMLButtonElement>('kbWarCopy')?.addEventListener('click', warCopy);
+  el<HTMLButtonElement>('kbWarShare')?.addEventListener('click', warShare);
+  el<HTMLButtonElement>('kbWarImg')?.addEventListener('click', warImage);
+  el<HTMLAnchorElement>('kbWarStart')?.addEventListener('click', () => {
+    warClosed = true;
+    stopWarWatch();
+  });
 
   /* P1-9：从对局页按「返回大厅」走 bfcache 回来时，DOM 会被原样复活 ——
      段位徽章还是开局前的旧值。pageshow(persisted) 是唯一可靠信号：

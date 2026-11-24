@@ -1285,7 +1285,9 @@
     "seo_title_word_recall": "Recuerdo de Palabras — Elige tu duelo",
     "mt_daily": "Reto diario",
     "md_daily": "Diez preguntas, un intento, el mismo set para todos. Corrección en el servidor, con racha y tabla diaria — nuevo set a las 00:00 UTC.",
-    "tag_daily": "Uno al día"
+    "tag_daily": "Uno al día",
+    "war_title": "Tu reto está listo",
+    "war_sub": "Envía el código a un amigo. Puedes empezar ya: se unirá al mismo duelo cuando quiera."
   },
   "md": {
     "share_invite_title": "Invita a un amigo",

@@ -1285,7 +1285,9 @@
     "seo_title_word_recall": "Wörter Erinnern — Wähle dein Duell",
     "mt_daily": "Tagesherausforderung",
     "md_daily": "Zehn Fragen, ein Versuch, derselbe Satz für alle. Serverseitig bewertet, mit Serie und Tagesrangliste – neuer Satz um 00:00 UTC.",
-    "tag_daily": "Einmal täglich"
+    "tag_daily": "Einmal täglich",
+    "war_title": "Deine Herausforderung steht",
+    "war_sub": "Schick den Code an eine Freundin oder einen Freund. Du kannst jetzt starten – die andere Seite steigt jederzeit in dasselbe Duell ein."
   },
   "md": {
     "share_invite_title": "Freund einladen",

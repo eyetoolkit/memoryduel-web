@@ -18,3 +18,14 @@
 /es/  /?lang=es 301
 /fr/  /?lang=fr 301
 /en/  /?lang=en 301
+
+# ── P1-12 知识对决「战书」邀请短链（2026-11-24）─────────────────────
+# 建房成功后分享出去的是 memoryduel.com/j/ABC123，不是那种
+# /train.html?room=ABC123 的长链 —— 短链才发得进微信群、才印得上图。
+# 接收方点开 302 → /train.html?room=ABC123，与直接用长链进房等价。
+# 🔴 必须 302 而不是 301：房码是**按房间**变化的，同一个 /j/ 路径不同 code
+#    是不同目标；永久重定向会被浏览器长期缓存，房码就永远改不了。
+# 🔴 :splat 放在 query 里是 CF Pages 支持的写法（官方 _redirects 允许在
+#    destination 的路径与查询串中使用占位符）。上线后必须实测一条：
+#    curl -sI https://www.memoryduel.com/j/ABC123 | grep -i location
+/j/*  /train.html?room=:splat  302

@@ -1285,7 +1285,9 @@
     "seo_title_word_recall": "单词回忆 — 选择你的对战",
     "mt_daily": "每日挑战",
     "md_daily": "十道题，一次机会，全球同题。服务端判分，连胜与日榜照记——每天 00:00 UTC 换新题。",
-    "tag_daily": "每日一局"
+    "tag_daily": "每日一局",
+    "war_title": "战书已就绪",
+    "war_sub": "把房码发给朋友。你可以先开局，对方随时进来打同一场。"
   },
   "md": {
     "share_invite_title": "邀请好友",

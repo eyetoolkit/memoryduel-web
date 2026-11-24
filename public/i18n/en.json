@@ -1285,7 +1285,9 @@
     "seo_title_word_recall": "Word Recall — Choose Your Duel",
     "mt_daily": "Daily challenge",
     "md_daily": "Ten questions, one attempt, the same set for everyone. Server-scored, with a streak and a daily board — new set at 00:00 UTC.",
-    "tag_daily": "One a day"
+    "tag_daily": "One a day",
+    "war_title": "Your challenge is ready",
+    "war_sub": "Send the code to a friend. You can start now — they join the same duel whenever they like."
   },
   "md": {
     "share_invite_title": "Invite a friend",
