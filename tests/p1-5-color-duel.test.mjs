@@ -200,9 +200,16 @@ test('软下线后首页游戏矩阵不再含 color-recall 卡片', () => {
   //    软下线 = 游戏页源文件 + vite 入口 + worker daily API 全部保留（URL 仍可访问），
   //    只收掉「曝光面」：首页卡片 + sitemap 索引。此处断言「不再出现」即守护软下线契约。
   assert.ok(!home.includes('/games/color-recall/'), '软下线后首页不应有 color-recall 入口');
+  /* P1-13（2026-11-24）：首页三模式区块（含最后一张 .gcard「vs AI」）已删除，
+     模式选择统一到 /games/knowledge-duel/lobby/。
+     🔴 契约从「恰好 1 张」收紧为「0 张」：原断言的本意是防 7 个下线游戏
+        从首页复活；现在连 knowledge-duel 的游戏卡也不在首页出现了，
+        这个意图只会被更彻底地满足。若哪天有人把 .gcard 加回来，
+        先问是不是把已下线的游戏也带回来了。 */
   const cards = (home.match(/class="gcard"/g) || []).length;
-  assert.strictEqual(cards, 1, '首页应只剩 1 张游戏卡（knowledge-duel）');
-  assert.ok(home.includes('/games/knowledge-duel/lobby/'), 'knowledge-duel 入口应保留');
+  assert.strictEqual(cards, 0, 'P1-13 后首页不应再有 .gcard（三模式区块已删）');
+  // 游戏入口本身不能丢：hero 的「Play a friend with a room code」仍指向大厅
+  assert.ok(home.includes('/games/knowledge-duel/lobby/'), 'knowledge-duel 大厅入口应保留');
 });
 
 /* ── 2026-11-04 契约变更：软下线 → 真下线 ──

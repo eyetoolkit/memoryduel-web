@@ -78,9 +78,11 @@
 <nav class="nav ar-nav" aria-label="Main"><div class="nav-in ar-nav-in">
   <a class="logo ar-logo" href="/"><span class="mk"></span>MemoryDuel</a>
   <div class="nav-links ar-links">
+    <!-- P1-13：原「Features → #modes」随三模式区块一起删除。
+         模式选择统一到 /games/knowledge-duel/lobby/（hero 的「Play a friend」
+         CTA 指向它），不在导航里留一个跳回页顶的死锚点。 -->
     <a href="#play" data-i18n="home_v2.nav_play">Play</a>
     <a href="#how" data-i18n="home_v2.nav_how">How to play</a>
-    <a href="#modes" data-i18n="home_v2.features_nav">Features</a>
     <a href="#globalTop" data-i18n="home_v2.nav_leaderboard">Leaderboard</a>
   </div>
   <span class="spacer"></span><div id="lang-switcher"></div>
@@ -93,7 +95,6 @@
   <div class="nav-drawer-in">
     <a href="#play" data-i18n="home_v2.nav_play">Play</a>
     <a href="#how" data-i18n="home_v2.nav_how">How to play</a>
-    <a href="#modes" data-i18n="home_v2.features_nav">Features</a>
     <a href="#globalTop" data-i18n="home_v2.nav_leaderboard">Leaderboard</a>
     <a href="/membership/" data-i18n="home_v2.sign_in">Sign in</a>
   </div>
@@ -119,7 +120,12 @@
       <div class="ar-cta-stack">
         <!-- id=startAiBtn 复用 home.mjs bindAiStart()：一键直达 /train.html?cat=general&mode=ai -->
         <button class="btn ar-btn-gold" id="startAiBtn" type="button" data-i18n="home_v3.cta_main">Start a duel — it's free</button>
-        <a class="btn ar-btn-outline" href="/games/knowledge-duel/lobby/" data-i18n="home_v3.cta_friend">Play a friend with a room code</a>
+        <!-- 🔴 P1-13：原三模式区块的首张卡带 data-stage="live"，删区块后
+             这里是首页唯一指向 /games/.../lobby/ 的游戏入口。
+             scripts/filter-sitemap.mjs 靠这个标记判定「哪些游戏已上线」，
+             标记丢了会把 knowledge-duel 从**生产 sitemap**里删掉
+             （2026-11-24 构建门禁抓到：已移除未上线游戏: knowledge-duel）。 -->
+        <a class="btn ar-btn-outline" href="/games/knowledge-duel/lobby/" data-stage="live" data-i18n="home_v3.cta_friend">Play a friend with a room code</a>
       </div>
       <p class="ar-micro" data-i18n="home_v3.cta_micro">No login · No install · No ads</p>
       <div class="ar-stats">
@@ -231,37 +237,15 @@
   </div>
 </section>
 
-<!-- ═══════ MODES（首张卡保留 gcard 类契约：软下线门禁要求恰好 1 张） ═══════ -->
-<section class="ar-modes" id="modes" aria-label="Battle modes">
-  <div class="wrap">
-    <div class="ar-sec-head center">
-      <h2 data-i18n="home_v3.modes_title">Always someone to play.</h2>
-      <p class="ar-sec-sub" data-i18n="home_v3.modes_sub">Three ways in. All of them start in one tap.</p>
-    </div>
-    <div class="ar-mode-grid">
-      <a class="gcard" href="/games/knowledge-duel/lobby/" data-stage="live">
-        <span class="ar-ribbon" data-i18n="home_v2.tag_live">Live</span>
-        <div class="ar-mode-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28"><rect x="4" y="7" width="16" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="9" cy="13" r="1.4" fill="currentColor"/><circle cx="15" cy="13" r="1.4" fill="currentColor"/><path d="M12 4v3M8 19v2M16 19v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
-        <h3 data-i18n="home_v3.mode_ai_t">vs AI</h3>
-        <p data-i18n="home_v3.mode_ai_d">An opponent that is always ready. Pick a category and go — best for your first duel.</p>
-        <span class="ar-mode-cta" data-i18n="home_v2.game_play">Play now →</span>
-      </a>
-      <a class="ar-mode-card" href="/games/knowledge-duel/lobby/?mode=online">
-        <div class="ar-mode-ico online" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9S14.5 18.3 12 21c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></div>
-        <h3 data-i18n="home_v3.mode_online_t">Online match</h3>
-        <p data-i18n="home_v3.mode_online_d">We look for a real player for 8 seconds. If nobody is online, we'll say so and arrange an AI rival instead.</p>
-        <span class="ar-mode-cta" data-i18n="home_v3.mode_cta">Find a match →</span>
-      </a>
-      <a class="ar-mode-card" href="/games/knowledge-duel/lobby/#room">
-        <div class="ar-mode-ico friend" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28"><rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M7 10h3M7 14h6M14 10h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
-        <h3 data-i18n="home_v3.mode_friend_t">Private room</h3>
-        <p data-i18n="home_v3.mode_friend_d">Six-letter code, one friend, zero friction. Share the code and you are in.</p>
-        <span class="ar-mode-cta" data-i18n="home_v3.mode_cta_room">Create a room →</span>
-      </a>
-    </div>
-  </div>
-</section>
-
+<!-- P1-13 · 三模式区块已移除（2026-11-24）
+     原来这里有三张卡：vs AI / Online match / Private room，但它们**全部指向
+     /games/knowledge-duel/lobby/** —— 玩家要连点两次「选模式」（首页选一次，
+     大厅再选一次）。hero 里已经有「Start a duel」（直达 AI）和
+     「Play a friend with a room code」（进大厅）：模式选择统一在大厅完成。
+     🔴 删的是**重复入口**，不是功能：大厅的四种模式 + 每日挑战 + 分类/难度
+        全部保留，7 个已下线游戏的 301 落点也不变（仍指向大厅）。
+        ar-modes 的 CSS 留在共享皮肤 home-arena.css 里不动 —— 那个文件
+        三站共用，为一处已删区块去改全局皮肤，风险大于收益。 -->
 <!-- ═══════ LEADERBOARD（保留 #topRankList / #ecoCard 真实数据契约） ═══════ -->
 <section class="ar-section wrap ar-rank" id="globalTop" aria-label="Leaderboard">
   <div class="ar-rank-grid">
