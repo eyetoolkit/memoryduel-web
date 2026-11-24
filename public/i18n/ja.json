@@ -1191,7 +1191,8 @@
     "diff_normal": "ふつう",
     "diff_hard": "むずかしい",
     "diff_hint": "難易度が高いほどラウンド数が増え、各ラウンドの内容も長くなります。",
-    "invite": "招待"
+    "invite": "招待",
+    "streak_toast": "🔥 {n} 連続正解！"
   },
   "colduel": {
     "title": "色彩記憶対戦 · MemoryDuel",

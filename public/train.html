@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" data-site="memory">
 <head>
-  <script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:71,fallback:"en"};</script>
+  <script>window.__I18N_CONFIG__={supported:["en","zh","ja","es","fr","de"],dictVersion:72,fallback:"en"};</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <!-- standalone 下 iOS 状态栏取 theme-color；2026-11-05 方案 A 全站统一冷纸底 -->
@@ -202,6 +202,25 @@
   /* 末题倍率标记：跟在「答对」后面，强调这是双倍题 */
   .battle-explain .ex-x2{font-style:normal; font-weight:800; font-size:11px; letter-spacing:.04em;
     color:#fff; background:var(--red); padding:1px 6px; border-radius:999px; margin-left:4px; vertical-align:1px}
+  /* P1-10：连击倍率用橙色，和末题的红色 ×2 区分开 */
+  .battle-explain .ex-streak, .res-review .ex-streak{font-style:normal; font-weight:800; font-size:11px;
+    letter-spacing:.04em; color:#fff; background:#EA580C; padding:1px 6px;
+    border-radius:999px; margin-left:4px; vertical-align:1px; white-space:nowrap}
+  /* 连对 3 题起的飘火提示：固定在中上部，不挡答题区，pointer-events:none */
+  .streak-toast{position:fixed; left:50%; top:22%; transform:translateX(-50%);
+    z-index:60; pointer-events:none; padding:10px 18px; border-radius:999px;
+    background:linear-gradient(135deg,#EA580C,#DC2626); color:#fff;
+    font-size:15px; font-weight:800; letter-spacing:.02em;
+    box-shadow:0 8px 24px rgba(220,38,38,.32);
+    animation:streak-pop 1.4s ease-out forwards}
+  @keyframes streak-pop{
+    0%{opacity:0; transform:translate(-50%,14px) scale(.86)}
+    18%{opacity:1; transform:translate(-50%,0) scale(1.06)}
+    32%{transform:translate(-50%,0) scale(1)}
+    75%{opacity:1}
+    100%{opacity:0; transform:translate(-50%,-18px) scale(.98)}
+  }
+  html[data-theme="dark"] .streak-toast{box-shadow:0 8px 28px rgba(0,0,0,.5)}
   .battle-bot-thinking{text-align:center; padding:12px; color:var(--mute); font-size:13px; font-style:italic}
   .battle-actions{display:flex; gap:10px; justify-content:center; margin-top:18px; flex-wrap:wrap}
 
@@ -436,22 +455,50 @@
           startPracticeBattle 生成 bot 节奏）全部调 scoreLocal()，
           改公式只改本函数一处，别再各写一份常数。 */
     var SCORE_MAX = 15, SCORE_FLOOR = 0.35, FINAL_MULT = 2;
+    /* 2026-11-24 P1-10：局内连击倍率，与服务端 lib/duel-tiers.js 严格同值。
+       第 1 题 ×1.0、第 2 题 ×1.2、第 3 题起 ×1.5；答错清零。
+       🔴 与末题倍率相乘：末题连对 = ×2 ×1.5 = ×3。 */
+    var STREAK_MULT = [1, 1, 1.2, 1.5];
+    var STREAK_FIRE_AT = 3;
+    function streakMult(n) {
+      n = Number(n);
+      if (!isFinite(n) || n <= 0) return 1;
+      return STREAK_MULT[Math.min(Math.floor(n), STREAK_MULT.length - 1)];
+    }
+    function streakStep(prev, correct) {
+      var p = Number(prev);
+      var safe = isFinite(p) && p > 0 ? Math.floor(p) : 0;
+      if (!correct) return { streak: 0, mult: 1 };
+      var streak = safe + 1;
+      return { streak: streak, mult: streakMult(streak) };
+    }
     /* 纯函数版：轮数由调用方显式给。生成 bot 节奏时 B.questions 还没填，
-       不能依赖 B，必须走这个。 */
-    function scoreAt(correct, ms, round, total) {
+       不能依赖 B，必须走这个。第 5 参 streakBefore 是本题作答前的连对数。 */
+    function scoreAt(correct, ms, round, total, streakBefore) {
       if (!correct) return 0;
       var n = Number(total) || TOTAL_ROUNDS;
       var speed = Math.max(0, Math.min(1, 1 - ms / PER_QUESTION_MS));
       var base = Math.round(SCORE_MAX * (SCORE_FLOOR + (1 - SCORE_FLOOR) * speed));
-      return Math.round(base * (n > 1 && round === n - 1 ? FINAL_MULT : 1));
+      var roundM = n > 1 && round === n - 1 ? FINAL_MULT : 1;
+      return Math.round(base * roundM * streakMult(streakBefore));
     }
     function isFinalRound(round) {
       var n = (B && B.questions && B.questions.length) || TOTAL_ROUNDS;
       return n > 1 && round === n - 1;
     }
-    function scoreLocal(correct, ms, round) {
+    function scoreLocal(correct, ms, round, streakBefore) {
       return scoreAt(correct, ms, round,
-        (B && B.questions && B.questions.length) || TOTAL_ROUNDS);
+        (B && B.questions && B.questions.length) || TOTAL_ROUNDS, streakBefore);
+    }
+    /* 本地练习的连击从已作答序列派生，不额外存状态 */
+    function localStreakBefore(list, round) {
+      var s = 0;
+      for (var i = 0; i < round; i++) {
+        var a = list && list[i], q = B.questions[i];
+        if (!a || !q || typeof q.ans !== 'number') break;
+        s = (a.option === q.ans) ? s + 1 : 0;
+      }
+      return s;
     }
     /* 🔴 2026-10-29：AI 难度档。
        原先三个常量写死（2–9 秒思考 / 62% 正确率），而类别选择与难度诉求
@@ -768,12 +815,38 @@
       var q = B.questions[round];
       if (!q || typeof q.ans !== 'number' || q.ans < 0) return;
       var correct = option === q.ans;
-      var gained = scoreLocal(correct, ms, round);
+      var before = localStreakBefore(B.answers, round);
+      var step = streakStep(before, correct);
+      var roundM = isFinalRound(round) ? FINAL_MULT : 1;
+      var gained = scoreAt(correct, ms, round,
+        B.questions.length, before);
       paintReveal({
         round: round, yourOption: option, correctOption: q.ans, correct: correct,
-        yourGained: gained, mult: isFinalRound(round) ? FINAL_MULT : 1,
+        yourGained: gained, mult: roundM,
+        streak: step.streak, streakMult: step.mult, totalMult: roundM * step.mult,
         explain: q.explain || q.ex || null,
       });
+    }
+
+    /* P1-10：连对 3 题起飘一个 🔥 提示。动态创建、1.4s 后自毁，
+       重复触发先移除旧节点，避免页面上堆一串。 */
+    function showStreakToast(n) {
+      var old = document.getElementById('streakToast');
+      if (old && old.parentNode) old.parentNode.removeChild(old);
+      var el = document.createElement('div');
+      el.id = 'streakToast';
+      el.className = 'streak-toast';
+      var fallback = '🔥 {n} in a row';
+      var msg = fallback;
+      try {
+        /* window.t(key, vars, lang, fallback) —— 第 2 参才是插值变量，第 4 参才是兜底 */
+        if (window.t) msg = window.t('duel.streak_toast', { n: n }, undefined, fallback) || fallback;
+      } catch (e) {}
+      el.textContent = String(msg).replace(/\{n\}/g, String(n));
+      document.body.appendChild(el);
+      setTimeout(function () {
+        if (el.parentNode) el.parentNode.removeChild(el);
+      }, 1400);
     }
 
     function paintReveal(r) {
@@ -794,8 +867,11 @@
       if (r.correct) {
         var dbl = (Number(r.mult) || 1) > 1
           ? ' <i class="ex-x2">×' + (Number(r.mult) || 1) + '</i>' : '';
+        /* 连击倍率单独一个标记，别混进末题 ×2 里，否则玩家看不懂 ×3 从哪来 */
+        var sm = Number(r.streakMult) || 1;
+        var fire = sm > 1 ? ' <i class="ex-streak">🔥 ×' + sm + '</i>' : '';
         head = '<b class="ex-ok">✓ ' +
-               T('duel.correct', zhOnly('答对', 'Correct')) + dbl +
+               T('duel.correct', zhOnly('答对', 'Correct')) + dbl + fire +
                ' +' + (Number(r.yourGained) || 0) + '</b>';
       } else if (yi < 0) {
         head = '<b class="ex-bad">⏱ ' +
@@ -811,6 +887,10 @@
       ex.innerHTML = head + (r.explain
         ? '<div class="ex-text">' + escHtml(String(r.explain)) + '</div>' : '');
       ex.classList.add('show');
+
+      /* P1-10：连对 3 题起飘火，服务端揭晓与本地降级共用同一入口 */
+      var stk = Number(r.streak) || 0;
+      if (r.correct && stk >= STREAK_FIRE_AT) showStreakToast(stk);
     }
 
     function renderHintButton() {
@@ -929,16 +1009,21 @@
        但明确不计战绩、不发币。数值口径与服务端 duel-tiers.js 保持一致。 */
     function localPracticeResult(answers) {
       var you = 0, bot = 0, per = [];
+      var youStreak = 0;
       for (var i = 0; i < B.questions.length; i++) {
         var q = B.questions[i], a = answers[i];
         var correct = a.option === q.ans;
-        var gained = scoreLocal(correct, a.ms, i);
+        var before = youStreak;
+        var step = streakStep(before, correct);
+        youStreak = step.streak;
+        var roundM = isFinalRound(i) ? FINAL_MULT : 1;
+        var gained = scoreAt(correct, a.ms, i, B.questions.length, before);
         var p = B.botPlan[i] || { gained: 0, option: -1 };
         you += gained; bot += Number(p.gained) || 0;
         per.push({ round: i, yourOption: a.option, correctOption: q.ans, correct: correct,
-          mult: isFinalRound(i) ? FINAL_MULT : 1,
-          botOption: p.option, botCorrect: p.option === q.ans, yourGained: gained,
-          botGained: Number(p.gained) || 0 });
+          mult: roundM, streak: step.streak, streakMult: step.mult, totalMult: roundM * step.mult,
+          botOption: p.option, botCorrect: p.option === q.ans, botStreak: p.streak || 0,
+          yourGained: gained, botGained: Number(p.gained) || 0 });
       }
       return { youScore: you, botScore: bot,
         outcome: you > bot ? 'win' : (you < bot ? 'lose' : 'draw'),
@@ -963,7 +1048,9 @@
       var review = '<details class="res-review"><summary>' + T('duel.review','Review all questions') + '</summary><ul>' +
         (r.perQuestion || []).map(function (p) {
           return '<li>#' + (p.round + 1) +
-            ((Number(p.mult) || 1) > 1 ? ' <b class="ex-x2">×' + p.mult + '</b>' : '') + ' · ' +
+            ((Number(p.mult) || 1) > 1 ? ' <b class="ex-x2">×' + p.mult + '</b>' : '') +
+            ((Number(p.streakMult) || 1) > 1
+              ? ' <b class="ex-streak">🔥 ×' + p.streakMult + '</b>' : '') + ' · ' +
             (p.correct ? '✅ ' + T('duel.correct','Correct') : '❌ ' + T('duel.wrong','Wrong')) +
             ' · ' + T('duel.your_score','You') + ' +' + p.yourGained +
             ' / ' + T('duel.bot_score','AI') + ' +' + p.botGained + '</li>';
@@ -1020,6 +1107,8 @@
         var filtered = pool.filter(function (q) { return !q.diff || tier.diff.indexOf(q.diff) >= 0; });
         if (filtered.length >= TOTAL_ROUNDS) pool = filtered;
         pool = shuffleArr(pool.slice()).slice(0, TOTAL_ROUNDS);
+        /* P1-10：bot 按自己的答题序列推进连击，与服务端 botAnswerFor 同口径 */
+        var botStreak = 0;
         var bot = pool.map(function (q, qi) {
           var n = (q.options || []).length || 4;
           var correct = Math.random() < tier.acc;
@@ -1029,8 +1118,12 @@
             option = wrong.length ? wrong[Math.floor(Math.random() * wrong.length)] : q.ans;
           }
           var thinkMs = Math.round(tier.min + Math.random() * (tier.max - tier.min));
-          var gained = scoreAt(correct, thinkMs, qi, pool.length);
-          return { thinkMs: thinkMs, option: option, gained: gained };
+          var before = botStreak;
+          var step = streakStep(before, correct);
+          botStreak = step.streak;
+          var gained = scoreAt(correct, thinkMs, qi, pool.length, before);
+          return { thinkMs: thinkMs, option: option, correct: correct,
+            streak: step.streak, gained: gained };
         });
         startBattle({ questions: pool, bot: bot, practice: true });
       }

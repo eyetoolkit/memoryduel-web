@@ -1191,7 +1191,8 @@
     "diff_normal": "普通",
     "diff_hard": "困难",
     "diff_hint": "难度越高轮次越多，且每轮的内容更长。",
-    "invite": "邀请"
+    "invite": "邀请",
+    "streak_toast": "🔥 连对 {n} 题！"
   },
   "colduel": {
     "title": "颜色记忆对决 · MemoryDuel",

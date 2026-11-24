@@ -1191,7 +1191,8 @@
     "diff_normal": "Normal",
     "diff_hard": "Schwer",
     "diff_hint": "Höhere Schwierigkeit fügt Runden hinzu — und jede Runde wird länger.",
-    "invite": "Einladen"
+    "invite": "Einladen",
+    "streak_toast": "🔥 {n} in Folge!"
   },
   "colduel": {
     "title": "Farb-Duell · MemoryDuel",

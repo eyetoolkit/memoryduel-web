@@ -1191,7 +1191,8 @@
     "diff_normal": "Normal",
     "diff_hard": "Hard",
     "diff_hint": "Higher difficulty adds rounds — and each round gets longer.",
-    "invite": "Invite"
+    "invite": "Invite",
+    "streak_toast": "🔥 {n} in a row!"
   },
   "colduel": {
     "title": "Colour Recall Duel · MemoryDuel",

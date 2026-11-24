@@ -1191,7 +1191,8 @@
     "diff_normal": "Normal",
     "diff_hard": "Difficile",
     "diff_hint": "Une difficulté plus élevée ajoute des manches — et chaque manche devient plus longue.",
-    "invite": "Inviter"
+    "invite": "Inviter",
+    "streak_toast": "🔥 {n} d'affilée !"
   },
   "colduel": {
     "title": "Duel des couleurs · MemoryDuel",
