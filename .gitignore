@@ -6,3 +6,8 @@ dist/
 *.log
 .DS_Store
 _design-review/
+.pnpm-store/
+.cf-branch
+.cf-build-env
+.cf-project
+.wtest
