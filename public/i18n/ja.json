@@ -1359,5 +1359,22 @@
     "daily_t": "デイリーチャレンジ",
     "daily_d": "10問・1日1回・全員同じ問題。連勝を途切れさせないで。",
     "daily_cta": "今日に挑戦 →"
+  },
+  "mm_privacy_40": "<strong>匿名アクセス数の計測</strong>：上記の同意ベースの任意分析に加え、1 日あたり何台の異なるブラウザが訪問したかを測るため、<code>/__uv</code> でファーストパーティかつ Cookie を使用しないカウンターを稼働させています。エッジサーバーはリクエストの IP アドレス、ユーザーエージェント、UTC 日付から短命の日次ハッシュを生成し、集計値のみを保持します。Cookie を設定せず、フォーム入力も読み取らず、第三者サービスも使用せず、クロスサイトプロファイルも作成しません。厳密に匿名の集計統計であるため、分析の同意選択には依存しません。",
+  "mm_privacy_41": "7a. COPPA 2025 アップデート（米国ユーザー向け）",
+  "mm_privacy_42": "<strong>2026 年 9 月 30 日発効。</strong>本節は、2025-01-16 に公布された米国児童オンラインプライバシー保護法（COPPA）最終改正（遵守期限 2026-04-22）に対応するため、上記ポリシーを補足するものです。",
+  "mm_privacy_43": "<strong>永続的識別子の開示</strong> — クラウド ELO 同期が有効な場合、ブラウザは <code>crypto.randomUUID()</code> により UUID を自動生成します。この UUID は Cloudflare KV に 90 日間の TTL で保存され、レッスンをまたいだ ELO 追跡のみに使用されます。IP アドレス、デバイスフィンガープリント、広告 ID は収集しません。",
+  "mm_privacy_44": "<strong>第三者の区分</strong> — Cloudflare, Inc.（Workers Paid、KV、D1、R2、Durable Objects）、GitHub, Inc.（ソースコード）、Agent Mail（智邮、連絡用メールエイリアス）。広告ネットワーク、データブローカー、ソーシャルプラットフォーム、および Cloudflare Workers Logs 以外の分析サービスは使用しません。",
+  "mm_privacy_45": "<strong>目的の限定</strong> — UUID とゲームデータは、(1) レッスンをまたぐ ELO 追跡、(2) 不正防止、(3) エンジン改善、(4) セッションリプレイにのみ使用されます。行動プロファイリング、広告、リマーケティング、クロスサイト識別には決して使用しません。",
+  "mm_privacy_46": "<strong>生体識別子</strong> — 顔認識、声紋、指紋、網膜スキャンなど、いかなる生体データも収集しません。2025 年改正で拡張された定義は当サービスには該当しません。",
+  "mm_privacy_47": "<strong>DSAR（データ主体請求）窓口</strong> — <a href=\"mailto:support@memoryduel.com\">support@memoryduel.com</a>（COPPA § 312.6 の指定連絡先も兼ねます）。ご請求は 48 時間以内に対応します。",
+  "mm_privacy_48": "書面ポリシー全文：<a href=\"https://raw.githubusercontent.com/eyetoolkit/tri-sites/main/compliance/data-retention.md\">書面によるデータ保持ポリシー</a> · <a href=\"https://raw.githubusercontent.com/eyetoolkit/tri-sites/main/compliance/information-security.md\">書面による情報セキュリティプログラム</a>",
+  "mm_privacy_49": "7b. 概要（COPPA 2025 補足）",
+  "mm_privacy_50": "当サービスは、2025 年 1 月 16 日付の米国児童オンラインプライバシー保護法（COPPA）最終改正（遵守期限 2026-04-22）を遵守しています。児童の個人識別情報（ブラウザが自動生成する匿名 UUID とゲーム結果データのみ）を収集しないため、COPPA のほとんどの要件は適用されません。残る要件（書面による保持ポリシー、書面による情報セキュリティプログラム、永続的識別子の開示）は、本文書および上記リンクの compliance/ 文書により満たしています。データの削除や権利行使については support@memoryduel.com までご連絡ください。",
+  "consent": {
+    "aria": "Cookie の同意",
+    "text": "サイト改善のため、匿名の分析に Cookie を使用します。同意がない限り、いかなる追跡も行いません。",
+    "reject": "拒否",
+    "accept": "同意する"
   }
 }

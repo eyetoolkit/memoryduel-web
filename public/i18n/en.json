@@ -1359,5 +1359,22 @@
     "daily_t": "Daily Challenge",
     "daily_d": "Ten questions, one attempt, same set for everyone. Keep your streak alive.",
     "daily_cta": "Play today →"
+  },
+  "mm_privacy_40": "<strong>Anonymous visit counting</strong>: in addition to the optional, consent-based analytics described above, we run a first-party, cookieless counter at <code>/__uv</code> to measure how many distinct browsers visit each day. Our edge server derives a short-lived daily hash from the request's IP address, user agent and the UTC date, then keeps only the aggregate count. It sets no cookies, reads no form input, uses no third-party service and does not build a cross-site profile. Because it is strictly anonymous aggregate statistics, it does not depend on the analytics consent choice.",
+  "mm_privacy_41": "7a. COPPA 2025 Update (US users)",
+  "mm_privacy_42": "<strong>Effective September 30, 2026.</strong> This section supplements the policy above to satisfy the U.S. Children's Online Privacy Protection Act (COPPA) Final Amendments published 2025-01-16, with compliance deadline 2026-04-22.",
+  "mm_privacy_43": "<strong>Persistent identifier disclosure</strong> — when cloud ELO sync is enabled, the browser auto-generates a UUID via <code>crypto.randomUUID()</code>. This UUID is stored in Cloudflare KV with a 90-day TTL and is used solely for cross-lesson ELO tracking. No IP address, device fingerprint, or Advertising ID is collected.",
+  "mm_privacy_44": "<strong>Categories of third parties</strong> — Cloudflare, Inc. (Workers Paid, KV, D1, R2, Durable Objects); GitHub, Inc. (source code); Agent Mail (智邮) for the contact email alias. No advertising networks, data brokers, social platforms, or analytics beyond Cloudflare Workers Logs.",
+  "mm_privacy_45": "<strong>Purpose limitation</strong> — UUID and game data are used solely for: (1) cross-lesson ELO tracking, (2) anti-cheat, (3) engine improvement, (4) session replay. Never for behavioral profiling, advertising, re-marketing, or cross-site identification.",
+  "mm_privacy_46": "<strong>Biometric identifiers</strong> — we do not collect facial recognition, voiceprints, fingerprints, retina scans, or any biometric data. The 2025 amendment's expanded definition does not apply to our service.",
+  "mm_privacy_47": "<strong>DSAR contact</strong> — <a href=\"mailto:support@memoryduel.com\">support@memoryduel.com</a> (also the COPPA § 312.6 designated contact). Requests are processed within 48 hours.",
+  "mm_privacy_48": "Full written policies: <a href=\"https://raw.githubusercontent.com/eyetoolkit/tri-sites/main/compliance/data-retention.md\">Written Data Retention Policy</a> · <a href=\"https://raw.githubusercontent.com/eyetoolkit/tri-sites/main/compliance/information-security.md\">Written Information Security Program</a>",
+  "mm_privacy_49": "7b. Summary (COPPA 2025 supplement)",
+  "mm_privacy_50": "We comply with the U.S. Children's Online Privacy Protection Act (COPPA) Final Amendments of 16 January 2025 (compliance deadline 2026-04-22). Because we do not collect children's personal identity information — only a browser-generated anonymous UUID and game result data — most COPPA requirements do not apply. The remaining requirements (written retention policy, written information security program, persistent identifier disclosure) are met through this document and the compliance/ documents linked above. To delete data or exercise your rights, contact support@memoryduel.com.",
+  "consent": {
+    "aria": "Cookie consent",
+    "text": "We use cookies for anonymous analytics to improve the site. Nothing is tracked without your consent.",
+    "reject": "Reject",
+    "accept": "Accept"
   }
 }

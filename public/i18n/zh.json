@@ -1359,5 +1359,22 @@
     "daily_t": "每日挑战",
     "daily_d": "十道题，一次机会，全球同题。别断了你的连胜。",
     "daily_cta": "开始今天 →"
+  },
+  "mm_privacy_40": "<strong>匿名访问计数</strong>：除上文所述基于同意的可选分析外，我们还在 <code>/__uv</code> 运行一个第一方、无 Cookie 的计数器，用于统计每天有多少个不同浏览器访问。边缘服务器根据请求的 IP 地址、User-Agent 与 UTC 日期生成一个短期每日哈希，仅保留聚合计数。它不设置 Cookie、不读取表单输入、不使用第三方服务，也不构建跨站画像。由于它只做严格匿名的聚合统计，因此不受分析同意选项的影响。",
+  "mm_privacy_41": "7a. COPPA 2025 补充（美国用户）",
+  "mm_privacy_42": "<strong>自 2026 年 9 月 30 日起生效。</strong>本节是对上述政策的补充，用以满足美国《儿童在线隐私保护法》（COPPA）于 2025-01-16 发布的最终修正案（合规截止日 2026-04-22）。",
+  "mm_privacy_43": "<strong>持久标识符披露</strong> —— 启用云端 ELO 同步时，浏览器会通过 <code>crypto.randomUUID()</code> 自动生成一个 UUID。该 UUID 存储在 Cloudflare KV 中，TTL 为 90 天，仅用于跨课程、跨对局的 ELO 追踪。我们不收集 IP 地址、设备指纹或广告 ID。",
+  "mm_privacy_44": "<strong>第三方类别</strong> —— Cloudflare, Inc.（Workers Paid、KV、D1、R2、Durable Objects）；GitHub, Inc.（源代码托管）；Agent Mail（智邮，用于联系邮箱别名）。不涉及广告网络、数据经纪商、社交平台，除 Cloudflare Workers Logs 外也无其它分析服务。",
+  "mm_privacy_45": "<strong>目的限制</strong> —— UUID 与游戏数据仅用于：(1) 跨课程 ELO 追踪；(2) 反作弊；(3) 引擎改进；(4) 会话回放。绝不用于行为画像、广告、再营销或跨站识别。",
+  "mm_privacy_46": "<strong>生物识别标识符</strong> —— 我们不收集人脸识别数据、声纹、指纹、视网膜扫描或任何生物识别数据。2025 年修正案扩大后的定义不适用于本服务。",
+  "mm_privacy_47": "<strong>数据主体请求（DSAR）联系方式</strong> —— <a href=\"mailto:support@memoryduel.com\">support@memoryduel.com</a>（同时为 COPPA § 312.6 指定联系人）。请求将在 48 小时内处理。",
+  "mm_privacy_48": "完整书面政策：<a href=\"https://raw.githubusercontent.com/eyetoolkit/tri-sites/main/compliance/data-retention.md\">书面数据留存政策</a> · <a href=\"https://raw.githubusercontent.com/eyetoolkit/tri-sites/main/compliance/information-security.md\">书面信息安全计划</a>",
+  "mm_privacy_49": "7b. 中文摘要（COPPA 2025 补充）",
+  "mm_privacy_50": "我们遵守美国《儿童在线隐私保护法》（COPPA）2025 年 1 月 16 日最终修正案（含 2026-04-22 合规截止日）。由于我们不收集儿童个人身份信息（仅收集浏览器自动生成的匿名 UUID 与游戏结果数据），COPPA 大部分要求不适用。例外要求（书面留存政策、书面信息安全计划、持久标识符披露）已通过本文档及上方链接的 compliance/ 文档满足。如需删除数据或行使权利，请联系 support@memoryduel.com。",
+  "consent": {
+    "aria": "Cookie 同意",
+    "text": "我们使用 Cookie 进行匿名分析以改进网站。未经您的同意，我们不会追踪任何内容。",
+    "reject": "拒绝",
+    "accept": "接受"
   }
 }

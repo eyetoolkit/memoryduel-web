@@ -509,7 +509,7 @@
   "mm_train_1": "NumeriDuel",
   "mm_train_2": "BoardDuel",
   "mm_train_3": "MemoryDuel",
-  "mm_train_4": "You",
+  "mm_train_4": "Du",
   "mm_index_1": "NumeriDuel",
   "mm_index_2": "BoardDuel",
   "mm_index_3": "MemoryDuel",
@@ -540,7 +540,7 @@
   "mm_privacy_21": "Wir können folgende Drittanbieter-Dienste verwenden:",
   "mm_privacy_22": "<strong>Plausible Analytics</strong>: ein datenschutzfreundliches Analysewerkzeug (keine Cookies, DSGVO-konform). Siehe <a href=\"https://plausible.io/data-policy\">Plausibles Datenrichtlinie</a>.",
   "mm_privacy_23": "<strong>Cloudflare</strong>: Webhosting und CDN. Siehe <a href=\"https://www.cloudflare.com/privacypolicy/\">Cloudflares Datenschutzerklärung</a>.",
-  "mm_privacy_24": "6. Children's Datenschutz",
+  "mm_privacy_24": "6. Datenschutz für Kinder",
   "mm_privacy_25": "Diese Website ist für alle Altersgruppen. Da wir keine persönlichen Identitätsdaten erheben, sind die Regelungen zu Kinderdaten nach COPPA oder DSGVO (Art. 8) nicht anwendbar.",
   "mm_privacy_26": "7. Ihre Rechte",
   "mm_privacy_27": "Wir erheben sehr wenige Daten, überwiegend auf Ihrem lokalen Gerät. Sie können:",
@@ -1359,5 +1359,22 @@
     "daily_t": "Tagesherausforderung",
     "daily_d": "Zehn Fragen, ein Versuch, derselbe Satz für alle. Halte deine Serie am Leben.",
     "daily_cta": "Heute spielen →"
+  },
+  "mm_privacy_40": "<strong>Anonyme Besuchszählung</strong>: Zusätzlich zur oben beschriebenen optionalen, einwilligungsbasierten Analyse betreiben wir unter <code>/__uv</code> einen First-Party-Zähler ohne Cookies, um zu messen, wie viele verschiedene Browser täglich zu Besuch kommen. Unser Edge-Server leitet aus der IP-Adresse der Anfrage, dem User-Agent und dem UTC-Datum einen kurzlebigen Tages-Hash ab und speichert nur die aggregierte Anzahl. Er setzt keine Cookies, liest keine Formulareingaben, nutzt keinen Drittanbieterdienst und erstellt kein standortübergreifendes Profil. Da es sich um streng anonyme aggregierte Statistiken handelt, ist er von der Analyse-Einwilligung unabhängig.",
+  "mm_privacy_41": "7a. COPPA-Update 2025 (Nutzer in den USA)",
+  "mm_privacy_42": "<strong>Gültig ab 30. September 2026.</strong> Dieser Abschnitt ergänzt die obige Richtlinie, um die am 16.01.2025 veröffentlichten Final Amendments des U.S. Children's Online Privacy Protection Act (COPPA) zu erfüllen (Compliance-Frist 22.04.2026).",
+  "mm_privacy_43": "<strong>Offenlegung persistenter Identifikatoren</strong> — ist die Cloud-ELO-Synchronisierung aktiviert, erzeugt der Browser automatisch eine UUID über <code>crypto.randomUUID()</code>. Diese UUID wird mit einer TTL von 90 Tagen in Cloudflare KV gespeichert und ausschließlich für lektionsübergreifendes ELO-Tracking verwendet. Es werden keine IP-Adresse, kein Geräte-Fingerprint und keine Werbe-ID erhoben.",
+  "mm_privacy_44": "<strong>Kategorien von Dritten</strong> — Cloudflare, Inc. (Workers Paid, KV, D1, R2, Durable Objects); GitHub, Inc. (Quellcode); Agent Mail (智邮) für das Kontakt-E-Mail-Alias. Keine Werbenetzwerke, Datenhändler, Social-Media-Plattformen oder Analysen über Cloudflare Workers Logs hinaus.",
+  "mm_privacy_45": "<strong>Zweckbindung</strong> — UUID und Spieldaten werden ausschließlich verwendet für: (1) lektionsübergreifendes ELO-Tracking, (2) Anti-Cheat, (3) Engine-Verbesserung, (4) Session-Replay. Niemals für Verhaltensprofiling, Werbung, Re-Marketing oder standortübergreifende Identifizierung.",
+  "mm_privacy_46": "<strong>Biometrische Identifikatoren</strong> — wir erheben keine Gesichtserkennung, Stimmabdrücke, Fingerabdrücke, Netzhautscans oder sonstige biometrische Daten. Die erweiterte Definition der Änderung von 2025 findet auf unseren Dienst keine Anwendung.",
+  "mm_privacy_47": "<strong>DSAR-Kontakt</strong> — <a href=\"mailto:support@memoryduel.com\">support@memoryduel.com</a> (zugleich benannte Kontaktstelle nach COPPA § 312.6). Anfragen werden innerhalb von 48 Stunden bearbeitet.",
+  "mm_privacy_48": "Vollständige schriftliche Richtlinien: <a href=\"https://raw.githubusercontent.com/eyetoolkit/tri-sites/main/compliance/data-retention.md\">Schriftliche Datenaufbewahrungsrichtlinie</a> · <a href=\"https://raw.githubusercontent.com/eyetoolkit/tri-sites/main/compliance/information-security.md\">Schriftliches Informationssicherheitsprogramm</a>",
+  "mm_privacy_49": "7b. Zusammenfassung (COPPA-Ergänzung 2025)",
+  "mm_privacy_50": "Wir erfüllen die Final Amendments des U.S. Children's Online Privacy Protection Act (COPPA) vom 16. Januar 2025 (Compliance-Frist 22.04.2026). Da wir keine personenidentifizierenden Daten von Kindern erheben — nur eine vom Browser erzeugte anonyme UUID und Spieldaten —, sind die meisten COPPA-Anforderungen nicht anwendbar. Die verbleibenden Anforderungen (schriftliche Aufbewahrungsrichtlinie, schriftliches Informationssicherheitsprogramm, Offenlegung persistenter Identifikatoren) werden durch dieses Dokument und die oben verlinkten compliance/-Dokumente erfüllt. Für Datenlöschung oder die Ausübung Ihrer Rechte kontaktieren Sie support@memoryduel.com.",
+  "consent": {
+    "aria": "Cookie-Einwilligung",
+    "text": "Wir verwenden Cookies für anonyme Analysen zur Verbesserung der Website. Ohne Ihre Einwilligung wird nichts erfasst.",
+    "reject": "Ablehnen",
+    "accept": "Akzeptieren"
   }
 }

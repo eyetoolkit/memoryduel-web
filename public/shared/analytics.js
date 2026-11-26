@@ -84,12 +84,12 @@
   // ---- 横幅 ----
   function bannerHTML() {
     return '' +
-      '<div id="duel-consent" class="duel-consent" role="dialog" aria-live="polite" aria-label="Cookie consent">' +
+      '<div id="duel-consent" class="duel-consent" role="dialog" aria-live="polite" aria-label="Cookie consent" data-i18n-aria-label="consent.aria">' +
         '<div class="dc-inner">' +
-          '<p class="dc-text">We use cookies for anonymous analytics to improve the site. Nothing is tracked without your consent.</p>' +
+          '<p class="dc-text" data-i18n="consent.text">We use cookies for anonymous analytics to improve the site. Nothing is tracked without your consent.</p>' +
           '<div class="dc-actions">' +
-            '<button type="button" class="dc-reject" data-dc="reject">Reject</button>' +
-            '<button type="button" class="dc-accept" data-dc="accept">Accept</button>' +
+            '<button type="button" class="dc-reject" data-dc="reject" data-i18n="consent.reject">Reject</button>' +
+            '<button type="button" class="dc-accept" data-dc="accept" data-i18n="consent.accept">Accept</button>' +
           '</div>' +
         '</div>' +
       '</div>';
