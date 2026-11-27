@@ -11,3 +11,8 @@ _design-review/
 .cf-build-env
 .cf-project
 .wtest
+
+# 本地密钥（2026-11-27 补：此前未被忽略，git add -A 会误提交）
+p12-keys.json
+*.p12
+CLAUDE.md
