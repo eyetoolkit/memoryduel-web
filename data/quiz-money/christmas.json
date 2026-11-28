@@ -1,0 +1,79 @@
+{
+  "slug": "christmas",
+  "keyword": "christmas quiz",
+  "hubLabel": "Christmas",
+  "crumb": "Christmas",
+  "eyebrow": "holiday quiz",
+  "title": "Christmas Quiz — 20 Questions on Traditions and Their Origins",
+  "h1": "Christmas Quiz",
+  "desc": "20-question Christmas quiz on where the traditions actually came from: the tree, the cards, the reindeer and the red suit. Answers explained, free to play.",
+  "about": "Christmas traditions",
+  "playHeading": "Take the Christmas quiz",
+  "intro": [
+    "Almost nothing about Christmas is as old as it feels. The tree is a German import, the cards are Victorian, the red suit is a twentieth-century advertising image, and the reindeer with the red nose was invented by a department store in 1939.",
+    "That is what this quiz is about — not whether you know the songs, but whether you know where the furniture of the holiday came from. Twenty questions on dates, countries of origin and the specific people who turned a religious feast into the thing we decorate every December.",
+    "The full answer key is below the quiz, followed by what the twenty questions cover and short answers to the questions people ask most about Christmas traditions."
+  ],
+  "covers": [
+    "Dates: why the Western church settled on 25 December, when the twelve days start, and what Boxing Day actually is.",
+    "Countries of origin: the German tree, the English card, the Italian gift-bringer, and the Japanese Christmas dinner that is fried chicken.",
+    "The commercial layer: the advertising campaign that fixed Santa in red, and the department store that invented Rudolph.",
+    "Music and story: Silent Night, The Nutcracker, A Christmas Carol, and the best-selling single ever recorded.",
+    "The counter-intuitive ones — a Christmas in midsummer, and a four-candle wreath that marks a season nobody counts."
+  ],
+  "coversProse": [
+    "A lot of Christmas trivia is folklore repeated until it sounds like history. Where a claim is genuinely contested — the Coca-Cola Santa being the sole origin of the red suit, for instance — the explanation says so instead of repeating the myth.",
+    "The questions are ordered so that the easy ones establish the calendar and the harder ones go after origins, which is where most people discover that they know the tradition but not the century."
+  ],
+  "faq": [
+    [
+      "Why is Christmas on 25 December?",
+      "The Western church fixed the date by the fourth century. It does not match the likely season of the nativity, and the choice is usually explained as falling near the Roman solstice festival rather than being derived from the gospels."
+    ],
+    [
+      "Where did the Christmas tree come from?",
+      "Germany. Decorated evergreen trees are documented in German towns from the sixteenth century, and the custom spread to Britain and North America in the nineteenth century through German-born royalty and immigrants."
+    ],
+    [
+      "Who invented Rudolph the Red-Nosed Reindeer?",
+      "Robert L. May, a copywriter at the department store Montgomery Ward, wrote the story in 1939 as a giveaway booklet. The store had been buying colouring books for customers and wanted to stop."
+    ],
+    [
+      "What is Boxing Day?",
+      "26 December, the day after Christmas. The name most likely comes from the old practice of giving servants and tradespeople a boxed gift or gratuity on that day."
+    ],
+    [
+      "Why does Japan eat fried chicken at Christmas?",
+      "A marketing campaign by KFC in the 1970s sold fried chicken as the Christmas meal, and it worked well enough that booking a bucket in advance is now normal in Japan."
+    ]
+  ],
+  "manual": [
+    ["On which date is Christmas celebrated in the Western Christian tradition?", ["24 December", "25 December", "26 December", "6 January"], 1, "Western churches keep 25 December. Orthodox churches using the Julian calendar celebrate on what is 7 January in the Gregorian calendar."],
+    ["In which country did the decorated Christmas tree tradition begin?", ["Germany", "Norway", "England", "Netherlands"], 0, "Decorated evergreens are recorded in German towns from the sixteenth century, and German immigrants carried the custom to North America."],
+    ["Santa Claus is loosely based on a saint from which ancient city?", ["Myra", "Bethlehem", "Antioch", "Corinth"], 0, "Saint Nicholas was bishop of Myra, in what is now southern Turkey. His gift-giving legend travelled to the Netherlands as Sinterklaas and then to America."],
+    ["Which country is the home of the carol 'Silent Night'?", ["Austria", "Germany", "Italy", "Ireland"], 0, "It was written in 1818 in Oberndorf, Austria, by a priest and a schoolteacher. The traditional account has it first performed with guitar because the church organ was broken."],
+    ["In which country were commercial Christmas cards first sold?", ["England", "United States", "Germany", "France"], 0, "Henry Cole commissioned the first commercial card in London in 1843. Only a small number of the originals survive."],
+    ["Which country made fried chicken a Christmas dinner tradition?", ["Japan", "South Korea", "Philippines", "China"], 0, "KFC ran a campaign in Japan in the 1970s positioning fried chicken as the Christmas meal, and it became the default."],
+    ["Which brand's advertising helped fix the modern image of Santa in a red suit?", ["Coca-Cola", "Macy's", "Sears", "Kodak"], 0, "Haddon Sundblom's Coca-Cola illustrations from the 1930s fixed a plump, red-suited Santa in the public imagination, though red robes predate the ads."],
+    ["What date is Boxing Day?", ["26 December", "25 December", "1 January", "6 January"], 0, "Boxing Day follows Christmas Day and is a public holiday in Britain and much of the Commonwealth. The name probably comes from boxed gifts to servants."],
+    ["On which date do the twelve days of Christmas begin?", ["25 December", "13 December", "21 December", "1 December"], 0, "The twelve days run from Christmas Day to Epiphany eve, which is why Twelfth Night falls on 5 January."],
+    ["Which plant is traditionally hung so that people kiss beneath it?", ["Mistletoe", "Holly", "Ivy", "Rosemary"], 0, "Mistletoe is the kissing plant. Holly is the one with red berries used in wreaths, and the two are often confused in decoration."],
+    ["Which plant's red berries and spiny leaves are a standard Christmas decoration?", ["Holly", "Mistletoe", "Poinsettia", "Laurel"], 0, "Holly provides the red-and-green contrast that most Christmas decoration is built on. Poinsettia is the red-leaved pot plant from Mexico."],
+    ["In Italy, which figure traditionally brings gifts to children in early January?", ["La Befana", "Befana Claus", "Babbo Natale", "San Nicola"], 0, "La Befana is an old woman on a broom who arrives on Epiphany eve. Babbo Natale is the Italian name for Father Christmas."],
+    ["Which country celebrates Saint Lucia's Day on 13 December with candlelit processions?", ["Sweden", "Norway", "Denmark", "Finland"], 0, "Sweden marks Lucia with a girl in a white gown and candle crown leading a procession, a tradition tied to the winter solstice and to Sicily's Saint Lucy."],
+    ["Which company created Rudolph the Red-Nosed Reindeer as a giveaway?", ["Montgomery Ward", "Macy's", "Sears", "Woolworth"], 0, "Robert L. May wrote it for Montgomery Ward in 1939. The store gave away millions of copies and later handed the rights to May."],
+    ["Who wrote A Christmas Carol?", ["Charles Dickens", "Washington Irving", "Hans Christian Andersen", "Mark Twain"], 0, "Dickens published it in December 1843 and it sold out within days. He wrote it partly to pay off a debt."],
+    ["Who composed the ballet The Nutcracker?", ["Pyotr Tchaikovsky", "Sergei Prokofiev", "Igor Stravinsky", "Nikolai Rimsky-Korsakov"], 0, "Tchaikovsky composed it in 1892. It was only mildly successful at first and became a Christmas staple in the West in the mid-twentieth century."],
+    ["How many candles are on a traditional Advent wreath?", ["Three", "Four", "Five", "Seven"], 1, "Four candles, one for each Sunday of Advent, with a fifth often added for Christmas Day itself."],
+    ["Which date is Epiphany, when the Three Kings are celebrated?", ["6 January", "25 December", "1 January", "2 February"], 0, "Epiphany falls on 6 January and closes the Christmas season. In Spain and much of Latin America the gifts arrive that morning, not on Christmas Day."],
+    ["In which season does Christmas fall in Australia?", ["Summer", "Winter", "Autumn", "Spring"], 0, "Australia is in the southern hemisphere, so Christmas lands at the start of summer — which is why the carols are sung at the beach."],
+    ["Whose recording of 'White Christmas' is the best-selling single ever released?", ["Bing Crosby", "Frank Sinatra", "Nat King Cole", "Elvis Presley"], 0, "Bing Crosby's 1942 recording has sold on the order of fifty million copies, a figure no other single has matched."]
+  ],
+  "picks": [],
+  "related": [
+    { "slug": "food", "label": "Food", "note": "22 questions" },
+    { "slug": "religion", "label": "Religion", "note": "" },
+    { "slug": "modern-history", "label": "Modern history", "note": "" },
+    { "slug": "music", "label": "Music", "note": "20 questions" }
+  ]
+}

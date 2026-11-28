@@ -587,7 +587,9 @@ function main() {
   }
   console.log(`[quiz] 可生成 ${topics.length} 个（剔除 ${dropped.length} 个：题量/质量不足）`);
 
-  const totalAll = topics.length;
+  // 专题页底部「Browse all N quizzes」要的是站内 quiz 总数，
+  // 不是 topics.length —— 商业页（MONEY）也在 /quiz/ 里，漏算就少报 16 个。
+  const totalAll = topics.length + MONEY.size;
 
   // 相关主题：共同标签权重 → 同分类兜底
   for (const t of topics) {

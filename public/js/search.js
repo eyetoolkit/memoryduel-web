@@ -24,6 +24,7 @@
   var LOG_MIN_LEN = 3;
 
   var DOCS = [];
+  var TOTAL = 0;
   var input, list, count, popular;
   var tokens = [];
   var results = [];
@@ -161,8 +162,12 @@
 
   function chips() {
     var out = '';
+    var n = 0;
     DOCS.forEach(function (d) {
-      if (d.p) out += '<a href="' + esc(d.u) + '">' + esc(d.t.replace(/\s*Quiz$/, '')) + '</a>';
+      if (d.p && n < 8) {
+        out += '<a href="' + esc(d.u) + '">' + esc(d.t.replace(/\s*Quiz$/, '')) + '</a>';
+        n++;
+      }
     });
     return out || '<a href="/quiz/">Browse all quizzes</a>';
   }
@@ -191,7 +196,7 @@
       list.innerHTML = '';
       list.insertAdjacentHTML(
         'afterend',
-        '<div class="sq-none" id="sq-none"><p>Nothing in the 166 quizzes matches <strong>' +
+        '<div class="sq-none" id="sq-none"><p>Nothing in the ' + (TOTAL || '') + ' quizzes matches <strong>' +
           esc(query) +
           '</strong> yet. Try a broader word \u2014 <em>space</em> instead of <em>nebula</em>, <em>war</em> instead of <em>Potsdam</em>.</p><div class="sq-chips">' +
           chips() +
@@ -351,6 +356,7 @@
       })
       .then(function (data) {
         DOCS = (data.docs || []).map(prep);
+        TOTAL = DOCS.length;
         if (initial) {
           render(initial);
           scheduleLog(initial);

@@ -1,0 +1,79 @@
+{
+  "slug": "movies",
+  "keyword": "movie quiz",
+  "hubLabel": "Movies",
+  "crumb": "Movies",
+  "eyebrow": "film quiz",
+  "title": "Movie Quiz — 20 Questions on Directors, Actors and Lines",
+  "h1": "Movie Quiz",
+  "desc": "20-question movie quiz: who directed it, who played it, and which film the line comes from. Answers explained on the page, no sign-up needed.",
+  "about": "Movie trivia",
+  "playHeading": "Take the movie quiz",
+  "intro": [
+    "Film trivia splits into three kinds of memory, and this quiz tests all three. There is the director question — who was behind the camera. There is the casting question — who stood in front of it. And there is the line question, where four words are enough to place an entire film.",
+    "The questions avoid release dates and box-office takings, because those are the facts that go stale and the ones people argue about. What is left is the stuff you either know or you do not: Han Solo's ship, the first fully computer-animated feature, the actor who won a posthumous Oscar for a Batman film.",
+    "The complete answer key sits below the quiz, followed by the ground the twenty questions cover and short answers to the questions people search for most about these films."
+  ],
+  "covers": [
+    "Directors and their signature films: Tarantino, Spielberg, Cameron, Nolan, Jackson, Hitchcock and the Wachowskis.",
+    "Casting: who played Jack Dawson, Hermione Granger, the T-800, James Bond in 2006, and the Joker in 2008.",
+    "Lines and where they come from — 'Life is like a box of chocolates' and 'Here's looking at you, kid'.",
+    "Milestones: the first fully computer-animated feature, and the film credited with inventing the summer blockbuster.",
+    "Franchise furniture: Han Solo's ship, the Star Wars film that delivers the famous reveal, and the studio behind Toy Story."
+  ],
+  "coversProse": [
+    "Nothing here depends on a number that moves. No budgets, no box-office records, no 'highest-grossing film of all time' — those answers change every few years and make a quiz feel broken when they do.",
+    "The hard lane leans on craft rather than fame: who actually directed a film people assume was directed by someone else, and which year a line was first spoken rather than which film is most quoted."
+  ],
+  "faq": [
+    [
+      "Who directed Pulp Fiction?",
+      "Quentin Tarantino, in 1994. It was his second feature after Reservoir Dogs and won the Palme d'Or at Cannes."
+    ],
+    [
+      "Which film first used computer animation for an entire feature?",
+      "Toy Story, released by Pixar in 1995. Every earlier animated feature was drawn or shot frame by frame by hand."
+    ],
+    [
+      "Who played the Joker in The Dark Knight?",
+      "Heath Ledger, who won a posthumous Academy Award for the role. He died in January 2008, before the film was released."
+    ],
+    [
+      "Who directed the Lord of the Rings trilogy?",
+      "Peter Jackson, who shot all three films together in New Zealand. The trilogy was released between 2001 and 2003."
+    ],
+    [
+      "What is Han Solo's spaceship called?",
+      "The Millennium Falcon, a modified YT-1300 freighter. It appears first in A New Hope and is described as having made the Kessel Run in less than twelve parsecs."
+    ]
+  ],
+  "manual": [
+    ["Who directed the 1994 film Pulp Fiction?", ["Martin Scorsese", "Quentin Tarantino", "Coen brothers", "David Fincher"], 1, "Pulp Fiction was Tarantino's second feature and won the Palme d'Or at Cannes before becoming a cult reference point."],
+    ["Which 1975 Steven Spielberg film is credited with inventing the summer blockbuster?", ["Jaws", "Close Encounters", "Raiders of the Lost Ark", "E.T."], 0, "Jaws opened wide in summer 1975 and proved a film could earn most of its money in a few weeks rather than over months."],
+    ["Who directed Avatar, released in 2009?", ["Ridley Scott", "James Cameron", "Peter Jackson", "Christopher Nolan"], 1, "James Cameron wrote and directed Avatar, and returned for the sequels decades later after developing the underwater capture technology."],
+    ["Who directed Inception, released in 2010?", ["Christopher Nolan", "Denis Villeneuve", "Darren Aronofsky", "Alfonso Cuarón"], 0, "Inception was written and directed by Christopher Nolan, who had pitched the idea a decade before he was able to make it."],
+    ["Which film contains the line 'Life is like a box of chocolates'?", ["The Shawshank Redemption", "Forrest Gump", "Big", "Rain Man"], 1, "Tom Hanks says it as Forrest on a park bench. The line is often misquoted as 'Life is a box of chocolates'."],
+    ["Who played Jack Dawson in the 1997 film Titanic?", ["Brad Pitt", "Johnny Depp", "Leonardo DiCaprio", "Matt Damon"], 2, "Leonardo DiCaprio played Jack opposite Kate Winslet's Rose. Matthew McConaughey was among those considered for the part."],
+    ["Who directed the Lord of the Rings trilogy?", ["Ridley Scott", "Peter Jackson", "Guillermo del Toro", "George Lucas"], 1, "Peter Jackson shot all three films in one continuous production in New Zealand between 1999 and 2000."],
+    ["Which film won Best Picture at the 1995 Academy Awards, for films of 1994?", ["Pulp Fiction", "Forrest Gump", "The Shawshank Redemption", "Quiz Show"], 1, "Forrest Gump took Best Picture. Pulp Fiction won the original screenplay award but lost the top prize."],
+    ["Who played the T-800 in the 1984 film The Terminator?", ["Sylvester Stallone", "Arnold Schwarzenegger", "Dolph Lundgren", "Jean-Claude Van Damme"], 1, "Arnold Schwarzenegger played the Terminator, a role originally offered to O. J. Simpson, who was judged too recognisable as a killer."],
+    ["Who played James Bond in Casino Royale, released in 2006?", ["Pierce Brosnan", "Daniel Craig", "Timothy Dalton", "Sean Connery"], 1, "Daniel Craig's first Bond film was a reboot of the series, and it opened with the black-and-white bathroom fight that defined his version."],
+    ["What is the name of Han Solo's spaceship in Star Wars?", ["Naboo Royal", "Millennium Falcon", "Slave I", "Tantive IV"], 1, "The Millennium Falcon is a heavily modified YT-1300 freighter, and its 'twelve parsecs' claim is about distance, not speed."],
+    ["In which Star Wars film does Darth Vader reveal he is Luke's father?", ["A New Hope", "The Empire Strikes Back", "Return of the Jedi", "Revenge of the Sith"], 1, "The reveal comes at the end of The Empire Strikes Back, in a film that spends most of its running time splitting the heroes apart."],
+    ["Who directed The Matrix, released in 1999?", ["The Wachowskis", "Paul Verhoeven", "Luc Besson", "Alex Proyas"], 0, "Lana and Lilly Wachowski wrote and directed it. They had pitched the idea with a comic-book storyboard before anyone would fund it."],
+    ["Which studio made Toy Story, the first fully computer-animated feature?", ["DreamWorks", "Pixar", "Disney", "Illumination"], 1, "Toy Story was Pixar's first feature, released in 1995. Disney distributed it and later bought the studio outright."],
+    ["Who played the Joker in The Dark Knight, released in 2008?", ["Jack Nicholson", "Jared Leto", "Heath Ledger", "Joaquin Phoenix"], 2, "Heath Ledger won a posthumous Academy Award for the role. He died in January 2008, six months before the film opened."],
+    ["Which film contains the line 'Here's looking at you, kid'?", ["Casablanca", "Gone with the Wind", "The Maltese Falcon", "Notorious"], 0, "Humphrey Bogart says it to Ingrid Bergman in Casablanca. The line was ad-libbed from a phrase Bogart used at the poker table."],
+    ["Who directed the 1960 film Psycho?", ["Alfred Hitchcock", "Billy Wilder", "Orson Welles", "Fritz Lang"], 0, "Hitchcock shot Psycho on a television budget and insisted cinemas not admit anyone after the film had started, to protect the shower scene."],
+    ["Which actor played Hermione Granger in the Harry Potter films?", ["Emma Stone", "Emma Watson", "Keira Knightley", "Carey Mulligan"], 1, "Emma Watson played Hermione across all eight films, starting in 2001 when she was eleven years old."],
+    ["Who played Vito Corleone in The Godfather, released in 1972?", ["Al Pacino", "Marlon Brando", "Robert De Niro", "James Caan"], 1, "Marlon Brando played the older Vito; Robert De Niro played the same character as a young man in Part II, and also won an Oscar for it."],
+    ["Who directed Citizen Kane, released in 1941?", ["Orson Welles", "John Ford", "Howard Hawks", "Frank Capra"], 0, "Citizen Kane was Orson Welles's first feature, made when he was twenty-five after arriving from radio and theatre."]
+  ],
+  "picks": [],
+  "related": [
+    { "slug": "film", "label": "Film", "note": "" },
+    { "slug": "harry-potter", "label": "Harry Potter", "note": "22 questions" },
+    { "slug": "tv-shows", "label": "TV shows", "note": "" },
+    { "slug": "marvel", "label": "Marvel", "note": "20 questions" }
+  ]
+}

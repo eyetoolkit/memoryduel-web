@@ -1,0 +1,79 @@
+{
+  "slug": "marvel",
+  "keyword": "marvel quiz",
+  "hubLabel": "Marvel",
+  "crumb": "Marvel",
+  "eyebrow": "superhero quiz",
+  "title": "Marvel Quiz — 20 Questions on Heroes, Metal and Infinity Stones",
+  "h1": "Marvel Quiz",
+  "desc": "20-question Marvel quiz covering the films and the comics behind them: Mjolnir, vibranium, adamantium, Wakanda and the Infinity Stones. Answers explained.",
+  "about": "Marvel films and comics",
+  "playHeading": "Take the Marvel quiz",
+  "intro": [
+    "Marvel trivia has one trap that catches almost everyone: the metals. Vibranium makes Captain America's shield, adamantium coats Wolverine's skeleton, and uru is what Thor's hammer is forged from. Three different answers, and people confidently give the wrong one.",
+    "This quiz covers both layers — the films that made the characters famous and the comics that invented them. Twenty questions on heroes, artefacts, home worlds and the one decision that started the whole run in 2008.",
+    "The full answer key is below the quiz, followed by what the twenty questions cover and short answers to the Marvel questions people ask most."
+  ],
+  "covers": [
+    "The metals and what they belong to: vibranium, adamantium, uru, and which hero each one is attached to.",
+    "Artefacts and places: Mjolnir, the Infinity Stones, Wakanda, Asgard and the Sanctum.",
+    "Casting across the films: Iron Man, Thor, Black Widow and the actors who defined them.",
+    "Origins: the 2008 film that launched the series, and the two men who created Spider-Man in 1962.",
+    "Character facts that are easy to half-remember — Loki's relationship to Thor, the Hulk's alter ego, and who snapped."
+  ],
+  "coversProse": [
+    "Everything here is answerable from having watched the films, with two exceptions that reward reading the comics: who created Spider-Man, and what Doctor Strange's title actually means.",
+    "The distractors are chosen to be plausible rather than random. Every wrong option on a metal question is a real Marvel metal, so guessing does not work — you have to know which one belongs to whom."
+  ],
+  "faq": [
+    [
+      "What metal is Captain America's shield made of?",
+      "Vibranium, in the films. In the comics the shield is a vibranium-steel alloy created by accident, and that accident is why it has never been reproduced."
+    ],
+    [
+      "What is Thor's hammer called?",
+      "Mjolnir, forged from uru metal. It is enchanted so that only someone judged worthy can lift it, which is the plot of the first Thor film."
+    ],
+    [
+      "Which film started the Marvel Cinematic Universe?",
+      "Iron Man, released in 2008, directed by Jon Favreau and starring Robert Downey Jr. The post-credits scene with Nick Fury is where the shared universe was announced."
+    ],
+    [
+      "Who created Spider-Man?",
+      "Stan Lee and Steve Ditko, in 1962. Ditko designed the costume and the web-shooters; Lee has said he wanted a hero who was a teenager rather than an adult sidekick."
+    ],
+    [
+      "Who is Loki to Thor?",
+      "His adopted brother. Loki is a Frost Giant raised in Asgard, which is the reveal that drives the first Thor film and everything Loki does afterwards."
+    ]
+  ],
+  "manual": [
+    ["Which actor played Tony Stark, also known as Iron Man, in the Marvel films?", ["Chris Evans", "Robert Downey Jr.", "Mark Ruffalo", "Paul Rudd"], 1, "Robert Downey Jr. played Tony Stark from 2008 to 2019. The role effectively launched the shared-universe model."],
+    ["What is the name of the African nation ruled by Black Panther?", ["Wakanda", "Zamunda", "Genosha", "Latveria"], 0, "Wakanda is the fictional country built on a vibranium deposit. Zamunda is from Coming to America; Latveria belongs to Doctor Doom."],
+    ["What metal is Captain America's shield made of in the films?", ["Vibranium", "Adamantium", "Uru", "Titanium"], 0, "Vibranium, the same metal that makes Wakanda wealthy. Adamantium is Wolverine's, and uru is Thor's hammer."],
+    ["What is Thor's hammer called?", ["Mjolnir", "Gungnir", "Stormbreaker", "Hofund"], 0, "Mjolnir is the hammer. Stormbreaker is the axe he has forged later, and Gungnir is Odin's spear."],
+    ["Who created Spider-Man?", ["Stan Lee and Steve Ditko", "Stan Lee and Jack Kirby", "Bob Kane and Bill Finger", "Joe Simon and Jack Kirby"], 0, "Lee and Ditko created him in 1962 in Amazing Fantasy 15. Kirby and Lee created most of the rest of the Marvel roster."],
+    ["Which 2008 film launched the Marvel Cinematic Universe?", ["Iron Man", "The Incredible Hulk", "Thor", "Captain America: The First Avenger"], 0, "Iron Man came first in 2008 and ended with the Nick Fury scene that announced a shared universe."],
+    ["In the films, what is Thanos trying to collect?", ["The Infinity Stones", "The Cosmic Cubes", "The Vibranium cores", "The Eternity Gems"], 0, "Six Infinity Stones — space, mind, reality, power, time and soul. Collecting all six lets him wipe out half of all life."],
+    ["Which actor plays Thor in the Marvel films?", ["Chris Hemsworth", "Chris Evans", "Chris Pratt", "Tom Hiddleston"], 0, "Chris Hemsworth plays Thor. Chris Evans is Captain America, Chris Pratt is Star-Lord, and Tom Hiddleston is Loki."],
+    ["What is Loki's relationship to Thor?", ["Adopted brother", "Cousin", "Half-brother by blood", "No relation"], 0, "Loki is a Frost Giant raised alongside Thor in Asgard, so he is an adopted brother rather than a blood relative."],
+    ["What is Black Widow's real name?", ["Natasha Romanoff", "Wanda Maximoff", "Maria Hill", "Yelena Belova"], 0, "Natasha Romanoff. Yelena Belova is the other Black Widow, and Wanda Maximoff is the Scarlet Witch."],
+    ["Which metal coats Wolverine's skeleton?", ["Adamantium", "Vibranium", "Uru", "Promethium"], 0, "Adamantium, bonded to his bones in the Weapon X programme. It is a different metal from the one in Captain America's shield."],
+    ["What is Professor X's real name?", ["Charles Xavier", "Erik Lehnsherr", "Hank McCoy", "Nathan Summers"], 0, "Charles Xavier. Erik Lehnsherr is Magneto, Hank McCoy is Beast, and Nathan Summers is Cable."],
+    ["What is the Hulk's alter ego called?", ["Bruce Banner", "Peter Parker", "Reed Richards", "Stephen Strange"], 0, "Bruce Banner. Peter Parker is Spider-Man, Reed Richards leads the Fantastic Four, and Stephen Strange is Doctor Strange."],
+    ["Which team does Star-Lord lead?", ["Guardians of the Galaxy", "The Avengers", "The Defenders", "The Inhumans"], 0, "Peter Quill, or Star-Lord, leads the Guardians of the Galaxy, a team that starts as a group of criminals in the 2014 film."],
+    ["What title is Doctor Strange known by?", ["Sorcerer Supreme", "Master of the Mystic Arts", "Guardian of the Sanctum", "High Sorcerer"], 0, "Sorcerer Supreme is the title for the Earth dimension's chief protector. The other options are descriptions rather than the formal title."],
+    ["What is the name of Peter Parker's aunt, who raises him?", ["May", "Mae", "Anna", "Gwen"], 0, "Aunt May. Gwen Stacy is a separate character — Peter's girlfriend — and the two are often confused in quizzes."],
+    ["In Avengers: Endgame, which character performs the snap that defeats Thanos?", ["Tony Stark", "Steve Rogers", "Thor", "Bruce Banner"], 0, "Tony Stark takes the stones and snaps, which kills him. Banner had performed an earlier snap to restore the vanished."],
+    ["What is the name of Thor's home realm?", ["Asgard", "Vanaheim", "Jotunheim", "Niflheim"], 0, "Asgard, one of the Nine Realms. Jotunheim is the Frost Giants' world and Vanaheim is another of the nine."],
+    ["Which Marvel character is known as 'the Merc with a Mouth'?", ["Deadpool", "Spider-Man", "Star-Lord", "Hawkeye"], 0, "Wade Wilson, or Deadpool, earned the nickname for talking constantly. The 2016 film leaned on that trait deliberately."],
+    ["What is the name of the AI that runs Iron Man's suit?", ["J.A.R.V.I.S.", "F.R.I.D.A.Y.", "U.L.T.R.O.N.", "E.D.I.T.H."], 0, "J.A.R.V.I.S. ran the early suits before becoming Vision. F.R.I.D.A.Y. and E.D.I.T.H. came later in the series."]
+  ],
+  "picks": [],
+  "related": [
+    { "slug": "movies", "label": "Movies", "note": "20 questions" },
+    { "slug": "disney", "label": "Disney", "note": "20 questions" },
+    { "slug": "film", "label": "Film", "note": "" },
+    { "slug": "harry-potter", "label": "Harry Potter", "note": "22 questions" }
+  ]
+}

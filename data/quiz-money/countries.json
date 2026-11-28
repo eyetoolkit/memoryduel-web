@@ -1,0 +1,79 @@
+{
+  "slug": "countries",
+  "keyword": "countries of the world quiz",
+  "hubLabel": "Countries",
+  "crumb": "Countries",
+  "eyebrow": "world geography quiz",
+  "title": "Countries of the World Quiz — 20 Questions with Answers",
+  "h1": "Countries of the World Quiz",
+  "desc": "20-question countries of the world quiz: the biggest, the smallest, the ones with no rivers and the ones with two continents. Every answer explained, full key on the page.",
+  "about": "Countries of the world",
+  "playHeading": "Take the countries quiz",
+  "intro": [
+    "Country quizzes are usually a memory test dressed up as geography: name the capital, name the flag, name the currency. This one leans on the facts that actually stick — the extremes, the exceptions and the borders that surprise people.",
+    "That means questions like which country is also a continent, which one has no permanent rivers at all, and which two South American countries Brazil does not touch. Twenty questions, each with an explanation, so a wrong answer teaches you the reason rather than just the name.",
+    "The full answer key is below the quiz, followed by what the twenty questions cover and short answers to the questions people ask most about countries and their borders."
+  ],
+  "covers": [
+    "The extremes of size: the largest country by area, the smallest by area, and the largest landlocked one.",
+    "Continents and coastlines: which country is also a continent, who has the longest coastline, and which continent holds the most countries.",
+    "Borders worth knowing: the longest shared border on earth, and the two South American countries Brazil does not border.",
+    "Physical records that are country facts too: the country with the most volcanoes, the largest rainforest, and the one with no permanent rivers.",
+    "Capitals and continents that catch people out — the Australian capital that is not Sydney, the African country with the largest population."
+  ],
+  "coversProse": [
+    "Every question here is checkable against an atlas, which is the point: a country quiz should be wrong-answer-proof. Where sources disagree — the number of landlocked states, for instance — the question is written so the answer does not depend on the disagreement.",
+    "Several questions are written as traps on purpose. The largest country is not the most populous, the capital of Australia is not its biggest city, and the country with the most volcanoes is not the one with the most mountains."
+  ],
+  "faq": [
+    [
+      "What is the largest country in the world?",
+      "Russia, at about 17.1 million square kilometres. It is nearly twice the size of Canada, the second largest, and it spans eleven time zones."
+    ],
+    [
+      "What is the smallest country in the world?",
+      "Vatican City, at roughly 0.49 square kilometres and a population in the hundreds. Monaco is second and Nauru third by area."
+    ],
+    [
+      "Which country is also a continent?",
+      "Australia. It is the only country whose territory covers an entire continent, which is why 'Australia' can mean the country or the landmass depending on who is talking."
+    ],
+    [
+      "How many countries are there in the world?",
+      "193 member states of the United Nations, plus two observer states — the Holy See and Palestine. Depending on how you count disputed territories, the number cited ranges from 193 to 197."
+    ],
+    [
+      "Which country has the longest coastline?",
+      "Canada, at roughly 202,000 kilometres. The figure is so large because it counts the Arctic archipelago, where the coastline is shredded into thousands of islands."
+    ]
+  ],
+  "manual": [
+    ["Which country is the largest in the world by land area?", ["Russia", "Canada", "China", "United States"], 0, "Russia covers about 17.1 million square kilometres, close to twice the area of Canada in second place."],
+    ["Which country is the smallest in the world by area?", ["Monaco", "Nauru", "Vatican City", "San Marino"], 2, "Vatican City is about 0.49 square kilometres. Monaco is second and Nauru third, both far larger."],
+    ["Which country is the only one that covers an entire continent?", ["Australia", "Russia", "Brazil", "India"], 0, "Australia is the only state whose territory is also a whole continent. Antarctica has no sovereign country."],
+    ["Which country has the longest coastline in the world?", ["Indonesia", "Canada", "Russia", "Australia"], 1, "Canada's coastline runs to roughly 202,000 kilometres, mostly because of the thousands of islands in its Arctic archipelago."],
+    ["Which two countries share the longest land border in the world?", ["Russia and China", "Chile and Argentina", "Canada and the United States", "India and Bangladesh"], 2, "The Canada–United States border runs about 8,891 kilometres, including the Alaska segment."],
+    ["Which is the largest country in South America?", ["Argentina", "Peru", "Brazil", "Colombia"], 2, "Brazil covers about half the continent and borders ten of its twelve other countries."],
+    ["Brazil does not border which two South American countries?", ["Chile and Ecuador", "Peru and Bolivia", "Uruguay and Paraguay", "Guyana and Suriname"], 0, "Brazil touches every South American country except Chile and Ecuador, which sit on the Pacific side behind the Andes."],
+    ["Which is the largest country in Africa by area?", ["Nigeria", "Algeria", "Sudan", "Democratic Republic of the Congo"], 1, "Algeria is the largest African country, most of it Sahara. Sudan was larger until South Sudan separated in 2011."],
+    ["Which country has no permanent rivers at all?", ["Saudi Arabia", "Egypt", "Morocco", "Jordan"], 0, "Saudi Arabia has no permanently flowing rivers. It relies on aquifers and desalination instead."],
+    ["Which country has the most volcanoes?", ["Japan", "Indonesia", "Iceland", "Chile"], 1, "Indonesia has the most active volcanoes of any country, sitting along the Sunda arc where the Indo-Australian plate dives under Eurasia."],
+    ["Which continent contains the most countries?", ["Asia", "Europe", "Africa", "South America"], 2, "Africa has 54 recognised countries, ahead of Asia's 48. Europe's count depends on how you treat transcontinental states."],
+    ["What is the capital of Australia?", ["Sydney", "Melbourne", "Canberra", "Perth"], 2, "Canberra was purpose-built as a compromise between Sydney and Melbourne, which is why neither of the two biggest cities is the capital."],
+    ["Which country owns Greenland?", ["Norway", "Iceland", "Denmark", "Canada"], 2, "Greenland is a self-governing territory within the Kingdom of Denmark, not an independent country."],
+    ["Which country has the largest landlocked territory in the world?", ["Mongolia", "Kazakhstan", "Chad", "Bolivia"], 1, "Kazakhstan is the largest landlocked country, and the only one bigger than a million square kilometres that touches no ocean."],
+    ["Which country is often called the Land of the Rising Sun?", ["China", "Korea", "Japan", "Vietnam"], 2, "Japan's name, Nihon, literally means origin of the sun — the direction China lies from Japan's perspective at the eastern edge of Asia."],
+    ["Which country has the largest population in Africa?", ["Egypt", "Ethiopia", "Nigeria", "South Africa"], 2, "Nigeria passed Egypt as Africa's most populous country and is now well over 200 million people."],
+    ["Which small country sits in the Pyrenees between France and Spain?", ["Andorra", "Liechtenstein", "San Marino", "Monaco"], 0, "Andorra is a co-principality of about 468 square kilometres, bordered only by France and Spain."],
+    ["Which country has the most UNESCO World Heritage sites?", ["China", "Italy", "Spain", "France"], 1, "Italy and China have traded the top spot for years and sit within a site or two of each other, with Italy usually ahead."],
+    ["Which country's administrative capital is the highest in the world?", ["Peru", "Bolivia", "Ecuador", "Nepal"], 1, "La Paz sits at roughly 3,600 metres. Bolivia's constitutional capital is Sucre; La Paz is the seat of government."],
+    ["Which city sits on two continents, joined by a bridge over the Bosphorus?", ["Istanbul", "Cairo", "Athens", "Moscow"], 0, "Istanbul has districts in both Europe and Asia, and the Bosphorus strait between them is the continental divide."]
+  ],
+  "picks": [],
+  "related": [
+    { "slug": "capitals", "label": "World capitals", "note": "22 questions" },
+    { "slug": "geography", "label": "Geography", "note": "" },
+    { "slug": "flags", "label": "Flags of the world", "note": "20 questions" },
+    { "slug": "us-states", "label": "US states", "note": "24 questions" }
+  ]
+}

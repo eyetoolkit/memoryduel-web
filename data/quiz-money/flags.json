@@ -1,0 +1,79 @@
+{
+  "slug": "flags",
+  "keyword": "flags of the world quiz",
+  "hubLabel": "Flags",
+  "crumb": "Flags of the world",
+  "eyebrow": "flag quiz",
+  "title": "Flags of the World Quiz — 20 Questions with Answers",
+  "h1": "Flags of the World Quiz",
+  "desc": "20-question flags of the world quiz: the maple leaf, the cedar, the dragon and the one national flag that is not a rectangle. Every answer explained.",
+  "about": "National flags",
+  "playHeading": "Take the flags quiz",
+  "intro": [
+    "A flag is a design problem solved under brutal constraints: it has to be recognisable at a distance, from the wrong side, and while moving. That is why most of them fail into the same three shapes — stripes, a cross, or a canton with something in the corner.",
+    "This quiz tests the exceptions. The flag that is not a rectangle, the one with a dragon on it, the two countries whose flags are near-identical, and the oldest national flag still flying. Twenty questions, each with an explanation of where the design came from.",
+    "The full answer key is below the quiz, followed by what the twenty questions cover and short answers to the flag questions people search for most."
+  ],
+  "covers": [
+    "Plants and animals on flags: the maple leaf, the cedar of Lebanon, and the dragon of Bhutan.",
+    "The non-rectangular flag, and the square one that never adopted the rectangle in the first place.",
+    "Colour systems: the vertical tricolour of France, the black-red-gold of Germany, and the Nordic cross in Sweden and Iceland.",
+    "Religious and political symbols: the crescent and star of Pakistan and Turkey, the Ashoka Chakra of India, and the five stars of China.",
+    "Flag history: which national flag is the oldest still in use, and which country replaced the Union Jack on its flag in 1965."
+  ],
+  "coversProse": [
+    "Flag questions are unforgiving in one specific way: a wrong option is usually a real flag that nearly fits. That is deliberate here — the distractors are countries with similar designs, so knowing the answer means knowing why the design belongs to that country.",
+    "Nothing in this quiz depends on a flag that changed recently. Where a country has altered its flag within living memory, the question is written about the change itself rather than the current design."
+  ],
+  "faq": [
+    [
+      "Which country has the only non-rectangular national flag?",
+      "Nepal. Its flag is a double pennant made of two stacked triangles, representing the Himalayas and the two main religions of the country. It is the only national flag that is not a quadrilateral."
+    ],
+    [
+      "What is the oldest national flag still in use?",
+      "The Dannebrog of Denmark, traditionally dated to 1219. The legend places its origin at the Battle of Lyndanisse, though the design as used today settled much later."
+    ],
+    [
+      "Which two countries have almost identical flags?",
+      "Monaco and Indonesia both fly a simple horizontal red over white. The difference is proportion — Monaco's is 4:5 and Indonesia's is 2:3 — which is impossible to spot on a flagpole."
+    ],
+    [
+      "Why does the United States flag have 50 stars?",
+      "One for each state. The number has changed with every admission, which is why the flag has been redesigned 27 times since 1777."
+    ],
+    [
+      "What does the maple leaf on the Canadian flag stand for?",
+      "The eleven-point maple leaf is a national symbol rather than a regional one; it was chosen in 1964 after a debate that ran for months and produced thousands of submissions."
+    ]
+  ],
+  "manual": [
+    ["Which country's flag features a red maple leaf?", ["Canada", "Vermont", "Norway", "New Zealand"], 0, "Canada adopted the red-and-white maple leaf flag in 1965, replacing a design that carried the Union Jack in the canton."],
+    ["Which country's flag shows a green cedar tree?", ["Lebanon", "Cyprus", "Israel", "Jordan"], 0, "The cedar of Lebanon is on the flag because the tree is mentioned in the country's name and appears in its oldest literature."],
+    ["What is the Japanese flag's white field with a red disc called?", ["Hinomaru", "Sakura", "Kamon", "Nisshoki no hata"], 0, "Hinomaru means circle of the sun. The design has been used on banners for centuries and became the national flag in 1870."],
+    ["How many stars are on the flag of the United States?", ["48", "49", "50", "52"], 2, "Fifty stars for fifty states. The flag is redesigned whenever a state joins, which has happened 27 times."],
+    ["Which country has the only national flag that is not a rectangle?", ["Nepal", "Switzerland", "Bhutan", "Vatican City"], 0, "Nepal's flag is two stacked pennants. Switzerland and Vatican City are square, but square is still a rectangle."],
+    ["Which country's flag features a white dragon?", ["Bhutan", "Mongolia", "Thailand", "Nepal"], 0, "The Druk, or thunder dragon, is the national symbol of Bhutan. The flag is split diagonally into yellow and orange."],
+    ["Which country's flag is green with a white crescent and star?", ["Pakistan", "Bangladesh", "Algeria", "Mauritania"], 0, "Pakistan's flag has a white vertical band alongside the green field, which carries a crescent and a five-pointed star."],
+    ["In France's flag, what is the order of colours from the flagpole outwards?", ["Blue, white, red", "Red, white, blue", "Blue, red, white", "White, blue, red"], 0, "French blue sits at the hoist and red flies free. Reversing them gives you the Dutch flag, which is horizontal anyway."],
+    ["Which country's flag is a yellow cross on a blue field?", ["Sweden", "Finland", "Denmark", "Norway"], 0, "Sweden uses a yellow Nordic cross on blue. Finland's is blue on white, and Denmark's is white on red."],
+    ["Which country flies the oldest national flag still in use?", ["Denmark", "United Kingdom", "France", "Netherlands"], 0, "Denmark's Dannebrog is traditionally traced to 1219, though the modern design was fixed in the nineteenth century."],
+    ["Which country's flag is red with a white crescent and star?", ["Turkey", "Tunisia", "Singapore", "Azerbaijan"], 0, "Turkey's flag keeps the crescent and star of the Ottoman tradition on a plain red field, with the star turned outward."],
+    ["Which country's flag is a single large yellow star on a red field?", ["Vietnam", "China", "Angola", "Morocco"], 0, "Vietnam's star has five points and sits centred on red. China's flag has five stars, one large and four small."],
+    ["Which country's flag has horizontal bands of black, red and gold?", ["Germany", "Belgium", "Spain", "Belize"], 0, "Germany's flag runs black, red and gold horizontally. Belgium uses the same colours vertically."],
+    ["Which country's flag is blue with a red cross outlined in white?", ["Iceland", "Norway", "Finland", "Scotland"], 0, "Iceland combined the Norwegian colour scheme with a white outline so the red cross would not vanish against the blue."],
+    ["Which country's flag shows a lion holding a sword?", ["Sri Lanka", "Spain", "Netherlands", "Ethiopia"], 0, "Sri Lanka's flag has a gold lion on a maroon field, flanked by green and orange stripes for the country's other communities."],
+    ["Which two countries have a plain red-over-white horizontal flag?", ["Monaco and Indonesia", "Poland and Indonesia", "Monaco and Singapore", "Austria and Latvia"], 0, "Monaco and Indonesia are both red over white; only the proportions differ. Poland's is white over red, which is the reverse."],
+    ["How many stars appear on the flag of China?", ["Three", "Five", "Six", "One"], 1, "China's flag has five yellow stars — one large star with four smaller ones arranged in an arc beside it."],
+    ["Which country replaced the Union Jack on its national flag in 1965?", ["Canada", "Australia", "South Africa", "Jamaica"], 0, "Canada's maple leaf flag was adopted in February 1965 after a debate known as the Great Flag Debate, which ran for months."],
+    ["What is the wheel at the centre of India's flag called?", ["Ashoka Chakra", "Dharma wheel of Sarnath", "Sudarshana Chakra", "Konark wheel"], 0, "The Ashoka Chakra is a 24-spoke wheel taken from the Lion Capital at Sarnath, and it replaced the spinning wheel of the pre-independence design."],
+    ["Which country's flag is square rather than rectangular?", ["Switzerland", "Austria", "Belgium", "Netherlands"], 0, "Switzerland's flag is square for both the national flag and the civil ensign, which is unusual — most countries use a longer rectangle at sea."]
+  ],
+  "picks": [],
+  "related": [
+    { "slug": "countries", "label": "Countries", "note": "20 questions" },
+    { "slug": "capitals", "label": "World capitals", "note": "22 questions" },
+    { "slug": "geography", "label": "Geography", "note": "" },
+    { "slug": "us-states", "label": "US states", "note": "24 questions" }
+  ]
+}

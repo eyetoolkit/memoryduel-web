@@ -369,7 +369,7 @@ function patchHub(specs) {
   const block = `${START}
   <section class="qz-group">
     <h2>Featured quizzes</h2>
-    <p class="qz-note">The eight that people search for by name. Longer than the topic pages — 18 to 24 questions each, hand-checked, with a full answer key and FAQ.</p>
+    <p class="qz-note">The ${specs.length} that people search for by name. Longer than the topic pages — 20 to 24 questions each, hand-checked, with a full answer key and FAQ.</p>
     <ul class="qz-tags">
 ${items}
     </ul>
@@ -404,7 +404,10 @@ const byQid = new Map(corpus.items.map((it) => [it.qid, it]));
 
 const files = fs.readdirSync(SPEC_DIR).filter((f) => f.endsWith('.json')).sort();
 // 展示顺序按搜索量排，不按字母排（字母序会把食物排在元素周期表前面）
-const ORDER = ['us-states', 'capitals', 'us-presidents', 'world-war', 'periodic-table', 'harry-potter', 'human-body', 'food'];
+const ORDER = [
+  'movies', 'christmas', 'countries', 'flags', 'capitals', 'marvel', 'disney', 'harry-potter',
+  'us-states', 'us-presidents', 'sports', 'music', 'periodic-table', 'human-body', 'world-war', 'food',
+];
 const specs = files
   .map((f) => JSON.parse(fs.readFileSync(path.join(SPEC_DIR, f), 'utf8')))
   .sort((a, b) => {
