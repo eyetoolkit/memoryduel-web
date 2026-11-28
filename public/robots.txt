@@ -48,3 +48,6 @@ Sitemap: https://www.memoryduel.com/sitemap.xml
 LLMs: https://www.memoryduel.com/llms.txt
 LLMs-Full: https://www.memoryduel.com/llms-full.txt
 AI: https://www.memoryduel.com/ai.txt
+
+# /quiz/ 主题题库页（2026-11-28 新增，独立 sitemap，不动主 sitemap）
+Sitemap: https://www.memoryduel.com/sitemap-quiz.xml

@@ -1,0 +1,167 @@
+tier,tag,count,cat,slug
+A,festival,2644,culture,festival
+A,internet,2125,general,internet
+A,movies,1937,games,movies
+A,video games,1848,games,video-games
+A,religion,1836,culture,religion
+A,board games,1729,games,board-games
+A,hardware,1678,games,hardware
+A,actors,1664,movies,actors
+A,biology,1632,general,biology
+A,esports,1567,games,esports
+A,directors,1472,movies,directors
+A,ecology,1378,general,ecology
+A,composers,1344,general,composers
+A,painters,1305,arts,painters
+A,physics,1268,general,physics
+A,geography,1268,arts,geography
+A,europe,1239,arts,europe
+A,animals,1220,culture,animals
+A,rivers,1115,general,rivers
+A,artists,1104,arts,artists
+A,environmental science,1022,nature,environmental-science
+A,asia,921,culture,asia
+A,countries,916,culture,countries
+A,olympics,906,games,olympics
+A,chemistry,893,general,chemistry
+A,painting,882,arts,painting
+A,innovations,866,nature,innovations
+A,mountains,816,general,mountains
+A,astronomy,782,culture,astronomy
+A,literature,768,arts,literature
+A,environment,759,general,environment
+A,writers,749,arts,writers
+A,film,724,general,film
+A,modern history,700,history,modern-history
+A,terminology,685,games,terminology
+A,rock,678,music,rock
+A,networking,677,games,networking
+A,hinduism,676,culture,hinduism
+A,africa,670,arts,africa
+A,software,665,tech,software
+A,japan,643,arts,japan
+A,capitals,622,general,capitals
+A,plants,616,general,plants
+A,ancient history,604,culture,ancient-history
+A,albums,598,music,albums
+A,awards,594,arts,awards
+A,drama,575,arts,drama
+A,instruments,574,general,instruments
+A,india,570,culture,india
+A,security,524,tech,security
+A,records,524,games,records
+A,islam,522,culture,islam
+A,fantasy,521,arts,fantasy
+A,tennis,493,sports,tennis
+A,everyday facts,377,general,everyday-facts
+A,soccer,374,games,soccer
+A,league of legends,351,games,league-of-legends
+A,architecture,343,arts,architecture
+A,football,312,games,football
+A,bands,309,music,bands
+A,chess,303,games,chess
+A,cricket,298,sports,cricket
+A,climate,293,general,climate
+A,famous works,291,arts,famous-works
+A,famous artists,291,arts,famous-artists
+A,oceans,290,general,oceans
+A,basketball,260,general,basketball
+A,dota 2,254,games,dota-2
+A,south america,248,culture,south-america
+A,famous painters,248,arts,famous-painters
+A,planets,238,general,planets
+A,medieval history,235,history,medieval-history
+A,famous artwork,234,arts,famous-artwork
+A,mammals,230,general,mammals
+A,climate change,214,nature,climate-change
+A,golf,211,general,golf
+A,philosophy,195,arts,philosophy
+A,cold war,189,games,cold-war
+A,poetry,158,arts,poetry
+A,space,144,games,space
+A,anatomy,134,general,anatomy
+A,empire,124,history,empire
+A,baseball,122,sports,baseball
+A,elements,117,general,elements
+A,revolution,112,history,revolution
+A,geology,88,general,geology
+A,insects,81,general,insects
+A,sculpture,73,arts,sculpture
+A,periodic table,66,general,periodic-table
+A,world war,51,general,world-war
+A,solar system,46,general,solar-system
+A,formula 1,32,sports,formula-1
+B,opera,486,music,opera
+B,china,453,culture,china
+B,athletics,411,general,athletics
+B,sci-fi,409,games,sci-fi
+B,books,380,arts,books
+B,renaissance,372,arts,renaissance
+B,post-impressionism,356,arts,post-impressionism
+B,works,354,music,works
+B,nintendo,333,games,nintendo
+B,medieval,326,arts,medieval
+B,novel,319,arts,novel
+B,judaism,319,culture,judaism
+B,swimming,318,sports,swimming
+B,politics,315,general,politics
+B,atmosphere,312,general,atmosphere
+B,programming,300,tech,programming
+B,mexico,300,arts,mexico
+B,surrealism,295,arts,surrealism
+B,egypt,275,culture,egypt
+B,protocols,273,tech,protocols
+B,components,266,games,components
+B,international,257,games,international
+B,monopoly,253,games,monopoly
+B,botany,250,general,botany
+B,catan,248,games,catan
+B,conservation,238,nature,conservation
+B,storage,235,tech,storage
+B,cubism,232,arts,cubism
+B,mobile,223,games,mobile
+B,jazz,214,music,jazz
+B,strategy,209,games,strategy
+B,popular music,195,music,popular-music
+B,tv series,192,movies,tv-series
+B,general knowledge,192,games,general-knowledge
+B,card games,185,games,card-games
+B,marine biology,183,general,marine-biology
+B,battle royale,180,games,battle-royale
+B,american literature,176,arts,american-literature
+B,human body,171,general,human-body
+B,world cup,162,sports,world-cup
+B,modern art,162,arts,modern-art
+B,grand slam,157,sports,grand-slam
+B,ice hockey,143,sports,ice-hockey
+B,middle east,142,culture,middle-east
+B,water cycle,138,nature,water-cycle
+B,art history,132,arts,art-history
+B,20th century,129,arts,20th-century
+B,art movements,120,arts,art-movements
+B,classic literature,115,arts,classic-literature
+B,famous paintings,114,arts,famous-paintings
+B,famous art,106,arts,famous-art
+B,classic films,103,movies,classic-films
+B,earth science,95,general,earth-science
+B,magical realism,94,arts,magical-realism
+B,famous writers,93,arts,famous-writers
+B,world war i,89,history,world-war-i
+B,fighting games,89,games,fighting-games
+B,quantum mechanics,87,science,quantum-mechanics
+B,latin american literature,82,arts,latin-american-literature
+B,new year,80,culture,new-year
+B,particle physics,78,science,particle-physics
+B,academy awards,78,movies,academy-awards
+B,tv shows,73,movies,tv-shows
+B,latin america,73,arts,latin-america
+B,cell biology,70,nature,cell-biology
+B,genetics,56,nature,genetics
+B,lakes,55,general,lakes
+B,deserts,52,general,deserts
+B,cybersecurity,33,tech,cybersecurity
+B,boxing,31,sports,boxing
+B,poker,29,games,poker
+B,birds,23,general,birds
+B,weather,16,general,weather
+B,trees,15,general,trees
