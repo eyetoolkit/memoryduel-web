@@ -109,10 +109,29 @@
   function hitScore(tok, hay, w) {
     if (!hay) return 0;
     if (hay === tok) return w * 3;
-    if (hay.indexOf(tok) === 0) return w * 2.2;
-    if (hay.indexOf(' ' + tok) >= 0) return w * 1.5;
+    // 前缀命中只对 4 个字母以上的词开：否则 "man" 会把 "many"、"manager" 全算命中，
+    // 搜 "Iron Man" 时 catan 这种页面会靠 "many" 顶到第一位。
+    if (tok.length >= 4 && hay.indexOf(tok) === 0) return w * 2.2;
+    if (hay.indexOf(' ' + tok) >= 0) return w * 1.9;
     if (hay.indexOf(tok) >= 0) return w * 0.8;
     return 0;
+  }
+
+  /* 整串短语命中加成：搜 "iron man" 时，题干里真有这两个连着的词比
+     「两个词分别命中不同句子」可信得多，这条是排序的主要判据。 */
+  function phraseBonus(phrase, fields) {
+    if (!phrase) return 0;
+    var best = 0;
+    for (var i = 0; i < fields.length; i++) {
+      var f = fields[i];
+      if (!f.n) continue;
+      if (f.n === phrase) {
+        if (f.w * 5 > best) best = f.w * 5;
+      } else if (f.n.indexOf(phrase) >= 0) {
+        if (f.w * 3.2 > best) best = f.w * 3.2;
+      }
+    }
+    return best;
   }
 
   function search(query) {
@@ -147,6 +166,7 @@
       }
 
       if (!ok) continue;
+      if (tokens.length > 1) total += phraseBonus(tokens.join(' '), d._f);
       if (d.p) total += 1.5;
       out.push({ d: d, s: total, snip: snip ? snip.r : '' });
     }
