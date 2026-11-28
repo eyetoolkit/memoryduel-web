@@ -476,7 +476,8 @@ ${items.map((t) => `      <li><a href="/quiz/${t.slug}/">${esc(t.tag)}<span clas
   <meta property="og:image" content="${SITE}/og-default.jpg">
   <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
   <link rel="stylesheet" href="/css/shared/tokens.css?v=md-p3">
-  <link rel="stylesheet" href="/quiz/quiz.css?v=qz1">
+  <link rel="stylesheet" href="/quiz/quiz.css?v=qz2">
+  <link rel="stylesheet" href="/css/search.css?v=se1">
   <script>window.__GA4_ID__="G-2YY4FC8G44";</script>
   <link rel="stylesheet" href="/shared/consent.css?v=ph0-1">
   <link rel="stylesheet" href="/css/consent-md.css?v=md1">
@@ -504,6 +505,13 @@ ${items.map((t) => `      <li><a href="/quiz/${t.slug}/">${esc(t.tag)}<span clas
       <li>answers included</li>
     </ul>
   </header>
+
+  <!-- 站内搜索入口：无 JS 也能用（GET 提交到 /search/，页面自己读 ?q=） -->
+  <form class="sq-form" action="/search/" method="get" role="search">
+    <label class="sq-label" for="sq-q">Search quizzes</label>
+    <input id="sq-q" class="sq-input" type="search" name="q" placeholder="Search ${totalPages} quizzes — by topic or by exact question…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
+    <button class="sq-btn" type="submit">Search</button>
+  </form>
 
 ${groups}
 

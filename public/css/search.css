@@ -1,0 +1,199 @@
+/* ==========================================================================
+   站内搜索页 /search/（2026-11-28）
+   --------------------------------------------------------------------------
+   只负责搜索框与结果列表；版式骨架复用 /quiz/quiz.css 的 qz-* 类，
+   所以本文件必须排在 quiz.css 之后加载。
+   颜色一律走 tokens.css 变量，暗色模式自动跟随。
+   ========================================================================== */
+
+.sq-form {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+  margin: 22px 0 6px;
+}
+
+.sq-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.sq-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 14px 16px;
+  font: inherit;
+  font-size: 17px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--r-md);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.sq-input::placeholder {
+  color: var(--text-muted);
+}
+
+.sq-input:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-ring);
+}
+
+.sq-btn {
+  flex: 0 0 auto;
+  padding: 0 22px;
+  font: inherit;
+  font-weight: 600;
+  color: var(--on-brand);
+  background: var(--brand);
+  border: 0;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.sq-btn:hover {
+  background: var(--brand-hover);
+}
+
+.sq-count {
+  min-height: 1.4em;
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.sq-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.sq-list:empty {
+  display: none;
+}
+
+.sq-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.sq-item:hover,
+.sq-item.is-active {
+  border-color: var(--brand);
+  box-shadow: var(--e-1);
+}
+
+.sq-link {
+  display: block;
+  padding: 13px 15px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.sq-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  font-weight: 650;
+  font-size: 16px;
+  color: var(--text-strong);
+  line-height: 1.35;
+}
+
+.sq-cat {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--brand-text);
+  background: var(--brand-subtle);
+  border-radius: var(--r-full);
+  padding: 2px 8px;
+}
+
+.sq-snip {
+  margin: 5px 0 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.sq-snip mark {
+  background: var(--brand-subtle);
+  color: var(--text-strong);
+  border-radius: 3px;
+  padding: 0 2px;
+}
+
+/* 无结果时的收尾块：不装作有结果，直接给下一步 */
+.sq-none {
+  padding: 22px 18px;
+  background: var(--surface);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r-md);
+  text-align: center;
+}
+
+.sq-none p {
+  margin: 0 0 12px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.sq-none strong {
+  color: var(--text);
+}
+
+.sq-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.sq-chips a {
+  padding: 6px 12px;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-full);
+  text-decoration: none;
+}
+
+.sq-chips a:hover {
+  border-color: var(--brand);
+  color: var(--brand-text);
+}
+
+@media (max-width: 560px) {
+  .sq-form {
+    flex-wrap: wrap;
+  }
+
+  .sq-btn {
+    padding: 12px 18px;
+    flex: 1 0 100%;
+  }
+
+  .sq-input {
+    font-size: 16px;
+  }
+}

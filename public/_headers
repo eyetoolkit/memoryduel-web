@@ -39,6 +39,12 @@
 /.git/*
   X-Robots-Tag: noindex
 
+# 站内搜索页（2026-11-28）
+# 工具页，本身不该跟 166 个 quiz 页抢排名：content 里写 noindex，这里再兜一层，
+# 防止以后有人改页面属性时忘了。索引 JSON 同路径，一并 noindex 无害。
+/search/*
+  X-Robots-Tag: noindex, follow
+
 # Battle / train HTML: short edge cache so quiz-data ?v= bumps land fast
 /train.html
   Cache-Control: public, max-age=60, must-revalidate
