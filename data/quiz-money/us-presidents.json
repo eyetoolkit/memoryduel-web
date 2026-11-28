@@ -1,0 +1,83 @@
+{
+  "slug": "us-presidents",
+  "keyword": "US presidents quiz",
+  "hubLabel": "US presidents",
+  "crumb": "US presidents",
+  "eyebrow": "history quiz",
+  "title": "US Presidents Quiz — 20 Questions on the American Presidency (with Answers)",
+  "h1": "US Presidents Quiz",
+  "desc": "20 questions on US presidents: firsts, term lengths, amendments, assassinations and the men behind the famous laws. Every answer explained on the page.",
+  "about": "Presidents of the United States",
+  "playHeading": "Take the US presidents quiz",
+  "intro": [
+    "Presidential trivia is the part of American history most people half-remember: you know Lincoln freed the slaves and Roosevelt did the New Deal, but the ordinal numbers, the amendments and the one-term presidents blur together.",
+    "This quiz has 20 questions built around the distinctions that actually get tested — who was first, who served longest, who resigned, which amendment stopped a third term. No sign-up, no timer, and every answer carries a one-sentence explanation so the correction sticks.",
+    "The full answer key is below the quiz, followed by a short summary of what the 20 questions cover and the answers to the questions people ask most often about the presidency itself."
+  ],
+  "covers": [
+    "Firsts: the first president, the first to live in the White House, the first to be impeached.",
+    "Term rules: the two-term tradition, Franklin Roosevelt's four elections, and the 22nd Amendment that ended it.",
+    "The shortest and longest presidencies, and why the numbering runs higher than the number of people who have held the office.",
+    "Landmark acts and the president attached to each: the Emancipation Proclamation, the Civil Rights Act of 1964, the Louisiana Purchase.",
+    "Careers before politics — the general, the peanut farmer, the actor."
+  ],
+  "coversProse": [
+    "The questions avoid the two failure modes of president quizzes: asking for a list of ordinals nobody remembers, and asking about whoever is in office this week. Everything here is settled history with a date attached.",
+    "If you get fewer than twelve, the useful next step is not another quiz but a timeline — the answer key doubles as one, because each explanation names the year."
+  ],
+  "faq": [
+    [
+      "Who was the first president of the United States?",
+      "George Washington, who took office in 1789 and served two terms. He was elected unanimously by the Electoral College in both 1789 and 1792."
+    ],
+    [
+      "How many presidents has the United States had?",
+      "Forty-five people have held the office, but the numbering runs higher than that because two presidents served two non-consecutive terms and are counted twice. Grover Cleveland, for example, is both the 22nd and the 24th president."
+    ],
+    [
+      "Which president served the shortest term?",
+      "William Henry Harrison, who died of illness 31 days after his inauguration in 1841 and is the first president to die in office."
+    ],
+    [
+      "Can a US president serve more than two terms?",
+      "No. The 22nd Amendment, ratified in 1951, limits a president to two elected terms. Before it, the two-term limit was a convention rather than a rule, and Franklin D. Roosevelt was elected four times."
+    ],
+    [
+      "Which presidents were assassinated?",
+      "Four: Abraham Lincoln in 1865, James Garfield in 1881, William McKinley in 1901 and John F. Kennedy in 1963."
+    ],
+    [
+      "Whose faces are on Mount Rushmore?",
+      "George Washington, Thomas Jefferson, Theodore Roosevelt and Abraham Lincoln — chosen to represent the founding, expansion, development and preservation of the country."
+    ]
+  ],
+  "picks": [],
+  "manual": [
+    ["Who was the first president of the United States?", ["Thomas Jefferson", "George Washington", "John Adams", "James Madison"], 1, "Washington took office in 1789 and was elected unanimously by the Electoral College in both of his elections."],
+    ["Which president wrote the Declaration of Independence?", ["George Washington", "Benjamin Franklin", "Thomas Jefferson", "John Adams"], 2, "Jefferson drafted the Declaration in 1776, sixteen years before he became the third president."],
+    ["Which president issued the Emancipation Proclamation?", ["Andrew Jackson", "Abraham Lincoln", "Ulysses S. Grant", "Andrew Johnson"], 1, "Lincoln issued the preliminary proclamation in September 1862 and the final version on 1 January 1863."],
+    ["Which president was assassinated in 1963?", ["Franklin D. Roosevelt", "Dwight Eisenhower", "John F. Kennedy", "Lyndon B. Johnson"], 2, "Kennedy was shot in Dallas on 22 November 1963, in the third year of his term."],
+    ["Which president resigned from office?", ["Andrew Johnson", "Richard Nixon", "Bill Clinton", "Herbert Hoover"], 1, "Nixon resigned in August 1974, the only president to do so, after the Watergate investigation closed in on him."],
+    ["Which president was elected to four terms?", ["Woodrow Wilson", "Franklin D. Roosevelt", "Harry Truman", "Theodore Roosevelt"], 1, "Roosevelt won in 1932, 1936, 1940 and 1944. The 22nd Amendment was passed after his death to prevent a repeat."],
+    ["Which amendment limits a president to two terms?", ["The 20th", "The 22nd", "The 25th", "The 26th"], 1, "The 22nd Amendment was ratified in 1951, four years after it passed Congress."],
+    ["Who was the first president to live in the White House?", ["George Washington", "John Adams", "Thomas Jefferson", "James Monroe"], 1, "John Adams moved in during 1800, near the end of his single term. Washington never lived there — the building was not finished while he was in office."],
+    ["Which president served the shortest term?", ["Zachary Taylor", "William Henry Harrison", "James Garfield", "Millard Fillmore"], 1, "Harrison died 31 days after his 1841 inauguration, having caught a cold that turned into pneumonia."],
+    ["Who was the youngest person elected president?", ["Theodore Roosevelt", "John F. Kennedy", "Bill Clinton", "Barack Obama"], 1, "Kennedy was 43 when elected in 1960. Theodore Roosevelt was younger when he took office, but he succeeded a president who died rather than being elected."],
+    ["Which president was impeached in 1998?", ["Richard Nixon", "Bill Clinton", "Andrew Johnson", "George W. Bush"], 1, "Clinton was impeached by the House in December 1998 and acquitted by the Senate in February 1999."],
+    ["Which president served two non-consecutive terms in the 19th century?", ["Ulysses S. Grant", "Grover Cleveland", "Benjamin Harrison", "Chester Arthur"], 1, "Cleveland won in 1884, lost in 1888, and won again in 1892, which is why he is numbered as both the 22nd and 24th president."],
+    ["Which president led the Rough Riders during the Spanish-American War?", ["William McKinley", "Theodore Roosevelt", "William Taft", "Woodrow Wilson"], 1, "Roosevelt led the volunteer cavalry regiment in 1898, three years before becoming president."],
+    ["How many presidents served before Abraham Lincoln?", ["13", "14", "15", "16"], 2, "Lincoln was the 16th president, so fifteen men held the office before him, beginning with Washington in 1789."],
+    ["Which president ordered the Berlin Airlift in 1948?", ["Franklin D. Roosevelt", "Harry Truman", "Dwight Eisenhower", "John F. Kennedy"], 1, "Truman ordered the airlift after the Soviet Union blockaded West Berlin, and it ran for almost a year."],
+    ["Which president signed the Civil Rights Act of 1964?", ["John F. Kennedy", "Lyndon B. Johnson", "Richard Nixon", "Dwight Eisenhower"], 1, "Kennedy proposed the bill, but it was Johnson who signed it into law on 2 July 1964, months after Kennedy's death."],
+    ["Which president worked as a peanut farmer before entering politics?", ["Jimmy Carter", "Harry Truman", "Ronald Reagan", "Gerald Ford"], 0, "Carter ran the family peanut farm in Plains, Georgia, and used the background deliberately in his 1976 campaign."],
+    ["Which president had a career as a Hollywood actor?", ["Ronald Reagan", "John F. Kennedy", "Richard Nixon", "Gerald Ford"], 0, "Reagan appeared in more than fifty films before turning to politics, and was president of the Screen Actors Guild."],
+    ["Which president was born in Hawaii?", ["Barack Obama", "Bill Clinton", "George W. Bush", "Lyndon B. Johnson"], 0, "Obama was born in Honolulu in 1961, two years after Hawaii became a state."],
+    ["Who was the first president to be impeached?", ["Andrew Johnson", "Bill Clinton", "Richard Nixon", "John Tyler"], 0, "Andrew Johnson was impeached by the House in 1868 and missed removal from office by a single Senate vote."]
+  ],
+  "related": [
+    { "slug": "us-states", "label": "US states", "note": "24 questions" },
+    { "slug": "world-war", "label": "World War II", "note": "22 questions" },
+    { "slug": "ancient-history", "label": "Ancient history", "note": "" },
+    { "slug": "capitals", "label": "World capitals", "note": "" }
+  ]
+}

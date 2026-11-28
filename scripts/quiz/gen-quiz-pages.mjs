@@ -152,6 +152,28 @@ const DUP_SIM = 0.72;
 
 /* ────────────────── 选篇：难度配比 + 确定性洗牌 ────────────────── */
 
+/* 选项洗牌（确定性）
+   语料里正确答案压倒性地落在第 0/1 位——不洗牌的话「永远点第一个」能拿高分，
+   区分度归零。种子取题干哈希，保证同一页重跑字节一致。 */
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return function () {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function shuffleOptions(q) {
+  const rnd = mulberry32(fnv1a(q.q));
+  const idx = q.o.map((_, i) => i);
+  for (let i = idx.length - 1; i > 0; i--) {
+    const j = Math.floor(rnd() * (i + 1));
+    [idx[i], idx[j]] = [idx[j], idx[i]];
+  }
+  return { ...q, o: idx.map((i) => q.o[i]), c: idx.indexOf(q.c) };
+}
+
 function selectQuestions(tag, pool, n) {
   const seen = new Set();
   const cands = [];
@@ -207,7 +229,7 @@ function selectQuestions(tag, pool, n) {
   // 页内按 easy → medium → hard 排，让题目从易到难爬坡
   const rank = { easy: 0, medium: 1, hard: 2 };
   kept.sort((a, b) => (rank[String(a.d).toLowerCase()] ?? 1.5) - (rank[String(b.d).toLowerCase()] ?? 1.5));
-  return kept.slice(0, n);
+  return kept.slice(0, n).map(shuffleOptions);
 }
 
 /* ────────────────── 文案 ────────────────── */
@@ -407,7 +429,9 @@ ${relItems}
 
 /* ────────────────── 总览页 ────────────────── */
 
-function renderHub(topics) {
+function renderHub(topics, extra = 0) {
+  // extra = 商业意图页数量（它们不在 topics 里，但算总数、算文案）
+  const totalPages = topics.length + extra;
   const byCat = new Map();
   for (const t of topics) {
     const k = t.cat || 'other';
@@ -432,7 +456,7 @@ ${items.map((t) => `      <li><a href="/quiz/${t.slug}/">${esc(t.tag)}<span clas
 
   const totalQ = topics.reduce((s, t) => s + t.actual, 0);
   const url = SITE + '/quiz/';
-  const desc = `Browse ${topics.length} topic quizzes built from the MemoryDuel question bank — ${totalQ.toLocaleString('en-US')} questions in total, each with answers and explanations.`;
+  const desc = `Browse ${totalPages} topic and featured quizzes built from the MemoryDuel question bank — ${totalQ.toLocaleString('en-US')} questions in total, each with answers and explanations.`;
 
   return `<!DOCTYPE html>
 <html lang="en" data-site="memory">
@@ -441,7 +465,7 @@ ${items.map((t) => `      <li><a href="/quiz/${t.slug}/">${esc(t.tag)}<span clas
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#F4F5F9">
   <script>(function(){try{var t=localStorage.getItem('md-theme2');if(t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.setAttribute('data-theme','dark');var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content','#12131F');}}catch(e){}})();</script>
-  <title>Topic Quizzes — ${topics.length} Subjects with Answers | MemoryDuel</title>
+  <title>Topic Quizzes — ${totalPages} Subjects with Answers | MemoryDuel</title>
   <meta name="description" content="${esc(desc)}">
   <link rel="canonical" href="${url}">
   <meta property="og:type" content="website">
@@ -472,10 +496,10 @@ ${items.map((t) => `      <li><a href="/quiz/${t.slug}/">${esc(t.tag)}<span clas
   <header class="qz-hero">
     <p class="qz-eyebrow">question bank</p>
     <h1>Topic Quizzes</h1>
-    <p class="qz-lead">${topics.length} subjects, ${totalQ.toLocaleString('en-US')} questions, every answer explained. Pick a shelf and start — no account, no timer unless you want one.</p>
+    <p class="qz-lead">${totalPages} quizzes, ${totalQ.toLocaleString('en-US')} questions, every answer explained. Pick a shelf and start — no account, no timer unless you want one.</p>
     <p class="qz-lead">Each quiz pulls ${word(PER_PAGE)} questions out of the full bank for that topic, so you can retake one and get a different set. The ones you miss tell you which neighbour topic to try next.</p>
     <ul class="qz-stats">
-      <li>${topics.length} quizzes</li>
+      <li>${totalPages} quizzes</li>
       <li>${totalQ.toLocaleString('en-US')} questions</li>
       <li>answers included</li>
     </ul>
@@ -506,6 +530,17 @@ ${groups}
 /* ────────────────── 主流程 ────────────────── */
 
 function main() {
+  // 商业意图页（data/quiz-money/*.json）由 gen-money-pages.mjs 独占维护。
+  // 这里必须跳过它们的 slug：本脚本会先清空 OUT 下所有子目录再重写，
+  // 不跳过就会把手工页面连题目带 FAQ 一起删掉。
+  const MONEY_DIR = path.join(ROOT, 'data/quiz-money');
+  const MONEY = new Set(
+    fs.existsSync(MONEY_DIR)
+      ? fs.readdirSync(MONEY_DIR).filter((f) => f.endsWith('.json'))
+          .map((f) => JSON.parse(fs.readFileSync(path.join(MONEY_DIR, f), 'utf8')).slug)
+      : []
+  );
+
   const topicsRaw = readTopics(TOPICS);
   const corpus = readCorpus(CORPUS);
   console.log(`[quiz] 主题 ${topicsRaw.length} 个 · 语料 ${corpus.length} 题`);
@@ -536,6 +571,7 @@ function main() {
   const topics = [];
   const dropped = [];
   for (const t of topicsRaw) {
+    if (MONEY.has(t.slug)) continue; // 交给 gen-money-pages.mjs
     const pool = byTag.get(t.tag) || [];
     const qs = selectQuestions(t.tag, pool, PER_PAGE);
     if (qs.length < MIN_POOL) { dropped.push(`${t.tag}(${qs.length})`); continue; }
@@ -587,7 +623,7 @@ function main() {
   // 清掉上一轮的产物，避免 slug 改名后留孤儿页
   fs.mkdirSync(OUT, { recursive: true });
   for (const e of fs.readdirSync(OUT, { withFileTypes: true })) {
-    if (e.isDirectory() && e.name !== 'assets') {
+    if (e.isDirectory() && e.name !== 'assets' && !MONEY.has(e.name)) {
       fs.rmSync(path.join(OUT, e.name), { recursive: true, force: true });
     }
   }
@@ -602,14 +638,33 @@ function main() {
     written++;
   }
 
-  // 总览页
-  fs.writeFileSync(path.join(OUT, 'index.html'), renderHub(topics));
+  // 总览页。精选区（MONEY 块）由 gen-money-pages.mjs 维护，这里只负责搬回去：
+  // 先摘出旧块，写完新 hub 再插回第一个分类区之前，避免每次重跑都丢。
+  const hubFile = path.join(OUT, 'index.html');
+  const MS = '<!-- MONEY:START -->';
+  const ME = '<!-- MONEY:END -->';
+  let moneyBlock = '';
+  if (fs.existsSync(hubFile)) {
+    const old = fs.readFileSync(hubFile, 'utf8');
+    const i = old.indexOf(MS); const j = old.indexOf(ME);
+    if (i >= 0 && j > i) moneyBlock = old.slice(i, j + ME.length);
+  }
+  let hubHtml = renderHub(topics, MONEY.size);
+  if (moneyBlock) {
+    const anchor = hubHtml.indexOf('<section class="qz-group">');
+    if (anchor >= 0) hubHtml = hubHtml.slice(0, anchor) + moneyBlock + '\n\n  ' + hubHtml.slice(anchor);
+  }
+  fs.writeFileSync(hubFile, hubHtml);
 
   // 独立 sitemap：不动主 sitemap（那里有 /games/ 过滤逻辑，别去碰）
   const urls = [
     `  <url><loc>${SITE}/quiz/</loc><changefreq>weekly</changefreq><priority>0.9</priority><lastmod>${TODAY}</lastmod></url>`,
     ...topics.map((t) =>
       `  <url><loc>${SITE}/quiz/${t.slug}/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>${TODAY}</lastmod></url>`
+    ),
+    // 商业意图页：不重生成，但 URL 必须留在 sitemap 里
+    ...[...MONEY].map((slug) =>
+      `  <url><loc>${SITE}/quiz/${slug}/</loc><changefreq>monthly</changefreq><priority>0.8</priority><lastmod>${TODAY}</lastmod></url>`
     ),
   ].join('\n');
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>

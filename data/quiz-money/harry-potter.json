@@ -1,0 +1,81 @@
+{
+  "slug": "harry-potter",
+  "keyword": "Harry Potter quiz",
+  "hubLabel": "Harry Potter",
+  "crumb": "Harry Potter",
+  "eyebrow": "books & films quiz",
+  "title": "Harry Potter Quiz — 22 Questions on Hogwarts, Characters & Spells",
+  "h1": "Harry Potter Quiz",
+  "desc": "22-question Harry Potter quiz covering Hogwarts houses, characters, spells and the Triwizard Tournament. Answers and explanations on the page, no sign-up.",
+  "about": "Harry Potter series",
+  "playHeading": "Take the Harry Potter quiz",
+  "intro": [
+    "There are two kinds of Harry Potter knowledge: the plot you could summarise in a minute, and the details that only survive a second read — which house the Sorting Hat almost chose, what Harry's Patronus takes the shape of, how many pieces of soul Voldemort actually split off.",
+    "This quiz is built for the second kind. 22 questions across the seven books and eight films, no sign-up, no timer, and an explanation after every answer so a miss tells you where to look rather than just costing you a point.",
+    "The answer key sits directly under the quiz. Contains spoilers for the whole series, including the ending — if you are mid-read, come back later."
+  ],
+  "covers": [
+    "Hogwarts: the houses, the headmaster, the platform, and the dog behind the door on the third floor.",
+    "Characters: Harry's owl, Ron's rat, Hermione's cat, and the house-elf who keeps turning up.",
+    "Spells and magic: what Expelliarmus does, what a Patronus looks like, and how many Horcruxes were made on purpose.",
+    "The tournament: how many tasks, and which year it happens in.",
+    "Book-to-film details: the actor behind Snape, and which book closes the series."
+  ],
+  "coversProse": [
+    "Every question here is answerable from either the books or the films — the quiz deliberately avoids details that only exist in one version, because a quiz that punishes you for having seen the film instead of read the book is testing the wrong thing.",
+    "The difficulty is in the recall, not in the obscurity. Nothing here requires you to remember a minor character's middle name; several questions do require you to have finished the series."
+  ],
+  "faq": [
+    [
+      "How many books and films are there?",
+      "Seven books, published between 1997 and 2007, and eight films, because the final book was split into two parts released in 2010 and 2011."
+    ],
+    [
+      "Do I need to have read the books to do well?",
+      "No. All 22 questions can be answered from the films alone, and several are easier if you have only seen the films. The quiz avoids book-only trivia on purpose."
+    ],
+    [
+      "Does the quiz contain spoilers?",
+      "Yes. Several questions reference events from the last two books, including the fate of major characters. If you are partway through the series, the quiz will spoil it."
+    ],
+    [
+      "Is this an official Harry Potter quiz?",
+      "No. It is an unofficial fan-made quiz on MemoryDuel and is not affiliated with or endorsed by J.K. Rowling, Warner Bros. or any rights holder. Names are used descriptively."
+    ],
+    [
+      "Can I retake it?",
+      "Yes, as often as you like, and there is no account needed. The question order is fixed, so a second run is a memory test rather than a fresh set — the answer key is the better study tool once you have played once."
+    ]
+  ],
+  "picks": [],
+  "manual": [
+    ["Which Hogwarts house is Harry Potter sorted into?", ["Slytherin", "Ravenclaw", "Gryffindor", "Hufflepuff"], 2, "The Sorting Hat hesitates and considers Slytherin, but Harry asks not to go there and is placed in Gryffindor."],
+    ["What is the name of the wizarding school Harry attends?", ["Beauxbatons", "Hogwarts", "Durmstrang", "Ilvermorny"], 1, "Hogwarts School of Witchcraft and Wizardry is in Scotland, and the other three schools appear during the Triwizard Tournament."],
+    ["Who is headmaster of Hogwarts for most of the series?", ["Severus Snape", "Minerva McGonagall", "Albus Dumbledore", "Horace Slughorn"], 2, "Dumbledore leads the school from the first book until his death, after which McGonagall takes over."],
+    ["What position does Harry play on his Quidditch team?", ["Chaser", "Beater", "Keeper", "Seeker"], 3, "Harry is a Seeker, the player whose job is to catch the Golden Snitch and end the match."],
+    ["How many Horcruxes did Voldemort deliberately create?", ["Three", "Five", "Six", "Seven"], 2, "He intended six, splitting his soul into seven parts in total. The seventh fragment lodged in Harry by accident, which Voldemort never planned."],
+    ["What is the name of Harry's owl?", ["Errol", "Hedwig", "Pigwidgeon", "Crookshanks"], 1, "Hagrid buys Hedwig for Harry's eleventh birthday, and she is killed during the escape from Privet Drive."],
+    ["Which spell is used to disarm an opponent?", ["Expelliarmus", "Stupefy", "Lumos", "Petrificus Totalus"], 0, "Expelliarmus knocks a wand out of an opponent's hand. Harry uses it so often that it becomes his signature."],
+    ["What is the name of the three-headed dog guarding the trapdoor?", ["Fang", "Norbert", "Fluffy", "Aragog"], 2, "Fluffy belongs to Hagrid and can be put to sleep with music, which is how the trio gets past him."],
+    ["Which platform at King's Cross leads to the Hogwarts Express?", ["Platform 7", "Platform 9", "Platform 9¾", "Platform 13"], 2, "Students run through the barrier between platforms nine and ten to reach the hidden Platform 9¾."],
+    ["Who teaches Potions during Harry's first year?", ["Horace Slughorn", "Severus Snape", "Remus Lupin", "Gilderoy Lockhart"], 1, "Snape teaches Potions from the first book until Slughorn replaces him, after which Snape finally gets the Defence Against the Dark Arts post."],
+    ["What is the wizarding prison called?", ["Nurmengard", "Azkaban", "Gringotts", "Malfoy Manor"], 1, "Azkaban is guarded by Dementors until the Ministry loses control of them during the second war."],
+    ["Which shop in Diagon Alley sells wands?", ["Flourish and Blotts", "Ollivanders", "Quality Quidditch Supplies", "Weasleys' Wizard Wheezes"], 1, "Ollivanders is where Harry buys his wand, and where the twin cores of his and Voldemort's wands are first noticed."],
+    ["What is the name of Ron Weasley's rat?", ["Scabbers", "Trevor", "Pigwidgeon", "Arnold"], 0, "Scabbers is later revealed to be Peter Pettigrew in his Animagus form, a rat."],
+    ["Dobby is which kind of magical creature?", ["Goblin", "House-elf", "Centaur", "Kreacher's cousin"], 1, "Dobby is a house-elf, first belonging to the Malfoy family, later freed by Harry and eventually killed by Bellatrix."],
+    ["What is the name of the competition held in Harry's fourth year?", ["The Quidditch World Cup", "The Triwizard Tournament", "The Duelling Club", "The O.W.L. Trials"], 1, "The Triwizard Tournament pits one champion from each of three schools against three tasks."],
+    ["How many tasks are in the Triwizard Tournament?", ["Two", "Three", "Four", "Five"], 1, "Three: dragons, the lake, and the maze. The final task is where the Portkey takes Harry to the graveyard."],
+    ["What shape does Harry's Patronus take?", ["A wolf", "An otter", "A stag", "A phoenix"], 2, "Harry's Patronus is a stag, echoing his father James, whose Animagus form was also a stag."],
+    ["What is Voldemort's birth name?", ["Tom Riddle", "Tom Gaunt", "Marvolo Slytherin", "Tom Malfoy"], 0, "Tom Marvolo Riddle rearranged the letters of his name into 'I am Lord Voldemort'."],
+    ["Which house is Draco Malfoy sorted into?", ["Gryffindor", "Slytherin", "Ravenclaw", "Hufflepuff"], 1, "Draco follows his family into Slytherin, the house that produced most of Voldemort's early followers."],
+    ["Which teacher turns out to be a werewolf?", ["Severus Snape", "Remus Lupin", "Alastor Moody", "Gilderoy Lockhart"], 1, "Lupin is a werewolf, which is why he takes Wolfsbane Potion and why he resigns at the end of the third book."],
+    ["What is the final book in the series called?", ["Harry Potter and the Half-Blood Prince", "Harry Potter and the Order of the Phoenix", "Harry Potter and the Deathly Hallows", "Harry Potter and the Goblet of Fire"], 2, "Deathly Hallows was published in 2007 and adapted into two films released in 2010 and 2011."],
+    ["Which actor played Severus Snape in the films?", ["Ralph Fiennes", "Alan Rickman", "Gary Oldman", "Jason Isaacs"], 1, "Alan Rickman played Snape across all eight films, a role he had discussed with J.K. Rowling before filming began."]
+  ],
+  "related": [
+    { "slug": "movies", "label": "Movies", "note": "" },
+    { "slug": "american-literature", "label": "American literature", "note": "" },
+    { "slug": "video-games", "label": "Video games", "note": "" },
+    { "slug": "periodic-table", "label": "Periodic table", "note": "22 questions" }
+  ]
+}

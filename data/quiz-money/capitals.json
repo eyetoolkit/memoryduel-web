@@ -1,0 +1,81 @@
+{
+  "slug": "capitals",
+  "keyword": "world capitals quiz",
+  "hubLabel": "World capitals",
+  "crumb": "World capitals",
+  "eyebrow": "geography quiz",
+  "title": "World Capitals Quiz — 22 Questions on Country Capitals (with Answers)",
+  "h1": "World Capitals Quiz",
+  "desc": "22-question world capitals quiz: the easy ones, the ones that moved, and the capitals that are not the biggest city. Every answer explained on the page.",
+  "about": "Capital cities",
+  "playHeading": "Take the world capitals quiz",
+  "intro": [
+    "Capital cities are a strange category of knowledge: everyone can name Paris and Tokyo, and almost nobody can name Naypyidaw or Ngerulmud without help. The gap between those two ends is where this quiz lives.",
+    "It runs 22 questions, easy to hard, and deliberately includes the capitals that trip people up — the purpose-built ones like Canberra and Brasília, the ones that moved like Astana, and the ones where the biggest city is not the capital at all.",
+    "Each answer comes with the reasoning attached, and the full key is below the quiz. No sign-up, no timer, no regional restrictions — if you are reading this in a country the quiz covers, the capital question still counts."
+  ],
+  "covers": [
+    "The classics: Paris, Tokyo, Ottawa, Canberra, Brasília — the ones you are expected to know.",
+    "The hard end: Naypyidaw, Ulaanbaatar, Ngerulmud, Juba and the capitals of Central Asia.",
+    "Capitals that moved or were renamed, including Kazakhstan's shift from Almaty and its later renamings.",
+    "Records: the highest capital, the smallest by area, the northernmost capital, the one built on fourteen islands.",
+    "Cities identified by their river rather than by their country — the Thames, the Danube, the Nile."
+  ],
+  "coversProse": [
+    "The quiz leans on the two things that make capitals hard: countries that moved theirs, and countries whose capital is a small city chosen for political reasons rather than a large one that grew on its own.",
+    "Roughly half the questions are place-to-capital and half are capital-to-country, because those are separate skills — knowing that Canberra is the capital of Australia does not always survive being asked which country has Canberra as its capital."
+  ],
+  "faq": [
+    [
+      "Which country has three capital cities?",
+      "South Africa. Pretoria is the executive capital, Cape Town is the legislative capital and Bloemfontein is the judicial capital. Bolivia is often described the same way, with Sucre as the constitutional capital and La Paz as the seat of government."
+    ],
+    [
+      "What is the highest capital city in the world?",
+      "La Paz, Bolivia, at roughly 3,600 metres. It is the highest administrative capital; Bolivia's constitutional capital is Sucre, which sits much lower."
+    ],
+    [
+      "Which capital city was moved most recently?",
+      "Kazakhstan has changed its capital city's name twice without moving it. Almaty was replaced by Astana in 1997, the city was renamed Nur-Sultan in 2019, and the name reverted to Astana in 2022."
+    ],
+    [
+      "Why are so many capitals not the largest city in their country?",
+      "Because capitals are chosen for politics, not population. Canberra, Brasília, Ottawa and Washington were all built or designated to keep government away from an established commercial centre, or to settle a rivalry between two regions."
+    ],
+    [
+      "What is the smallest capital city in the world?",
+      "By area, Vatican City. By population, Ngerulmud in Palau has only a few hundred residents, which makes it one of the smallest capitals by population anywhere."
+    ]
+  ],
+  "picks": [
+    "gen_geography_0011",
+    "gen_geography_0025",
+    "gen_geography_0009",
+    "gen_geography_0001",
+    "gen_geography_0005",
+    "gen_geography_0010",
+    "gen_geography_0016",
+    "gen_geography_0054",
+    "gen_geography_0090",
+    "gen_geography_0122",
+    "gen_geography_0128",
+    "gen_geography_0136",
+    "gen_geography_0151",
+    "gen_geography_0167",
+    "gen_geography_0203",
+    "gen_geography_0207",
+    "gen_geography_0216",
+    "gen_geography_0228",
+    "gen_geography_0234",
+    "gen_geography_0239",
+    "gen_geography_0242",
+    "gen_geography_0263"
+  ],
+  "manual": [],
+  "related": [
+    { "slug": "us-states", "label": "US states", "note": "24 questions" },
+    { "slug": "rivers", "label": "Rivers", "note": "" },
+    { "slug": "mountains", "label": "Mountains", "note": "" },
+    { "slug": "africa", "label": "Africa", "note": "" }
+  ]
+}

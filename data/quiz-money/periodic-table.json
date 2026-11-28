@@ -1,0 +1,82 @@
+{
+  "slug": "periodic-table",
+  "keyword": "periodic table quiz",
+  "hubLabel": "Periodic table",
+  "crumb": "Periodic table",
+  "eyebrow": "chemistry quiz",
+  "title": "Periodic Table Quiz — 22 Questions on Elements, Symbols & Groups",
+  "h1": "Periodic Table Quiz",
+  "desc": "22-question periodic table quiz: symbols, atomic numbers, groups and the trends that decide reactivity. Every answer explained, full key on the page.",
+  "about": "The periodic table",
+  "playHeading": "Take the periodic table quiz",
+  "intro": [
+    "The periodic table rewards two different kinds of memory. There is the lookup kind — Fe is iron, Au is gold, atomic number 6 is carbon — and there is the structural kind, where you know why sodium reacts and argon does not, without having to recall a single row of the table.",
+    "This quiz tests both. 22 questions across symbols, atomic numbers, group names and periodic trends, with an explanation after every answer so that a wrong guess turns into a rule rather than a fact.",
+    "The complete answer key is below the quiz, followed by what the 22 questions cover and short answers to the questions that come up most often about the table itself."
+  ],
+  "covers": [
+    "Symbols in both directions: Au to gold, and gold back to Au — including the ones that do not match the English name (Na, K, Fe, Pb, Hg, W).",
+    "Atomic numbers and what they actually count: protons, which define the element.",
+    "Groups and families: noble gases in group 18, alkali metals in group 1, halogens in group 17.",
+    "Periodic trends: electronegativity, melting point and first ionisation energy, and which corner of the table they point towards.",
+    "A handful of structural facts — who published the table, how many periods it has, and which elements are liquid at room temperature."
+  ],
+  "coversProse": [
+    "Half of these questions can be answered by pure recall and half require a rule. That split is deliberate: the table is not a list to memorise but a map with directions, and the questions in the hard lane are the ones where the map matters more than the list.",
+    "Where a question depends on a trend, the explanation names the reason — shielding, nuclear charge, distance from the nucleus — instead of just restating the answer, because the reason is what transfers to the next question."
+  ],
+  "faq": [
+    [
+      "How many elements are in the periodic table?",
+      "118, arranged in seven periods and eighteen groups. Elements 113 to 118 were formally named between 2016 and 2017, which completed the seventh period."
+    ],
+    [
+      "Who created the periodic table?",
+      "Dmitri Mendeleev published the version that became standard in 1869. He ordered the known elements by atomic weight, left gaps for elements not yet discovered, and predicted their properties — several of those predictions were later confirmed."
+    ],
+    [
+      "What is the difference between atomic number and mass number?",
+      "Atomic number is the number of protons in the nucleus and defines which element it is. Mass number is protons plus neutrons, so two atoms of the same element with different mass numbers are isotopes."
+    ],
+    [
+      "Why are noble gases so unreactive?",
+      "Their outer electron shell is full, so they have no energetic reason to gain, lose or share electrons. That is why helium, neon and argon are used where a chemically inert atmosphere is needed."
+    ],
+    [
+      "Which elements are liquid at room temperature?",
+      "Mercury and bromine. Gallium, caesium and francium melt at slightly above room temperature, so they are solid in most rooms but liquid on a warm day."
+    ]
+  ],
+  "picks": [
+    "gen_science_0020",
+    "gen_science_0095",
+    "gen_science_0448",
+    "gen_general_0405",
+    "gen_science_0074",
+    "gen_science_0139",
+    "gen_science_0574",
+    "gen_science_0054",
+    "gen_science_0326",
+    "gen_science_0379",
+    "gen_general_0124",
+    "gen_general_0115",
+    "gen_science_0075",
+    "gen_science_0016",
+    "gen_general_0028",
+    "gen_general_0190",
+    "gen_science_0265"
+  ],
+  "manual": [
+    ["Who published the first widely accepted periodic table, in 1869?", ["Antoine Lavoisier", "Dmitri Mendeleev", "John Dalton", "Ernest Rutherford"], 1, "Mendeleev ordered the known elements by atomic weight and left gaps for elements that had not yet been discovered."],
+    ["Which group of the periodic table contains the alkali metals?", ["Group 1", "Group 2", "Group 17", "Group 18"], 0, "Group 1 starts with lithium, sodium and potassium. All of them have a single outer electron, which is why they react so readily."],
+    ["Which element is liquid at room temperature apart from mercury?", ["Iodine", "Bromine", "Gallium", "Chlorine"], 1, "Bromine is a red-brown liquid at room temperature. Chlorine is a gas and iodine a solid at the same temperature."],
+    ["How many periods does the standard periodic table have?", ["Five", "Six", "Seven", "Eight"], 2, "Seven periods, corresponding to the filling of the electron shells. Period 7 is the one that was completed in 2016."],
+    ["What is the chemical symbol for lead?", ["Ld", "Pb", "Le", "Pl"], 1, "Pb comes from the Latin plumbum, which is also where the word plumbing comes from."]
+  ],
+  "related": [
+    { "slug": "chemistry", "label": "Chemistry", "note": "" },
+    { "slug": "physics", "label": "Physics", "note": "" },
+    { "slug": "biology", "label": "Biology", "note": "" },
+    { "slug": "human-body", "label": "Human body", "note": "22 questions" }
+  ]
+}

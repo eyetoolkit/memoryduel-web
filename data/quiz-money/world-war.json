@@ -1,0 +1,317 @@
+{
+  "slug": "world-war",
+  "keyword": "World War 2 quiz",
+  "hubLabel": "World War II",
+  "crumb": "World War II",
+  "eyebrow": "history quiz",
+  "title": "World War 2 Quiz — 22 Questions on Battles, Dates & Leaders (with Answers)",
+  "h1": "World War 2 Quiz",
+  "desc": "22-question World War II quiz: the dates, the turning-point battles, the leaders and the code names. Every answer explained, full answer key on the page.",
+  "about": "World War II",
+  "playHeading": "Take the World War 2 quiz",
+  "intro": [
+    "World War II is the most heavily documented event in modern history, which makes it easy to recognise and surprisingly hard to date precisely. Most people know 1945 and D-Day; far fewer can place Midway, Stalingrad or the Potsdam Conference on a timeline without stopping to think.",
+    "This quiz has 22 questions drawn from both theatres — European and Pacific — with an emphasis on the moments that changed the direction of the war rather than on troop counts nobody can remember.",
+    "Every answer carries a one-line explanation with the year attached, so the answer key doubles as a compressed timeline. It sits directly below the quiz."
+  ],
+  "covers": [
+    "The timeline: 1939 in Poland, 1940 over Britain, 1941 at Pearl Harbor, 1944 in Normandy, 1945 at Potsdam.",
+    "Turning points: Stalingrad on the Eastern Front, Midway in the Pacific, and why historians single those two out.",
+    "The leaders: Hitler, Churchill, Roosevelt, Stalin, and which of them changed sides during the war.",
+    "Code names and organisations: Operation Overlord, the Luftwaffe, the Gestapo, the Manhattan Project.",
+    "The end of the war: the two atomic bombings, the surrender of Germany and Japan, and the occupation of Germany."
+  ],
+  "coversProse": [
+    "The questions are split roughly two to one between the European and Pacific theatres, which matches how the war is taught in most English-language schools — but the Pacific questions are not an afterthought, because Midway and the island campaign decide several of the harder items.",
+    "Nothing here depends on memorising casualty figures. Where a number matters, it is a date, and the explanation gives the context that makes the date stick."
+  ],
+  "faq": [
+    [
+      "When did World War II start and end?",
+      "In Europe it began on 1 September 1939 with the German invasion of Poland and ended on 8 May 1945 with Germany's surrender. In the Pacific it ended on 2 September 1945, after the atomic bombings of Hiroshima and Nagasaki and Japan's surrender."
+    ],
+    [
+      "When did the United States enter the war?",
+      "On 8 December 1941, the day after Japan attacked Pearl Harbor. The United States declared war on Japan that day, and Germany declared war on the United States four days later."
+    ],
+    [
+      "Which countries were the Axis powers?",
+      "Germany, Italy and Japan were the three principal Axis powers. Hungary, Romania, Bulgaria and several others joined or were absorbed into the Axis at various points."
+    ],
+    [
+      "Why was Stalingrad a turning point?",
+      "The encirclement and surrender of the German Sixth Army in early 1943 ended any realistic chance of Germany defeating the Soviet Union, and from then on the Eastern Front moved westwards almost continuously."
+    ],
+    [
+      "How is this quiz different from a World War I quiz?",
+      "It covers only 1939 to 1945. Questions about the Treaty of Versailles, the Central Powers or the 1914 assassination in Sarajevo belong to the First World War and are deliberately excluded here."
+    ]
+  ],
+  "picks": [],
+  "manual": [
+    [
+      "In which year did the Second World War begin in Europe?",
+      [
+        "1937",
+        "1938",
+        "1939",
+        "1941"
+      ],
+      2,
+      "Germany invaded Poland on 1 September 1939, and Britain and France declared war two days later."
+    ],
+    [
+      "The German invasion of which country triggered Britain's declaration of war?",
+      [
+        "France",
+        "Poland",
+        "Belgium",
+        "Czechoslovakia"
+      ],
+      1,
+      "Britain and France had guaranteed Polish independence, so the invasion on 1 September 1939 forced their hand."
+    ],
+    [
+      "In which year did Japan attack Pearl Harbor?",
+      [
+        "1939",
+        "1940",
+        "1941",
+        "1942"
+      ],
+      2,
+      "The attack came on 7 December 1941 and brought the United States into the war the following day."
+    ],
+    [
+      "On which date did the D-Day landings take place?",
+      [
+        "6 June 1944",
+        "6 June 1943",
+        "11 November 1944",
+        "1 May 1945"
+      ],
+      0,
+      "The Normandy landings on 6 June 1944 were the largest seaborne invasion in history and opened the Western Front."
+    ],
+    [
+      "Who was the leader of Nazi Germany during the war?",
+      [
+        "Joseph Goebbels",
+        "Adolf Hitler",
+        "Hermann Göring",
+        "Heinrich Himmler"
+      ],
+      1,
+      "Hitler was chancellor from 1933 and took the title of Führer in 1934, holding both offices until his suicide in 1945."
+    ],
+    [
+      "Who was British prime minister for most of the war?",
+      [
+        "Neville Chamberlain",
+        "Winston Churchill",
+        "Clement Attlee",
+        "Anthony Eden"
+      ],
+      1,
+      "Churchill became prime minister in May 1940 and led the country until July 1945, when Attlee replaced him before the war in the Pacific ended."
+    ],
+    [
+      "Which battle is usually called the turning point of the Eastern Front?",
+      [
+        "Kursk",
+        "Stalingrad",
+        "Moscow",
+        "Berlin"
+      ],
+      1,
+      "The German Sixth Army surrendered at Stalingrad in February 1943, after being encircled through the winter."
+    ],
+    [
+      "Which two Japanese cities were struck by atomic bombs?",
+      [
+        "Tokyo and Osaka",
+        "Hiroshima and Nagasaki",
+        "Kyoto and Nagasaki",
+        "Hiroshima and Osaka"
+      ],
+      1,
+      "Hiroshima was bombed on 6 August 1945 and Nagasaki on 9 August 1945, six days before Japan announced its surrender."
+    ],
+    [
+      "In which year did the Second World War end?",
+      [
+        "1943",
+        "1944",
+        "1945",
+        "1946"
+      ],
+      2,
+      "Germany surrendered in May 1945 and Japan in September 1945, ending the war in both theatres."
+    ],
+    [
+      "What was the code name for the Allied invasion of Normandy?",
+      [
+        "Operation Torch",
+        "Operation Overlord",
+        "Operation Market Garden",
+        "Operation Barbarossa"
+      ],
+      1,
+      "Overlord was the invasion plan itself; the naval and airborne assault phase on 6 June was code-named Neptune."
+    ],
+    [
+      "What was the German air force called?",
+      [
+        "Wehrmacht",
+        "Luftwaffe",
+        "Kriegsmarine",
+        "Waffen-SS"
+      ],
+      1,
+      "The Luftwaffe was the air branch, while the Wehrmacht was the armed forces as a whole and the Kriegsmarine the navy."
+    ],
+    [
+      "Who was US president for most of the Second World War?",
+      [
+        "Herbert Hoover",
+        "Franklin D. Roosevelt",
+        "Harry Truman",
+        "Dwight Eisenhower"
+      ],
+      1,
+      "Roosevelt led the country from 1933 until his death in April 1945, three weeks before Germany surrendered. Truman then took over."
+    ],
+    [
+      "Which three countries formed the core of the Axis alliance?",
+      [
+        "Germany, Italy, Japan",
+        "Germany, Austria, Italy",
+        "Germany, Japan, Spain",
+        "Italy, Japan, Hungary"
+      ],
+      0,
+      "The Tripartite Pact of September 1940 formalised the alliance between Germany, Italy and Japan."
+    ],
+    [
+      "In which year was the Battle of Britain fought?",
+      [
+        "1939",
+        "1940",
+        "1941",
+        "1942"
+      ],
+      1,
+      "The air campaign ran from July to October 1940, and its failure persuaded Germany to abandon plans to invade Britain."
+    ],
+    [
+      "What was the name of the Nazi secret police?",
+      [
+        "Gestapo",
+        "Stasi",
+        "KGB",
+        "SS-Reichssicherheitshauptamt"
+      ],
+      0,
+      "The Gestapo was the secret state police, formed in 1933 and run from 1936 by Heinrich Himmler."
+    ],
+    [
+      "Which 1945 conference divided Germany into occupation zones?",
+      [
+        "Yalta",
+        "Potsdam",
+        "Tehran",
+        "Casablanca"
+      ],
+      1,
+      "Potsdam, held in July and August 1945, settled the occupation zones and the treatment of postwar Germany."
+    ],
+    [
+      "Which 1942 battle is considered the turning point in the Pacific?",
+      [
+        "Midway",
+        "Guadalcanal",
+        "Iwo Jima",
+        "Okinawa"
+      ],
+      0,
+      "At Midway in June 1942 the Japanese lost four fleet carriers, which ended their ability to take the offensive in the Pacific."
+    ],
+    [
+      "What was the systematic murder of European Jews by Nazi Germany called?",
+      [
+        "The Great Purge",
+        "The Holocaust",
+        "The Terror",
+        "The Final Solution of 1943"
+      ],
+      1,
+      "The Holocaust killed roughly six million Jews, along with millions of Roma, disabled people and others the regime classified as undesirable."
+    ],
+    [
+      "Which city was besieged for nearly 900 days during the war?",
+      [
+        "Moscow",
+        "Leningrad",
+        "Sevastopol",
+        "Kiev"
+      ],
+      1,
+      "The siege of Leningrad lasted from September 1941 to January 1944, and the civilian death toll was in the hundreds of thousands."
+    ],
+    [
+      "In which year did Italy surrender to the Allies?",
+      [
+        "1941",
+        "1942",
+        "1943",
+        "1944"
+      ],
+      2,
+      "Italy announced an armistice in September 1943, after the Allied landings in Sicily. Germany then occupied northern Italy and fought on."
+    ],
+    [
+      "Which country did Germany invade in June 1941, opening the Eastern Front?",
+      [
+        "France",
+        "The Soviet Union",
+        "Greece",
+        "Yugoslavia"
+      ],
+      1,
+      "Operation Barbarossa began on 22 June 1941 and eventually involved more troops than any other theatre of the war."
+    ],
+    [
+      "What was the Allied programme to build an atomic bomb called?",
+      [
+        "The Manhattan Project",
+        "Operation Alsos",
+        "The Tube Alloys Group",
+        "Project Trinity"
+      ],
+      0,
+      "The Manhattan Project ran from 1942 and produced the weapons used at Hiroshima and Nagasaki. Trinity was the name of the first test."
+    ]
+  ],
+  "related": [
+    {
+      "slug": "us-presidents",
+      "label": "US presidents",
+      "note": "20 questions"
+    },
+    {
+      "slug": "us-states",
+      "label": "US states",
+      "note": "24 questions"
+    },
+    {
+      "slug": "ancient-history",
+      "label": "Ancient history",
+      "note": ""
+    },
+    {
+      "slug": "periodic-table",
+      "label": "Periodic table",
+      "note": ""
+    }
+  ]
+}

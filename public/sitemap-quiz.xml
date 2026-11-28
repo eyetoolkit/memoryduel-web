@@ -42,7 +42,6 @@
   <url><loc>https://www.memoryduel.com/quiz/africa/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-11-28</lastmod></url>
   <url><loc>https://www.memoryduel.com/quiz/software/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-11-28</lastmod></url>
   <url><loc>https://www.memoryduel.com/quiz/japan/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-11-28</lastmod></url>
-  <url><loc>https://www.memoryduel.com/quiz/capitals/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-11-28</lastmod></url>
   <url><loc>https://www.memoryduel.com/quiz/plants/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-11-28</lastmod></url>
   <url><loc>https://www.memoryduel.com/quiz/ancient-history/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-11-28</lastmod></url>
   <url><loc>https://www.memoryduel.com/quiz/albums/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-11-28</lastmod></url>
@@ -89,8 +88,6 @@
   <url><loc>https://www.memoryduel.com/quiz/geology/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-11-28</lastmod></url>
   <url><loc>https://www.memoryduel.com/quiz/insects/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-11-28</lastmod></url>
   <url><loc>https://www.memoryduel.com/quiz/sculpture/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-11-28</lastmod></url>
-  <url><loc>https://www.memoryduel.com/quiz/periodic-table/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-11-28</lastmod></url>
-  <url><loc>https://www.memoryduel.com/quiz/world-war/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-11-28</lastmod></url>
   <url><loc>https://www.memoryduel.com/quiz/solar-system/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-11-28</lastmod></url>
   <url><loc>https://www.memoryduel.com/quiz/formula-1/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-11-28</lastmod></url>
   <url><loc>https://www.memoryduel.com/quiz/opera/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-11-28</lastmod></url>
@@ -131,7 +128,6 @@
   <url><loc>https://www.memoryduel.com/quiz/marine-biology/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-11-28</lastmod></url>
   <url><loc>https://www.memoryduel.com/quiz/battle-royale/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-11-28</lastmod></url>
   <url><loc>https://www.memoryduel.com/quiz/american-literature/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-11-28</lastmod></url>
-  <url><loc>https://www.memoryduel.com/quiz/human-body/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-11-28</lastmod></url>
   <url><loc>https://www.memoryduel.com/quiz/world-cup/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-11-28</lastmod></url>
   <url><loc>https://www.memoryduel.com/quiz/modern-art/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-11-28</lastmod></url>
   <url><loc>https://www.memoryduel.com/quiz/grand-slam/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-11-28</lastmod></url>
@@ -163,4 +159,12 @@
   <url><loc>https://www.memoryduel.com/quiz/poker/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-11-28</lastmod></url>
   <url><loc>https://www.memoryduel.com/quiz/birds/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-11-28</lastmod></url>
   <url><loc>https://www.memoryduel.com/quiz/trees/</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-11-28</lastmod></url>
+  <url><loc>https://www.memoryduel.com/quiz/capitals/</loc><changefreq>monthly</changefreq><priority>0.8</priority><lastmod>2026-11-28</lastmod></url>
+  <url><loc>https://www.memoryduel.com/quiz/food/</loc><changefreq>monthly</changefreq><priority>0.8</priority><lastmod>2026-11-28</lastmod></url>
+  <url><loc>https://www.memoryduel.com/quiz/harry-potter/</loc><changefreq>monthly</changefreq><priority>0.8</priority><lastmod>2026-11-28</lastmod></url>
+  <url><loc>https://www.memoryduel.com/quiz/human-body/</loc><changefreq>monthly</changefreq><priority>0.8</priority><lastmod>2026-11-28</lastmod></url>
+  <url><loc>https://www.memoryduel.com/quiz/periodic-table/</loc><changefreq>monthly</changefreq><priority>0.8</priority><lastmod>2026-11-28</lastmod></url>
+  <url><loc>https://www.memoryduel.com/quiz/us-presidents/</loc><changefreq>monthly</changefreq><priority>0.8</priority><lastmod>2026-11-28</lastmod></url>
+  <url><loc>https://www.memoryduel.com/quiz/us-states/</loc><changefreq>monthly</changefreq><priority>0.8</priority><lastmod>2026-11-28</lastmod></url>
+  <url><loc>https://www.memoryduel.com/quiz/world-war/</loc><changefreq>monthly</changefreq><priority>0.8</priority><lastmod>2026-11-28</lastmod></url>
 </urlset>

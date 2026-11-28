@@ -1,0 +1,82 @@
+{
+  "slug": "food",
+  "keyword": "food quiz",
+  "hubLabel": "Food",
+  "crumb": "Food",
+  "eyebrow": "food & culture quiz",
+  "title": "Food Quiz — 22 Questions on Ingredients, Origins & Food Facts",
+  "h1": "Food Quiz",
+  "desc": "22-question food quiz on ingredients, national dishes and the facts behind them: what guacamole is made of, where pizza comes from, which spice costs most.",
+  "about": "Food and cooking",
+  "playHeading": "Take the food quiz",
+  "intro": [
+    "Food trivia splits neatly in two: the questions about what a dish is made of, which you either know or do not, and the questions about where it came from, which are usually more surprising than people expect.",
+    "This quiz has 22 questions across both — ingredients, national dishes, festivals built around eating, and a few production facts that get quoted wrong more often than right.",
+    "Every answer is explained, the full key sits under the quiz, and there is no sign-up. The questions are about food in general rather than any one cuisine, so expect the spread to jump from Mexico to Japan to Ethiopia."
+  ],
+  "covers": [
+    "Ingredients: what guacamole, hummus, miso soup and pesto are actually made from.",
+    "Origins: where pizza, tea, the Dragon Boat Festival and the King Cake come from.",
+    "Festival food: mooncakes, latkes, pan de muerto and the coin hidden in a Christmas pudding.",
+    "Production and consumption: the most produced grain, the largest coffee producer, the country that eats the most chocolate per person.",
+    "The expensive end: the spice that costs more by weight than most metals."
+  ],
+  "coversProse": [
+    "Most food quizzes drift towards either a single cuisine or a list of brand names. This one deliberately stays on things that are stable — a dish's ingredients and the country it is associated with do not change, whereas which chain sells the most burgers does.",
+    "Where a fact is commonly repeated incorrectly, the explanation says so. The most-produced grain and the most-eaten staple are different answers, for instance, and the quiz asks for the distinction rather than the headline."
+  ],
+  "faq": [
+    [
+      "What is the most consumed food in the world?",
+      "Rice is the most widely consumed staple food by number of people who depend on it daily. Maize is the most produced grain by weight, but a large share of it goes to animal feed and fuel rather than directly to plates."
+    ],
+    [
+      "Which spice is the most expensive in the world?",
+      "Saffron, by a wide margin. It is hand-harvested from crocus flowers and it takes roughly 150,000 flowers to produce a single kilogram."
+    ],
+    [
+      "Is a tomato a fruit or a vegetable?",
+      "Botanically a fruit, because it develops from the flower and contains seeds. In cooking and in US tariff law it has been treated as a vegetable, which is where the confusion comes from."
+    ],
+    [
+      "Which country invented pizza?",
+      "Italy, and specifically Naples, where the modern flatbread with tomato was sold to working people in the eighteenth and nineteenth centuries. The Margherita version is named after a queen of Italy."
+    ],
+    [
+      "Why does this quiz mix cuisines?",
+      "Because the questions are about food as a subject rather than about one tradition. A quiz that only asks about Italian food tests whether you have eaten in Italy, not whether you know how food works."
+    ]
+  ],
+  "picks": [
+    "gen_general_0092",
+    "gen_general_0370",
+    "gen_general_0387",
+    "gen_general_0574",
+    "gen_general_0622",
+    "gen_general_0278",
+    "gen_general_0063",
+    "gen_general_0339",
+    "gen_general_0269",
+    "gen_general_en_690d67bf29ebc9f604c7",
+    "gen_culture_en_a1af5884b5297ed79419",
+    "gen_culture_en_d96dfef507405eef56bf",
+    "gen_culture_en_af81c0277e2c2d64da85",
+    "gen_general_en_22431ac5974469e93350",
+    "gen_culture_en_de58057a3d193ddef54d",
+    "gen_culture_en_e91db960a404ed0e5521",
+    "gen_culture_0012"
+  ],
+  "manual": [
+    ["Which spice is the most expensive in the world by weight?", ["Vanilla", "Saffron", "Cardamom", "Cinnamon"], 1, "Saffron is harvested by hand from crocus flowers, and roughly 150,000 flowers are needed for one kilogram of the dried spice."],
+    ["What is the main herb in traditional Italian pesto?", ["Parsley", "Basil", "Oregano", "Rosemary"], 1, "Pesto alla genovese is built on basil, pine nuts, garlic, Parmesan and olive oil, pounded together rather than cooked."],
+    ["Which cheese is traditionally used on a pizza Margherita?", ["Parmesan", "Mozzarella", "Gorgonzola", "Pecorino"], 1, "Mozzarella, ideally the fresh buffalo version, along with tomato and basil — the three colours of the Italian flag."],
+    ["Marzipan is made primarily from which nut?", ["Walnut", "Hazelnut", "Almond", "Cashew"], 2, "Marzipan is ground almonds and sugar. The ratio decides whether it is used for shaping or for eating."],
+    ["Tofu is made from which ingredient?", ["Rice", "Soybeans", "Wheat", "Chickpeas"], 1, "Tofu is curdled soy milk, pressed into blocks. The process is close to cheesemaking, which is why the texture varies with how hard it is pressed."]
+  ],
+  "related": [
+    { "slug": "human-body", "label": "Human body", "note": "22 questions" },
+    { "slug": "biology", "label": "Biology", "note": "" },
+    { "slug": "plants", "label": "Plants", "note": "" },
+    { "slug": "capitals", "label": "World capitals", "note": "" }
+  ]
+}

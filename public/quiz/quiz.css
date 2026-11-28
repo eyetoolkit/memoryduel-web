@@ -416,3 +416,80 @@ a:hover { text-decoration: underline; }
 @media (prefers-reduced-motion: reduce) {
   .qz-opt, .qz-btn, .qz-bar > i { transition: none; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   2026-11-28 · 商业意图页（/quiz/<slug>/ 的「精选版」）专用
+   --------------------------------------------------------------
+   这些页比主题页长：多了 jump 导航、覆盖范围清单、FAQ。
+   · 只加不删，主题页不受影响；
+   · 颜色全部走 tokens 变量，暗色自动翻转；
+   · FAQ 用 <dl>，不依赖 JS —— 抓取和读屏都是同一份内容。
+   ══════════════════════════════════════════════════════════════ */
+
+.qz-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.qz-jump a {
+  display: inline-block;
+  padding: 7px 13px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text, #0f172a);
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e4e8ee);
+  border-radius: 999px;
+  text-decoration: none;
+}
+.qz-jump a:hover { border-color: var(--brand, #4f46e5); text-decoration: none; }
+
+.qz-covers {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+.qz-covers li {
+  position: relative;
+  padding-left: 22px;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--text, #0f172a);
+}
+.qz-covers li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0.62em;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--brand, #4f46e5);
+  opacity: 0.75;
+}
+
+.qz-faq { margin: 6px 0 0; }
+.qz-faq dt {
+  margin-top: 16px;
+  font-size: 15px;
+  font-weight: 650;
+  color: var(--text, #0f172a);
+}
+.qz-faq dd {
+  margin: 6px 0 0;
+  font-size: 14.5px;
+  line-height: 1.62;
+  color: var(--text-muted, #5b6b7f);
+}
+.qz-faq dt:first-child { margin-top: 0; }
+
+.qz-meta {
+  margin: 14px 0 0;
+  font-size: 12.5px;
+  color: var(--text-muted, #5b6b7f);
+}

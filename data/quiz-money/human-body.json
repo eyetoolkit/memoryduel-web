@@ -1,0 +1,82 @@
+{
+  "slug": "human-body",
+  "keyword": "human body quiz",
+  "hubLabel": "Human body",
+  "crumb": "Human body",
+  "eyebrow": "biology quiz",
+  "title": "Human Body Quiz — 22 Questions on Organs, Bones & Blood",
+  "h1": "Human Body Quiz",
+  "desc": "22-question human body quiz covering organs, bones, blood types and the records that make anatomy memorable. Every answer explained on the page.",
+  "about": "Human anatomy",
+  "playHeading": "Take the human body quiz",
+  "intro": [
+    "Human anatomy is taught badly more often than it is taught well: the parts get memorised and the numbers get muddled. How many bones does an adult have? Most people say 206 and then hesitate when asked how many a newborn has.",
+    "This quiz has 22 questions on the body as a working system — organs, bones, blood, and the small set of numbers that are worth actually knowing. Every answer is explained, so a wrong guess is corrected with a reason rather than a red cross.",
+    "It runs easy to hard with no sign-up and no timer. The full answer key is directly below the quiz."
+  ],
+  "covers": [
+    "Organs and what they do: the liver's regeneration, the kidney's filtering, the pancreas and insulin, the lungs and water content.",
+    "Bones: 206 in an adult, around 270 at birth, and the smallest one in the body.",
+    "Blood: the most common type, the universal donor, and the rare type nicknamed golden blood.",
+    "Nerves and senses: the longest nerve, and the parts of the body with the densest supply of sweat glands.",
+    "Everyday numbers: how many teeth an adult has, how many chambers the heart has, and the normal resting heart rate."
+  ],
+  "coversProse": [
+    "The questions favour things you can check against your own body — teeth, resting pulse, the bone that is hardest to break — because those are the facts that survive without revision. Pure nomenclature is kept to a minimum; there is no question that asks you to name a muscle in Latin.",
+    "Two of the harder items are about records rather than structure, and both are flagged in the explanation as trivia: interesting, but not something a biology exam would ask for."
+  ],
+  "faq": [
+    [
+      "What is the largest organ in the human body?",
+      "The skin. It covers roughly two square metres in an adult and accounts for about 15 percent of body weight, which makes it both the largest organ by area and one of the heaviest."
+    ],
+    [
+      "How many bones are in the human body?",
+      "206 in a typical adult. Babies are born with around 270, and the count falls because some bones fuse during growth — the skull and the pelvis are the clearest examples."
+    ],
+    [
+      "What is the smallest bone in the human body?",
+      "The stapes, in the middle ear. It is about three millimetres long and transmits sound vibrations from the eardrum to the inner ear."
+    ],
+    [
+      "Which organ can regenerate itself?",
+      "The liver. It can regrow a substantial part of itself after surgery or injury, which is why living-donor liver transplants are possible."
+    ],
+    [
+      "Which blood type is the universal donor?",
+      "O negative. It carries neither A nor B antigens nor the RhD antigen, so it can be given to patients of any blood type in an emergency."
+    ]
+  ],
+  "picks": [
+    "gen_general_0001",
+    "gen_general_622692_2",
+    "gen_general_0772",
+    "gen_general_0113",
+    "gen_general_0283",
+    "gen_general_0349",
+    "gen_general_0466",
+    "gen_general_0555",
+    "gen_general_0781",
+    "gen_general_0142",
+    "gen_general_en_365e85b29fd971f2ac38",
+    "gen_science_en_058aac94b05fd8fc1589",
+    "gen_science_en_4a06ac9276d53d765eb1",
+    "gen_science_en_44ff98ab42659fa49f34",
+    "gen_general_en_2909521289d0d1afc1d0",
+    "gen_science_en_7d2d40c638b334377836",
+    "gen_science_443974_7",
+    "gen_science_0013"
+  ],
+  "manual": [
+    ["How many chambers does the human heart have?", ["Two", "Three", "Four", "Five"], 2, "Four: two atria on top and two ventricles below. The right side pumps to the lungs, the left side to the rest of the body."],
+    ["What is the longest bone in the human body?", ["Tibia", "Femur", "Humerus", "Fibula"], 1, "The femur, or thigh bone, is roughly a quarter of a person's height and is also the strongest bone in the body."],
+    ["Which part of the brain controls balance and coordination?", ["Cerebrum", "Cerebellum", "Medulla", "Hypothalamus"], 1, "The cerebellum sits at the back of the brain and fine-tunes movement, posture and balance."],
+    ["Which vitamin does the skin produce when exposed to sunlight?", ["Vitamin A", "Vitamin B12", "Vitamin C", "Vitamin D"], 3, "Ultraviolet light lets the skin synthesise vitamin D, which is why short daily sun exposure matters for bone health."]
+  ],
+  "related": [
+    { "slug": "anatomy", "label": "Anatomy", "note": "" },
+    { "slug": "biology", "label": "Biology", "note": "" },
+    { "slug": "food", "label": "Food", "note": "22 questions" },
+    { "slug": "periodic-table", "label": "Periodic table", "note": "" }
+  ]
+}
