@@ -195,6 +195,21 @@
     color:#fff;background:var(--md-brand,var(--brand,#4F46E5));border-radius:999px;padding:8px 15px;white-space:nowrap}
   .ar-daily-cta.done{background:transparent;color:var(--md-text-muted,var(--text-muted));border:1px solid var(--md-border,#E3E5EE)}
   @media (max-width:560px){ .ar-daily-cta{width:100%;justify-content:center} }
+
+  /* ── 主题题库入口（2026-11-28）───────────────────────────────
+     同 .ar-daily 的处理：内联在本页，不往 home-arena.css 加块
+     （那个文件三站共用，为首页一处区块去改全局皮肤风险大于收益）。
+     不设 background，靠 border + inherit 取色，暗色主题自动跟随。 */
+  .qz-entry{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:10px;margin:16px 0 12px}
+  .qz-entry-card{display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:12px 15px;border:1px solid var(--md-border,#E3E5EE);border-radius:12px;
+    font-weight:700;font-size:14.5px;color:inherit;
+    transition:border-color .15s,transform .15s}
+  .qz-entry-card:hover{border-color:var(--md-brand,var(--brand,#4F46E5));transform:translateY(-1px)}
+  .qz-entry-card::after{content:"\2192";color:var(--md-brand,var(--brand,#4F46E5));font-weight:700}
+  .qz-entry-all{display:inline-block;font-size:13.5px;font-weight:700;
+    color:var(--md-brand,var(--brand,#4F46E5))}
+  @media (max-width:560px){ .qz-entry{grid-template-columns:1fr 1fr} .qz-entry-card{font-size:13.5px;padding:11px 12px} }
 </style>
 <section class="ar-daily" id="daily" aria-label="Daily challenge">
   <a class="ar-daily-in" href="/daily/" id="arDaily">
@@ -235,6 +250,32 @@
       <p data-i18n="home_v2.step3_d">Beat the clock and your rival. Climb the ladder, earn badges.</p>
     </article>
   </div>
+</section>
+
+<!-- ═══════ 主题题库入口（2026-11-28）═══════════════════════════
+     为什么加在首页：162 个 /quiz/ 页面此前只有 sitemap 一条发现路径，
+     站内一个入口都没有。首页是全站被抓取最勤的页面，这里给一条真实
+     内链，比在 sitemap 里多写 162 行有效得多。
+     🔴 这一块刻意不加 data-i18n：题库页本身只有英文，六语种共用这块
+        会误导用户点进去看到纯英文。等题库做多语言再来接 i18n。
+     🔴 八个主题是固定的：不要在构建时读 CSV 动态生成 —— 首页是 Vite
+        入口，构建期读外部文件会让 CI 与本地产物不一致。 -->
+<section class="ar-section wrap" id="quizzes" aria-label="Topic quizzes">
+  <div class="ar-sec-head">
+    <h2>Practice by topic.</h2>
+    <p class="ar-sec-sub">Topic quizzes with the answers written out — fifteen questions each, drawn from the same 53,000-question bank. Play one, read the answer key, then take it back into a duel. Currently English only.</p>
+  </div>
+  <div class="qz-entry">
+    <a class="qz-entry-card" href="/quiz/movies/">Movies</a>
+    <a class="qz-entry-card" href="/quiz/video-games/">Video games</a>
+    <a class="qz-entry-card" href="/quiz/board-games/">Board games</a>
+    <a class="qz-entry-card" href="/quiz/chess/">Chess</a>
+    <a class="qz-entry-card" href="/quiz/biology/">Biology</a>
+    <a class="qz-entry-card" href="/quiz/periodic-table/">Periodic table</a>
+    <a class="qz-entry-card" href="/quiz/world-war/">World War</a>
+    <a class="qz-entry-card" href="/quiz/capitals/">Capitals</a>
+  </div>
+  <a class="qz-entry-all" href="/quiz/">Browse all 162 quizzes &rarr;</a>
 </section>
 
 <!-- P1-13 · 三模式区块已移除（2026-11-24）
@@ -300,7 +341,7 @@
       <a class="cur" href="https://www.memoryduel.com"><span class="pip" style="background:#4F46E5"></span>MemoryDuel</a>
     </div>
     <div class="foot-links">
-      <a href="/about/" data-i18n="nav.about">About</a><a href="/teacher/" data-i18n="nav.teacher">Teachers</a><a href="/contact/" data-i18n="nav.contact">Contact</a><a href="/privacy/" data-i18n="nav.privacy">Privacy</a><a href="/terms/" data-i18n="nav.terms">Terms</a><a href="/how-to-play/memory-match/" data-i18n="home_v2.nav_how">How to play</a>
+      <a href="/about/" data-i18n="nav.about">About</a><a href="/quiz/">Quizzes</a><a href="/teacher/" data-i18n="nav.teacher">Teachers</a><a href="/contact/" data-i18n="nav.contact">Contact</a><a href="/privacy/" data-i18n="nav.privacy">Privacy</a><a href="/terms/" data-i18n="nav.terms">Terms</a><a href="/how-to-play/memory-match/" data-i18n="home_v2.nav_how">How to play</a>
     </div>
   </div>
   <div class="copy" data-i18n="home_v2.footer_copy">© 2026 MemoryDuel · Explore the Duel family</div>
