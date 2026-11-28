@@ -11,7 +11,7 @@
   "playHeading": "Take the sports quiz",
   "intro": [
     "Sports knowledge is oddly uneven. People who watch every weekend can be certain that a cricket side has eleven players and entirely unsure how many points a touchdown is worth, because they only ever see the number after it has been added up.",
-    "This quiz goes after exactly that layer — the rules and measurements that sit underneath the games. Team sizes, scoring values, distances, and the four venues where a particular sport is essentially defined. Twenty questions, each explained, so a wrong answer tells you why the number is what it is.",
+    "This quiz goes after exactly that layer — the rules and measurements that sit underneath the games. Team sizes, scoring values, distances, and the venues where a particular sport is essentially defined. Twenty questions, each explained, so a wrong answer tells you why the number is what it is.",
     "The full answer key is below the quiz, followed by what the twenty questions cover and short answers to the sports questions people search for most."
   ],
   "covers": [
@@ -40,7 +40,7 @@
     ],
     [
       "Why is zero called love in tennis?",
-      "Most likely from the French 'l'oeuf', meaning egg, for the shape of a zero. The alternative story, that it comes from 'love' as playing for love, has no evidence behind it."
+      "Usually explained as coming from the French 'l'oeuf', meaning egg, for the shape of a zero, though the etymology is not settled. The alternative story, that it comes from playing for love, has no evidence behind it."
     ],
     [
       "What is the maximum break in snooker?",

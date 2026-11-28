@@ -6,7 +6,7 @@
   "eyebrow": "world geography quiz",
   "title": "Countries of the World Quiz — 20 Questions with Answers",
   "h1": "Countries of the World Quiz",
-  "desc": "20-question countries of the world quiz: the biggest, the smallest, the ones with no rivers and the ones with two continents. Every answer explained, full key on the page.",
+  "desc": "20-question countries of the world quiz: the biggest, the smallest, the ones with no rivers and the city that sits on two continents. Every answer explained, full key on the page.",
   "about": "Countries of the world",
   "playHeading": "Take the countries quiz",
   "intro": [
@@ -65,7 +65,7 @@
     ["Which country is often called the Land of the Rising Sun?", ["China", "Korea", "Japan", "Vietnam"], 2, "Japan's name, Nihon, literally means origin of the sun — the direction China lies from Japan's perspective at the eastern edge of Asia."],
     ["Which country has the largest population in Africa?", ["Egypt", "Ethiopia", "Nigeria", "South Africa"], 2, "Nigeria passed Egypt as Africa's most populous country and is now well over 200 million people."],
     ["Which small country sits in the Pyrenees between France and Spain?", ["Andorra", "Liechtenstein", "San Marino", "Monaco"], 0, "Andorra is a co-principality of about 468 square kilometres, bordered only by France and Spain."],
-    ["Which country has the most UNESCO World Heritage sites?", ["China", "Italy", "Spain", "France"], 1, "Italy and China have traded the top spot for years and sit within a site or two of each other, with Italy usually ahead."],
+    ["Which country has the most UNESCO World Heritage sites?", ["China", "Italy", "Spain", "France"], 1, "Italy leads with 61 sites to China's 60 as of 2025, a gap of one. The two have swapped the top spot more than once, so the margin is worth rechecking rather than memorising."],
     ["Which country's administrative capital is the highest in the world?", ["Peru", "Bolivia", "Ecuador", "Nepal"], 1, "La Paz sits at roughly 3,600 metres. Bolivia's constitutional capital is Sucre; La Paz is the seat of government."],
     ["Which city sits on two continents, joined by a bridge over the Bosphorus?", ["Istanbul", "Cairo", "Athens", "Moscow"], 0, "Istanbul has districts in both Europe and Asia, and the Bosphorus strait between them is the continental divide."]
   ],
