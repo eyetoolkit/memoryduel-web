@@ -128,6 +128,10 @@
 
   function finish() {
     host.innerHTML = '';
+    /* 清掉上一题的闭包引用：否则结算页按数字键/回车会调到已经卸载的
+       按钮上，分数被凭空改掉而界面毫无反应。 */
+    host._pick = null;
+    host._next = null;
     var pct = Math.round((score / QS.length) * 100);
     var box = el('div', 'qz-result');
 
